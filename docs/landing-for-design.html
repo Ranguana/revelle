@@ -1,0 +1,612 @@
+<!--
+REVELLE SOCIÉTÉ — landing page, for art direction
+
+WHAT IT IS
+"A creative director for your social life." Customer brings an occasion
+(birthday, girls weekend, dinner, getaway). Revelle returns a creative
+WORLD — not a theme — plus everything to execute it herself: the arrival,
+the centerpiece moment, the ending, games, soundtrack, styling, a shopping
+edit, printable invitations/menus, a short prep list.
+Human taste defines it; AI powers the system.
+First world: WESTHAMPTON, 1976 — vintage summer glamour, very
+questionable houseguests.
+Audience: women planning elevated gatherings. Mobile-first.
+
+THE ASK
+1. LUXURY + TRANSPORTING. Should feel like St Tropez / Portofino / the
+   Sahara. Heat, light, escape. Right now it is too austere and cool.
+2. MORE FUN. Playful, culturally current — an extremely stylish friend,
+   not a luxury brand template.
+3. KEEP THE ARC. The big bone arc bleeding off the right edge of the hero
+   is approved. It can evolve (mask it over photography, gradient, motion)
+   but it stays.
+
+HARD NOS (previous attempts were rejected for these)
+- NO ITALICS anywhere. Reads as AI-generated.
+- Do not stack shapes into a busy composition. One or two elements max;
+  the fun should come from wit, color and motion, not clutter.
+- No emoji section markers, no rounded cards with accent rails, no
+  everything-centered, no purple/blue gradients.
+
+FONTS — deliberately stripped from this file.
+Currently: Bodoni Moda (display), Karla (body), Space Mono (labels).
+The display face is still an open question; Fraunces and Ibarra Real Nova
+are the leading alternatives. Substitute freely.
+
+STRUCTURE
+hero -> not this/more this -> three steps -> WESTHAMPTON 1976 + anatomy
+-> closing principle -> footer
+-->
+<title>Revelle Société</title>
+
+<style>
+
+
+:root {
+  /* Sun-bleached plaster, terracotta, Mediterranean sea, brass. */
+  --ground: #EFE3D2;
+  --ground-2: #E7D7C1;
+  --ink: #2A2018;
+  --ink-soft: #5E5245;
+  --ink-faint: #8E8173;
+  --rule: #D4C3AC;
+  --aqua: #2F6675;
+  --oxblood: #B4522C;
+  --gold: #B98B33;
+
+  /* Dusk — the world section, after the sun goes. */
+  --night: #16242E;
+  --night-2: #101B23;
+  --night-ink: #F0E4D3;
+  --night-soft: #B0A492;
+  --night-aqua: #6FB3C2;
+  --night-oxblood: #E08050;
+
+  --display: "Bodoni Moda", Didot, "Bodoni MT", serif;
+  --body: "Karla", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Space Mono", ui-monospace, Menlo, monospace;
+
+  --measure: 62ch;
+  --pad: clamp(1.25rem, 5vw, 5rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #101B23;
+    --ground-2: #16242E;
+    --ink: #F0E4D3;
+    --ink-soft: #B0A492;
+    --ink-faint: #7E7466;
+    --rule: #2E3F4B;
+    --aqua: #6FB3C2;
+    --oxblood: #E08050;
+    --gold: #DFAE55;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ground: #101B23;
+  --ground-2: #16242E;
+  --ink: #F0E4D3;
+  --ink-soft: #B0A492;
+  --ink-faint: #7E7466;
+  --rule: #2E3F4B;
+  --aqua: #6FB3C2;
+  --oxblood: #E08050;
+  --gold: #DFAE55;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0;
+}
+
+/* ---------- hero: committed dark in both themes ---------- */
+
+.hero {
+  background: var(--night);
+  color: var(--night-ink);
+  padding: clamp(3rem, 9vw, 7rem) var(--pad) clamp(3.5rem, 10vw, 8rem);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -60% 40%;
+  height: 90%;
+  background: radial-gradient(ellipse at center, rgba(95,189,178,0.20), transparent 65%);
+  pointer-events: none;
+}
+
+.hero__inner { position: relative; max-width: 78rem; margin: 0 auto; }
+
+/* ---------- the mark: circle, rule, block ----------
+   One shape vocabulary, recomposed per world. The hero uses the
+   house arrangement; each world gets its own. */
+
+.mark {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero__copy { position: relative; z-index: 1; max-width: min(100%, 42rem); }
+
+/* The arc bleeds off the right edge — cropped by .hero's overflow,
+   so it reads as a sweep passing through rather than a logo. */
+.mark--hero {
+  right: -14%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(64vw, 46rem);
+  aspect-ratio: 1;
+}
+
+@media (max-width: 62rem) {
+  .mark--hero { right: -34%; width: 92vw; opacity: 0.18; }
+}
+
+.hero .eyebrow { color: var(--night-aqua); }
+
+.wordmark {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
+  letter-spacing: 0.02em;
+  margin: 0.4rem 0 clamp(3rem, 8vw, 6rem);
+}
+
+.wordmark em { font-style: normal; }
+
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.375rem, 1.6rem + 3.2vw, 4.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  margin: 0;
+  max-width: 16ch;
+}
+
+.hero h1 em {
+  font-style: normal;
+  color: var(--night-aqua);
+}
+
+.hero__lede {
+  margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+  max-width: 46ch;
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
+  color: var(--night-soft);
+}
+
+.hero__lede strong { color: var(--night-ink); font-weight: 700; }
+
+.cta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  margin-top: clamp(2rem, 5vw, 3rem);
+  padding: 0.9rem 1.6rem;
+  background: var(--night-aqua);
+  color: #0C1615;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.cta:hover { background: #7FD3C8; }
+.cta:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.cta span { opacity: 0.7; letter-spacing: 0.08em; }
+
+/* ---------- generic section ---------- */
+
+section { padding: clamp(3.5rem, 9vw, 7rem) var(--pad); }
+.inner { max-width: 78rem; margin: 0 auto; }
+
+h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.85rem, 1.3rem + 2.2vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  margin: 0.6rem 0 0;
+  max-width: 20ch;
+}
+
+h2 em { font-style: normal; color: var(--oxblood); }
+
+.lede { max-width: var(--measure); color: var(--ink-soft); margin: 1.25rem 0 0; }
+
+/* ---------- not this / more this ---------- */
+
+.contrast { background: var(--ground-2); }
+
+.contrast__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: clamp(2rem, 5vw, 4rem);
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+.col h3 {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.col--no h3 { color: var(--ink-faint); }
+.col--yes h3 { color: var(--oxblood); }
+
+.col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.85rem; }
+
+.col li {
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  padding-left: 1.4rem;
+  position: relative;
+}
+
+.col--no li { color: var(--ink-faint); text-decoration: line-through; text-decoration-thickness: 1px; }
+
+.col li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--ink-faint);
+}
+
+.col--yes li::before { content: "·"; color: var(--oxblood); font-weight: 700; }
+
+/* ---------- steps ---------- */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem);
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+}
+
+.step { border-top: 2px solid var(--ink); padding-top: 1.25rem; }
+
+.step__n {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  color: var(--aqua);
+  display: block;
+  margin-bottom: 0.9rem;
+}
+
+.step h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.65rem;
+  line-height: 1.15;
+  margin: 0 0 0.65rem;
+}
+
+.step p { margin: 0; color: var(--ink-soft); font-size: 0.9688rem; }
+
+/* ---------- the world ---------- */
+
+.world {
+  background: var(--night);
+  color: var(--night-ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.world::before {
+  content: "";
+  position: absolute;
+  inset: -30% 55% 40% -10%;
+  background: radial-gradient(ellipse at center, rgba(196,86,107,0.18), transparent 62%);
+  pointer-events: none;
+}
+
+.world .inner { position: relative; }
+
+.world__head { display: flex; align-items: flex-start; gap: clamp(1.5rem, 5vw, 4rem); flex-wrap: wrap; }
+.world__head > div { flex: 1 1 22rem; min-width: 0; }
+
+/* Same vocabulary, Westhampton's own arrangement: the sun low, the
+   pool line through it, the block off to one side. */
+.mark--world { position: static; width: clamp(7rem, 16vw, 11rem); aspect-ratio: 1; flex: 0 0 auto; }
+
+.world .eyebrow { color: var(--night-aqua); }
+
+.world__name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.25rem, 1.1rem + 5vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0.75rem 0 0;
+}
+
+.world__sub {
+  font-family: var(--display);
+  font-style: normal;
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.85rem);
+  color: var(--night-aqua);
+  margin: 0.75rem 0 0;
+  max-width: 30ch;
+}
+
+.world__why {
+  margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+  max-width: 52ch;
+  color: var(--night-soft);
+}
+
+.anatomy {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  border-top: 1px solid rgba(155,168,165,0.25);
+}
+
+.anatomy__row {
+  display: grid;
+  grid-template-columns: minmax(9rem, 15ch) 1fr;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: 1.15rem 0;
+  border-bottom: 1px solid rgba(155,168,165,0.18);
+  align-items: baseline;
+}
+
+.anatomy__k {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--night-aqua);
+}
+
+.anatomy__v { margin: 0; color: var(--night-soft); font-size: 0.9688rem; }
+
+/* ---------- close ---------- */
+
+.close { text-align: left; }
+
+.close blockquote {
+  font-family: var(--display);
+  font-style: normal;
+  font-size: clamp(1.5rem, 1.1rem + 2vw, 2.75rem);
+  line-height: 1.2;
+  margin: 0;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+
+.close blockquote span { color: var(--oxblood); font-style: normal; }
+
+.close .cta { background: var(--oxblood); color: #fff; }
+.close .cta:hover { background: #94304a; }
+
+footer {
+  padding: 2.5rem var(--pad) 3.5rem;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+footer .inner { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<header class="hero">
+  <div class="hero__inner">
+   <div class="hero__copy">
+    <p class="eyebrow">Est. for people who host</p>
+    <p class="wordmark">Revelle <em>Société</em></p>
+
+    <h1>You bring the occasion. We create the <em>experience</em>.</h1>
+
+    <p class="hero__lede">
+      A creative director for your social life. You tell us what you're planning
+      and how your people actually have fun. We come back with a world —
+      <strong>and everything you need to pull it off yourself</strong>.
+    </p>
+
+    <a class="cta" href="#quiz">Take the quiz <span>2 minutes</span></a>
+   </div>
+
+   <svg class="mark mark--hero" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+     <path d="M520 10 A290 290 0 0 0 520 590 L520 530 A230 230 0 0 1 520 70 Z" fill="#EDEBE3"></path>
+     <rect x="0" y="299" width="600" height="2" fill="#5FBDB2"></rect>
+   </svg>
+  </div>
+</header>
+
+<section class="contrast">
+  <div class="inner">
+    <p class="eyebrow">The difference</p>
+    <h2>Taste is the product. <em>Technology just makes it yours.</em></h2>
+
+    <div class="contrast__grid">
+      <div class="col col--no">
+        <h3>Not this</h3>
+        <ul>
+          <li>A forty-tab Pinterest board</li>
+          <li>A themed party with a costume rule</li>
+          <li>A planner with a clipboard and an invoice</li>
+          <li>A chatbot's list of fifty ideas</li>
+          <li>A schedule that runs your weekend</li>
+        </ul>
+      </div>
+      <div class="col col--yes">
+        <h3>More this</h3>
+        <ul>
+          <li>One world, chosen for your group</li>
+          <li>Details that land like an inside joke</li>
+          <li>A centerpiece moment people retell for years</li>
+          <li>Games your friends will actually play</li>
+          <li>Everything ready — and still yours to run</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="inner">
+    <p class="eyebrow">How it works</p>
+    <h2>Three steps. Roughly four minutes of your attention.</h2>
+
+    <div class="steps">
+      <article class="step">
+        <span class="step__n">01 / The quiz</span>
+        <h3>Mostly tapping</h3>
+        <p>
+          What you're planning, where it happens, how your group has fun, and what
+          would ruin it. Then one question only you can answer: tell us one thing
+          we couldn't possibly know.
+        </p>
+      </article>
+
+      <article class="step">
+        <span class="step__n">02 / The Edit</span>
+        <h3>We come back with a world</h3>
+        <p>
+          Not a theme. A world — with a point of view, a look, and a reason it
+          belongs to your people specifically. You'll see it before you buy it.
+        </p>
+      </article>
+
+      <article class="step">
+        <span class="step__n">03 / Your Revelle</span>
+        <h3>Yours to execute</h3>
+        <p>
+          The arrival, the moment, the ending, the soundtrack, the games, the
+          shopping edit, the printables. Built for your phone, on the day, in a
+          kitchen full of people.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="world">
+  <div class="inner">
+    <p class="eyebrow">A real Revelle — Labor Day, Westhampton</p>
+
+    <div class="world__head">
+      <div>
+        <h2 class="world__name">WESTHAMPTON, 1976</h2>
+        <p class="world__sub">Vintage summer glamour. Very questionable houseguests.</p>
+      </div>
+
+      <svg class="mark mark--world" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+        <circle cx="100" cy="100" r="72" fill="#EDEBE3"></circle>
+        <path d="M28 100 A72 72 0 0 1 172 100 Z" fill="#D9A441"></path>
+        <rect x="0" y="99.25" width="200" height="1.5" fill="#5FBDB2"></rect>
+      </svg>
+    </div>
+
+    <p class="world__why">
+      Six friends, a rented house, a fortieth nobody wanted announced. They wanted
+      glamour without a theme, and a long dinner that turned into something else.
+      So: a world with a cast of characters, one staged photograph, and a rule
+      about the record player.
+    </p>
+
+    <div class="anatomy">
+      <div class="anatomy__row">
+        <div class="anatomy__k">The World</div>
+        <p class="anatomy__v">The look, the palette, the reference images, the feeling to aim for.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">The Arrival</div>
+        <p class="anatomy__v">What's playing, what's in their hand, what they see first.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">The Moment</div>
+        <p class="anatomy__v">The centerpiece people retell later. Staged, but never announced.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">The Ending</div>
+        <p class="anatomy__v">How a night closes on purpose rather than by attrition.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">The Fun</div>
+        <p class="anatomy__v">Games and rituals matched to how this group actually behaves.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">The Soundtrack</div>
+        <p class="anatomy__v">Sequenced for the arc of the night, not one long shuffle.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">The Details</div>
+        <p class="anatomy__v">Table, cocktail, styling — specific enough to shop and execute.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">The Edit</div>
+        <p class="anatomy__v">A short, opinionated list of things to buy. Links included.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">Downloads</div>
+        <p class="anatomy__v">Invitations, menus, place cards, game materials — designed, print-ready.</p>
+      </div>
+      <div class="anatomy__row">
+        <div class="anatomy__k">Make it happen</div>
+        <p class="anatomy__v">A short prep list. Not a project plan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="close" id="quiz">
+  <div class="inner">
+    <p class="eyebrow">The principle</p>
+    <blockquote>
+      AI powers the system. <span>Human taste defines it.</span>
+    </blockquote>
+    <p class="lede">
+      Every world is made by people with a point of view, then matched and
+      personalized to you. Nothing reaches you that a human didn't approve.
+    </p>
+    <a class="cta" href="#quiz">Start your Revelle <span>2 minutes</span></a>
+  </div>
+</section>
+
+<footer>
+  <div class="inner">
+    <span>Revelle Société</span>
+    <span>You bring the occasion</span>
+  </div>
+</footer>
