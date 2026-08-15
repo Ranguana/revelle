@@ -26,9 +26,31 @@ export {
 
 export { runSelection } from "./engine.ts";
 
+/**
+ * THE MEMBER'S SIDE OF THE WALL.
+ *
+ * memberRevelle() is the only sanctioned way from a Candidate to something a
+ * member may see, and MemberRevelle structurally cannot carry the house's
+ * fields. A surface she looks at imports these and nothing else from here.
+ */
+export {
+  memberRevelle,
+  type MemberDestination,
+  type MemberPiece,
+  type MemberPrintedPiece,
+  type MemberRevelle,
+  type MemberSection,
+} from "./member.ts";
+
 export { buildVector, inheritDestination, topMatches } from "./vector.ts";
 export { chooseDestinations, type Shortlist } from "./destination.ts";
-export { planSlots, occasionEligibility, humanOccasion } from "./occasion.ts";
+export {
+  planSlots,
+  occasionEligibility,
+  humanOccasion,
+  type SlotPlan,
+} from "./occasion.ts";
+export { hostExclusions, type ExclusionAnswers } from "./exclusions.ts";
 export { scopePools, fillSlots, formatCents, type Fill, type SlotPool } from "./fill.ts";
 export {
   assemblageFingerprint,

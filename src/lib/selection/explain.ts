@@ -21,6 +21,12 @@
  * And her free-text answer, verbatim and prominent — never summarised, never
  * parsed, because it is the one part of the application a machine has no
  * business interpreting.
+ *
+ * EVERY SENTENCE IN THIS FILE IS FOR THE HOUSE. Not one of them is written for
+ * a member, and none of them may be shown to one — including the gap
+ * sentences, the drops, and the "do not deliver this one" verdict. That was
+ * always the intent; member.ts now makes it structural. If you are building a
+ * page she will look at, you want memberRevelle(), and nothing here.
  */
 
 import { formatCents } from "./fill.ts";
@@ -32,6 +38,7 @@ import type {
   CatalogueGap,
   Destination,
   DroppedPick,
+  ExcludedSlot,
   Explanation,
   OccasionShape,
   Pick,
@@ -51,10 +58,14 @@ export type ExplainInput = {
   picks: Pick[];
   dropped: DroppedPick[];
   gaps: CatalogueGap[];
+  /** Slots she does not have. Never mixed into `gaps`. */
+  excluded: ExcludedSlot[];
   swaps: Swap[];
   eliminated: Elimination[];
   budget: BudgetReport;
   lowConfidence: boolean;
+  /** Set only by assemblage uniqueness. A gap never sets it. */
+  blocked: string | null;
 };
 
 export function explain(input: ExplainInput): Explanation {
@@ -67,6 +78,7 @@ export function explain(input: ExplainInput): Explanation {
     picks,
     dropped,
     gaps,
+    excluded,
     swaps,
     eliminated,
     budget,
@@ -115,9 +127,17 @@ export function explain(input: ExplainInput): Explanation {
     );
   }
 
-  const fromCohort = positives.filter((m) =>
-    vector.terms[m.facet.id]?.contributions.some((c) => c.source === "cohort")
-  );
+  // "Came mostly from her cohort" has to MEAN mostly. A facet she tapped
+  // herself, which her cohort also happens to carry, is hers — saying otherwise
+  // tells a curator to distrust the strongest signal in the whole vector.
+  const fromCohort = positives.filter((m) => {
+    const contributions = vector.terms[m.facet.id]?.contributions ?? [];
+    const share = (source: string) =>
+      contributions
+        .filter((c) => c.source === source)
+        .reduce((sum, c) => sum + Math.abs(c.weight), 0);
+    return share("cohort") > share("stated") + share("history");
+  });
   if (fromCohort.length > 0 && vector.evidenceCount < 12) {
     why.push(
       `${list(fromCohort.map((m) => m.facet.label.toLowerCase()))} came mostly from her cohort — ` +
@@ -190,10 +210,19 @@ export function explain(input: ExplainInput): Explanation {
   const money = budgetSentences(budget);
 
   // ── the catalogue's own problems ───────────────────────────────────
+  // WORK ORDERS. Every sentence here names something the house must author,
+  // and every one of them stops at the curator: what she receives is one piece
+  // smaller and carries no trace of the slot.
   const gapSentences = gaps.map(
     (gap) =>
       `${gap.required ? "REQUIRED" : "Optional"} slot "${gap.slotLabel}" is unfilled. ${gap.detail}`
   );
+
+  // ── the slots she does not have ────────────────────────────────────
+  // NOT work orders, and kept out of the list above on purpose. A gap list
+  // padded with things nobody can act on is a gap list nobody reads, and it is
+  // the only signal telling the house what to write next.
+  const excludedSentences = excluded.map((slot) => slot.detail);
 
   // ── when a human must look ─────────────────────────────────────────
   const confidence: string[] = [];
@@ -218,8 +247,16 @@ export function explain(input: ExplainInput): Explanation {
   if (gaps.some((gap) => gap.required)) {
     confidence.push(
       `A required slot could not be filled. That is a catalogue gap, not a ` +
-        `customer-facing error, and it is the house's problem to author out.`
+        `customer-facing error, and it is the house's problem to author out. ` +
+        `It does not hold the Revelle back: she receives what there was and ` +
+        `never learns the slot existed.`
     );
+  }
+  // The one verdict that DOES withhold, and its wording lives here rather than
+  // anywhere a member-facing surface could reach. See member.ts, which refuses
+  // to build a view of a blocked candidate at all.
+  if (input.blocked !== null) {
+    confidence.push(input.blocked);
   }
 
   return {
@@ -231,6 +268,7 @@ export function explain(input: ExplainInput): Explanation {
     swapped: swapSentences,
     budget: money,
     gaps: gapSentences,
+    excluded: excludedSentences,
     confidence,
     secret: application.secret,
   };

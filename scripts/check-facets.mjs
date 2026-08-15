@@ -41,6 +41,7 @@
 import pg from "pg";
 
 import { FIELDS } from "../src/lib/quiz.ts";
+import { TONES, VOICE_FACETS } from "../src/lib/voice.ts";
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -67,6 +68,29 @@ const { rows } = await client.query(`
          f.label, f.description, f.status
     from quiz_option_facet m
     join facet f on f.id = m.facet_id
+`);
+
+/*
+ * The voice half. A tone is a quiz option like any other and is checked above;
+ * what is checked here is the layer beneath it — the weights that decide what a
+ * tone MEANS, which the loop above cannot see because they are not options.
+ *
+ * A tone that resolves to nothing is fatal for the same reason a missing option
+ * mapping is: she can tap it, it is stored, and it means nothing to the rest of
+ * the system. A weight that DIFFERS is reported and not fatal — the database
+ * wins on what a term is, and a curator retuning a weight in the tool is the
+ * mechanism working rather than failing.
+ */
+const { rows: voiceRows } = await client.query(`
+  select t.code::text as tone, v.code::text as facet, r.weight::float8 as weight
+    from voice_tone_facet r
+    join facet t on t.id = r.tone_facet_id
+    join facet v on v.id = r.voice_facet_id
+`);
+
+const { rows: axisRows } = await client.query(`
+  select code::text as code, label, description
+    from facet where dimension_code = 'voice'
 `);
 await client.end();
 
@@ -101,9 +125,61 @@ for (const [fieldId, field] of Object.entries(FIELDS)) {
 
 const orphaned = [...mapped.keys()].filter((k) => !seen.has(k));
 
+// ── the voice mapping ──────────────────────────────────────────────────
+
+const resolved = new Map(
+  voiceRows.map((r) => [`${r.tone}/${r.facet}`, r.weight])
+);
+const axes = new Map(axisRows.map((r) => [r.code, r]));
+
+const unresolved = [];
+const reweighted = [];
+
+for (const tone of TONES) {
+  const rows = voiceRows.filter((r) => r.tone === tone.code);
+  if (rows.length === 0) {
+    unresolved.push(tone.code);
+    continue;
+  }
+  for (const { code, weight } of tone.facets) {
+    const stored = resolved.get(`${tone.code}/${code}`);
+    if (stored === undefined) {
+      reweighted.push(`${tone.code} -> ${code}: absent in the database`);
+    } else if (Math.abs(stored - weight) > 1e-9) {
+      reweighted.push(
+        `${tone.code} -> ${code}: db ${stored} vs voice.ts ${weight}`
+      );
+    }
+  }
+}
+
+for (const facet of VOICE_FACETS) {
+  const row = axes.get(facet.code);
+  if (!row) {
+    unresolved.push(`voice/${facet.code}`);
+    continue;
+  }
+  if (row.label !== facet.label || row.description !== facet.description) {
+    reweighted.push(`voice/${facet.code}: wording differs from voice.ts`);
+  }
+}
+
+for (const line of reweighted) console.log(`[check-facets] voice drift ${line}`);
+
 for (const line of relabelled) console.log(`[check-facets] relabelled  ${line}`);
 for (const key of orphaned) {
   console.log(`[check-facets] retired     ${key} (kept so old answers resolve)`);
+}
+
+if (unresolved.length > 0) {
+  console.error(
+    `\n[check-facets] FAILED: ${unresolved.length} tone(s) or voice axis(es) ` +
+      `resolve to nothing. A tone she can tap that means nothing is the ` +
+      `failure db/007 exists to prevent:\n  ` +
+      unresolved.join("\n  ") +
+      `\n\nHas db/007-the-voice-of-her-people.sql been applied?`
+  );
+  process.exit(1);
 }
 
 if (missing.length > 0) {
@@ -119,5 +195,6 @@ if (missing.length > 0) {
 
 console.log(
   `[check-facets] ok — ${seen.size} quiz options all resolve to facets ` +
-    `(${relabelled.length} relabelled, ${orphaned.length} retired)`
+    `(${relabelled.length} relabelled, ${orphaned.length} retired), and ` +
+    `every tone resolves to a voice axis (${reweighted.length} reweighted)`
 );

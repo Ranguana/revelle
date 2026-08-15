@@ -38,7 +38,7 @@
  */
 import pg from "pg";
 
-import { DESTINATIONS } from "../src/lib/destinations.ts";
+import { DESTINATIONS, DESTINATION_TONES } from "../src/lib/destinations.ts";
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -91,6 +91,74 @@ try {
     } else {
       worldId = existing[0].id;
       console.log(`[seed-destinations] exists   ${key} — left as it is`);
+    }
+
+    // ── how it sounds, in the vocabulary a host answers in ──────────
+    //
+    // The same fifty tones she is shown (src/lib/voice.ts), so that matching a
+    // register is a set operation over shared rows rather than a comparison of
+    // two private descriptions. See the note at the top of db/007.
+    //
+    // Same rule as everything else here: NEVER overwrite a curator. A tag that
+    // already exists is left exactly as she set it and the difference is
+    // reported, because a weight changed in the tool is a judgement and this
+    // script has no standing to reverse it.
+    const tones = DESTINATION_TONES[key] ?? [];
+    if (tones.length > 0) {
+      const codes = tones.map((t) => t.code);
+      const weights = tones.map((t) => t.weight);
+
+      // The insert below joins by code, so a tone that does not exist would
+      // simply produce no row. Fail loudly instead: a destination missing a tag
+      // it thinks it has is a destination that quietly matches nobody.
+      const { rows: known } = await client.query(
+        `select f.code::text as code
+           from facet f
+          where f.dimension_code = 'voice_tone' and f.code::text = any($1::text[])`,
+        [codes]
+      );
+      if (known.length !== codes.length) {
+        const found = new Set(known.map((r) => r.code));
+        throw new Error(
+          `${key} is tagged with tones that are not in the vocabulary: ` +
+            `${codes.filter((c) => !found.has(c)).join(", ")}. ` +
+            `Has db/007 been applied?`
+        );
+      }
+
+      const { rows: added } = await client.query(
+        `insert into world_facet (world_id, facet_id, weight, provenance, note)
+         select $1, f.id, t.weight, 'curator', 'From src/lib/destinations.ts.'
+           from unnest($2::text[], $3::numeric[]) as t(code, weight)
+           join facet f
+             on f.dimension_code = 'voice_tone' and f.code::text = t.code
+         on conflict (world_id, facet_id) do nothing
+         returning facet_id`,
+        [worldId, codes, weights]
+      );
+
+      const { rows: differing } = await client.query(
+        `select f.code::text as code, wf.weight
+           from world_facet wf
+           join facet f on f.id = wf.facet_id
+           join unnest($2::text[], $3::numeric[]) as t(code, weight)
+             on t.code = f.code::text
+          where wf.world_id = $1
+            and f.dimension_code = 'voice_tone'
+            and wf.weight <> t.weight`,
+        [worldId, codes, weights]
+      );
+
+      console.log(
+        `[seed-destinations] tones    ${key} ${added.length} tagged, ` +
+          `${tones.length - added.length} already there`
+      );
+      for (const row of differing) {
+        console.log(
+          `[seed-destinations] tones    ${key} ${row.code} is ${row.weight} ` +
+            `here and differs in src/lib/destinations.ts — left as it is`
+        );
+      }
     }
 
     const payload = JSON.stringify(voice);

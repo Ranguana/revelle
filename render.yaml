@@ -96,6 +96,16 @@ services:
       - key: MAIL_REPLY_TO
         sync: false
 
+      # THE DESK. Comma-separated addresses of the people who may sign in to
+      # /desk. Read on every request by src/lib/staff.ts and FAILS CLOSED: unset
+      # or empty means nobody is staff and the segment is unreachable.
+      #
+      # sync: false because these are personal addresses and must be set in the
+      # dashboard rather than committed. Changing the list takes effect at the
+      # next request — no deploy, and no migration.
+      - key: STAFF_EMAILS
+        sync: false
+
       # Optional, defaults to 10 in src/lib/db.ts.
       # - key: DATABASE_POOL_MAX
       #   value: "10"

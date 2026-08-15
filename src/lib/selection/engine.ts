@@ -34,6 +34,21 @@ import {
   type SelectionResult,
 } from "./types.ts";
 
+/**
+ * WHAT AN UNFILLABLE SLOT DOES, AND DOES NOT DO.
+ *
+ * It does not stop a candidate being produced, it does not stop one being
+ * delivered, and it does not reach her. A slot the catalogue could not fill
+ * leaves her Revelle one piece smaller and nothing else — no error, no
+ * placeholder, no apology. The signal goes to the curator (`gaps`,
+ * explanation.gaps, and lowConfidence when the slot was required) because the
+ * pool needs authoring, and it goes nowhere else. See member.ts.
+ *
+ * Exactly one thing withholds a whole candidate, and it is not a gap: an
+ * assemblage that has already been delivered to someone. Two women must not
+ * receive the same object.
+ */
+
 export function runSelection(
   input: SelectionInput,
   overrides: Partial<EngineOptions> = {}
@@ -64,12 +79,29 @@ export function runSelection(
     now
   );
 
-  if (impasse) {
-    return { candidates: [], vector, eliminated, impasse, seed, gaps: [] };
-  }
+  // ── the occasion gate, and her own exclusions ──────────────────────
+  // Planned before the impasse check returns, so that "she is not serving
+  // food" is on the record even in a run that produced nothing: the curator
+  // must be able to see it, and it must never look like something to author.
+  const plan = planSlots(
+    catalogue.slotRules,
+    catalogue.shape,
+    application.scale,
+    application.exclusions
+  );
+  const slots = plan.slots;
 
-  // ── the occasion gate ──────────────────────────────────────────────
-  const slots = planSlots(catalogue.slotRules, catalogue.shape, application.scale);
+  if (impasse) {
+    return {
+      candidates: [],
+      vector,
+      eliminated,
+      impasse,
+      seed,
+      gaps: [],
+      excluded: plan.excluded,
+    };
+  }
 
   // Every assemblage already delivered, plus every one produced in this run:
   // two candidates on the same destination must differ from each other, or the
@@ -105,7 +137,9 @@ export function runSelection(
     );
 
     // ── stage 4 ──────────────────────────────────────────────────────
-    const fill = fillSlots(pools, application.scale, options);
+    // The occasion's shape goes in as well as her scale: it carries how many
+    // blocks the evening has for a game that stops the room.
+    const fill = fillSlots(pools, application.scale, catalogue.shape, options);
 
     const picks: Pick[] = fill.picks.map((pick) => {
       const pool = pools.get(pick.slot.key);
@@ -127,10 +161,25 @@ export function runSelection(
     const dropped = [...fill.dropped, ...novelty.dropped];
     const budget = budgetReport(novelty.picks, application.scale);
 
+    // MANDATORY CURATOR REVIEW, which is not the same as a downgrade. A
+    // required slot the catalogue could not fill flags this candidate for a
+    // human — the house should look at a thin pool — and changes nothing about
+    // what she receives.
     const lowConfidence =
       entry.score < options.lowConfidenceScore ||
       fill.gaps.some((gap) => gap.required) ||
       !novelty.novel;
+
+    // THE ONE VERDICT THAT WITHHOLDS. Assemblage uniqueness, and nothing else:
+    // this exact set has been delivered before, and delivering it again would
+    // make two women's Revelles the same object. Its wording never leaves the
+    // house side — memberRevelle() refuses a blocked candidate outright.
+    const blocked = novelty.novel
+      ? null
+      : `Could not find an unissued assemblage after ${novelty.attempts} local ` +
+        `swap${novelty.attempts === 1 ? "" : "s"}. Do not deliver this one — ` +
+        `the catalogue is too thin here, which is a house problem and shows up ` +
+        `in assemblage_headroom().`;
 
     // ── stage 6 ──────────────────────────────────────────────────────
     const explanation = explain({
@@ -144,20 +193,13 @@ export function runSelection(
       picks: novelty.picks,
       dropped,
       gaps: fill.gaps,
+      excluded: plan.excluded,
       swaps: novelty.swaps,
       eliminated,
       budget,
       lowConfidence,
+      blocked,
     });
-
-    if (!novelty.novel) {
-      explanation.confidence.push(
-        `Could not find an unissued assemblage after ${novelty.attempts} local ` +
-          `swap${novelty.attempts === 1 ? "" : "s"}. Do not deliver this one — ` +
-          `the catalogue is too thin here, which is a house problem and shows up ` +
-          `in assemblage_headroom().`
-      );
-    }
 
     for (const gap of fill.gaps) {
       if (!allGaps.some((g) => g.pool === gap.pool && g.slotCode === gap.slotCode)) {
@@ -179,11 +221,20 @@ export function runSelection(
       budget,
       score: novelty.picks.reduce((sum, pick) => sum + pick.score, 0),
       lowConfidence,
+      blocked,
       explanation,
     });
   }
 
-  return { candidates, vector, eliminated, impasse: null, seed, gaps: allGaps };
+  return {
+    candidates,
+    vector,
+    eliminated,
+    impasse: null,
+    seed,
+    gaps: allGaps,
+    excluded: plan.excluded,
+  };
 }
 
 /**

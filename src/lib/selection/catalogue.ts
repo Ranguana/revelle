@@ -15,6 +15,7 @@
  */
 
 import { runSelection } from "./engine.ts";
+import { hostExclusions } from "./exclusions.ts";
 import { assemblageFingerprint } from "./novelty.ts";
 import type {
   Application,
@@ -25,6 +26,7 @@ import type {
   EngineOptions,
   Facet,
   FacetTags,
+  GameShape,
   HistorySignal,
   Ingredient,
   OccasionClaim,
@@ -187,6 +189,16 @@ async function loadApplication(
     musicService: nullableStr(row.music_service),
     stated,
     scale,
+    // The third gate, and today it is empty for everyone: nothing the quiz
+    // currently asks can state "I am not serving food" or "no games". When the
+    // question exists, `recorded` is where its answer arrives and this line
+    // does not change. See exclusions.ts, which names the wiring exactly.
+    exclusions: hostExclusions({
+      occasion: str(row.occasion) as OccasionCode,
+      environment: str(row.environment),
+      stated,
+      recorded: [],
+    }),
     createdAt: iso(row.created_at),
   };
 }
@@ -322,6 +334,8 @@ const POOLS: readonly {
   price: string | null;
   minGuests: string | null;
   maxGuests: string | null;
+  /** game.shape — db/010. Only the game pool has one. */
+  shape: string | null;
   active: string;
 }[] = [
   {
@@ -330,6 +344,7 @@ const POOLS: readonly {
     price: "price_cents",
     minGuests: null,
     maxGuests: null,
+    shape: null,
     active: "t.status = 'active'",
   },
   {
@@ -338,6 +353,7 @@ const POOLS: readonly {
     price: "price_cents",
     minGuests: "min_guests",
     maxGuests: "max_guests",
+    shape: "shape",
     active: "t.status = 'active'",
   },
   {
@@ -346,6 +362,7 @@ const POOLS: readonly {
     price: null,
     minGuests: null,
     maxGuests: null,
+    shape: null,
     active: "t.status = 'active'",
   },
 ];
@@ -360,6 +377,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
               ${spec.price ? `t.${spec.price}` : "null::integer"} as price_cents,
               ${spec.minGuests ? `t.${spec.minGuests}` : "null::integer"} as min_guests,
               ${spec.maxGuests ? `t.${spec.maxGuests}` : "null::integer"} as max_guests,
+              ${spec.shape ? `t.${spec.shape}::text` : "null::text"} as shape,
               coalesce(
                 (select jsonb_object_agg(x.facet_id, x.weight)
                    from ${spec.table}_facet x where x.${idColumn} = t.id),
@@ -405,6 +423,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
         issuance: issuance(row),
         minGuests: num(row.min_guests),
         maxGuests: num(row.max_guests),
+        shape: gameShape(row.shape),
         isFixture: str(row.slug).startsWith("fixture-"),
       });
     }
@@ -419,6 +438,7 @@ async function loadSlotRules(
 ): Promise<SlotRule[]> {
   const { rows } = await db.query(
     `select os.slot_code, sk.label, sk.description, sk.section, sk.per_guest,
+            sk.excluded_by,
             os.pool, os.min_count, os.max_count, os.required, os.per_day,
             os.position, os.note
        from occasion_slot os
@@ -441,6 +461,7 @@ async function loadSlotRules(
     perDay: Boolean(row.per_day),
     position: Number(row.position),
     note: str(row.note ?? ""),
+    excludedBy: nullableStr(row.excluded_by),
   }));
 }
 
@@ -449,7 +470,8 @@ async function loadShape(
   occasion: OccasionCode
 ): Promise<OccasionShape> {
   const { rows } = await db.query(
-    `select occasion, label, days, note from occasion_shape where occasion = $1`,
+    `select occasion, label, days, note, scheduled_game_max
+       from occasion_shape where occasion = $1`,
     [occasion]
   );
   const row = rows[0];
@@ -464,6 +486,11 @@ async function loadShape(
     label: str(row.label),
     days: Number(row.days),
     note: str(row.note ?? ""),
+    // db/010's column is NOT NULL with a default of 1, so the coalesce is only
+    // ever reached by a hand-built row. One block is the conservative answer:
+    // an evening that programmes nothing is a quiet evening, and an evening
+    // that programmes three things at once is not an evening.
+    scheduledGameMax: num(row.scheduled_game_max) ?? 1,
   };
 }
 
@@ -537,6 +564,25 @@ function str(value: unknown): string {
 
 function nullableStr(value: unknown): string | null {
   return value === null || value === undefined ? null : String(value);
+}
+
+/**
+ * game_shape, or null for a pool that has no shape.
+ *
+ * An unrecognised value becomes null rather than being trusted, and null means
+ * "takes no block". The alternative — trusting the string — would have a
+ * misspelt enum value silently stop counting against the evening's blocks, and
+ * the failure would be a host handed three games in one hour.
+ */
+function gameShape(value: unknown): GameShape | null {
+  switch (value) {
+    case "scheduled":
+    case "ambient":
+    case "finale":
+      return value;
+    default:
+      return null;
+  }
 }
 
 function iso(value: unknown): string {

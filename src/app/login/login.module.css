@@ -1,0 +1,191 @@
+/*
+ * THE DOOR.
+ *
+ * A sign-in page is not a landing page. There is one thing to do here and the
+ * page should be small enough that the thing to do is the only thing on it —
+ * so: one column, a hairline, a field, a button. No collage, no arc, no
+ * occasion cards, nothing that argues for the product to somebody who has
+ * already bought it.
+ *
+ * It keeps the landing page's rules, because it belongs to the same house:
+ * every colour is a token from src/lib/tokens.ts and none is named here; no
+ * border radius; transitions are 160ms and only on colour; no italics.
+ * Designed at 390px first, like everything else.
+ */
+
+.page {
+  min-height: 100dvh;
+  display: grid;
+  /* Not centred. Sitting a little above the middle is what a door does — dead
+     centre reads as a modal, and leaves a form floating with nothing under it
+     on a tall desktop window. */
+  align-content: start;
+  justify-items: center;
+  padding: clamp(4rem, 18vh, 9rem) clamp(1.25rem, 6vw, 2rem) 4rem;
+  background: var(--ground);
+  color: var(--ink);
+}
+
+.inner {
+  width: 100%;
+  max-width: 23rem;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 1.75rem;
+}
+
+.title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 1.6rem + 2vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 0 0 1.75rem;
+}
+
+/* The hairline the masthead uses, at the width of the form rather than the
+   page, so the field below reads as being under a rule and not in a box. */
+.rule {
+  height: 1px;
+  background: var(--rule);
+  margin: 0 0 1.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Underline, not a box. A boxed input on a plaster ground reads as a form to
+   be filled in; a ruled line reads as somewhere to write. */
+.input {
+  appearance: none;
+  width: 100%;
+  padding: 0.6rem 0 0.55rem;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  transition: border-color 160ms ease;
+}
+
+.input:hover {
+  border-bottom-color: var(--ink-faint);
+}
+
+.input:focus {
+  outline: none;
+  border-bottom-color: var(--oxblood);
+}
+
+/* The focus ring globals.css draws is the accessible one; it is restored here
+   for keyboard users because the border change above is not enough on its own. */
+.input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: baseline;
+  padding: 0.9rem 1.4rem;
+  background: var(--oxblood);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border: 0;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    opacity 160ms ease;
+}
+
+.button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--oxblood) 82%, #000);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.32;
+}
+
+/*
+ * The answer.
+ *
+ * ONE STYLE FOR BOTH OUTCOMES on purpose — it is set in the body face at the
+ * body's colour, and only the little mark to its left changes. The sentence a
+ * member sees and the sentence a stranger sees are identical (see
+ * src/lib/login.ts), and a green tick against a grey line would put the
+ * difference back into the design after the code went to the trouble of
+ * removing it.
+ */
+.answer {
+  margin: 1.5rem 0 0;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.refusal {
+  border-left-color: var(--oxblood);
+}
+
+/* Someone who arrived here from a link that had already been spent. */
+.notice {
+  margin: 0 0 1.75rem;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--oxblood);
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* One quiet line, and the only one. */
+.hint {
+  margin: 2.5rem 0 0;
+  color: var(--ink-faint);
+  font-size: 0.875rem;
+}
+
+.back {
+  display: inline-block;
+  margin: 2.5rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-decoration: none;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.back:hover {
+  color: var(--ink);
+  border-bottom-color: var(--rule);
+}

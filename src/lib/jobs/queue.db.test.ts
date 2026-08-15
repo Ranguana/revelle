@@ -48,7 +48,7 @@ import {
 import { registerFixtures } from "./fixtures.ts";
 import { createRegistry } from "./registry.ts";
 import { JobRunner, type RunnerLogger } from "./runner.ts";
-import { PermanentJobError, type JobRow, type Queryable } from "./types.ts";
+import { PermanentJobError, type Queryable } from "./types.ts";
 
 const URL = process.env.JOBS_TEST_DATABASE_URL;
 const skip = URL ? false : "set JOBS_TEST_DATABASE_URL to run these";
@@ -422,6 +422,10 @@ test("one piece fails and retries while the others finish; the parent reports ho
   assert.equal(status.piecesTotal, 4);
   assert.equal(status.piecesSucceeded, 0);
   assert.equal(status.piecesPending, 4);
+  assert.ok(
+    status.nextAttemptAt instanceof Date,
+    "a waiting parent must not tell the page to stop polling — its pieces are due"
+  );
 
   // Everything runs. Three succeed; the flaky one fails and backs off.
   const second = await r.tick();
@@ -434,6 +438,10 @@ test("one piece fails and retries while the others finish; the parent reports ho
   assert.equal(status.piecesSucceeded, 3, "the progress bar is honest");
   assert.equal(status.piecesPending, 1);
   assert.equal(status.piecesFailed, 0, "a piece with attempts left has not failed");
+  assert.ok(
+    (status.nextAttemptAt?.getTime() ?? 0) > Date.now(),
+    "and the page is told when the retry is due, not that it is over"
+  );
 
   // The failing piece is backed off; nothing else is affected by it.
   assert.equal((await r.tick()).claimed, 0);
@@ -600,8 +608,8 @@ test("the status query answers done, in progress, and failed-and-why", { skip },
 test("queue health is one row and reports a stalled queue", { skip }, async () => {
   const idle = await queueHealth(db);
   assert.deepEqual(
-    { queued: idle.queued, running: idle.running, failed: idle.failed },
-    { queued: 0, running: 0, failed: 0 }
+    { queued: idle.queued, running: idle.running, failedLastDay: idle.failedLastDay },
+    { queued: 0, running: 0, failedLastDay: 0 }
   );
   assert.equal(idle.oldestRunnableAgeMs, null);
 

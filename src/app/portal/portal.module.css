@@ -1,0 +1,79 @@
+/*
+ * The portal's first room.
+ *
+ * Same rules as everywhere else in the house: every colour is a token, no
+ * border radius, no italics, transitions only on colour. Deliberately sparse —
+ * the four areas of docs/portal-spec.md are what fills this, and inventing a
+ * layout for them before they exist would mean throwing it away.
+ */
+
+.page {
+  min-height: 100dvh;
+  background: var(--ground);
+  color: var(--ink);
+  padding: clamp(3rem, 10vh, 6rem) clamp(1.25rem, 6vw, 5rem) 4rem;
+}
+
+.inner {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 1.75rem;
+}
+
+.title {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 1.7rem + 2.4vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 0 0 1.75rem;
+}
+
+.rule {
+  height: 1px;
+  background: var(--rule);
+  margin: 0 0 1.75rem;
+}
+
+.line {
+  margin: 0 0 1rem;
+  color: var(--ink-soft);
+}
+
+.address {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+.out {
+  margin-top: 3rem;
+}
+
+.button {
+  padding: 0.7rem 1.1rem;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.button:hover {
+  color: var(--ink);
+  border-color: var(--ink-faint);
+}

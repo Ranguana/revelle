@@ -20,6 +20,7 @@
 
 import type {
   EligibilityClaim,
+  ExcludedSlot,
   OccasionClaim,
   OccasionCode,
   OccasionShape,
@@ -73,8 +74,8 @@ export function claimEligibility(
     return {
       eligible: false,
       reason: forbidden.note
-        ? `never ${describe(value)} — ${forbidden.note}`
-        : `never ${describe(value)}`,
+        ? `never for ${describe(value)} — ${forbidden.note}`
+        : `never for ${describe(value)}`,
     };
   }
 
@@ -87,10 +88,15 @@ export function claimEligibility(
     eligible: false,
     reason:
       `written for ${natives.map((c) => describe(c.key)).join(", ")}` +
-      `, not ${describe(value)}`,
+      `, not for ${describe(value)}`,
   };
 }
 
+/**
+ * `describe` returns a bare noun phrase on both axes — "a birthday", "the
+ * moment" — so that one template reads correctly for both. Building the
+ * preposition into the describer is what produced "written for at a birthday".
+ */
 export function occasionEligibility(
   claims: readonly OccasionClaim[],
   occasion: OccasionCode
@@ -98,7 +104,10 @@ export function occasionEligibility(
   return claimEligibility(
     claims.map((c) => ({ key: c.occasion, fit: c.fit, note: c.note })),
     occasion,
-    (key) => `at a ${humanOccasion(key)}`
+    (key) => {
+      const noun = humanOccasion(key);
+      return `${/^[aeiou]/i.test(noun) ? "an" : "a"} ${noun}`;
+    }
   );
 }
 
@@ -109,7 +118,7 @@ export function slotEligibility(
   return claimEligibility(
     claims.map((c) => ({ key: c.slotCode, fit: c.fit, note: c.note })),
     slotCode,
-    (key) => `as ${key.replace(/_/g, " ")}`
+    (key) => key.replace(/_/g, " ")
   );
 }
 
@@ -132,18 +141,58 @@ export function slotEligibility(
  * person without a seat. Where the band is open-topped there is no high, and
  * the quantity falls back to the planning number with the fact recorded, so
  * stage 6 can tell the curator to confirm it before anything is printed.
+ *
+ * ── AND THE SLOTS SHE DOES NOT HAVE ──────────────────────────────────
+ *
+ * `exclusions` removes a rule from the plan ENTIRELY, before anything is
+ * scoped, filled or dropped. She is not serving food, so the menu is not a
+ * slot that went unfilled — it is a slot her Revelle never had, and the
+ * distinction is the difference between a work order for the house and noise
+ * in the work order list. See exclusions.ts.
+ *
+ * Her answer beats `required`. Required describes the occasion's shape, not an
+ * obligation on her. The removal is recorded so the curator can see it if she
+ * looks; it is not something to act on, and it is never a gap.
  */
+export type SlotPlan = {
+  slots: UnitSlot[];
+  /** Removed because she said she does not have them. Not gaps. */
+  excluded: ExcludedSlot[];
+};
+
 export function planSlots(
   rules: readonly SlotRule[],
   shape: OccasionShape,
-  scale: Scale
-): UnitSlot[] {
+  scale: Scale,
+  exclusions: readonly string[] = []
+): SlotPlan {
   const guests = scale.guestsHigh ?? scale.guestsPlanning ?? null;
   const slots: UnitSlot[] = [];
+  const excluded: ExcludedSlot[] = [];
+  const excludedCodes = new Set(exclusions);
 
   const ordered = [...rules].sort((a, b) => a.position - b.position);
 
   for (const rule of ordered) {
+    if (rule.excludedBy !== null && excludedCodes.has(rule.excludedBy)) {
+      excluded.push({
+        slotCode: rule.slotCode,
+        slotLabel: rule.label,
+        pool: rule.pool,
+        requiredByOccasion: rule.required,
+        exclusion: rule.excludedBy,
+        detail:
+          `"${rule.label}" was never planned: she said ${rule.excludedBy}. ` +
+          `Nothing to author — this is not a gap` +
+          (rule.required
+            ? `, and it outranks the occasion asking for it. Required is the ` +
+              `shape of a ${humanOccasion(shape.occasion)}, not an obligation ` +
+              `on her.`
+            : `.`),
+      });
+      continue;
+    }
+
     const days = rule.perDay ? Math.max(1, shape.days) : 1;
 
     for (let day = 1; day <= days; day += 1) {
@@ -169,7 +218,7 @@ export function planSlots(
     }
   }
 
-  return slots;
+  return { slots, excluded };
 }
 
 /** For a sentence, not for a customer. The house's own names. */

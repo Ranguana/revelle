@@ -7,10 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "node --test \"src/**/*.test.ts\"",
     "migrate": "node scripts/migrate.mjs",
+    "spotify:authorize": "node scripts/spotify-authorize.mjs",
+    "spotify:verify": "node scripts/spotify-authorize.mjs --verify",
     "prompt": "node scripts/writer-prompt.mjs",
     "check:facets": "node scripts/check-facets.mjs",
-    "seed:destinations": "node scripts/seed-destinations.mjs"
+    "check:coverage": "node scripts/check-destination-facets.mjs",
+    "seed:destinations": "node scripts/seed-destinations.mjs",
+    "seed:games": "node scripts/seed-games.mjs",
+    "seed:menus": "node scripts/seed-menus.mjs",
+    "seed:fixtures": "node scripts/seed-fixtures.mjs",
+    "selection:demo": "node scripts/selection-demo.mjs"
   },
   "dependencies": {
     "next": "16.3.1",

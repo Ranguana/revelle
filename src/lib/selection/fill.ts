@@ -49,6 +49,31 @@
  * Both numbers may be NULL, and null means ask her, never no limit. A candidate
  * built against a null ceiling is one the curator must price by hand, and stage
  * 6 says so.
+ *
+ * ── THE EVENING'S BLOCKS ARE CARRIED THE SAME WAY ────────────────────
+ *
+ * db/010 gives a game a SHAPE and an occasion a number of blocks
+ * (occasion_shape.scheduled_game_max: one for a long dinner, two for a
+ * birthday, three for a weekend). A birthday has three slots that all draw
+ * from the game pool, and with nothing to stop it the search will fill all
+ * three with scheduled games and hand a host two and a quarter hours of
+ * programming with a dinner somewhere inside it.
+ *
+ * So the count is carried on the state, exactly like the money, and it binds
+ * DURING the search rather than being reported afterwards by
+ * revelle_game_load. Two things cannot occupy the same hour: a fourth
+ * scheduled game is not a weak candidate, it is an impossibility, and the
+ * budget's own lesson applies — a rule checked at the end is a rule that
+ * produces a set nobody can use.
+ *
+ * AMBIENT AND FINALE GAMES DO NOT COUNT. That distinction is the entire point
+ * of the shape column. Three games in one evening is fine when one runs
+ * underneath it and one is the ending; three scheduled games at a dinner party
+ * is not.
+ *
+ * When the cap binds the extra game is simply NOT PLACED. Per member.ts, that
+ * is invisible to her — the deliverable does not exist in her Revelle, and no
+ * heading is printed over an empty body.
  */
 
 import {
@@ -70,6 +95,7 @@ import type {
   FacetTags,
   Ingredient,
   OccasionCode,
+  OccasionShape,
   Pick,
   Scale,
   UnitSlot,
@@ -136,7 +162,11 @@ export function scopePools(
   for (const slot of slots) {
     if (bySlotCode.has(slot.slotCode)) continue;
 
-    const rejected: string[] = [];
+    // Ranked, because a catalogue gap is only useful if the FIRST reasons it
+    // gives are the ones a curator can act on. "Fourteen games are written for
+    // another slot" is noise; "every game that fits needs at least four people
+    // and there are two of them" is the answer.
+    const rejected: { rank: number; text: string }[] = [];
     const candidates: ScopedCandidate[] = [];
 
     for (const ingredient of ingredients) {
@@ -153,24 +183,27 @@ export function scopePools(
         (facetId) => (ingredient.facets[facetId] ?? 0) > 0
       );
       if (veto) {
-        rejected.push(
-          `${ingredient.name} carries ${facetLabel(veto)}, which she vetoed`
-        );
+        rejected.push({
+          rank: 0,
+          text: `${ingredient.name} carries ${facetLabel(veto)}, which she vetoed`,
+        });
         continue;
       }
 
       const scope = ingredient.worlds[destination.id];
       if (scope?.forbidden) {
-        rejected.push(
-          `${ingredient.name} is forbidden under ${destination.name}` +
-            (scope.note ? ` — ${scope.note}` : "")
-        );
+        rejected.push({
+          rank: 0,
+          text:
+            `${ingredient.name} is forbidden under ${destination.name}` +
+            (scope.note ? ` — ${scope.note}` : ""),
+        });
         continue;
       }
 
       const forOccasion = occasionEligibility(ingredient.occasions, occasion);
       if (!forOccasion.eligible) {
-        rejected.push(`${ingredient.name} is ${forOccasion.reason}`);
+        rejected.push({ rank: 1, text: `${ingredient.name} is ${forOccasion.reason}` });
         continue;
       }
 
@@ -180,23 +213,36 @@ export function scopePools(
       // day-two material with nothing to object.
       const forSlot = slotEligibility(ingredient.slots, slot.slotCode);
       if (!forSlot.eligible) {
-        rejected.push(`${ingredient.name} is ${forSlot.reason}`);
+        rejected.push({ rank: 2, text: `${ingredient.name} is ${forSlot.reason}` });
         continue;
       }
 
       // A group-size limit is a constraint, not a taste. A parlour game for
       // four at a party of forty is not a weak match, it is an impossibility.
+      //
+      // Its sibling constraint — how many block-occupying games the evening
+      // has room for — cannot be applied here, and the reason is worth
+      // stating: a group size is a property of ONE ingredient, and this loop
+      // decides one ingredient at a time. The cap is a property of the SET, so
+      // it binds in fillSlots below, where there is a running count to compare
+      // against. Same class of rule as the budget, enforced in the same place.
       if (groupSize !== null) {
         if (ingredient.minGuests !== null && groupSize < ingredient.minGuests) {
-          rejected.push(
-            `${ingredient.name} needs at least ${ingredient.minGuests}`
-          );
+          rejected.push({
+            rank: 0,
+            text:
+              `${ingredient.name} needs at least ${ingredient.minGuests} people ` +
+              `and there are ${groupSize}`,
+          });
           continue;
         }
         if (ingredient.maxGuests !== null && groupSize > ingredient.maxGuests) {
-          rejected.push(
-            `${ingredient.name} tops out at ${ingredient.maxGuests}`
-          );
+          rejected.push({
+            rank: 0,
+            text:
+              `${ingredient.name} tops out at ${ingredient.maxGuests} people ` +
+              `and there are ${groupSize}`,
+          });
           continue;
         }
       }
@@ -229,7 +275,13 @@ export function scopePools(
               `Nothing in the ${slot.pool} pool can fill "${slot.label}" for a ` +
               `${humanOccasion(occasion)} under ${destination.name}.` +
               (rejected.length > 0
-                ? ` ${rejected.length} were ruled out: ${rejected.slice(0, 3).join("; ")}` +
+                ? ` ${rejected.length} were ruled out; the ones worth knowing about: ` +
+                  rejected
+                    .slice()
+                    .sort((a, b) => a.rank - b.rank)
+                    .slice(0, 3)
+                    .map((r) => r.text)
+                    .join("; ") +
                   (rejected.length > 3 ? `; and ${rejected.length - 3} more.` : ".")
                 : ` The pool is empty.`),
           }
@@ -254,16 +306,25 @@ type State = {
   score: number;
   used: Set<string>;
   chosenFacets: FacetTags[];
+  /** Blocks of the evening spent. Ambient and finale games spend none. */
+  scheduled: number;
 };
+
+/** Does placing this thing take one of the evening's blocks? */
+function takesABlock(ingredient: Ingredient): boolean {
+  return ingredient.shape === "scheduled";
+}
 
 /** STAGE 4. */
 export function fillSlots(
   pools: Map<string, SlotPool>,
   scale: Scale,
+  shape: OccasionShape,
   options: EngineOptions
 ): Fill {
   const ceiling = toCents(scale.budgetCeiling);
   const planning = toCents(scale.budgetPlanning);
+  const blocks = Math.max(0, shape.scheduledGameMax);
 
   // ── most-constrained first ─────────────────────────────────────────
   // Required before optional on a tie, then the authored order, so that a run
@@ -299,7 +360,15 @@ export function fillSlots(
   }
 
   let beam: State[] = [
-    { picks: [], dropped: [], cost: 0, score: 0, used: new Set(), chosenFacets: [] },
+    {
+      picks: [],
+      dropped: [],
+      cost: 0,
+      score: 0,
+      used: new Set(),
+      chosenFacets: [],
+      scheduled: 0,
+    },
   ];
 
   for (let i = 0; i < order.length; i += 1) {
@@ -318,10 +387,27 @@ export function fillSlots(
       let cheapestFallback: { candidate: ScopedCandidate; cost: number } | null =
         null;
       let weakest: { name: string; score: number } | null = null;
+      let blockedByShape: string | null = null;
 
       for (const candidate of entry.candidates) {
         const key = `${candidate.ingredient.pool}:${candidate.ingredient.id}`;
         if (state.used.has(key)) continue;
+
+        // THE EVENING HAS RUN OUT OF BLOCKS.
+        //
+        // Before the budget and before the score, because it is the hardest of
+        // the three: money can be argued about and a weak match is a judgement,
+        // but an hour that is already spent is spent. Skipped rather than
+        // penalised, and skipped here rather than in scopePools, because it
+        // depends on what this state has already placed.
+        //
+        // An ambient game runs underneath the evening and a finale ends it;
+        // neither takes a block, so neither is counted and neither is ever
+        // refused for this reason.
+        if (takesABlock(candidate.ingredient) && state.scheduled >= blocks) {
+          if (blockedByShape === null) blockedByShape = candidate.ingredient.name;
+          continue;
+        }
 
         const cost = lineCost(candidate.unitCost, slot.quantity);
         const projected = state.cost + cost + nextCheapest;
@@ -379,6 +465,34 @@ export function fillSlots(
         }
       }
 
+      // The same courtesy for the evening's blocks. A curator reading a
+      // birthday with two games and wondering where the third went is owed the
+      // sentence; the member is owed nothing here, because to her the slot
+      // simply does not exist. Never a CatalogueGap: the pool was not thin,
+      // the evening was full.
+      const outOfBlocks: DroppedPick | null =
+        blockedByShape === null
+          ? null
+          : {
+              slot,
+              ingredientName: blockedByShape,
+              lineCost: null,
+              reason: "scheduled_cap",
+              detail:
+                `not placed in "${slot.label}": a ${humanOccasion(shape.occasion)} ` +
+                `has ${blocks} block${blocks === 1 ? "" : "s"} for a game that stops ` +
+                `the room, and ${state.scheduled} ${
+                  state.scheduled === 1 ? "is" : "are"
+                } already spent. Ambient games and the finale do not count ` +
+                `toward it. Nothing is wrong with the catalogue.`,
+            };
+
+      if (outOfBlocks !== null && placed > 0) {
+        for (let c = childrenFrom; c < next.length; c += 1) {
+          next[c] = { ...next[c], dropped: [...next[c].dropped, outOfBlocks] };
+        }
+      }
+
       if (slot.required) {
         // A required slot that could not be filled within the ceiling still has
         // to be filled: the spec's answer to "budget can't be met" is the
@@ -391,16 +505,26 @@ export function fillSlots(
           next.push(extend(state, pick, cost, key, candidate.ingredient.facets));
           placed += 1;
         }
-        // Nothing at all could fill it: a catalogue gap, already recorded. The
-        // state continues without it rather than dying, so one thin pool does
-        // not cost the curator every other candidate.
-        if (placed === 0) next.push(state);
+        // Nothing at all could fill it: a catalogue gap, or an evening with no
+        // block left. EITHER WAY THE STATE CONTINUES rather than dying.
+        //
+        // A required slot that cannot be filled must not cost her the rest of
+        // her Revelle, and it must not cost the curator every other candidate.
+        // "Required" is the occasion's shape and a house signal — it is how the
+        // honouring beat with nothing written for it reaches whoever authors
+        // the pool — and it is never a reason to withhold. She receives what
+        // there was, and never learns a slot existed. See member.ts.
+        if (placed === 0) {
+          next.push(outOfBlocks === null ? state : withDrop(state, outOfBlocks));
+        }
         continue;
       }
 
       // Optional: skipping is always available, and is what "dropped to stay
       // under budget" actually is.
-      if (blockedByBudget !== null && placed === 0) {
+      if (outOfBlocks !== null && placed === 0) {
+        next.push(withDrop(state, outOfBlocks));
+      } else if (blockedByBudget !== null && placed === 0) {
         next.push({
           ...state,
           dropped: [
@@ -505,7 +629,13 @@ function extend(
     score: state.score + pick.score,
     used,
     chosenFacets: [...state.chosenFacets, facets],
+    scheduled: state.scheduled + (takesABlock(pick.ingredient) ? 1 : 0),
   };
+}
+
+/** A house note about this state, carried forward. Never seen by a member. */
+function withDrop(state: State, note: DroppedPick): State {
+  return { ...state, dropped: [...state.dropped, note] };
 }
 
 function prune(states: State[], width: number): State[] {

@@ -41,6 +41,18 @@ export type Polarity = "positive" | "negative";
 /** occasion_fit in db/009. */
 export type OccasionFit = "native" | "forbidden";
 
+/**
+ * game_shape in db/010. Games only; every other pool carries null.
+ *
+ * `scheduled` occupies a block of the evening, and an occasion has a small
+ * number of blocks (occasion_shape.scheduled_game_max). `ambient` runs
+ * underneath everything and consumes none. `finale` closes the night. Only
+ * `scheduled` is counted against the cap — that distinction IS the point:
+ * three games in one evening is fine when one runs underneath it and one is
+ * the ending.
+ */
+export type GameShape = "scheduled" | "ambient" | "finale";
+
 /** taste_provenance in db/002. */
 export type Provenance =
   | "curator"
@@ -112,6 +124,19 @@ export type Application = {
   musicService: string | null;
   stated: StatedFacet[];
   scale: Scale;
+  /**
+   * SLOTS THAT DO NOT EXIST FOR HER — slot_exclusion codes, db/014.
+   *
+   * "Maybe someone won't even be serving food, in that case no menu." That is
+   * a FACT about her evening, not a dislike, and it is not a catalogue gap:
+   * the house has nothing to author. A slot named here is removed from the
+   * plan before the fill runs, so it is never filled, never dropped and never
+   * reported as missing.
+   *
+   * Empty today, and deliberately so — see exclusions.ts for exactly which
+   * question would fill it.
+   */
+  exclusions: string[];
   createdAt: string;
 };
 
@@ -202,6 +227,12 @@ export type Ingredient = {
   /** Games only. A constraint, never a score. */
   minGuests: number | null;
   maxGuests: number | null;
+  /**
+   * Games only; null in every other pool. game.shape in db/010, and the reason
+   * the fill can tell a block-occupying game from one that runs underneath the
+   * evening. A constraint on the SET, never a score.
+   */
+  shape: GameShape | null;
   isFixture: boolean;
 };
 
@@ -219,6 +250,16 @@ export type SlotRule = {
   perDay: boolean;
   position: number;
   note: string;
+  /**
+   * slot_kind.excluded_by — db/014. The name of the FACT about her evening
+   * that removes this slot from her plan entirely: 'no_food' takes the menu,
+   * 'no_games' takes the games. Null on a slot no answer can remove.
+   *
+   * On the slot table rather than in a list in this file so that making a new
+   * slot excludable is an INSERT, exactly as slot_shape made "which shapes may
+   * fill this slot" data rather than code.
+   */
+  excludedBy: string | null;
 };
 
 export type OccasionShape = {
@@ -226,6 +267,41 @@ export type OccasionShape = {
   label: string;
   days: number;
   note: string;
+  /**
+   * occasion_shape.scheduled_game_max — db/010. How many block-occupying games
+   * this occasion has room for. One for a long dinner, two for a birthday,
+   * three for a weekend, because the weekend has days.
+   *
+   * Read by fillSlots and enforced DURING the search, not reported afterwards:
+   * two things cannot occupy the same hour, so a fourth scheduled game is not
+   * a weak candidate, it is an impossibility.
+   */
+  scheduledGameMax: number;
+};
+
+/**
+ * A SLOT SHE DOES NOT HAVE — and the difference between this and a gap is the
+ * whole reason it exists.
+ *
+ * A CatalogueGap is a work order: the pool could not fill a slot her occasion
+ * has, and the house must author something. This is not. She is not serving
+ * food, so there is no menu; there is nothing to write, nothing to fix, and
+ * nothing for a curator to do. Keeping the two in one list would fill the gap
+ * list with noise and the gap list would stop being read — which would cost
+ * the house the only signal telling it what to write next.
+ *
+ * To the member both look identical: the deliverable is simply absent.
+ */
+export type ExcludedSlot = {
+  slotCode: string;
+  slotLabel: string;
+  pool: string;
+  /** What the occasion asked for, before her answer removed it. */
+  requiredByOccasion: boolean;
+  /** The slot_exclusion code that removed it. */
+  exclusion: string;
+  /** Why, in a sentence, for the curator. */
+  detail: string;
 };
 
 /**
@@ -322,10 +398,27 @@ export type DroppedPick = {
   slot: UnitSlot;
   ingredientName: string;
   lineCost: number | null;
-  reason: "budget" | "pool_empty" | "collision" | "no_good_match";
+  reason:
+    | "budget"
+    | "pool_empty"
+    | "collision"
+    | "no_good_match"
+    /** The evening had no block left. See occasion_shape.scheduled_game_max. */
+    | "scheduled_cap";
   detail: string;
 };
 
+/**
+ * A WORK ORDER FOR THE HOUSE, and never anything else.
+ *
+ * A gap means her occasion has a slot and the pool could not fill it. It is
+ * how the library learns what to write next, so it must survive all the way to
+ * the curator — and it must never cross into anything she sees. See member.ts:
+ * an unfillable slot means the deliverable does not exist in her Revelle. Not
+ * an error, not a placeholder, not an apology. Silence.
+ *
+ * Distinct from ExcludedSlot, which is not a work order at all.
+ */
 export type CatalogueGap = {
   pool: string;
   slotCode: string;
@@ -360,6 +453,15 @@ export type BudgetReport = {
   unpricedItems: string[];
 };
 
+/**
+ * THE CURATOR'S ACCOUNT. House-facing, every sentence of it.
+ *
+ * That was already the intent; it is now also enforced, because "curator-facing
+ * by convention" is a rule the first person to build a preview page breaks by
+ * accident. MemberRevelle in member.ts structurally cannot carry this field,
+ * and memberRevelle() is the only sanctioned way to get from a Candidate to
+ * something a member may see.
+ */
 export type Explanation = {
   headline: string;
   destination: string[];
@@ -369,6 +471,8 @@ export type Explanation = {
   swapped: string[];
   budget: string[];
   gaps: string[];
+  /** Slots she does not have. Not gaps, and never in the same list. */
+  excluded: string[];
   confidence: string[];
   /** Her free-text answer, verbatim. Never summarised. */
   secret: string | null;
@@ -389,6 +493,20 @@ export type Candidate = {
   score: number;
   /** Low confidence forces curator review regardless of sampling rate. */
   lowConfidence: boolean;
+  /**
+   * WHY THIS ONE MUST NOT GO OUT, or null when it may.
+   *
+   * The only thing that ever sets it is assemblage uniqueness — this exact set
+   * has already been delivered to someone, and delivering it again would make
+   * two women's Revelles the same object. That is a reason to withhold the
+   * whole candidate.
+   *
+   * A CATALOGUE GAP IS NOT. A slot the pool could not fill leaves her Revelle
+   * one piece smaller and nothing else; it never sets this, never blocks
+   * issuance, and never reaches her. memberRevelle() refuses a blocked
+   * candidate outright and the sentence stays here, on the house side.
+   */
+  blocked: string | null;
   explanation: Explanation;
 };
 
@@ -399,7 +517,10 @@ export type SelectionResult = {
   /** Set when dealbreakers left nothing at all. */
   impasse: string | null;
   seed: number;
+  /** What the house must author. A work order. */
   gaps: CatalogueGap[];
+  /** What she said she does not have. NOT a work order. */
+  excluded: ExcludedSlot[];
 };
 
 // ── tuning ───────────────────────────────────────────────────────────

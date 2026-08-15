@@ -430,7 +430,11 @@ export type GenerationStatus = {
   createdAt: Date;
   startedAt: Date | null;
   finishedAt: Date | null;
-  /** Null when nothing further is scheduled — stop polling. */
+  /**
+   * Null if and only if the job has settled. Otherwise the soonest moment
+   * anything is due — including a piece's retry while the parent itself is
+   * merely waiting. A page can poll until this is null and nothing else.
+   */
   nextAttemptAt: Date | null;
   lastError: string | null;
   piecesTotal: number;
@@ -486,7 +490,8 @@ export type QueueHealth = {
   queued: number;
   running: number;
   waiting: number;
-  failed: number;
+  /** Failures in the last 24 hours. Bounded on purpose — see db/008. */
+  failedLastDay: number;
   leasesExpired: number;
   /** Milliseconds. Growing past a few minutes means nothing is claiming. */
   oldestRunnableAgeMs: number | null;
@@ -495,7 +500,7 @@ export type QueueHealth = {
 
 export async function queueHealth(db: Queryable): Promise<QueueHealth> {
   const { rows } = await db.query<QueryRow>(
-    `select queued, running, waiting, failed, leases_expired,
+    `select queued, running, waiting, failed_last_day, leases_expired,
             extract(epoch from oldest_runnable_age) * 1000 as oldest_ms,
             last_failure_at
        from job_queue_health`
@@ -505,7 +510,7 @@ export async function queueHealth(db: Queryable): Promise<QueueHealth> {
     queued: Number(row.queued ?? 0),
     running: Number(row.running ?? 0),
     waiting: Number(row.waiting ?? 0),
-    failed: Number(row.failed ?? 0),
+    failedLastDay: Number(row.failed_last_day ?? 0),
     leasesExpired: Number(row.leases_expired ?? 0),
     oldestRunnableAgeMs:
       row.oldest_ms === null || row.oldest_ms === undefined

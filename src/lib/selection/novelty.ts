@@ -224,9 +224,13 @@ export function ensureNovel(
  *   optional before required, then fewest points contributed, then most
  *   alternatives available
  *
- * and the first entry with somewhere to go is the one that moves. A pick with
- * no alternatives at all is skipped rather than returned, because "swap it" is
- * not an instruction that can be carried out.
+ * and the first entry is the one that moves.
+ *
+ * Picks with NO alternatives are returned too, last. It is tempting to filter
+ * them out — "swap it" is not an instruction that can be carried out — but
+ * filtering them is what made an assemblage with no spare ingredients anywhere
+ * fail outright, when dropping one optional pick would have resolved it.
+ * Swapping is not the only local repair; it is only the first one to try.
  */
 function leastLoadBearing(
   picks: readonly Pick[],
@@ -240,10 +244,10 @@ function leastLoadBearing(
       );
       return { index, pick, alternatives };
     })
-    .filter((entry) => entry.alternatives.length > 0)
     .sort(
       (a, b) =>
         Number(a.pick.slot.required) - Number(b.pick.slot.required) ||
+        Number(a.alternatives.length === 0) - Number(b.alternatives.length === 0) ||
         a.pick.score - b.pick.score ||
         b.alternatives.length - a.alternatives.length
     );

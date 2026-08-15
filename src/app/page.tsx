@@ -103,11 +103,13 @@ export default function Home() {
                 Pricing
               </Link>
               {/*
-                Login goes here and is one line away. It is held back only
-                because /login does not exist yet — a door in the masthead that
-                opens onto a 404 is worse than a masthead with one door. Put it
-                back the moment the route lands.
+                The second door, for someone who already belongs. It signs in
+                a member and a curator alike — /login decides which room from
+                the address, and says nothing to either of them about which.
               */}
+              <Link className={styles.mastheadLink} href="/login">
+                Login
+              </Link>
             </nav>
           </div>
 
