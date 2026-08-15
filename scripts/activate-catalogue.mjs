@@ -87,7 +87,7 @@ try {
     const { rows } = await client.query(
       `select format(
                 'update %I set %I = %L where %I = %L returning slug',
-                $1, $2, $3, $2, 'draft'
+                $1::text, $2::text, $3::text, $2::text, 'draft'
               ) as sql`,
       [p.entity_table, p.active_column, p.active_value]
     );
