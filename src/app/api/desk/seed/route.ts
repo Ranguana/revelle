@@ -44,16 +44,31 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /** Exactly the preDeployCommand render.yaml carries, in order. */
-const STEPS = [
-  "seed:destinations",
-  "seed:menus",
-  "seed:drinks",
-  "seed:games",
+const STEPS: readonly (readonly [string, ...string[]])[] = [
+  ["seed:destinations"],
+  ["seed:menus"],
+  ["seed:drinks"],
+  ["seed:games"],
   // Twice on purpose: the menu and drink seeders create a draft stub for a
   // destination that has content and no authored look, and this is what
   // completes a stub once somebody writes the voice.
-  "seed:destinations",
-] as const;
+  ["seed:destinations"],
+];
+
+/**
+ * Offering the catalogue, which the seeders deliberately will not do.
+ *
+ * Everything a seeder creates is a draft, because deciding that something
+ * reaches a customer is a curator's decision. This is that decision, and it is
+ * a SEPARATE call — POST with {"activate": true} — so it can never happen as a
+ * side effect of seeding.
+ *
+ * It publishes a destination only if that destination has a published voice.
+ * A house with a look and no voice cannot write anything.
+ */
+const ACTIVATE: readonly (readonly [string, ...string[]])[] = [
+  ["activate:catalogue", "--", "--yes"],
+];
 
 function sameSecret(given: string, expected: string): boolean {
   const a = Buffer.from(given);
@@ -64,9 +79,10 @@ function sameSecret(given: string, expected: string): boolean {
   return timingSafeEqual(a, b);
 }
 
-function run(script: string): Promise<{ script: string; code: number; output: string }> {
+function run(argv: readonly string[]): Promise<{ script: string; code: number; output: string }> {
+  const script = argv.join(" ");
   return new Promise((resolve) => {
-    const child = spawn("npm", ["run", script], {
+    const child = spawn("npm", ["run", ...argv], {
       env: process.env,
       // The repo root. Render runs the service from it, and a seeder resolves
       // docs/menus.md relative to its own file rather than to cwd, so this is
@@ -101,8 +117,12 @@ export async function POST(request: Request): Promise<Response> {
     return new Response("Not found", { status: 404 });
   }
 
+  // A body is optional; a malformed one is not a reason to fail.
+  const body = (await request.json().catch(() => null)) as { activate?: unknown } | null;
+  const steps = body?.activate === true ? [...STEPS, ...ACTIVATE] : STEPS;
+
   const results: { script: string; code: number; output: string }[] = [];
-  for (const step of STEPS) {
+  for (const step of steps) {
     const result = await run(step);
     results.push(result);
     // Stop at the first failure rather than pressing on: the later seeders

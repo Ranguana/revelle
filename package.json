@@ -22,7 +22,8 @@
     "seed:occasion": "node scripts/seed-occasion.mjs",
     "selection:demo": "node scripts/selection-demo.mjs",
     "build:tone-marks": "node scripts/build-tone-marks.mjs",
-    "check:tone-marks": "node scripts/build-tone-marks.mjs --check"
+    "check:tone-marks": "node scripts/build-tone-marks.mjs --check",
+    "activate:catalogue": "node scripts/activate-catalogue.mjs"
   },
   "dependencies": {
     "next": "16.3.1",
