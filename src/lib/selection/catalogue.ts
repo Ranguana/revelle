@@ -32,6 +32,7 @@ import type {
   OccasionClaim,
   OccasionCode,
   OccasionShape,
+  PrintedPiece,
   Scale,
   SelectionInput,
   SelectionResult,
@@ -148,7 +149,8 @@ async function loadApplication(
   if (!row) throw new Error(`No application ${applicationId}`);
 
   const { rows: statedRows } = await db.query(
-    `select facet_id, dimension_code, facet_code, facet_label, quiz_field, polarity
+    `select facet_id, dimension_code, facet_code, facet_label, quiz_field,
+            polarity, answer_weight
        from quiz_response_facet
       where quiz_response_id = $1`,
     [applicationId]
@@ -161,7 +163,22 @@ async function loadApplication(
     label: str(r.facet_label),
     field: str(r.quiz_field),
     polarity: str(r.polarity) === "negative" ? "negative" : "positive",
+    // numeric, so it arrives as a string. A missing or unreadable weight falls
+    // back to 1 — the value every answer carried before db/016 — because the
+    // failure mode of guessing zero is an answer that silently means nothing.
+    weight: num(r.answer_weight) ?? 1,
   }));
+
+  // SLOTS SHE DOES NOT HAVE. The codes as she stated them, resolved by the
+  // database through quiz_option_exclusion (db/016) and passed to
+  // hostExclusions() verbatim. Nothing is derived from an answer that means
+  // something else — db/014 refused the two near misses by name, and that
+  // refusal is why this is a read rather than a rule.
+  const { rows: exclusionRows } = await db.query(
+    `select exclusion_code from quiz_response_exclusion
+      where quiz_response_id = $1`,
+    [applicationId]
+  );
 
   const scale: Scale = {
     guestBand: nullableStr(row.guest_count_band),
@@ -189,15 +206,13 @@ async function loadApplication(
     musicService: nullableStr(row.music_service),
     stated,
     scale,
-    // The third gate, and today it is empty for everyone: nothing the quiz
-    // currently asks can state "I am not serving food" or "no games". When the
-    // question exists, `recorded` is where its answer arrives and this line
-    // does not change. See exclusions.ts, which names the wiring exactly.
+    // The third gate. `recorded` is exactly what db/014 said it would be: the
+    // codes she stated, read back, with the rule itself unchanged.
     exclusions: hostExclusions({
       occasion: str(row.occasion) as OccasionCode,
       environment: str(row.environment),
       stated,
-      recorded: [],
+      recorded: exclusionRows.map((r) => str(r.exclusion_code)),
     }),
     createdAt: iso(row.created_at),
   };
@@ -331,38 +346,77 @@ async function loadDestinations(db: Queryable): Promise<Destination[]> {
 const POOLS: readonly {
   pool: string;
   table: string;
+  /**
+   * The column holding the sentence a member reads. `description` in three of
+   * the four pools; a menu's is its dishes, in the author's own punctuation,
+   * because a menu has no description and its line IS the thing (db/012).
+   */
+  describe: string;
   price: string | null;
   minGuests: string | null;
   maxGuests: string | null;
   /** game.shape — db/010. Only the game pool has one. */
   shape: string | null;
+  /**
+   * The table of objects this pool sets in the destination's typeface —
+   * game_printed_matter, db/010. Null in a pool that prints nothing of its
+   * own, which is every pool but games today.
+   */
+  printed: string | null;
   active: string;
 }[] = [
   {
     pool: "product",
     table: "product",
+    describe: "description",
     price: "price_cents",
     minGuests: null,
     maxGuests: null,
     shape: null,
+    printed: null,
     active: "t.status = 'active'",
   },
   {
     pool: "game",
     table: "game",
+    describe: "description",
     price: "price_cents",
     minGuests: "min_guests",
     maxGuests: "max_guests",
     shape: "shape",
+    printed: "game_printed_matter",
     active: "t.status = 'active'",
   },
   {
     pool: "tracklist",
     table: "tracklist",
+    describe: "description",
     price: null,
     minGuests: null,
     maxGuests: null,
     shape: null,
+    printed: null,
+    active: "t.status = 'active'",
+  },
+  // MENUS — db/012's pool, and until now the only one the engine could not
+  // see, which meant `the_menu` reported a catalogue gap on every occasion
+  // that has one however full the pool was. It is registered exactly like the
+  // other three (install_facet_tags, install_revelle_ingredients and the three
+  // scoping installers all ran in db/012), so it needs an entry here and
+  // nothing else.
+  //
+  // No price column, deliberately: db/012 declines to invent a per-head cost
+  // for a menu nobody has priced. It therefore arrives with priceCents null
+  // and is listed by name in the budget report, which is the honest version.
+  {
+    pool: "menu",
+    table: "menu",
+    describe: "dishes",
+    price: null,
+    minGuests: null,
+    maxGuests: null,
+    shape: null,
+    printed: null,
     active: "t.status = 'active'",
   },
 ];
@@ -373,7 +427,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
   for (const spec of POOLS) {
     const idColumn = `${spec.table}_id`;
     const { rows } = await db.query(
-      `select t.id, t.slug, t.name, t.description,
+      `select t.id, t.slug, t.name, t.${spec.describe} as description,
               ${spec.price ? `t.${spec.price}` : "null::integer"} as price_cents,
               ${spec.minGuests ? `t.${spec.minGuests}` : "null::integer"} as min_guests,
               ${spec.maxGuests ? `t.${spec.maxGuests}` : "null::integer"} as max_guests,
@@ -400,6 +454,18 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
                                              'note', w.note))
                    from ${spec.table}_world w where w.${idColumn} = t.id),
                 '{}'::jsonb) as worlds,
+              ${
+                spec.printed
+                  ? `coalesce(
+                (select jsonb_agg(jsonb_build_object(
+                          'piece', pm.piece, 'label', pm.label,
+                          'description', pm.description,
+                          'per_guest', pm.per_guest, 'quantity', pm.quantity)
+                        order by pm.position, pm.piece)
+                   from ${spec.printed} pm where pm.${idColumn} = t.id),
+                '[]'::jsonb)`
+                  : "'[]'::jsonb"
+              } as printed_matter,
               s.issue_count, s.last_issued_at, s.customer_count
          from ${spec.table} t
          left join ingredient_issuance s
@@ -424,6 +490,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
         minGuests: num(row.min_guests),
         maxGuests: num(row.max_guests),
         shape: gameShape(row.shape),
+        printedMatter: printedPieces(row.printed_matter),
         isFixture: str(row.slug).startsWith("fixture-"),
       });
     }
@@ -640,6 +707,20 @@ function scopes(value: unknown): Ingredient["worlds"] {
     }
   }
   return out;
+}
+
+function printedPieces(value: unknown): PrintedPiece[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((entry) => {
+    const row = entry as Record<string, unknown>;
+    return {
+      piece: str(row.piece),
+      label: str(row.label),
+      description: str(row.description ?? ""),
+      perGuest: Boolean(row.per_guest),
+      quantity: num(row.quantity),
+    };
+  });
 }
 
 function issuance(row: Record<string, unknown>): Ingredient["issuance"] {

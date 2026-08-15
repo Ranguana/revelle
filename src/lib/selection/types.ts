@@ -107,6 +107,19 @@ export type StatedFacet = {
   label: string;
   field: string;
   polarity: Polarity;
+  /**
+   * quiz_option_facet.answer_weight — db/016. HOW MUCH, AND WHICH END, signed
+   * -1..1 and never zero. 1 for every answer to an unordered question, which is
+   * all of them until the making axis.
+   *
+   * A NEGATIVE WEIGHT IS NOT A VETO, and the two must never be collapsed.
+   * `polarity` answers "is this a dealbreaker" and only "what would ruin it" is
+   * asked that way. This answers "which end of an ordinal axis", and it is
+   * scored: a host who wants everything to arrive finished is pulled toward the
+   * most finished menus in the pool, not shown an empty table because
+   * everything in it involves cooking.
+   */
+  weight: number;
 };
 
 /** The application, resolved. */
@@ -133,8 +146,9 @@ export type Application = {
    * plan before the fill runs, so it is never filled, never dropped and never
    * reported as missing.
    *
-   * Empty today, and deliberately so — see exclusions.ts for exactly which
-   * question would fill it.
+   * Filled from `quiz_response_exclusion` (db/016), which resolves her answers
+   * about food and about games into slot_exclusion codes the same way
+   * quiz_response_facet resolves the rest of them into vocabulary.
    */
   exclusions: string[];
   createdAt: string;
@@ -210,6 +224,29 @@ export type WorldScope = {
   note: string | null;
 };
 
+/**
+ * ONE OBJECT THAT GETS PRINTED — game_printed_matter in db/010.
+ *
+ * A real thing in the destination's palette and face: the rules card, the
+ * prompts, the ballot. It is a property of the INGREDIENT and not of the
+ * Revelle, because it is authored once with the game and travels with it into
+ * every Revelle the game lands in.
+ *
+ * Nothing here scores or filters. It is carried so that member.ts can answer
+ * "what is printed" from the same object that answers "what did she get",
+ * which is the one-answer rule that file states.
+ */
+export type PrintedPiece = {
+  /** 'the_deck', 'voting_slips'. Machine-stable within its ingredient. */
+  piece: string;
+  label: string;
+  description: string;
+  /** One per head, counted from the top of her guest band. */
+  perGuest: boolean;
+  /** A fixed count when it is not per head. Null when nobody has counted. */
+  quantity: number | null;
+};
+
 /** One member of one pool. */
 export type Ingredient = {
   pool: string;
@@ -233,6 +270,15 @@ export type Ingredient = {
    * evening. A constraint on the SET, never a score.
    */
   shape: GameShape | null;
+  /**
+   * WHAT GETS PRINTED, when this ingredient brings objects with it.
+   *
+   * Optional rather than an empty array, so that a snapshot assembled by hand
+   * — every fixture in selection.test.ts, every caller written before db/010
+   * grew the table — stays valid without being edited. Absent and empty mean
+   * the same thing to every reader: this ingredient prints nothing.
+   */
+  printedMatter?: readonly PrintedPiece[];
   isFixture: boolean;
 };
 

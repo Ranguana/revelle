@@ -59,10 +59,21 @@ const DISCO = facet("f-disco", "taste_direction", "disco_after_dark");
 const NOVELTY = facet("f-novelty", "anti_preference", "novelty");
 const EASE = facet("f-ease", "affinity", "ease");
 const GUESTS = facet("f-guests", "guest_count", "from_9_to_12");
+/** db/016's making axis. One signed facet, four answers on it. */
+const MADE = facet("f-made", "making", "made_by_hand");
 
 const OPTIONS = withDefaults({ seed: 42, now: new Date("2026-08-15T00:00:00Z") });
 
-function stated(f: Facet, polarity: "positive" | "negative" = "positive"): StatedFacet {
+/**
+ * `weight` defaults to 1, which is what every answer to an unordered question
+ * carries. The making axis is the first question with four answers on one
+ * signed axis; pass a weight to build one of those.
+ */
+function stated(
+  f: Facet,
+  polarity: "positive" | "negative" = "positive",
+  weight = 1
+): StatedFacet {
   return {
     facetId: f.id,
     dimension: f.dimension,
@@ -70,6 +81,7 @@ function stated(f: Facet, polarity: "positive" | "negative" = "positive"): State
     label: f.label,
     field: f.dimension,
     polarity,
+    weight,
   };
 }
 
@@ -333,6 +345,23 @@ const SLOT_RULES: SlotRule[] = [
     note: "",
     excludedBy: null,
   },
+  // db/014's excludable slot, with db/016's answer now able to remove it.
+  // Required by the occasion, which is the interesting half: her answer wins.
+  {
+    slotCode: "the_menu",
+    label: "The menu",
+    description: "",
+    section: "details",
+    perGuest: false,
+    pool: "menu",
+    minCount: 1,
+    maxCount: 1,
+    required: true,
+    perDay: false,
+    position: 15,
+    note: "",
+    excludedBy: "no_food",
+  },
 ];
 
 test("planSlots: a per-day slot becomes one slot per day of the occasion", () => {
@@ -371,6 +400,71 @@ test("planSlots: a per-head slot counts from the TOP of the guest band", () => {
     openTopped.find((s) => s.slotCode === "favour")?.quantity,
     75,
     "an open-topped band falls back to the planning number, to be confirmed"
+  );
+});
+
+// ── slots she does not have ──────────────────────────────────────────
+
+test("planSlots: a slot she opted out of is never in the plan, and is not a gap", () => {
+  const plan = planSlots(SLOT_RULES, SHAPE, SCALE, ["no_food"]);
+
+  assert.equal(
+    plan.slots.filter((s) => s.slotCode === "the_menu").length,
+    0,
+    "removed before anything is scoped, so it can never go unfilled"
+  );
+  assert.equal(plan.excluded.length, 1);
+  assert.equal(plan.excluded[0].slotCode, "the_menu");
+  assert.equal(plan.excluded[0].exclusion, "no_food");
+  assert.ok(
+    plan.excluded[0].requiredByOccasion,
+    "the occasion asked for it and she outranks the occasion"
+  );
+  assert.match(plan.excluded[0].detail, /this is not a gap/);
+
+  // And everything else she did not opt out of is untouched.
+  assert.ok(plan.slots.some((s) => s.slotCode === "day_material"));
+});
+
+test("planSlots: an exclusion nobody stated removes nothing", () => {
+  const plan = planSlots(SLOT_RULES, SHAPE, SCALE, ["no_games"]);
+  assert.equal(plan.excluded.length, 0, "no slot here is removed by no_games");
+  assert.ok(plan.slots.some((s) => s.slotCode === "the_menu"));
+});
+
+test("an opted-out slot produces no gap; an unfillable one still does", () => {
+  const vector = buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS);
+  const scope = (exclusions: string[]) => {
+    const slots = planSlots(SLOT_RULES, SHAPE, SCALE, exclusions).slots;
+    // An empty menu pool either way. The only difference is whether the slot
+    // was ever in the plan.
+    return fillSlots(
+      scopePools(
+        slots,
+        [],
+        destination("d1", "SOMEWHERE", {}),
+        "girls_weekend",
+        vector.weights,
+        vector.dealbreakers,
+        (id) => FACETS[id]?.label ?? id,
+        SCALE,
+        OPTIONS,
+        OPTIONS.now!
+      ),
+      SCALE,
+      SHAPE,
+      OPTIONS
+    );
+  };
+
+  assert.ok(
+    scope([]).gaps.some((g) => g.slotCode === "the_menu"),
+    "she wanted a menu and the pool could not fill it: a work order"
+  );
+  assert.equal(
+    scope(["no_food"]).gaps.filter((g) => g.slotCode === "the_menu").length,
+    0,
+    "she is not serving food: there is nothing to author"
   );
 });
 
@@ -458,6 +552,33 @@ test("buildVector: a soft negative is worth about a fifth of a positive", () => 
   );
   const ratio = Math.abs(vector.weights[NOVELTY.id] / vector.weights[COASTAL.id]);
   assert.ok(Math.abs(ratio - OPTIONS.softNegativeRatio) < 1e-9);
+});
+
+test("buildVector: an ordinal answer carries its own weight and its own sign", () => {
+  const made = buildVector([stated(MADE, "positive", 1)], [], [], FACETS, OPTIONS);
+  const leaning = buildVector([stated(MADE, "positive", 0.4)], [], [], FACETS, OPTIONS);
+  const bought = buildVector([stated(MADE, "positive", -1)], [], [], FACETS, OPTIONS);
+
+  assert.equal(made.weights[MADE.id], OPTIONS.statedWeight);
+  assert.ok(
+    Math.abs(leaning.weights[MADE.id] - OPTIONS.statedWeight * 0.4) < 1e-9,
+    "mostly made is a weaker claim than actually made, not a different one"
+  );
+  assert.equal(bought.weights[MADE.id], -OPTIONS.statedWeight);
+});
+
+test("buildVector: a negative-weight answer is NOT a dealbreaker", () => {
+  const bought = buildVector([stated(MADE, "positive", -1)], [], [], FACETS, OPTIONS);
+  assert.deepEqual(
+    bought.dealbreakers,
+    [],
+    "she asked for the other end of an axis; she did not veto anything"
+  );
+
+  // The contrast, so the difference is on the record: the SAME facet, asked
+  // the way "what would ruin it" asks, does eliminate.
+  const vetoed = buildVector([stated(MADE, "negative")], [], [], FACETS, OPTIONS);
+  assert.deepEqual(vetoed.dealbreakers, [MADE.id]);
 });
 
 test("buildVector: a scale answer is a constraint and never a taste", () => {
@@ -582,6 +703,66 @@ test("scoping: a group-size limit is a constraint, and it says so", () => {
   assert.equal(day1.candidates.length, 0);
   assert.ok(day1.gap, "an empty required pool is a catalogue gap");
   assert.match(day1.gap!.detail, /tops out at 4 people and there are 12/);
+});
+
+/**
+ * THE MAKING AXIS, END TO END OVER ONE POOL.
+ *
+ * Four menus at the four authored levels, and the same host answering the
+ * question two different ways. The pool does not change; the order does, and
+ * nothing is ever removed from it — which is the whole instruction: a host who
+ * wants everything bought is shown the most finished things there are, not an
+ * empty table.
+ */
+test("the making axis reorders the pool and never empties it", () => {
+  const menus = [
+    ingredient("m-actually", "menu", "Actually made", { [MADE.id]: 1 }),
+    ingredient("m-mostly", "menu", "Mostly made", { [MADE.id]: 0.4 }),
+    ingredient("m-half", "menu", "Half made", { [MADE.id]: -0.4 }),
+    ingredient("m-bought", "menu", "Bought and arranged", { [MADE.id]: -1 }),
+  ];
+
+  const rank = (answerWeight: number) => {
+    const vector = buildVector(
+      [stated(MADE, "positive", answerWeight)],
+      [],
+      [],
+      FACETS,
+      OPTIONS
+    );
+    const slots = planSlots(SLOT_RULES, SHAPE, SCALE).slots;
+    const pools = scopePools(
+      slots,
+      menus,
+      destination("d1", "SOMEWHERE", {}),
+      "girls_weekend",
+      vector.weights,
+      vector.dealbreakers,
+      (id) => FACETS[id]?.label ?? id,
+      SCALE,
+      OPTIONS,
+      OPTIONS.now!
+    );
+    const menu = [...pools.values()].find((p) => p.slot.slotCode === "the_menu")!;
+    return menu.candidates.map((c) => c.ingredient.name);
+  };
+
+  assert.deepEqual(rank(1), [
+    "Actually made",
+    "Mostly made",
+    "Half made",
+    "Bought and arranged",
+  ]);
+  assert.deepEqual(
+    rank(-1),
+    ["Bought and arranged", "Half made", "Mostly made", "Actually made"],
+    "the ladder inverts whole, which four independent facets could not do"
+  );
+  assert.equal(
+    rank(-1).length,
+    menus.length,
+    "nothing is eliminated: a weight, not a filter"
+  );
 });
 
 test("a thin pool is a catalogue gap and never an error", () => {

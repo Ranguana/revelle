@@ -42,8 +42,12 @@ import { TONE_GROUPS, TONES } from "./voice.ts";
  *
  * 2026-08-c adds the voice question. A response written against 2026-08-b has
  * no `voice_tones` and is not missing one.
+ *
+ * 2026-08-d adds three: what is being eaten, where games sit, and how much of
+ * it she wants to make. It also adds four options to "how does this group
+ * actually have fun", which is additive and would not on its own need a bump.
  */
-export const QUIZ_VERSION = "2026-08-c";
+export const QUIZ_VERSION = "2026-08-d";
 
 export type QuizOption = {
   /** Permanent. Stored in the database. */
@@ -180,6 +184,19 @@ const TASTE_DIRECTIONS: readonly QuizOption[] = [
   { code: "faded_coastal", label: "Faded coastal", hint: "Salt on everything, bare feet by eight" },
 ];
 
+/*
+ * The last four were added by db/016, and they are the four things
+ * src/lib/games.ts wrote down and then refused to insert: "none of them is
+ * worth an insert until a host can ANSWER in it". Making something, working the
+ * room, keeping a secret, and playing for stakes are what the founder's seven
+ * games actually split along, and until now the nearest terms were
+ * `cook_together` for a room with paint on its hands and `compete` for talking
+ * a stranger out of a foreign coin.
+ *
+ * They belong here and not in four private facets on the catalogue side, for
+ * the reason that file gives: a description in a richer vocabulary than the one
+ * she answers in leaves the join returning mush.
+ */
 const GROUP_FUN: readonly QuizOption[] = [
   { code: "long_dinner", label: "Sit at the table for five hours" },
   { code: "dance", label: "Dance without being asked twice" },
@@ -191,6 +208,121 @@ const GROUP_FUN: readonly QuizOption[] = [
   { code: "wander", label: "End up somewhere unplanned" },
   { code: "swim_late", label: "Swim long after dark" },
   { code: "cook_together", label: "Crowd into the kitchen" },
+  { code: "make_something", label: "Make something with their hands" },
+  { code: "work_the_room", label: "Talk a stranger into something" },
+  { code: "keep_a_secret", label: "Keep something to themselves all night" },
+  { code: "play_for_stakes", label: "Play for something worth winning" },
+];
+
+/**
+ * WHAT IS BEING EATEN — and, in two of its four answers, whether there is a
+ * menu at all.
+ *
+ * "Maybe someone won't even be serving food, in that case no menu." Nothing in
+ * the application could state that until now, and db/014 refused every near
+ * miss rather than infer it: a restaurant is a ROOM, and a room says where and
+ * not whether. This asks.
+ *
+ * The other two answers earn their place separately: the menu pool already
+ * distinguishes a dinner from a standing party in the author's own words —
+ * menu 2 in docs/menus.md is "a cocktail party, standing, not dinner" — so the
+ * same tap that states the fact also weights the pool.
+ */
+const FOOD_PLANS: readonly QuizOption[] = [
+  {
+    code: "sit_down",
+    label: "Dinner at a table",
+    hint: "Courses, and nobody gets up",
+  },
+  {
+    code: "standing",
+    label: "Things to pick at, standing up",
+    hint: "A cocktail party, not a dinner",
+  },
+  {
+    code: "eating_out",
+    label: "A table booked somewhere else",
+    hint: "Somebody else is choosing the food",
+  },
+  {
+    code: "drinks_only",
+    label: "Drinks, and nothing that needs a plate",
+  },
+];
+
+/**
+ * WHERE GAMES SIT — appetite, and it can be an outright no.
+ *
+ * Distinct from "what would ruin it", where `forced_fun` lives, and the
+ * distinction is db/014's: a woman can veto forced participation and still want
+ * a game. One is a dislike, scored; this is a fact about the evening, and
+ * "none at all" removes the game slots before anything is chosen.
+ *
+ * Distinct again from "how does this group actually have fun", which says what
+ * KIND. A wildly competitive group can still want nothing organised.
+ *
+ * WHETHER THEY WILL PERFORM IS NOT ASKED HERE, because it is already asked
+ * twice: `perform` on the question above, which is what actually weights the
+ * game pool, and the whole `performance` group of tones on the voice question,
+ * which includes "Would rather die than perform".
+ */
+const PLAY_APPETITES: readonly QuizOption[] = [
+  { code: "none", label: "None at all", hint: "The evening runs itself" },
+  {
+    code: "one_thing",
+    label: "One, at the right moment",
+    hint: "It starts, it ends, everyone goes back to the table",
+  },
+  {
+    code: "underneath",
+    label: "Something running underneath",
+    hint: "Nobody has to stop what they are doing",
+  },
+  {
+    code: "the_point",
+    label: "The games are the night",
+    hint: "This is what they came for",
+  },
+];
+
+/**
+ * HOW MUCH OF IT SHE WANTS TO MAKE.
+ *
+ * The founder's four values, authored for menus in docs/menus.md — actually
+ * made, mostly made, half made, bought and arranged — asked once and applied to
+ * everything: the menu, the printed matter, the edit, the table.
+ *
+ * IT IS NOT A BUDGET QUESTION. `spend_per_person` asks about money and this
+ * does not, and the two are independent in both directions: expensive materials
+ * worked by hand sit at one end of this axis and cheap things that arrive
+ * finished sit at the other. On this axis, finished means somebody else did the
+ * work and it shows in the finish.
+ *
+ * db/016 carries it as ONE signed facet rather than four, so that the middle of
+ * the ladder is ordered — bought and arranged is nearer half made than it is to
+ * actually made, and four separate terms could not say so.
+ */
+const MAKING_LEVELS: readonly QuizOption[] = [
+  {
+    code: "actually_made",
+    label: "Made by hand, all of it",
+    hint: "The afternoon before is part of the evening",
+  },
+  {
+    code: "mostly_made",
+    label: "Made by hand, mostly",
+    hint: "One or two things arrive finished",
+  },
+  {
+    code: "half_made",
+    label: "Half made, half arranged",
+    hint: "One real dish and a good table",
+  },
+  {
+    code: "bought_and_arranged",
+    label: "Bought and arranged",
+    hint: "Nothing is cooked. The plates are the work",
+  },
 ];
 
 const ANTI_PREFERENCES: readonly QuizOption[] = [
@@ -349,6 +481,16 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
     help: "If it is not settled, say so — it changes what we send.",
     fields: [{ id: "environment", type: "single", options: ENVIRONMENTS }],
   },
+  // Straight after the room, because it is the same subject: what the room is
+  // for. And before anything about taste, because two of its answers remove a
+  // deliverable, and a question that can delete the menu should be asked while
+  // she is still describing the evening rather than decorating it.
+  {
+    key: "food",
+    eyebrow: "The food",
+    title: "What are they eating?",
+    fields: [{ id: "food_plan", type: "single", options: FOOD_PLANS }],
+  },
   {
     key: "taste",
     eyebrow: "The direction",
@@ -419,6 +561,26 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
         max: 3,
       },
     ],
+  },
+  // After "what would ruin it" and not before it. She has just said whether
+  // forced participation is a dealbreaker; this asks the different question of
+  // whether there is anything organised at all, and the two read as a pair
+  // rather than as the same question twice.
+  {
+    key: "play",
+    eyebrow: "The games",
+    title: "Where do games sit in this?",
+    fields: [{ id: "play_appetite", type: "single", options: PLAY_APPETITES }],
+  },
+  // Beside the games and nowhere near the spend question, deliberately. This is
+  // about her hands, that one is about her money, and putting them on adjacent
+  // screens is how "luxury" quietly comes to mean "expensive".
+  {
+    key: "making",
+    eyebrow: "The making",
+    title: "How much of this do you want to make?",
+    help: "The food, the table, the paper — one answer covers all of it.",
+    fields: [{ id: "how_made", type: "single", options: MAKING_LEVELS }],
   },
   {
     key: "secret",

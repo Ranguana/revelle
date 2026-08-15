@@ -28,6 +28,10 @@
  *             for how it is PRESENTED. Reported so a drift that was not
  *             intended gets noticed.
  *
+ * A fourth case is not a disagreement at all and is listed separately: an
+ * ORDINAL question whose options are four points on ONE signed axis. Its words
+ * are supposed to differ from the facet's. See the note above `sharesAnAxis`.
+ *
  * Exit code is non-zero only for MISSING.
  *
  * ─────────────────────────────────────────────────────────────────────
@@ -65,6 +69,7 @@ await client.connect();
 
 const { rows } = await client.query(`
   select m.quiz_field, m.option_code::text as option_code, m.answer_polarity,
+         m.facet_id::text as facet_id, m.answer_weight::float8 as answer_weight,
          f.label, f.description, f.status
     from quiz_option_facet m
     join facet f on f.id = m.facet_id
@@ -96,8 +101,34 @@ await client.end();
 
 const mapped = new Map(rows.map((r) => [`${r.quiz_field}/${r.option_code}`, r]));
 
+/*
+ * AN ORDINAL QUESTION SHARES ONE FACET ACROSS ITS OPTIONS, and the wording
+ * check has to know that or it reports drift forever.
+ *
+ * Most questions are unordered and their options map one-to-one onto facets —
+ * the facet IS the option, so its label and description should be the option's
+ * label and hint, and a difference is real drift worth printing.
+ *
+ * An ordinal question is not like that. "How much of this do you want to make?"
+ * has four answers on ONE signed axis (db/016: four separate terms could not
+ * say that bought and arranged is nearer half made than actually made), so the
+ * facet's words describe the AXIS and the option's words describe one point on
+ * it. They differ on purpose and always will.
+ *
+ * So the comparison is skipped exactly where the mapping is not one-to-one,
+ * which is a property of the data rather than a list of exceptions to keep up
+ * to date.
+ */
+const optionsPerFacet = new Map();
+for (const row of rows) {
+  optionsPerFacet.set(row.facet_id, (optionsPerFacet.get(row.facet_id) ?? 0) + 1);
+}
+const sharesAnAxis = (row) => (optionsPerFacet.get(row.facet_id) ?? 0) > 1;
+
 const missing = [];
 const relabelled = [];
+/** Options that are one point on a shared, ordinal axis. Not drift. */
+const shared = [];
 const seen = new Set();
 
 for (const [fieldId, field] of Object.entries(FIELDS)) {
@@ -110,6 +141,10 @@ for (const [fieldId, field] of Object.entries(FIELDS)) {
     const row = mapped.get(key);
     if (!row) {
       missing.push(key);
+      continue;
+    }
+    if (sharesAnAxis(row)) {
+      shared.push(`${key} (weight ${row.answer_weight})`);
       continue;
     }
     if (row.label !== option.label) {
@@ -167,6 +202,9 @@ for (const facet of VOICE_FACETS) {
 for (const line of reweighted) console.log(`[check-facets] voice drift ${line}`);
 
 for (const line of relabelled) console.log(`[check-facets] relabelled  ${line}`);
+for (const line of shared) {
+  console.log(`[check-facets] one axis    ${line}`);
+}
 for (const key of orphaned) {
   console.log(`[check-facets] retired     ${key} (kept so old answers resolve)`);
 }
@@ -195,6 +233,7 @@ if (missing.length > 0) {
 
 console.log(
   `[check-facets] ok — ${seen.size} quiz options all resolve to facets ` +
-    `(${relabelled.length} relabelled, ${orphaned.length} retired), and ` +
+    `(${relabelled.length} relabelled, ${shared.length} on a shared axis, ` +
+    `${orphaned.length} retired), and ` +
     `every tone resolves to a voice axis (${reweighted.length} reweighted)`
 );

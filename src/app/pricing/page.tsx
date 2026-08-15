@@ -83,11 +83,33 @@ export default function PricingPage() {
                   <span className={styles.fine}> a year</span>
                 </p>
               )}
+              {/*
+                What membership adds over a single commission, and every line
+                is something a one-off structurally CANNOT have rather than
+                something withheld from it. A member does not get a better
+                Revelle — she gets a house that remembers. Withholding craft to
+                force an upgrade would poison the thing being sold.
+
+                No feature list, no ticks, no comparison table: a société
+                states its terms and does not argue for itself.
+              */}
               <p className={styles.termBody}>
-                Apply once, then dues annually. Being known is what dues buy:
-                your taste, your people, and every destination you have been
-                given, kept and carried forward, so the third is sharper than
-                the first.
+                Apply once, then dues annually. Membership is continuity: the
+                société keeps your taste, your people, and what you would never
+                do twice, so the third is sharper than the first.
+              </p>
+              <p className={styles.termBody}>
+                You are never given the same thing twice — not the same table,
+                the same game, or the same ending. Your people are remembered
+                as well as your taste, so the friend who will not get up in
+                front of a room never has to say so again.
+              </p>
+              <p className={styles.termBody}>
+                Everything you have been sent stays yours, in its own type,
+                years later. Anything you need written afterwards — a change of
+                plan, a note before, a thank-you — is written in the same voice
+                as the invitation. And the house writes when you have not asked
+                it to, a few times a year, about nothing you are buying.
                 {trialDays > 0
                   ? ` The first ${spellCount(trialDays)} days are free.`
                   : ""}

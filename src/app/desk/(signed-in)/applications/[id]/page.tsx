@@ -51,6 +51,9 @@ type Application = {
   guest_count_band: string | null;
   spend_per_person: string | null;
   music_service: string | null;
+  food_plan: string | null;
+  play_appetite: string | null;
+  how_made: string | null;
   event_date: string | null;
   guest_count_confirmed: number | null;
   answers: unknown;
@@ -81,6 +84,9 @@ export default async function ApplicationPage({
             qr.guest_count_band::text as guest_count_band,
             qr.spend_per_person::text as spend_per_person,
             qr.music_service::text as music_service,
+            qr.food_plan::text as food_plan,
+            qr.play_appetite::text as play_appetite,
+            qr.how_made::text as how_made,
             qr.event_date, qr.guest_count_confirmed, qr.answers,
             c.email::text as email, c.name,
             s.guests_low, s.guests_high, s.guests_planning,
@@ -177,6 +183,15 @@ export default async function ApplicationPage({
               </Fact>
               <Fact label="Music">
                 {optionLabel("music_service", application.music_service)}
+              </Fact>
+              <Fact label="Food">
+                {optionLabel("food_plan", application.food_plan)}
+              </Fact>
+              <Fact label="Games">
+                {optionLabel("play_appetite", application.play_appetite)}
+              </Fact>
+              <Fact label="Making">
+                {optionLabel("how_made", application.how_made)}
               </Fact>
             </div>
             <div className={styles.facts} style={{ marginTop: "0.5rem" }}>

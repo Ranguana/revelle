@@ -54,23 +54,25 @@
  * and that description returning mush, because she was never given a way to
  * make most of those claims.
  *
- * Four things the founder's games genuinely are, that the vocabulary cannot
- * currently say. They are written down rather than worked around, and none of
- * them is worth an insert until a host can ANSWER in it:
+ * Four things the founder's games genuinely are, that the vocabulary could not
+ * say. They were written down rather than worked around, because none of them
+ * was worth an insert until a host could ANSWER in it:
  *
  *   1. MAKING SOMETHING. Art Battle is a room of people with paint on their
- *      hands. `group_fun` has cook_together and nothing else physical.
+ *      hands. `group_fun` had cook_together and nothing else physical.
  *   2. WORKING THE ROOM. The Reverse Scavenger Hunt and the Secret Cards run on
  *      persuasion — talking a stranger out of a foreign coin. `compete` is the
  *      nearest term and competition is not persuasion.
  *   3. A SECRET. Two of these games turn on nobody knowing what anybody else is
- *      doing. Nothing expresses concealment.
+ *      doing. Nothing expressed concealment.
  *   4. STAKES — objects to win, and the willingness to gamble one. Two games
  *      are built on it.
  *
- * The honest proposal is a `group_fun` question with four more options, not
- * four facets tagged on one side of a join. See the report in the pull request
- * that added this file.
+ * The honest proposal was a `group_fun` question with four more options, not
+ * four facets tagged on one side of a join. That is what db/016 did:
+ * `make_something`, `work_the_room`, `keep_a_secret` and `play_for_stakes` are
+ * now four more tiles on "how does this group actually have fun", and the tags
+ * below are the other side of that join. Nothing else about these games moved.
  */
 
 /** db/010. What a game does to an evening. */
@@ -257,12 +259,26 @@ const ART_BATTLE: Game = {
     "Mistake.",
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "make_something",
+      weight: 1,
+      note: "The game this term was missing for. A room of people with paint on their hands.",
+    },
     { dimension: "affinity", code: "wit", weight: 0.9 },
     {
       dimension: "group_fun",
       code: "compete",
       weight: 0.8,
       note: "Five categories and a vote. It is a competition with a ballot.",
+    },
+    {
+      dimension: "group_fun",
+      code: "keep_a_secret",
+      weight: 0.5,
+      note:
+        "Nothing is signed and nobody may explain their own work. The room " +
+        "spends round two not knowing who made what.",
     },
     { dimension: "affinity", code: "one_moment", weight: 0.7 },
     {
@@ -413,9 +429,23 @@ const REVERSE_SCAVENGER_HUNT: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "work_the_room",
+      weight: 1,
+      note:
+        "The inversion IS this term: nothing is hidden and nothing may be " +
+        "taken, so the only way to get anything is to talk somebody out of it.",
+    },
+    {
+      dimension: "group_fun",
       code: "compete",
       weight: 1,
       note: "A scored list and a clock. This is the competitive one.",
+    },
+    {
+      dimension: "group_fun",
+      code: "play_for_stakes",
+      weight: 0.4,
+      note: "Scored, and the winner takes seventy-five into the auction.",
     },
     {
       dimension: "anti_preference",
@@ -556,7 +586,23 @@ const LETS_MAKE_A_DEAL: Game = {
     "and a hundred dollars of restaurant.",
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "play_for_stakes",
+      weight: 1,
+      note:
+        "Three doors, a real prize behind one, and a final gamble of " +
+        "everything held on one box. It is the term itself.",
+    },
     { dimension: "group_fun", code: "compete", weight: 0.9 },
+    {
+      dimension: "group_fun",
+      code: "work_the_room",
+      weight: 0.6,
+      note:
+        "The ticket market. The audience buying and selling from the " +
+        "contestant before a door opens is why the room is loud.",
+    },
     {
       dimension: "anti_preference",
       code: "novelty",
@@ -715,12 +761,34 @@ const SECRET_GAME_CARDS: Game = {
     "chores; with them, half the room is quietly being sabotaged.",
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "keep_a_secret",
+      weight: 1,
+      note:
+        "One card each and nobody says what is on theirs. Take the secret out " +
+        "and the deck is a list of chores.",
+    },
     { dimension: "affinity", code: "wit", weight: 1 },
+    {
+      dimension: "group_fun",
+      code: "work_the_room",
+      weight: 0.9,
+      note:
+        "Convince somebody you met a celebrity; get four strangers chanting " +
+        "your name; persuade somebody to lie for you.",
+    },
     {
       dimension: "group_fun",
       code: "perform",
       weight: 0.9,
       note: "A conga line and four strangers chanting your name.",
+    },
+    {
+      dimension: "group_fun",
+      code: "play_for_stakes",
+      weight: 0.5,
+      note: "Twenty Party Bucks a card, and a wicked card can take the lot.",
     },
     {
       dimension: "anti_preference",
@@ -840,6 +908,14 @@ const THE_SECRET_AUCTION: Game = {
     "rather than a prize-giving.",
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "play_for_stakes",
+      weight: 1,
+      note:
+        "A currency and not a raffle, spent on lots nobody has seen. The " +
+        "founder's own reason for the game is this term.",
+    },
     { dimension: "group_fun", code: "compete", weight: 1 },
     { dimension: "affinity", code: "one_moment", weight: 0.9 },
     {
@@ -1137,6 +1213,14 @@ const IMPOSTER: Game = {
     "which is the argument for never letting a recommended game be required.",
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "keep_a_secret",
+      weight: 1,
+      note:
+        "One person has not heard the word and has to get through the round " +
+        "without anybody finding out. That is the entire game.",
+    },
     { dimension: "group_fun", code: "compete", weight: 0.7 },
     { dimension: "affinity", code: "wit", weight: 0.7 },
     {

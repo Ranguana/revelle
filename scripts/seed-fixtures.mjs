@@ -1010,6 +1010,9 @@ const APPLICATIONS = [
     guests: "from_9_to_12",
     spend: "from_150_to_300",
     music: "spotify",
+    foodPlan: "sit_down",
+    playAppetite: "one_thing",
+    howMade: "actually_made",
     secret:
       "Her sister will bring a guitar. Nobody has told her not to bring the guitar.",
     cohorts: { "fixture-the-long-table": 0.7, "fixture-coastal-restraint": 0.3 },
@@ -1038,6 +1041,12 @@ const APPLICATIONS = [
     guests: "from_13_to_20",
     spend: "under_75",
     music: "apple_music",
+    // Under $75 a head AND everything arriving finished — the pair that proves
+    // the two axes are independent. She is not spending much and she is not
+    // cooking either, and neither answer implies the other.
+    foodPlan: "standing",
+    playAppetite: "the_point",
+    howMade: "bought_and_arranged",
     secret:
       "It is her fortieth and she has told exactly two people. The other eleven think it is a Tuesday.",
     cohorts: { "fixture-late-and-loud": 0.6, "fixture-the-long-table": 0.4 },
@@ -1056,6 +1065,10 @@ const APPLICATIONS = [
     guests: "from_6_to_8",
     spend: "over_600",
     music: "print",
+    // The other half of that pair: over $600 a head and making it herself.
+    foodPlan: "sit_down",
+    playAppetite: "underneath",
+    howMade: "actually_made",
     secret:
       "Two of them have not spoken since March. Both are coming and neither knows the other is.",
     cohorts: { "fixture-coastal-restraint": 0.8 },
@@ -1081,6 +1094,12 @@ const APPLICATIONS = [
     guests: "two",
     spend: "not_sure",
     music: "print",
+    // Both opt-outs, in one fixture. Dinner is booked somewhere else and
+    // nothing is organised: her plan has no menu and no games, neither is a
+    // gap, and neither reaches the desk's list.
+    foodPlan: "eating_out",
+    playAppetite: "none",
+    howMade: "bought_and_arranged",
     secret: "",
     cohorts: { "fixture-coastal-restraint": 0.5 },
     signals: [],
@@ -1414,6 +1433,9 @@ try {
       guest_count_band: application.guests,
       spend_per_person: application.spend,
       music_service: application.music,
+      food_plan: application.foodPlan,
+      play_appetite: application.playAppetite,
+      how_made: application.howMade,
       secret: application.secret,
       email: application.email,
     };
@@ -1423,8 +1445,10 @@ try {
       `insert into quiz_response
          (customer_id, answers, quiz_version, submission_key, occasion,
           environment, taste_directions, group_fun, anti_preferences, affinities,
-          secret, guest_count_band, spend_per_person, music_service)
-       values ($1, $2::jsonb, '2026-08-b', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+          secret, guest_count_band, spend_per_person, music_service,
+          food_plan, play_appetite, how_made)
+       values ($1, $2::jsonb, '2026-08-d', $3, $4, $5, $6, $7, $8, $9, $10, $11,
+               $12, $13, $14::food_plan, $15::play_appetite, $16::making_level)
        on conflict (submission_key) do update set status = quiz_response.status
        returning id`,
       [
@@ -1441,6 +1465,12 @@ try {
         application.guests,
         application.spend,
         application.music,
+        // db/016. Vale is the one who says no to both: dinner is booked
+        // elsewhere and nothing is organised, so her plan has no menu slot and
+        // no game slots — and neither absence is a gap.
+        application.foodPlan,
+        application.playAppetite,
+        application.howMade,
       ]
     );
     const responseId = response[0].id;

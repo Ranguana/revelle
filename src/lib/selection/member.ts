@@ -43,7 +43,7 @@
  * part of her Revelle.
  */
 
-import type { Candidate, SectionKind } from "./types.ts";
+import type { Candidate, Pick, SectionKind } from "./types.ts";
 
 /**
  * The house's fields, forbidden by name.
@@ -100,16 +100,24 @@ export type MemberSection = {
 /**
  * WHAT GETS SET IN THE DESTINATION'S TYPEFACE.
  *
- * Today that is each placed piece's own authored text, in the order she reads
- * it. When Ingredient grows db/010's game_printed_matter rows — the card, the
- * rules sheet, the ballot — they hang off THIS list and nowhere else, so that
- * "what is printed" stays one answer rather than a second one assembled by
- * whoever is building the print job that week.
+ * Ingredient has now grown db/010's game_printed_matter rows — the card, the
+ * rules sheet, the ballot — and they hang off THIS list and nowhere else, so
+ * that "what is printed" stays one answer rather than a second one assembled
+ * by whoever is building the print job that week. A surface that wants the
+ * objects reads this; it does not go back to the pool tables for them.
+ *
+ * An ingredient that prints nothing of its own falls back to its own authored
+ * text, which is the right answer for a menu: the menu card IS the menu's
+ * line of dishes, and there is no second object to author.
  */
 export type MemberPrintedPiece = {
   heading: string;
   body: string;
   section: SectionKind;
+  /** One per head. The renderer says "one each", never a tally. */
+  perGuest: boolean;
+  /** A fixed count of the object, or null when nobody has counted. */
+  quantity: number | null;
 };
 
 export type MemberRevelle = HouseOnly & {
@@ -174,12 +182,42 @@ export function memberRevelle(candidate: Candidate): MemberRevelle {
     },
     pieces,
     sections,
-    printedMatter: pieces
-      .filter((piece) => piece.description.trim().length > 0)
-      .map((piece) => ({
-        heading: piece.heading,
-        body: piece.description,
-        section: piece.section,
-      })),
+    printedMatter: candidate.picks
+      .slice()
+      .sort((a, b) => a.slot.position - b.slot.position)
+      .flatMap(printedMatterOf),
   };
+}
+
+/**
+ * The objects one pick prints, or its own authored text when it prints none.
+ *
+ * Split out because the fallback is the interesting half. A game brings real
+ * objects and its description is a sentence ABOUT the game, not a thing to
+ * set in type; a menu brings no objects and its authored line of dishes IS
+ * the card. Neither case needs a caller to know which is which.
+ */
+function printedMatterOf(pick: Pick): MemberPrintedPiece[] {
+  const objects = pick.ingredient.printedMatter ?? [];
+  if (objects.length > 0) {
+    return objects.map((object) => ({
+      heading: object.label,
+      body: object.description,
+      section: pick.slot.section,
+      perGuest: object.perGuest,
+      quantity: object.quantity,
+    }));
+  }
+
+  const body = pick.ingredient.description.trim();
+  if (body.length === 0) return [];
+  return [
+    {
+      heading: pick.slot.label,
+      body,
+      section: pick.slot.section,
+      perGuest: false,
+      quantity: null,
+    },
+  ];
 }

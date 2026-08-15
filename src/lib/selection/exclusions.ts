@@ -38,16 +38,25 @@
  * an INSERT, the way slot_shape made "which shapes may fill this slot" data in
  * db/010.
  *
- * ── WHERE THE ANSWERS WOULD COME FROM — THE SEAM ─────────────────────
+ * ── WHERE THE ANSWERS COME FROM ──────────────────────────────────────
  *
- * NOTHING IN THE CURRENT QUIZ CAN STATE EITHER FACT. The full question set is
- * src/lib/quiz.ts, and it was read for this:
+ * She states them, in two questions added by db/016 and QUIZ_VERSION
+ * 2026-08-d:
  *
- *   occasion, environment, taste_directions, group_fun, voice_tones,
- *   anti_preferences, affinities, secret, guest_count_band,
- *   spend_per_person, music_service, email
+ *   food_plan       "What are they eating?"    'eating_out' and 'drinks_only'
+ *                   both carry 'no_food'. One says somebody else is choosing
+ *                   the food; the other says there is none. Neither is a
+ *                   dislike of menus.
+ *   play_appetite   "Where do games sit in this?"   'none at all' carries
+ *                   'no_games'.
  *
- * The near misses, and why each is refused rather than quietly used:
+ * The mapping is DATA — quiz_option_exclusion in db/016, the same bridge shape
+ * quiz_option_facet uses for taste — so a second answer that means "no menu"
+ * is an INSERT, and this file still knows no option codes and no slot codes.
+ * quiz_response_exclusion resolves a response into codes, and
+ * src/lib/selection/catalogue.ts passes them in as `recorded`.
+ *
+ * The near misses, and why each is still refused rather than quietly used:
  *
  *   environment = 'restaurant_or_venue'  Says where, not whether. A woman who
  *     books the back room of a restaurant may still be choosing the food, and
@@ -58,20 +67,17 @@
  *     mean there are no games, and treating a veto as a fact would make her
  *     dislikes structural.
  *   group_fun                            What they enjoy, not what she is
- *     providing. Not choosing "compete" is not saying "no games".
+ *     providing. Not choosing "compete" is not saying "no games". The four
+ *     options db/016 added to it — making something, working the room, keeping
+ *     a secret, playing for stakes — do not change this: they say what kind,
+ *     and kind is not whether.
  *
- * So this returns nothing today, and that is the correct answer rather than a
- * placeholder. The wiring, when the question is added:
- *
- *   1. a question — "Are you serving food?" / "Do you want games?" — added to
- *      QUIZ_STEPS in src/lib/quiz.ts by the piece of work already queued;
- *   2. its answer stored per response, the way quiz_response_facet stores the
- *      others, against the slot_exclusion codes in db/014;
- *   3. THIS FUNCTION reads it and returns the codes.
- *
- * Steps 1 and 2 are somebody else's; step 3 is one line here. Nothing else in
- * the engine changes, because everything downstream already takes the set as
- * an input and already handles it being empty.
+ * NOTE THAT THE OPT-OUT AND THE APPETITE ARE ONE QUESTION AND TWO
+ * CONSEQUENCES. "None at all" both removes the game slots (here) and weights
+ * her vector away from anything played (db/016's `organised_play` at -1), which
+ * is why the exclusion and the facet are two separate bridges off one answer.
+ * An evening with no games can still have an edit with a deck of cards in it,
+ * and it should not.
  */
 
 import type { OccasionCode, StatedFacet } from "./types.ts";
@@ -86,9 +92,9 @@ export type ExclusionAnswers = {
   environment: string;
   stated: readonly StatedFacet[];
   /**
-   * Codes already recorded against the response by whatever asked her. Empty
-   * until the question above exists; passed through verbatim so that adding
-   * the question is a change to the LOADER and not to this rule.
+   * The codes she stated, read back from quiz_response_exclusion (db/016).
+   * Passed through verbatim, which is what made adding the question a change
+   * to the LOADER and not to this rule.
    */
   recorded?: readonly string[];
 };
@@ -96,9 +102,10 @@ export type ExclusionAnswers = {
 /**
  * The slot_exclusion codes that apply to this application.
  *
- * Deliberately returns [] for everything the current quiz can express — see
- * the seam above. Deriving an exclusion from an answer that does not mean it
- * would delete a deliverable she wanted, and she would never learn why.
+ * Only what she stated. Nothing is derived from `occasion`, `environment` or
+ * `stated`, and they are parameters so that the refusal is visible: deriving an
+ * exclusion from an answer that does not mean it would delete a deliverable she
+ * wanted, and she would never learn why.
  */
 export function hostExclusions(answers: ExclusionAnswers): string[] {
   const codes = new Set<string>();

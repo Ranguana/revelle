@@ -56,7 +56,10 @@ export type FacetRow = {
  *                describes a delivery channel, not what anything is like.
  *   season       projected from menu.season by a trigger (db/012). Offering it
  *   cooking      as a checkbox would let a curator create a second, contrary
- *                copy of a fact the column already holds.
+ *                copy of a fact the column already holds. `cooking` is also
+ *                deprecated by db/016 and would already fall out of the query
+ *                below; it stays listed because the reason is the interesting
+ *                part.
  */
 const NOT_OFFERED = new Set([
   "voice",
@@ -67,6 +70,21 @@ const NOT_OFFERED = new Set([
   "season",
   "cooking",
 ]);
+
+/**
+ * Dimensions withheld from ONE pool rather than from all of them.
+ *
+ * `making` is the axis db/016 asks a host once and applies to everything she
+ * receives — the printed matter, the edit, the table, the games — so a curator
+ * must be able to say that a letterpress invitation arrives finished and a
+ * fold-it-yourself one does not. On a MENU it is not hers to say: it is
+ * projected from menu.cooking by the same trigger that projects the season, and
+ * a checkbox beside it would be the second contrary copy this whole list exists
+ * to prevent.
+ */
+const NOT_OFFERED_FOR: Readonly<Record<string, ReadonlySet<string>>> = {
+  menu: new Set(["making"]),
+};
 
 /**
  * THE FIFTY TONES ARE FOR DESTINATIONS ONLY.
@@ -107,9 +125,11 @@ export async function taggingVocabulary(
       where f.status = 'active'
       order by d.position, f.label`
   );
+  const withheld = NOT_OFFERED_FOR[entity];
   return rows.filter(
     (row) =>
       !NOT_OFFERED.has(row.dimension_code) &&
+      !withheld?.has(row.dimension_code) &&
       (entity === "world" || !DESTINATION_ONLY.has(row.dimension_code))
   );
 }

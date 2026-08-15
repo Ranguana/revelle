@@ -108,6 +108,8 @@ export function buildVector(
 
     if (answer.polarity === "negative") {
       dealbreakers.add(answer.facetId);
+      // `weight` is 1 on every veto — db/016 constrains it, because a veto has
+      // no degree — so the arithmetic below is unchanged by its existence.
       // Recorded in the vector too, at the soft-negative ratio, so that a
       // destination merely LEANING toward something she vetoed also scores
       // worse than one that is silent about it. The veto does the eliminating;
@@ -121,7 +123,28 @@ export function buildVector(
       continue;
     }
 
-    add(answer.facetId, options.statedWeight, "stated", `she asked for it`);
+    // THE ANSWER'S OWN WEIGHT, and the reason this is a multiplication rather
+    // than a constant.
+    //
+    // Most questions are unordered: old-world Riviera is not more or less than
+    // desert modern, so every one of those answers carries weight 1 and this is
+    // exactly what it was before db/016. An ORDINAL question is different. "How
+    // much of this do you want to make" has four answers on one axis, and a
+    // host at the finished end is making a claim AGAINST making things by hand
+    // — a negative term in her vector, which pulls the pool toward the most
+    // finished things in it and eliminates nothing.
+    //
+    // That is deliberately not a dealbreaker. A veto is what she said would
+    // ruin the evening; this is a preference with a direction, and confusing
+    // the two would empty her menu pool over an answer about her afternoon.
+    add(
+      answer.facetId,
+      options.statedWeight * answer.weight,
+      "stated",
+      answer.weight < 0
+        ? `she asked for the other end of this`
+        : `she asked for it`
+    );
   }
 
   // ── what we have learned about her ─────────────────────────────────

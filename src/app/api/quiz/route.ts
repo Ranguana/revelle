@@ -125,14 +125,16 @@ export async function POST(request: Request): Promise<Response> {
            occasion, occasion_other, environment,
            taste_directions, group_fun, anti_preferences, affinities,
            voice_tones,
-           secret, guest_count_band, spend_per_person, music_service
+           secret, guest_count_band, spend_per_person, music_service,
+           food_plan, play_appetite, how_made
          ) values (
            $1, $2::jsonb, $3, $4,
            $5::occasion_type, $6, $7::environment_type,
            $8::text[], $9::text[], $10::text[], $11::text[],
            $12::text[],
            $13, $14::guest_count_band, $15::spend_per_person_band,
-           $16::soundtrack_delivery
+           $16::soundtrack_delivery,
+           $17::food_plan, $18::play_appetite, $19::making_level
          )
          returning id`,
         [
@@ -161,6 +163,13 @@ export async function POST(request: Request): Promise<Response> {
           // here: the field is required, so a submission that reached this line
           // has an answer. See db/005.
           answers.music_service,
+          // db/016. Two of the four food answers and one of the four play
+          // answers carry a slot_exclusion — no menu, no games — through
+          // quiz_option_exclusion. Nothing is derived here: the code is stored
+          // and the database says what it means, exactly as every other answer.
+          answers.food_plan,
+          answers.play_appetite,
+          answers.how_made,
         ]
       );
 
