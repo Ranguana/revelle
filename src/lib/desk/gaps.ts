@@ -54,7 +54,7 @@ import { query } from "@/lib/db";
  */
 
 export type IngestibleGap = {
-  /** Which pool could not fill the slot: 'product', 'game', 'menu'. */
+  /** Which pool could not fill the slot: 'product', 'game', 'menu', 'drink'. */
   pool: string;
   slotCode: string;
   slotLabel: string;

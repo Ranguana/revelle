@@ -18,8 +18,8 @@ import { recordAction, requireStaff } from "@/lib/staff";
  *                     NOT reach a delivered Revelle: hers were cloned and are
  *                     frozen.
  *
- *   THE INGREDIENTS   `<pool>_world` — how a product, a game, a menu or a
- *                     soundtrack behaves UNDER this destination. Stage 3 of
+ *   THE INGREDIENTS   `<pool>_world` — how a product, a game, a menu, a drink
+ *                     or a soundtrack behaves UNDER this destination. Stage 3 of
  *                     docs/selection-spec.md, as two columns: `forbidden` is a
  *                     structural never, `affinity` is a signed re-weighting.
  *                     A missing row means neutral, which is the correct
@@ -28,11 +28,12 @@ import { recordAction, requireStaff } from "@/lib/staff";
 
 const SECTION_CODES = new Set(SECTION_KINDS.map((kind) => kind.code));
 
-/** The four pools that can be scoped to a destination. See db/009. */
+/** The five pools that can be scoped to a destination. See db/009, db/017. */
 const POOLS = {
   product: { table: "product_world", column: "product_id", label: "Products" },
   game: { table: "game_world", column: "game_id", label: "Games" },
   menu: { table: "menu_world", column: "menu_id", label: "Menus" },
+  drink: { table: "drink_world", column: "drink_id", label: "Drinks" },
   tracklist: {
     table: "tracklist_world",
     column: "tracklist_id",

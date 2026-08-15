@@ -19,6 +19,7 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
   [
     { href: "/desk/destinations", label: "Destinations" },
     { href: "/desk/menus", label: "Menus" },
+    { href: "/desk/drinks", label: "Drinks" },
     { href: "/desk/products", label: "Products" },
   ],
   [

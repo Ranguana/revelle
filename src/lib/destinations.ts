@@ -392,6 +392,442 @@ export const WESTHAMPTON_1976_TONES: readonly ToneWeight[] = [
 ];
 
 /**
+ * HAVANA, THE SMALL HOURS.
+ *
+ * The first destination the CATALOGUE asked for. Its food and its bar were
+ * authored before it had a name — menus 28 and 29 in docs/menus.md, drinks 19
+ * and 20 in docs/drinks.md — so the look and the voice below are written to
+ * those and not the other way round. Read them first; everything here is an
+ * answer to something specific in them.
+ *
+ * ── WHY THERE IS NO YEAR ─────────────────────────────────────────────
+ *
+ * WESTHAMPTON is a place and a YEAR. Havana is a place and an HOUR, and the
+ * difference is the whole design.
+ *
+ * Give this destination a decade and there is only one decade anybody reaches
+ * for: 1950s Havana as an American playground — the casinos, the linen suits,
+ * somebody else's country photographed at its least free. That is kitsch, it is
+ * in poor taste, and it is the same failure WESTHAMPTON's own rule already
+ * forbids: the house is not doing an impression of itself. The founder's
+ * catalogue names no year either. It names an evening with two halves — a long
+ * dinner party (28, 19) and A LATE SUPPER AFTER DANCING (29, 20) — which is a
+ * structural fact almost nothing else in the library has, and it is a fact
+ * about the clock rather than the calendar.
+ *
+ * So the time is a time of night. It dates nothing, it excludes nobody, and it
+ * is the honest reading of the source: coffee at every hour including after
+ * midnight, a bar that shakes rather than stirs, and a table that gets carried
+ * back against the wall in the middle of the evening.
+ *
+ * ── THE SECOND TRAP, AND THE RULE IT PRODUCED ────────────────────────
+ *
+ * WESTHAMPTON speaks as THE HOUSE. Havana speaks as a house too — a house in
+ * Havana, in its own words — and the way that goes wrong is impersonation: an
+ * accent set down on paper, a word spelled the way a foreigner hears it, an
+ * exclamation borrowed to prove where we are. Real nouns are the opposite of
+ * caricature. A courtyard, a fan, the Malecón, the ice, the last coffee are
+ * facts; a performed accent is a costume. The rule is in `never`, in the
+ * house's own words, exactly where WESTHAMPTON keeps its ban on anachronism.
+ */
+const HAVANA_LOOK: Theme = {
+  key: "havana",
+  type: {
+    // The three faces the repo ships. Havana differentiates on palette and on
+    // voice, which is where a destination is felt anyway — see the note at the
+    // top of this file about what a fourth family actually costs.
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // The house palette turned warm and one shade deeper: rose-ochre plaster,
+    // the green-blue every shutter on the street is painted, brass under a
+    // bulb, and the red of a roof tile. Recognisably the same seven colours the
+    // other eleven plates are drawn in — no turquoise, no hot pink, nothing
+    // that belongs on a postcard. This is a courtyard at three in the morning.
+    ground: "#F2DCC3",
+    ground2: "#E8C9A9",
+    ink: "#2B1D16",
+    inkSoft: "#63503F",
+    inkFaint: "#95826F",
+    rule: "#D8BC9B",
+    aqua: "#1E6B6E",
+    oxblood: "#B8452A",
+    gold: "#C08A2E",
+    night: "#152622",
+    night2: "#0E1B18",
+    nightInk: "#F2E2CB",
+    nightSoft: "#B4A18A",
+    nightAqua: "#5FB6AE",
+    nightOxblood: "#E4885C",
+    bone: "#F6F0E4",
+  },
+  paletteDark: {
+    ground: "#0E1B18",
+    ground2: "#152622",
+    ink: "#F2E2CB",
+    inkSoft: "#B4A18A",
+    inkFaint: "#83745F",
+    rule: "#2A403A",
+    aqua: "#5FB6AE",
+    oxblood: "#E4885C",
+    gold: "#DDA84E",
+  },
+};
+
+export const HAVANA: Destination = {
+  key: "havana",
+  name: "HAVANA, THE SMALL HOURS",
+  tagline: "The table is pushed back for the dancing. Supper again at three.",
+  premise:
+    "A house on Tejadillo with a courtyard, a fan that turns and does not " +
+    "cool, and a night with two halves. Dinner runs until the table is " +
+    "carried back against the wall. What follows the dancing is a second " +
+    "supper nobody planned and everybody expects.",
+  look: HAVANA_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The house on Tejadillo, and whoever in it is still up.",
+    selfReference: ["we", "the house", "the house on Tejadillo"],
+    audience:
+      "the people coming to dinner, most of whom will still be here at three",
+    address: {
+      mode: "collective_first",
+      note:
+        "Arrangements are said as we: we eat at ten, we move the table, we " +
+        "will be up. The we is the household, never a management. Second " +
+        "person is spent on the two things a guest acts on — when to come, " +
+        "and which room is theirs — and never on enthusiasm.",
+    },
+
+    register:
+      "A note written standing up in the kitchen at the hour it describes, " +
+      "with the coffee going and the music still on in the next room.",
+    formality: "plain",
+    cadence:
+      "A statement, then the thing that actually happens, joined by a comma " +
+      "or left as its own sentence. The line ends on an hour or on a plain " +
+      "noun. It does not end on a flourish.",
+    sentence: { typicalWords: 11, maxWords: 20 },
+    punctuation:
+      "Periods and commas, and the comma is where the night turns. A colon " +
+      "only when a real list is coming. No exclamation points, no ellipses, " +
+      "no parentheses, no dash held open for effect, no quotation marks " +
+      "around a word that is being nudged, and no semicolons. This is a note, " +
+      "not a paragraph.",
+    orthography:
+      "Hours in words: nine o'clock, half past two, three in the morning, " +
+      "first light. Days by name. Headings in full caps, and nothing else is " +
+      "capitalised for emphasis. Food and drink get their plain names — a " +
+      "plantain is a plantain. A place keeps its own name and its own " +
+      "spelling, Tejadillo and the Malecón, and nothing else on the page is " +
+      "spelled to sound like anywhere.",
+
+    humour: {
+      mode: "warm",
+      mechanism:
+        "Say the excessive thing as though it were the schedule, and let the " +
+        "hour carry it: the second supper, the third coffee, the fan that has " +
+        "never worked. Nobody in the house is the target — the night is. " +
+        "Never a punchline, never a second sentence explaining the first.",
+    },
+
+    lexicon: [
+      {
+        term: "the house on Tejadillo",
+        gloss: "the address. Given in place of directions, which are not given",
+        insteadOf: ["the venue", "the location", "the address below"],
+      },
+      {
+        term: "the courtyard",
+        gloss: "where the night is, at every hour, whatever the room was for",
+        insteadOf: ["the patio", "the terrace", "the outdoor space"],
+      },
+      {
+        term: "the table",
+        gloss:
+          "the long dinner, and the piece of furniture that gets carried back against the wall",
+        insteadOf: ["the dinner party", "the seating", "the spread"],
+      },
+      {
+        term: "the dancing",
+        gloss: "the middle of the night, and the reason the table is moved",
+        insteadOf: ["the party", "the entertainment", "the dance floor"],
+      },
+      {
+        term: "the second supper",
+        gloss:
+          "what is eaten after the dancing. Not a snack and not a novelty — the other half of dinner",
+        insteadOf: ["late-night bites", "the after-party", "midnight snacks"],
+      },
+      {
+        term: "the coffee",
+        gloss: "small, strong, sweet, at any hour. There is never a last one",
+        insteadOf: ["espresso", "a nightcap", "caffeine"],
+      },
+      {
+        term: "the fan",
+        gloss:
+          "the one in the courtyard. It turns and does not cool, and has been like that for years",
+        insteadOf: ["the air conditioning", "the breeze"],
+      },
+      {
+        term: "the door is open",
+        gloss: "the reply convention. Nobody replies and nobody is counted",
+        insteadOf: ["RSVP", "please confirm", "let us know", "regrets only"],
+      },
+      {
+        term: "first light",
+        gloss: "when it ends, which is not a decision anyone makes",
+        insteadOf: ["the end of the night", "closing time", "last call"],
+      },
+    ],
+
+    formulae: [
+      "{Arrangement} at {hour}. {What actually happens} at {the later hour}.",
+      "The door is open from {hour}.",
+      "There is coffee {when}.",
+      "The table is moved after {the dish}.",
+      "{Plain fact about the house}. It has always been like that.",
+      "We {do the thing}. Nobody is asked and nobody is counted.",
+      "{Dish}, and then {the same thing again, later and smaller}.",
+      "Bring nobody who {the thing that ends a night early}.",
+    ],
+
+    banned: [
+      "sultry",
+      "sizzling",
+      "steamy",
+      "exotic",
+      "tropical",
+      "paradise",
+      "fiesta",
+      "salsa",
+      "casino",
+      "cigar",
+      "authentic",
+      "escape",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The house on Tejadillo.",
+      "The door is open.",
+      "We will be up.",
+      "There is coffee.",
+    ],
+
+    always: [
+      "Name a real thing: a street, an hour, a fan, a glass, a pot of coffee.",
+      "Let the hour carry it. Ten o'clock and three in the morning are two different suppers.",
+      "Say the arrangement, then say what happens instead of it.",
+      "Write as though the music is still on in the next room and one of us is still up.",
+      "Assume the reader is coming, and that they will stay too long.",
+      "Give the food and the drink their plain names. A plantain is a plantain.",
+      "Hand everyone the same glass. What is in it is nobody's business.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never name the feeling — no sultry, no magic, no romance, no unforgettable, no memories.",
+      "Never put an accent on the page. No phonetic spelling, no borrowed slang, no word set down to sound foreign. A real name is a fact; a spelling that performs an accent is a costume.",
+      "Never date the house. No year, no decade, no politics, no casino, no cigar sold as a souvenir. This is somebody's home and it is not a set.",
+      "Never borrow another Havana — a song everyone knows, a bar from a paperback, a man who drank somewhere. Nobody here is a stop on a tour.",
+      "Never explain the second supper. It is not a novelty and it is not a bit.",
+      "Never write the dancing as a performance. Nobody is watching, and the house is not either.",
+      "Never write a line that separates the people drinking from the people who are not. Same glass, same lime, no mention.",
+      "Never thank people for coming, ask them to reply, or count who is coming.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or to be safe: the street, the door, the stairs, a hospital, what is in the food. Fact first, fewest words, no joke.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, a cancellation, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "The house on Tejadillo, Saturday. Come after nine. We eat at ten.",
+      },
+      {
+        piece: "invitation",
+        text: "We will feed you twice. The second one is at three.",
+        note: "The whole destination in eleven words. The joke is the hour, and the hour is true.",
+      },
+      {
+        piece: "invitation",
+        text: "Dinner, and then the table goes back against the wall. Nobody sits down again.",
+      },
+      { piece: "invitation", text: "The door is open from nine and stays open." },
+      { piece: "invitation", text: "Bring nobody who has to be up early." },
+      {
+        piece: "menu_item",
+        text: "Pork with garlic and citrus, in the oven since the afternoon.",
+      },
+      {
+        piece: "menu_item",
+        text: "Sweet plantains at the table. The green ones come later, with garlic sauce.",
+      },
+      {
+        piece: "menu_item",
+        text: "Black beans and white rice. There is no version of this night without them.",
+      },
+      {
+        piece: "menu_item",
+        text: "Daiquiris shaken hard. The same glass, limeade and mint, for whoever would rather.",
+      },
+      {
+        piece: "menu_item",
+        text: "Flan, and then coffee. Small cups, strong and sweet, at whatever hour it is.",
+      },
+      {
+        piece: "menu_item",
+        text: "Sandwiches pressed flat at half past two, when the dancing lets up.",
+      },
+      {
+        piece: "menu_item",
+        text: "Coconut ice cream, eaten standing in the kitchen.",
+      },
+      {
+        piece: "notice",
+        text: "There is coffee at every hour, including this one.",
+      },
+      {
+        piece: "notice",
+        text: "The table is moved after the flan. Everybody helps and nobody is asked.",
+      },
+      {
+        piece: "notice",
+        text: "The fan in the courtyard turns and does not cool. It has always been like that.",
+      },
+      {
+        piece: "notice",
+        text: "The stairs to the roof are steep and unlit. Take somebody with you.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is off the courtyard. Leave the window open. The noise stops before it matters.",
+      },
+      {
+        piece: "house_note",
+        text: "The coffee pot is never washed with soap. That is not going to change.",
+      },
+      { piece: "place_card", text: "Marta — where she can see the door." },
+      {
+        piece: "place_card",
+        text: "Rafael — beside somebody who will get him up.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everybody names the song that gets them up. Nobody names their own. We play them in order.",
+      },
+      {
+        piece: "bulletin",
+        text: "Sunday. The pork went on at two. Somebody has taken the good chair into the courtyard.",
+      },
+      { piece: "heading", text: "DINNER, AND WHAT THE TABLE IS MOVED FOR" },
+      { piece: "heading", text: "AFTER THE DANCING" },
+      { piece: "heading", text: "WHAT THERE IS AT THREE" },
+      { piece: "sign_off", text: "The house on Tejadillo." },
+      { piece: "sign_off", text: "We will be up." },
+    ],
+
+    rejected: [
+      {
+        text: "Havana, 1957. The casino, the linen suits, the last good year.",
+        why: "Somebody else's country as a playground, photographed at its least free. Kitsch, and the exact failure the period rule exists to stop.",
+      },
+      {
+        text: "Sultry nights, strong rum, and a rhythm you can feel.",
+        why: "Three feelings named in a row and a place sold as a temperature. Brochure.",
+      },
+      {
+        text: "Vamos. Dinner at nine.",
+        why: "A word put on the page to sound foreign. The house does not perform its own language.",
+      },
+      {
+        text: "The record on all night, the one everybody knows.",
+        why: "Borrows another Havana. A record collection somebody else assembled is not a destination.",
+      },
+      {
+        text: "Cigars on the roof after the second supper.",
+        why: "The single most costume object available. Somebody probably did; the page still does not.",
+      },
+      {
+        text: "The dancing starts when the rum runs out.",
+        why: "Measures the night in what is in the glass. The mocktail mirror exists so that nobody's evening is counted that way.",
+      },
+      {
+        text: "Come and lose track of time.",
+        why: "Names the feeling and instructs. The hours are printed, and the printed hours are the point.",
+      },
+      {
+        text: "A little slice of old Havana.",
+        why: "A menu board wrote this. Old Havana is a place, not a mood, and the house is in it.",
+      },
+    ],
+  },
+};
+
+/**
+ * HAVANA's voice, said in the tones a host is shown.
+ *
+ * Same discipline as WESTHAMPTON's list above and the same falsifiability test:
+ * a destination whose voice cannot be said in six to ten of the fifty is a
+ * destination the voice question cannot match, and the answer is to fix the
+ * tones rather than to describe around them.
+ *
+ * Every tag points at a line of the voice above:
+ *
+ *   good_natured     "Nobody in the house is the target — the night is."
+ *                    Carries humour_warm, which is where this house parts
+ *                    company with Westhampton's dry.
+ *   lingers          "Dinner runs until the table is carried back against the
+ *                    wall." A long dinner party is the whole first half.
+ *   laughs_first     "the music still on in the next room" — the one tone here
+ *                    that puts volume on the positive side, which is the other
+ *                    half of the difference from a house where the best line is
+ *                    muttered.
+ *   says_it_out_loud "We will be up." "We will feed you twice." The fond thing
+ *                    said plainly, with no armour on it.
+ *   no_speeches      "It does not end on a flourish." "Never write the dancing
+ *                    as a performance." The claim AGAINST theatricality, which
+ *                    is what keeps a warm house from becoming a loud one.
+ *   exact_word       Hours in words, half past two, three in the morning. The
+ *                    night is late and the writing about it is exact.
+ *   asks_properly    "Take somebody with you." "Leave the window open." The
+ *                    house attends to a person without making a thing of it.
+ *
+ * Formality, address and humour mode are NOT tagged: the voice states them —
+ * plain, collective first, warm — and `statedVoiceFacets` derives them. All
+ * three differ from Westhampton's, which is the point of authoring a second
+ * destination at all. Two houses that resolve to the same vector are one house
+ * with two palettes.
+ */
+export const HAVANA_TONES: readonly ToneWeight[] = [
+  { code: "good_natured", weight: 1 },
+  { code: "lingers", weight: 0.9 },
+  { code: "laughs_first", weight: 0.7 },
+  { code: "says_it_out_loud", weight: 0.6 },
+  { code: "no_speeches", weight: 0.6 },
+  { code: "exact_word", weight: 0.5 },
+  { code: "asks_properly", weight: 0.4 },
+];
+
+/**
  * Every destination that exists, by slug — the same slug as `world.slug`.
  *
  * A plain object rather than a Map so it survives being imported by a script,
@@ -400,6 +836,7 @@ export const WESTHAMPTON_1976_TONES: readonly ToneWeight[] = [
  */
 export const DESTINATIONS = {
   "westhampton-1976": WESTHAMPTON_1976,
+  havana: HAVANA,
 } as const satisfies Record<string, Destination>;
 
 export type DestinationKey = keyof typeof DESTINATIONS;
@@ -415,4 +852,5 @@ export type DestinationKey = keyof typeof DESTINATIONS;
  */
 export const DESTINATION_TONES = {
   "westhampton-1976": WESTHAMPTON_1976_TONES,
+  havana: HAVANA_TONES,
 } as const satisfies Record<DestinationKey, readonly ToneWeight[]>;

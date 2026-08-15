@@ -1,10 +1,15 @@
 /*
- * The portal's first room.
+ * The portal's first room: her occasions.
  *
  * Same rules as everywhere else in the house: every colour is a token, no
- * border radius, no italics, transitions only on colour. Deliberately sparse —
- * the four areas of docs/portal-spec.md are what fills this, and inventing a
- * layout for them before they exist would mean throwing it away.
+ * border radius, no italics, transitions only on colour. Still deliberately
+ * sparse — membership, dues and correspondence are the rest of
+ * docs/portal-spec.md and inventing a layout for them before they exist would
+ * mean throwing it away.
+ *
+ * This screen is painted in the HOUSE's palette, unlike the inside of an
+ * occasion. That is the point of it: the société is one place, and the
+ * destinations are the rooms off it.
  */
 
 .page {
@@ -44,7 +49,7 @@
 }
 
 .line {
-  margin: 0 0 1rem;
+  margin: 0;
   color: var(--ink-soft);
 }
 
@@ -54,8 +59,123 @@
   color: var(--ink-soft);
 }
 
+/* ── the shelf ────────────────────────────────────────────────────── */
+
+.shelf {
+  margin: 0 0 2.75rem;
+}
+
+/* The footer draws its own rule; a shelf's bottom margin under it left two
+   hairlines with a hand's width of nothing between them. */
+.shelf:last-of-type {
+  margin-bottom: 0;
+}
+
+.shelfHead {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 0.5rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * One entry is one target. Grid rather than flex so the three lines share a
+ * left edge no matter how long the date is, and `display: grid` on the anchor
+ * itself so the whole strip — not the words — is what a thumb hits.
+ *
+ * Two columns: the writing, and a mark in the second that says it opens.
+ */
+.entry {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 1.25rem;
+  row-gap: 0.3rem;
+  padding: 1.15rem 0;
+  border-top: 1px solid var(--rule);
+  text-decoration: none;
+  color: inherit;
+  transition: color 160ms ease;
+}
+
+.when,
+.destination,
+.tagline {
+  grid-column: 1;
+}
+
+/*
+ * The mark: a hairline chevron, drawn from two edges of a square rotated
+ * forty-five degrees. Drawn rather than a character so it takes the palette's
+ * ink and cannot arrive as a font's idea of an arrow — and drawn at all
+ * because a phone has no hover to reveal it with.
+ */
+.open {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-top: 1px solid var(--ink-faint);
+  border-right: 1px solid var(--ink-faint);
+  transform: rotate(45deg);
+  transition: border-color 160ms ease;
+}
+
+.entry:hover .open {
+  border-color: var(--oxblood);
+}
+
+.list li:last-child .entry {
+  border-bottom: 1px solid var(--rule);
+}
+
+.when {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.destination {
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+
+.tagline {
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.entry:hover .destination {
+  color: var(--oxblood);
+}
+
+/*
+ * The footer, and it reads as one: a hairline above it and a wide gap below
+ * the shelf, so that "signed in as" and the way out are plainly not part of
+ * her occasions.
+ */
 .out {
-  margin-top: 3rem;
+  margin-top: 4rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 1.25rem;
+  justify-items: start;
 }
 
 .button {

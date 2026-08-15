@@ -32,6 +32,7 @@ const TABLES = new Set([
   "world_voice",
   "product",
   "menu",
+  "drink",
   "game",
 ]);
 

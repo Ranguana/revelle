@@ -1,0 +1,387 @@
+/*
+ * INSIDE AN OCCASION.
+ *
+ * Mobile first, and not as a slogan: every rule below is written for a phone
+ * held at arm's length in a kitchen, and the two media queries at the bottom
+ * are the adaptation to a desk. Nothing depends on hover, nothing depends on a
+ * pointer, and no tap target is smaller than a thumb.
+ *
+ * Every colour is `var(--…)`, and on this page those variables are the
+ * DESTINATION'S, written into the head by the page under `.page`. So this
+ * file describes shape and rhythm only — it does not know what colour
+ * Westhampton is, which is why it will not have to be rewritten for the
+ * second destination.
+ *
+ * House rules, unchanged: no border radius, no italics, transitions only on
+ * colour.
+ */
+
+.page {
+  min-height: 100dvh;
+  background: var(--ground);
+  color: var(--ink);
+  /* Bottom padding clears the phone's home indicator and gives the last
+     section somewhere to end. */
+  padding: calc(1.5rem + env(safe-area-inset-top)) 1.25rem
+    calc(4rem + env(safe-area-inset-bottom));
+}
+
+.inner {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+/* ── the masthead ─────────────────────────────────────────────────── */
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.back {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+  /* A back link on a phone is a target, not a word. */
+  padding: 0.5rem 0;
+  transition: color 160ms ease;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.when {
+  margin: 0;
+  padding: 0.5rem 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rule {
+  height: 1px;
+  background: var(--rule);
+  margin: 1rem 0 1.75rem;
+}
+
+/* ── the destination ──────────────────────────────────────────────── */
+
+.name {
+  font-family: var(--display);
+  font-weight: 400;
+  /* Reaches 3.5rem on a desk and stays readable at 390px. The clamp's low end
+     is deliberately generous: this is the line that tells her where she is. */
+  font-size: clamp(2.125rem, 1.55rem + 2.8vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+  /* Long destination names are two or three words with a comma and a year.
+     Balance keeps the year off a line by itself. */
+  text-wrap: balance;
+}
+
+.tagline {
+  margin: 0 0 1.25rem;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.premise {
+  margin: 0 0 1.25rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 34rem;
+}
+
+.dedication {
+  margin: 0 0 1.25rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--gold);
+  color: var(--ink-soft);
+  line-height: 1.6;
+  max-width: 34rem;
+}
+
+/* ── a section, openable ──────────────────────────────────────────── */
+
+.section {
+  border-top: 1px solid var(--rule);
+}
+
+.section:last-of-type {
+  border-bottom: 1px solid var(--rule);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  /* The whole strip is the target: 1.15rem of padding puts it well over the
+     44px a thumb needs, at any type size. */
+  padding: 1.15rem 0;
+  cursor: pointer;
+  list-style: none;
+  transition: color 160ms ease;
+}
+
+/* Safari draws its own triangle unless both of these are said. */
+.sectionHead::-webkit-details-marker {
+  display: none;
+}
+
+.sectionName {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/*
+ * The marker: a single hairline that gains a second one when closed, making a
+ * plus. Drawn rather than a character so it takes the destination's ink and
+ * cannot arrive as a font's idea of a triangle.
+ */
+.marker {
+  position: relative;
+  flex: 0 0 auto;
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/*
+ * Awning green rather than faint ink: it is the one colour WESTHAMPTON has
+ * that the house does not, and a page that takes a destination's palette and
+ * then spends it all on greys has not taken it.
+ */
+.marker::before,
+.marker::after {
+  content: "";
+  position: absolute;
+  background: var(--aqua);
+  transition: opacity 160ms ease;
+}
+
+.marker::before {
+  inset: 50% 0 auto 0;
+  height: 1px;
+}
+
+.marker::after {
+  inset: 0 50% 0 auto;
+  width: 1px;
+  opacity: 1;
+}
+
+.section[open] .marker::after {
+  opacity: 0;
+}
+
+.section[open] .sectionName {
+  color: var(--ink);
+}
+
+/* ── the pieces ───────────────────────────────────────────────────── */
+
+.pieces {
+  padding-bottom: 1.5rem;
+  display: grid;
+  gap: 1.75rem;
+}
+
+.piece {
+  /* No card, no box. A piece is type on the destination's ground; a border
+     around every deliverable would turn the page into a dashboard. */
+  max-width: 34rem;
+}
+
+.pieceHead {
+  margin: 0 0 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.pieceName {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.6rem;
+  /*
+   * A menu's name is a whole line of dishes and a game's is two words. Both
+   * have to wrap without splitting a word: `break-word` is the last resort for
+   * something genuinely longer than the column, and `hyphens: none` keeps the
+   * browser from inventing a hyphen inside "Portuguese".
+   */
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+}
+
+.pieceBody {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+.pieceBody p {
+  margin: 0 0 0.85rem;
+}
+
+.pieceBody p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── the printed matter ───────────────────────────────────────────── */
+
+.printed {
+  padding-bottom: 1.75rem;
+  display: grid;
+  gap: 1rem;
+}
+
+/*
+ * A card is paper. It commits to the destination's LIGHT values in both
+ * themes, and the mechanism for that is a token block scoped to THIS class
+ * plus data-theme="light" on the element — see the long note in page.tsx.
+ * Every colour below therefore resolves against the card's own block, not the
+ * page's, which is why a heading on bone stays ink at midnight.
+ */
+.card {
+  background: var(--bone);
+  color: var(--ink);
+  padding: 1.5rem 1.25rem;
+  border: 1px solid var(--rule);
+}
+
+.cardMark {
+  margin: 0 0 1rem;
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.cardHead {
+  margin: 0 0 0.75rem;
+  font-family: var(--display);
+  font-size: 1.375rem;
+  line-height: 1.1;
+  overflow-wrap: break-word;
+}
+
+.cardRule {
+  height: 1px;
+  background: var(--rule);
+  margin: 0 0 0.9rem;
+}
+
+.cardBody {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  overflow-wrap: break-word;
+}
+
+.cardCount {
+  margin: 0.9rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ── the prep ─────────────────────────────────────────────────────── */
+
+.prep {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 1.75rem;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 34rem;
+}
+
+.prepLine {
+  padding-left: 1rem;
+  border-left: 1px solid var(--rule);
+}
+
+.prepItem {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+.prepDetail {
+  margin: 0.3rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.prepWhen {
+  margin: 0.45rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+/* ── the desk, as the adaptation ──────────────────────────────────── */
+
+@media (min-width: 40rem) {
+  .page {
+    padding: 3rem 2.5rem 6rem;
+  }
+
+  .printed {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    /* Stretch, not start: a row of paper objects with three different heights
+       reads as a layout that failed rather than as a set of cards. */
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 64rem) {
+  .page {
+    padding: 4.5rem 3rem 8rem;
+  }
+
+  .inner {
+    max-width: 52rem;
+  }
+
+  /*
+   * On a wide screen the section label moves out into the margin, so the
+   * reading column stays a reading column. It is the same document, set the
+   * way a page with room is set.
+   */
+  .sectionHead {
+    padding: 1.4rem 0;
+  }
+
+  .pieces,
+  .prep {
+    padding-left: 0;
+  }
+}

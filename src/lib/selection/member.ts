@@ -98,7 +98,7 @@ export type MemberSection = {
 };
 
 /**
- * WHAT GETS SET IN THE DESTINATION'S TYPEFACE.
+ * ONE OBJECT THAT GETS SET IN THE DESTINATION'S TYPEFACE.
  *
  * Ingredient has now grown db/010's game_printed_matter rows — the card, the
  * rules sheet, the ballot — and they hang off THIS list and nowhere else, so
@@ -106,12 +106,19 @@ export type MemberSection = {
  * by whoever is building the print job that week. A surface that wants the
  * objects reads this; it does not go back to the pool tables for them.
  *
- * An ingredient that prints nothing of its own falls back to its own authored
- * text, which is the right answer for a menu: the menu card IS the menu's
- * line of dishes, and there is no second object to author.
+ * There is NO fallback to a piece's own description. An earlier version had
+ * one and it was wrong in a way only visible on the page: a soundtrack and a
+ * batch negroni are not printed, and rendering their descriptions as cards
+ * produced a stack of objects that do not exist. What prints is what an
+ * ingredient says prints. A menu says so in src/lib/selection/catalogue.ts,
+ * where the menu card is made out of the dishes, because that is the file that
+ * already knows a menu has no description and that its line IS the thing.
  */
 export type MemberPrintedPiece = {
+  /** The object. "The ballot", "The menu". */
   heading: string;
+  /** What it came with. "Art Battle" — two games both print "The rules". */
+  from: string;
   body: string;
   section: SectionKind;
   /** One per head. The renderer says "one each", never a tally. */
@@ -190,34 +197,19 @@ export function memberRevelle(candidate: Candidate): MemberRevelle {
 }
 
 /**
- * The objects one pick prints, or its own authored text when it prints none.
+ * The objects one pick prints. Nothing, for a pick that prints nothing.
  *
- * Split out because the fallback is the interesting half. A game brings real
- * objects and its description is a sentence ABOUT the game, not a thing to
- * set in type; a menu brings no objects and its authored line of dishes IS
- * the card. Neither case needs a caller to know which is which.
+ * The section travels from the SLOT rather than from the object, so the
+ * ballot that came with the game in THE FUN is filed under the fun — which is
+ * where she will look for it.
  */
 function printedMatterOf(pick: Pick): MemberPrintedPiece[] {
-  const objects = pick.ingredient.printedMatter ?? [];
-  if (objects.length > 0) {
-    return objects.map((object) => ({
-      heading: object.label,
-      body: object.description,
-      section: pick.slot.section,
-      perGuest: object.perGuest,
-      quantity: object.quantity,
-    }));
-  }
-
-  const body = pick.ingredient.description.trim();
-  if (body.length === 0) return [];
-  return [
-    {
-      heading: pick.slot.label,
-      body,
-      section: pick.slot.section,
-      perGuest: false,
-      quantity: null,
-    },
-  ];
+  return (pick.ingredient.printedMatter ?? []).map((object) => ({
+    heading: object.label,
+    from: pick.ingredient.name,
+    body: object.description,
+    section: pick.slot.section,
+    perGuest: object.perGuest,
+    quantity: object.quantity,
+  }));
 }

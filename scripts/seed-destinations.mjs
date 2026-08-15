@@ -22,6 +22,13 @@
  *     tokens included. A curator's edit in the tool outranks the module, and
  *     silently overwriting her copy is exactly the failure this house cares
  *     about most.
+ *   · THE ONE EXCEPTION: a STUB. scripts/seed-menus.mjs and
+ *     scripts/seed-drinks.mjs create a draft `world` row for a destination that
+ *     has authored content and has not been written yet, so the content can be
+ *     scoped to something true; the row marks itself as a stub in its own
+ *     `notes` column. A stub is completed in place from the module — never
+ *     duplicated, because every menu_world and drink_world row already points
+ *     at it — and its status is still left for a curator to change.
  *   · A destination with no voice yet gets its first one, published.
  *   · A destination whose published voice DIFFERS from the module is reported
  *     and left alone unless `--publish` is passed, in which case the next
@@ -39,6 +46,7 @@
 import pg from "pg";
 
 import { DESTINATIONS, DESTINATION_TONES } from "../src/lib/destinations.ts";
+import { isStubRow } from "./catalogue-vocabulary.mjs";
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -74,7 +82,7 @@ try {
     const tokens = JSON.stringify(look);
 
     const { rows: existing } = await client.query(
-      `select id, name from world where slug = $1`,
+      `select id, name, notes from world where slug = $1`,
       [key]
     );
 
@@ -88,6 +96,37 @@ try {
       );
       worldId = rows[0].id;
       console.log(`[seed-destinations] created  ${key} (draft)`);
+    } else if (isStubRow(existing[0])) {
+      // ── THE ONE EXCEPTION TO "LEAVE IT ALONE" ──────────────────────
+      //
+      // The rule above protects a CURATOR'S work, and a stub is not a
+      // curator's work. It is a placeholder that scripts/seed-menus.mjs or
+      // scripts/seed-drinks.mjs created so that authored content could be
+      // scoped to something true before the destination itself existed, and it
+      // says exactly that in its own notes column — which is what makes this
+      // safe to detect rather than guess at.
+      //
+      // Completing it in place matters because the alternative is worse in
+      // both directions: a second world row would orphan every menu_world and
+      // drink_world row already pointing at the stub, and leaving the stub
+      // alone would leave the destination permanently nameless and untokened
+      // while looking, to every screen, as though it had been authored.
+      //
+      // Status is NOT touched. Publishing a destination is a curator's
+      // decision and a seed script has no standing to make it — the same
+      // sentence this file has always ended on.
+      worldId = existing[0].id;
+      await client.query(
+        `update world
+            set name = $2, tagline = $3, description = $4,
+                tokens = $5::jsonb, notes = null
+          where id = $1`,
+        [worldId, name, tagline, premise, tokens]
+      );
+      console.log(
+        `[seed-destinations] adopted  ${key} — was a stub from a catalogue ` +
+          `seed; look and copy filled in, status left as it is`
+      );
     } else {
       worldId = existing[0].id;
       console.log(`[seed-destinations] exists   ${key} — left as it is`);

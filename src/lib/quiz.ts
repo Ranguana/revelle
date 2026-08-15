@@ -46,8 +46,15 @@ import { TONE_GROUPS, TONES } from "./voice.ts";
  * 2026-08-d adds three: what is being eaten, where games sit, and how much of
  * it she wants to make. It also adds four options to "how does this group
  * actually have fun", which is additive and would not on its own need a bump.
+ *
+ * 2026-08-e RETIRES one option — "Made by hand, mostly" — because the authored
+ * catalogue collapsed the making axis to three positions and a fourth answer
+ * would point at a rung nothing in the library sits on. A removed option is
+ * exactly the change this stamp exists for: a response written against
+ * 2026-08-d may carry `mostly_made` and is not wrong, it was asked a different
+ * question. The code keeps resolving; see db/016 and db/017.
  */
-export const QUIZ_VERSION = "2026-08-d";
+export const QUIZ_VERSION = "2026-08-e";
 
 export type QuizOption = {
   /** Permanent. Stored in the database. */
@@ -302,16 +309,25 @@ const PLAY_APPETITES: readonly QuizOption[] = [
  * the ladder is ordered — bought and arranged is nearer half made than it is to
  * actually made, and four separate terms could not say so.
  */
+/*
+ * THREE POSITIONS, AND THE CATALOGUE HAS THE SAME THREE.
+ *
+ * docs/menus.md and docs/drinks.md both carry exactly three: actually made ·
+ * half made · bought and arranged, said at the bar as actually mixed · half
+ * made · bought and poured. This question is the host's end of that one axis,
+ * so it offers the same three and no more.
+ *
+ * `mostly_made` was asked up to QUIZ_VERSION 2026-08-d and is RETIRED rather
+ * than deleted, which is the rule db/016 wrote down for exactly this: the value
+ * stays in `making_level` forever, its quiz_option_facet row stays so a stored
+ * answer keeps resolving, and it is simply never offered again.
+ * scripts/check-facets.mjs reports it as retired and does not fail.
+ */
 const MAKING_LEVELS: readonly QuizOption[] = [
   {
     code: "actually_made",
     label: "Made by hand, all of it",
     hint: "The afternoon before is part of the evening",
-  },
-  {
-    code: "mostly_made",
-    label: "Made by hand, mostly",
-    hint: "One or two things arrive finished",
   },
   {
     code: "half_made",

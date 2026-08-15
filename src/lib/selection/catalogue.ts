@@ -348,10 +348,19 @@ const POOLS: readonly {
   table: string;
   /**
    * The column holding the sentence a member reads. `description` in three of
-   * the four pools; a menu's is its dishes, in the author's own punctuation,
-   * because a menu has no description and its line IS the thing (db/012).
+   * the five pools; a menu's is its dishes and a drink's is its cocktails, in
+   * the author's own punctuation, because neither has a description and the
+   * line IS the thing (db/012, db/017).
    */
   describe: string;
+  /**
+   * THE SECOND BUILD OF THE SAME RECORD — drink.mocktails, and null everywhere
+   * else. Not a description of a different ingredient: the mocktail mirror is
+   * the same glass built without the alcohol, it is stored on the same row by
+   * db/017, and it is loaded here so that it cannot be anywhere the drink is
+   * not. See `printedMatterFor`.
+   */
+  mirror: string | null;
   price: string | null;
   minGuests: string | null;
   maxGuests: string | null;
@@ -369,6 +378,7 @@ const POOLS: readonly {
     pool: "product",
     table: "product",
     describe: "description",
+    mirror: null,
     price: "price_cents",
     minGuests: null,
     maxGuests: null,
@@ -380,6 +390,7 @@ const POOLS: readonly {
     pool: "game",
     table: "game",
     describe: "description",
+    mirror: null,
     price: "price_cents",
     minGuests: "min_guests",
     maxGuests: "max_guests",
@@ -391,6 +402,7 @@ const POOLS: readonly {
     pool: "tracklist",
     table: "tracklist",
     describe: "description",
+    mirror: null,
     price: null,
     minGuests: null,
     maxGuests: null,
@@ -412,6 +424,30 @@ const POOLS: readonly {
     pool: "menu",
     table: "menu",
     describe: "dishes",
+    mirror: null,
+    price: null,
+    minGuests: null,
+    maxGuests: null,
+    shape: null,
+    printed: null,
+    active: "t.status = 'active'",
+  },
+  // DRINKS — db/017's pool, and the first with TWO authored lines on one row.
+  //
+  // `describe` is the cocktails and `mirror` is the mocktail build of the same
+  // glass. They are one ingredient, they are selected together because they are
+  // one row, and nothing downstream is given a way to have one without the
+  // other. That is the entire guarantee: nobody at the table is visibly not
+  // drinking. Read the top of db/017 before adding a second drink pool, an
+  // `is_mocktail` flag, or a separate mirror ingredient.
+  //
+  // No price, for db/012's reason unchanged: docs/drinks.md carries no cost and
+  // inventing one per head would be a number nobody authored.
+  {
+    pool: "drink",
+    table: "drink",
+    describe: "cocktails",
+    mirror: "mocktails",
     price: null,
     minGuests: null,
     maxGuests: null,
@@ -428,6 +464,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
     const idColumn = `${spec.table}_id`;
     const { rows } = await db.query(
       `select t.id, t.slug, t.name, t.${spec.describe} as description,
+              ${spec.mirror ? `t.${spec.mirror}` : "null::text"} as mirror,
               ${spec.price ? `t.${spec.price}` : "null::integer"} as price_cents,
               ${spec.minGuests ? `t.${spec.minGuests}` : "null::integer"} as min_guests,
               ${spec.maxGuests ? `t.${spec.maxGuests}` : "null::integer"} as max_guests,
@@ -490,7 +527,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
         minGuests: num(row.min_guests),
         maxGuests: num(row.max_guests),
         shape: gameShape(row.shape),
-        printedMatter: printedPieces(row.printed_matter),
+        printedMatter: printedMatterFor(spec.pool, row),
         isFixture: str(row.slug).startsWith("fixture-"),
       });
     }
@@ -707,6 +744,76 @@ function scopes(value: unknown): Ingredient["worlds"] {
     }
   }
   return out;
+}
+
+/**
+ * WHAT THIS INGREDIENT PRINTS.
+ *
+ * Games have a table of it (db/010). A MENU does not, and does not need one:
+ * a menu is a single printed object whose text is its line of dishes, and
+ * db/012 says so in as many words — the dishes are held verbatim, in the
+ * author's punctuation, because the line IS the thing. Making the card here
+ * rather than in a migration keeps the claim next to the only other place
+ * that already knows a menu has no `description` column.
+ *
+ * `THE MENU` as the object's label and the menu's own name — "A long summer
+ * dinner" — as what it came with, which is how every other printed object
+ * reads: the object, then the thing it belongs to.
+ *
+ * A DRINK PRINTS TWO OBJECTS FROM ONE ROW, and this is where the mocktail
+ * mirror becomes visible without ever becoming separable. db/017 stores both
+ * builds on one record so they cannot be selected apart; here they become the
+ * bar card and the mirror card, exactly the way a game prints its rules and its
+ * ballot from one game. "The mirror" is the founder's own noun for it.
+ *
+ * The second card is not conditional. A drink cannot reach this function
+ * without a mirror — the column is NOT NULL and non-empty — so there is no
+ * branch in which a cocktail is printed alone, which is the whole point.
+ *
+ * Products and tracklists print nothing. There is no object; a soundtrack is
+ * not a card, and a page that renders one is showing her something that will
+ * never arrive.
+ */
+function printedMatterFor(
+  pool: string,
+  row: Record<string, unknown>
+): PrintedPiece[] {
+  if (pool === "drink") {
+    const cocktails = str(row.description ?? "").trim();
+    const mirror = str(row.mirror ?? "").trim();
+    if (cocktails.length === 0 || mirror.length === 0) return [];
+    return [
+      {
+        piece: "drink_card",
+        label: "The drinks",
+        description: cocktails,
+        perGuest: false,
+        quantity: null,
+      },
+      {
+        piece: "mirror_card",
+        label: "The mirror",
+        description: mirror,
+        perGuest: false,
+        quantity: null,
+      },
+    ];
+  }
+
+  if (pool === "menu") {
+    const dishes = str(row.description ?? "").trim();
+    if (dishes.length === 0) return [];
+    return [
+      {
+        piece: "menu_card",
+        label: "The menu",
+        description: dishes,
+        perGuest: false,
+        quantity: null,
+      },
+    ];
+  }
+  return printedPieces(row.printed_matter);
 }
 
 function printedPieces(value: unknown): PrintedPiece[] {

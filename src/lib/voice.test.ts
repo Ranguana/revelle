@@ -231,6 +231,86 @@ test("WESTHAMPTON, 1976 round-trips through the tone vocabulary", () => {
   assert.ok(affinity - wrong > 1, "the vocabulary does not discriminate");
 });
 
+/**
+ * The second destination, and the first chance to check the thing the
+ * vocabulary is actually FOR.
+ *
+ * One destination cannot fail this: any vector matches itself. Two can, and the
+ * failure would be silent — two houses authored months apart, described in the
+ * same handful of tones because those are the tones an author reaches for,
+ * resolving to the same vector and scoring the same against every host. That is
+ * a catalogue with one destination in it wearing two palettes.
+ *
+ * So the claim under test is not "Havana is warm". It is that Havana and
+ * Westhampton are far apart, and that a host's answers sort them.
+ */
+test("HAVANA, THE SMALL HOURS is a different house from Westhampton", () => {
+  const havana = destinationVoiceProfile(
+    DESTINATIONS.havana.voice,
+    DESTINATION_TONES.havana
+  );
+  const westhampton = destinationVoiceProfile(
+    DESTINATIONS["westhampton-1976"].voice,
+    DESTINATION_TONES["westhampton-1976"]
+  );
+
+  // Stated outright, and all three differ from Westhampton's cordial,
+  // impersonal, dry. A destination whose three stated facets match another's is
+  // already most of the way to being the same destination.
+  assert.equal(havana.formality_plain, 1);
+  assert.equal(havana.address_collective_first, 1);
+  assert.equal(havana.humour_warm, 1);
+
+  // What the prose says, arriving as numbers with the right sign: it is fond
+  // out loud, it takes its time, it is exact about the hour, it is louder than
+  // a house where the best line is muttered, and it does not perform.
+  const expected: [VoiceFacetCode, "positive" | "negative"][] = [
+    ["warmth", "positive"],
+    ["earnestness", "positive"],
+    ["cadence_unhurried", "positive"],
+    ["precision", "positive"],
+    ["volume", "positive"],
+    ["theatricality", "negative"],
+    ["irreverence", "negative"],
+  ];
+  for (const [code, sign] of expected) {
+    const weight = havana[code] ?? 0;
+    assert.ok(
+      sign === "positive" ? weight > 0 : weight < 0,
+      `${code} should be ${sign} for Havana; it is ${weight}`
+    );
+  }
+
+  assert.ok(
+    voiceAffinity(havana, westhampton) < 0.3,
+    "Havana and Westhampton resolve to nearly the same voice — one of them is " +
+      "not authored, it is echoed"
+  );
+
+  // And the sorting works in both directions, which is the whole point of
+  // tagging the catalogue in the vocabulary she answers in.
+  const warmGroup = toneProfile([
+    "good_natured",
+    "laughs_first",
+    "lingers",
+    "says_it_out_loud",
+  ]);
+  const dryGroup = toneProfile([
+    "deadpan",
+    "understated",
+    "low_voices",
+    "explains_nothing",
+  ]);
+  assert.ok(
+    voiceAffinity(warmGroup, havana) > voiceAffinity(warmGroup, westhampton),
+    "a warm, fond, lingering group should land on Havana"
+  );
+  assert.ok(
+    voiceAffinity(dryGroup, westhampton) > voiceAffinity(dryGroup, havana),
+    "a dry, quiet group should land on Westhampton"
+  );
+});
+
 test("silence is silence: unchosen tones make no claim", () => {
   const one = toneProfile(["deadpan"]);
   // Exactly the facets `deadpan` claims, and no others. Not a zero for the

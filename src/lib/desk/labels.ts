@@ -82,12 +82,36 @@ export const SEASONS: readonly { code: string; label: string }[] = [
   { code: "year_round", label: "Year-round" },
 ];
 
-/** cooking_level in db/012 — the four values as authored in docs/menus.md. */
-export const COOKING_LEVELS: readonly { code: string; label: string }[] = [
+/**
+ * THE MAKING AXIS, IN THE WORDS OF THE POOL THAT SPEAKS IT.
+ *
+ * One axis, three positions, two vocabularies — docs/menus.md and docs/drinks.md
+ * are explicit about both halves of that. A menu is actually made; the same
+ * position at the bar is actually mixed. Nothing downstream can tell them
+ * apart: db/017 projects both onto the single `made_by_hand` facet, and
+ * `bought and poured` is `bought_and_arranged` said over ice.
+ *
+ * `retired` is the fourth rung the catalogue used to have. It is kept in the
+ * list, marked, for one reason: a select that does not contain the value a row
+ * currently holds silently rewrites that row on the next save. A curator sees
+ * it, can move a menu off it, and cannot arrive at it by accident.
+ */
+export type MakingLevel = { code: string; label: string; retired?: true };
+
+/** cooking_level in db/012 — the values as authored in docs/menus.md. */
+export const COOKING_LEVELS: readonly MakingLevel[] = [
   { code: "actually_made", label: "Actually made" },
-  { code: "mostly_made", label: "Mostly made" },
   { code: "half_made", label: "Half made" },
   { code: "bought_and_arranged", label: "Bought and arranged" },
+  { code: "mostly_made", label: "Mostly made (retired)", retired: true },
+];
+
+/** making_level in db/016 — the same axis, as authored in docs/drinks.md. */
+export const MIXING_LEVELS: readonly MakingLevel[] = [
+  { code: "actually_made", label: "Actually mixed" },
+  { code: "half_made", label: "Half made" },
+  { code: "bought_and_arranged", label: "Bought and poured" },
+  { code: "mostly_made", label: "Mostly mixed (retired)", retired: true },
 ];
 
 /** occasion_type in db/001, in the order the application offers them. */

@@ -1,0 +1,170 @@
+#!/usr/bin/env node
+/**
+ * Turn the tone-icon handoff into src/app/apply/tone-marks.tsx.
+ *
+ * ── WHY THIS IS GENERATED AND NOT HAND-MAINTAINED ────────────────────
+ *
+ * The 51 SVGs in design/tone-icons/ are a DESIGN DELIVERABLE. They will be
+ * re-cut — a tone gets clearer, a new tone is added, the whole set is redrawn.
+ * Every one of those is a re-run of this script and a diff you can read, not an
+ * afternoon of hand-transcribing path data into JSX and hoping.
+ *
+ * Same arrangement as src/app/fonts.css and scripts/build-fonts.py: the source
+ * of truth is the asset, the committed file is the build, and the build is
+ * checked in so a deploy never has to run it.
+ *
+ * ── WHY THE COLOURS BECOME TOKENS ────────────────────────────────────
+ *
+ * src/app/plates.tsx states the rule for all house artwork: nothing names a
+ * colour, so a drawing cannot drift from the palette and a destination can one
+ * day repaint it. The handoff ships literal hexes precisely so they can be
+ * swapped here — its README says so.
+ *
+ * ── THE ONE THING NOT TO BREAK ───────────────────────────────────────
+ *
+ * Every icon is fitted to the same 46-unit optical box by a transform on its
+ * root <g>, with stroke-width = 1.5 / scale, so all 51 render at an identical
+ * 1.5-unit visual weight however far each drawing was scaled. That transform
+ * and that stroke width are carried through untouched. Do not "tidy" them.
+ *
+ *   node scripts/build-tone-marks.mjs           # write the file
+ *   node scripts/build-tone-marks.mjs --check   # fail if it is stale
+ */
+
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const SOURCE = join(root, "design/tone-icons");
+const TARGET = join(root, "src/app/apply/tone-marks.tsx");
+
+/** The handoff's five hexes, in the tokens this codebase already has. */
+const TOKENS = {
+  "#26251C": "var(--ink)",
+  "#A83E24": "var(--oxblood)",
+  "#1F6B7A": "var(--aqua)",
+  "#C9922F": "var(--gold)",
+  "#FBF4E7": "var(--bone)",
+};
+
+/** SVG attribute -> JSX prop, for every attribute the handoff actually uses. */
+const PROPS = {
+  "stroke-width": "strokeWidth",
+  "stroke-linecap": "strokeLinecap",
+  "stroke-linejoin": "strokeLinejoin",
+  "stroke-dasharray": "strokeDasharray",
+  "stroke-opacity": "strokeOpacity",
+  "fill-opacity": "fillOpacity",
+  "fill-rule": "fillRule",
+  "clip-rule": "clipRule",
+  "stroke-miterlimit": "strokeMiterlimit",
+};
+
+function toJsx(svg, code) {
+  // Keep only what is inside <svg>…</svg>: the root <g> and its children.
+  const open = svg.indexOf(">", svg.indexOf("<svg"));
+  const close = svg.lastIndexOf("</svg>");
+  if (open === -1 || close === -1) throw new Error(`${code}: not an <svg>`);
+  let body = svg.slice(open + 1, close).trim();
+
+  // A colour outside the agreed five is a mistake worth stopping for, not
+  // worth passing through: it would silently escape the palette.
+  for (const hex of body.match(/#[0-9A-Fa-f]{6}/g) ?? []) {
+    const key = hex.toUpperCase();
+    if (!TOKENS[key]) {
+      throw new Error(
+        `${code}: colour ${hex} is not in the handoff palette. ` +
+          `Either the asset is wrong or the palette has grown — decide, do not guess.`
+      );
+    }
+  }
+  body = body.replace(/#[0-9A-Fa-f]{6}/g, (hex) => TOKENS[hex.toUpperCase()]);
+
+  for (const [attr, prop] of Object.entries(PROPS)) {
+    body = body.replace(new RegExp(`\\b${attr}=`, "g"), `${prop}=`);
+  }
+
+  // <path …></path> -> <path … />. JSX has no void elements, and an explicit
+  // close is legal, but self-closing is what every other file here does.
+  body = body.replace(/<(path|circle|rect|line|polyline|polygon|ellipse)([^>]*?)><\/\1>/g,
+    (_m, tag, attrs) => `<${tag}${attrs.replace(/\s*$/, "")} />`);
+
+  if (/\b[a-z]+-[a-z]+=/.test(body)) {
+    const found = body.match(/\b[a-z]+-[a-z]+=/g);
+    throw new Error(
+      `${code}: hyphenated attribute(s) ${[...new Set(found)].join(", ")} have no JSX ` +
+        `mapping. Add them to PROPS rather than letting React drop them silently.`
+    );
+  }
+  return body;
+}
+
+const codes = readdirSync(SOURCE)
+  .filter((f) => f.endsWith(".svg"))
+  .map((f) => f.replace(/\.svg$/, ""))
+  .sort();
+
+const entries = codes.map((code) => {
+  const jsx = toJsx(readFileSync(join(SOURCE, `${code}.svg`), "utf8"), code);
+  const indented = jsx
+    .split("\n")
+    .map((l) => (l.trim() ? `    ${l.trim()}` : ""))
+    .filter(Boolean)
+    .join("\n");
+  // A code is a valid identifier by construction (^[a-z][a-z0-9_]*$), but
+  // quoting is what the rest of the codebase does for slug-keyed maps.
+  return `  "${code}": (\n    <>\n${indented}\n    </>\n  ),`;
+});
+
+const file = `import type { ReactNode } from "react";
+
+/**
+ * The tone marks — one per tone in src/lib/voice.ts.
+ *
+ * GENERATED by scripts/build-tone-marks.mjs from design/tone-icons/, which is a
+ * design deliverable. DO NOT EDIT THIS FILE: re-cut the SVG and re-run the
+ * script, so the drawing and the thing that ships can never disagree.
+ *
+ * ── WHAT THESE ARE ───────────────────────────────────────────────────
+ *
+ * Icons of FEELINGS. A host taps the ones that sound like her friends, and
+ * those taps are the only signal telling the house what register to write her
+ * invitations, menus and place cards in — so she has to be able to feel the
+ * difference between deadpan and warm before she reads a word. An earlier set
+ * drew conversation instead (a line was a spoken phrase, a dot a person, a gap
+ * a silence): internally consistent, and unreadable. It was replaced.
+ *
+ * ── HOW THEY HOLD TOGETHER ───────────────────────────────────────────
+ *
+ * Every icon is fitted to the same 46-unit optical box centred at 32,32 by the
+ * transform on its root <g>, with stroke-width = 1.5 / scale — so all ${codes.length}
+ * render at an identical 1.5-unit visual weight however far each drawing had to
+ * be scaled to fit. That is what makes them read as one commissioned set rather
+ * than ${codes.length} pieces of clip art, and it is not to be tidied away.
+ *
+ * The renderer supplies the <svg viewBox="0 0 64 64"> wrapper; each entry here
+ * is its contents. Nothing names a colour — see the rule at the top of
+ * src/app/plates.tsx.
+ *
+ * A missing key draws nothing and the tile still works, which is the correct
+ * failure: a tone with no mark is a plainer tile, not a broken one.
+ */
+export const TONE_MARKS: Record<string, ReactNode> = {
+${entries.join("\n")}
+};
+`;
+
+if (process.argv.includes("--check")) {
+  const current = readFileSync(TARGET, "utf8");
+  if (current !== file) {
+    console.error(
+      "tone-marks.tsx is stale. Run: node scripts/build-tone-marks.mjs"
+    );
+    process.exit(1);
+  }
+  console.log(`ok — tone-marks.tsx matches ${codes.length} icons in design/tone-icons/`);
+} else {
+  writeFileSync(TARGET, file);
+  console.log(`wrote ${TARGET} — ${codes.length} marks`);
+}

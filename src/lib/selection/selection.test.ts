@@ -1132,6 +1132,19 @@ function birthdayInput(): SelectionInput {
           description: "Two teams, one still life, forty minutes.",
           shape: "scheduled",
           slots: [{ slotCode: "game", fit: "native", note: null }],
+          // What it prints. A game brings real objects (db/010's
+          // game_printed_matter) and its description is a sentence ABOUT the
+          // game rather than something to set in type — which is why the
+          // member's printed matter is built from these and never from that.
+          printedMatter: [
+            {
+              piece: "voting_slips",
+              label: "The ballot",
+              description: "Five categories, one line each.",
+              perGuest: true,
+              quantity: null,
+            },
+          ],
         }),
         ingredient("p1", "product", "The good candles", { [COASTAL.id]: 0.6 }, {
           description: "Beeswax, and enough of them.",
@@ -1252,9 +1265,24 @@ test("and it is otherwise a complete Revelle, not a degraded one", () => {
     view.sections.every((s) => s.pieces.length > 0),
     "AND THERE IS NO EMPTY SECTION — a heading over nothing is the failure"
   );
+  // WHAT PRINTS IS WHAT AN INGREDIENT SAYS PRINTS, and nothing else. The
+  // ballot is a real object the game carries; the game's own description is a
+  // sentence about the game and is not a card. An earlier version of
+  // memberRevelle fell back to the description when an ingredient printed
+  // nothing, which put a soundtrack and a batch negroni on the page as printed
+  // objects — a failure only visible in a screenshot, which is where it was
+  // found.
+  const ballot = view.printedMatter.find((p) => p.heading === "The ballot");
+  assert.ok(ballot, "an authored object is hers to print");
+  assert.equal(ballot.from, "The Art Battle", "and it says what it came with");
+  assert.equal(ballot.perGuest, true, "one each, counted from her guest band");
   assert.ok(
-    view.printedMatter.some((p) => p.body.includes("forty minutes")),
-    "the printed matter is the authored text of what she actually got"
+    !view.printedMatter.some((p) => p.body.includes("forty minutes")),
+    "a description is not an object and must not be printed as one"
+  );
+  assert.ok(
+    !view.printedMatter.some((p) => p.body.includes("Beeswax")),
+    "and a product that prints nothing prints nothing"
   );
 });
 

@@ -9,11 +9,12 @@
  *
  * A `Destination` (src/lib/tokens.ts) is a LOOK and a VOICE, and both halves
  * are authored by hand before the thing exists — a palette, a lexicon, a page
- * of exemplars, a list of lines that were rejected. WESTHAMPTON, 1976 has all
- * of that. The other six have a poster and a description, which is what a
- * catalogue page needs and nowhere near what a writer needs.
+ * of exemplars, a list of lines that were rejected. WESTHAMPTON, 1976 and
+ * HAVANA, THE SMALL HOURS have all of that. The rest have a poster and a
+ * description, which is what a catalogue page needs and nowhere near what a
+ * writer needs.
  *
- * Stubbing six half-specified `Destination` objects to get them onto this page
+ * Stubbing half-specified `Destination` objects to get them onto this page
  * would put unauthored voices in the module a curator reviews, so they live
  * here instead, in the shape the page actually consumes. When one of them is
  * written end to end it graduates to destinations.ts and this file keeps only
@@ -360,6 +361,45 @@ export const LIBRARY: readonly Plate[] = [
       {
         label: "The Ending",
         detail: "Cards at the long table until the fire goes down.",
+      },
+    ],
+  },
+  /*
+   * The only plate on this shelf whose destination is written end to end —
+   * look, voice, exemplars and all — in src/lib/destinations.ts. It is here
+   * for the same reason the other eleven are: this file is the catalogue copy,
+   * and a plate needs a caption whether or not a writer has been given a
+   * lexicon. The name, the tagline and the occasion are the same words in both
+   * files on purpose; if they ever disagree, destinations.ts is the authored
+   * one and this is the one that drifted.
+   */
+  {
+    slug: "havana",
+    name: "HAVANA, THE SMALL HOURS",
+    caption: "Havana",
+    number: "No. 15",
+    occasion: "The long dinner",
+    tagline: "The table is pushed back for the dancing. Supper again at three.",
+    rows: [
+      {
+        label: "The Arrival",
+        detail:
+          "Nobody is early. The first daiquiri is shaken to order and handed over in the courtyard, where the fan turns and does not help.",
+      },
+      {
+        label: "The Moment",
+        detail:
+          "The table carried back against the wall between the flan and the coffee. Nobody is asked to help and everybody does.",
+      },
+      {
+        label: "The Table",
+        detail:
+          "Pork with garlic and citrus since the afternoon, black beans, rice, plantains sweet then green. Coffee small and sweet, at every hour.",
+      },
+      {
+        label: "The Ending",
+        detail:
+          "The second supper at three: sandwiches pressed flat, coconut ice cream, and the last coffee taken standing up.",
       },
     ],
   },

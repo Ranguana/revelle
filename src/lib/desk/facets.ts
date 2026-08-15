@@ -30,6 +30,7 @@ const TAGGABLE = {
   taste_cohort: { join: "taste_cohort_facet", column: "taste_cohort_id" },
   game: { join: "game_facet", column: "game_id" },
   menu: { join: "menu_facet", column: "menu_id" },
+  drink: { join: "drink_facet", column: "drink_id" },
 } as const;
 
 export type Taggable = keyof typeof TAGGABLE;
@@ -84,6 +85,10 @@ const NOT_OFFERED = new Set([
  */
 const NOT_OFFERED_FOR: Readonly<Record<string, ReadonlySet<string>>> = {
   menu: new Set(["making"]),
+  // Same rule, same reason: a drink's position on the making axis is projected
+  // from drink.making by db/017's trigger, and a checkbox beside it would be a
+  // second contrary copy of a fact the column already holds.
+  drink: new Set(["making"]),
 };
 
 /**

@@ -182,17 +182,17 @@ export default function MenuForm({
         </div>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="cooking_note">
-            How it bends
+            A note on the making
           </label>
           <input
             id="cooking_note"
             name="cooking_note"
             defaultValue={values.cooking_note ?? ""}
-            placeholder="chicken can be bought rotisserie"
             className={styles.input}
           />
           <span className={styles.hint}>
-            The escape hatch, in your words. The most useful line on the record.
+            For a curator, and read by nothing else. The three values above
+            carry how a menu bends; this is where a reason goes.
           </span>
         </div>
       </div>

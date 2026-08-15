@@ -406,6 +406,105 @@ export const POSTERS: Record<string, ReactNode> = {
   ),
 
   /*
+   * The only plate whose subject is the EMPTY MIDDLE of a room.
+   *
+   * Havana's night has two halves and the hinge between them is furniture: the
+   * table is carried back against the wall after the flan, and what is left is
+   * a cleared floor. So the table is at the edge with the coffee on it, a chair
+   * is against the far wall, and the middle of the poster is tile.
+   *
+   * The fanlight over the door is the one ornament, and it is drawn because it
+   * is architecture rather than souvenir — a real thing above a real doorway,
+   * in the seven house colours. Everything this destination refuses is a thing
+   * this poster does not contain: no car, no cigar, no casino, no flag, no
+   * palm. See the long note in src/lib/destinations.ts.
+   */
+  "havana": (
+    <>
+      <rect width="300" height="400" fill="var(--bone)" />
+      <rect width="300" height="304" fill="var(--ground2)" />
+
+      {/* the fanlight: seven lights, brass at the middle, bone mullions */}
+      <g stroke="var(--bone)" strokeWidth="2">
+        <path d="M150 141 L70.00 141.00 A80 80 0 0 1 77.92 106.29 Z" fill="var(--oxblood)" />
+        <path d="M150 141 L77.92 106.29 A80 80 0 0 1 100.12 78.45 Z" fill="var(--gold)" />
+        <path d="M150 141 L100.12 78.45 A80 80 0 0 1 132.20 63.01 Z" fill="var(--aqua)" />
+        <path d="M150 141 L132.20 63.01 A80 80 0 0 1 167.80 63.01 Z" fill="var(--gold-lit)" />
+        <path d="M150 141 L167.80 63.01 A80 80 0 0 1 199.88 78.45 Z" fill="var(--aqua)" />
+        <path d="M150 141 L199.88 78.45 A80 80 0 0 1 222.08 106.29 Z" fill="var(--gold)" />
+        <path d="M150 141 L222.08 106.29 A80 80 0 0 1 230.00 141.00 Z" fill="var(--oxblood)" />
+      </g>
+
+      {/* the doorframe, the transom under the glass, and the room beyond */}
+      <rect x="70" y="141" width="160" height="163" fill="var(--bone)" />
+      <rect x="70" y="141" width="160" height="10" fill="var(--night)" />
+      <rect x="84" y="151" width="132" height="153" fill="var(--night)" />
+
+      {/* the two leaves, louvred, standing open against the jambs */}
+      <g>
+        <rect x="84" y="151" width="24" height="153" fill="var(--aqua)" />
+        <rect x="192" y="151" width="24" height="153" fill="var(--aqua)" />
+        <g stroke="var(--bone)" strokeWidth="1.5" opacity="0.5">
+          <path d="M86 162 H106 M86 174 H106 M86 186 H106 M86 198 H106 M86 210 H106 M86 222 H106 M86 234 H106 M86 246 H106 M86 258 H106 M86 270 H106 M86 282 H106 M86 294 H106" />
+          <path d="M194 162 H214 M194 174 H214 M194 186 H214 M194 198 H214 M194 210 H214 M194 222 H214 M194 234 H214 M194 246 H214 M194 258 H214 M194 270 H214 M194 282 H214 M194 294 H214" />
+        </g>
+      </g>
+
+      {/* the bulb in the room the dancing is in */}
+      <rect x="148.5" y="151" width="3" height="30" fill="var(--gold)" opacity="0.8" />
+      <circle cx="150" cy="188" r="10" fill="var(--gold-lit)" />
+
+      {/* skirting, and the threshold where it crosses the doorway */}
+      <rect y="296" width="300" height="8" fill="var(--night)" />
+
+      {/* the floor, and the middle of it left clear */}
+      <rect y="304" width="300" height="96" fill="var(--bone)" />
+      <g fill="var(--oxblood)" opacity="0.3">
+        <path d="M22 315 L33 326 L22 337 L11 326 Z" />
+        <path d="M66 315 L77 326 L66 337 L55 326 Z" />
+        <path d="M110 315 L121 326 L110 337 L99 326 Z" />
+        <path d="M154 315 L165 326 L154 337 L143 326 Z" />
+        <path d="M198 315 L209 326 L198 337 L187 326 Z" />
+        <path d="M242 315 L253 326 L242 337 L231 326 Z" />
+        <path d="M286 315 L297 326 L286 337 L275 326 Z" />
+        <path d="M44 359 L55 370 L44 381 L33 370 Z" />
+        <path d="M88 359 L99 370 L88 381 L77 370 Z" />
+        <path d="M132 359 L143 370 L132 381 L121 370 Z" />
+        <path d="M176 359 L187 370 L176 381 L165 370 Z" />
+        <path d="M220 359 L231 370 L220 381 L209 370 Z" />
+        <path d="M264 359 L275 370 L264 381 L253 370 Z" />
+      </g>
+      <g stroke="var(--aqua)" strokeWidth="1.25" opacity="0.35">
+        <path d="M0 342 H300 M0 388 H300" />
+      </g>
+
+      {/* the table, pushed back against the wall, with the coffee on it */}
+      <g>
+        <path d="M14 228 C4 230 4 244 14 246" fill="none" stroke="var(--night)" strokeWidth="4" />
+        <path d="M34 224 L46 222 L46 230 Z" fill="var(--night)" />
+        <rect x="14" y="220" width="20" height="34" fill="var(--night)" />
+        <rect x="19" y="214" width="10" height="6" fill="var(--gold)" />
+        <rect x="41" y="244" width="11" height="10" fill="var(--gold-lit)" />
+        <rect x="55" y="244" width="11" height="10" fill="var(--gold-lit)" />
+        <rect x="2" y="254" width="66" height="9" fill="var(--oxblood)" />
+        <rect x="8" y="263" width="7" height="41" fill="var(--night)" />
+        <rect x="55" y="263" width="7" height="41" fill="var(--night)" />
+      </g>
+
+      {/* one chair, put back against the other wall, out of the way */}
+      <g>
+        <rect x="246" y="204" width="6" height="48" fill="var(--night)" />
+        <rect x="278" y="204" width="6" height="48" fill="var(--night)" />
+        <rect x="242" y="200" width="46" height="7" fill="var(--oxblood)" />
+        <rect x="242" y="222" width="46" height="6" fill="var(--oxblood)" />
+        <rect x="238" y="252" width="54" height="8" fill="var(--oxblood)" />
+        <rect x="244" y="260" width="6" height="44" fill="var(--night)" />
+        <rect x="280" y="260" width="6" height="44" fill="var(--night)" />
+      </g>
+    </>
+  ),
+
+  /*
    * The first plate in the library with a TABLE in it, laid and waiting. Every
    * other poster draws the place; this one draws the place and the evening,
    * which is why it can carry a long dinner as well as a getaway.

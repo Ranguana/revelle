@@ -30,12 +30,27 @@
  *   · A menu that already exists is LEFT ALONE and any difference is REPORTED.
  *     A curator's edit at the desk outranks the file. `--overwrite` reverses
  *     that, deliberately and only when asked.
- *   · Season and how-much-cooking are written as COLUMNS. Their facets are
- *     projected by a trigger (db/012) and are never written here.
+ *   · Season and how-much-making are written as COLUMNS. Their facets are
+ *     projected by a trigger (db/012, repointed by db/017) and never here.
  *   · The destination each menu was written for becomes a `menu_world` row at
- *     full affinity, when that destination exists as a `world`. When it does
- *     not — most of the library is still catalogue copy — it is reported and
- *     the menu stays general, which is a true statement rather than a hole.
+ *     full affinity. A destination with no `world` row yet gets a DRAFT STUB —
+ *     see the note on stubs in scripts/catalogue-vocabulary.mjs. A stub is
+ *     never issuable, so the menu is scoped to something true without becoming
+ *     deliverable under a destination nobody has authored.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * THE CURRENT DROP REWROTE MENUS 1–20
+ *
+ * The founder's latest docs/menus.md is not an extension of the first twenty,
+ * it is a replacement of them: names, dishes and the making line all moved, and
+ * the inline escape hatches ("lobster meat can be bought picked", "chicken can
+ * be bought rotisserie") were REMOVED on purpose. Her own note says why — the
+ * three values now say the same thing without a machine having to read prose.
+ *
+ * So on a database that already holds the old twenty this script will report
+ * twenty differences and change nothing, which is correct: overwriting a
+ * catalogue is a decision. `--overwrite` is how that decision is expressed, and
+ * it will also blank `cooking_note`, which is the intent.
  *
  * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL.
  */
@@ -43,6 +58,12 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import pg from "pg";
+
+import {
+  DESTINATIONS,
+  SEASONS,
+  ensureWorld,
+} from "./catalogue-vocabulary.mjs";
 
 const SOURCE = fileURLToPath(new URL("../docs/menus.md", import.meta.url));
 
@@ -56,57 +77,22 @@ function needsSsl(url) {
 }
 
 /**
- * The `## heading` in the document -> the `world.slug` it refers to.
+ * THE THREE AUTHORED VALUES, and only three.
  *
- * A table rather than a slugify() call, because "Vegas" is `las-vegas` and
- * "Westhampton" is `westhampton-1976`, and a rule that gets two of six wrong
- * is worse than a list. An unknown heading is an error, not a skip.
- */
-const DESTINATIONS = {
-  Westhampton: "westhampton-1976",
-  Nantucket: "nantucket",
-  "New York": "new-york",
-  "Cap Ferrat": "cap-ferrat",
-  "Côte d'Azur": "cote-dazur",
-  Vegas: "las-vegas",
-};
-
-/**
- * Her season wording -> the closed value in season_band (db/012).
+ * docs/menus.md states it at the top: "How much making has three values and
+ * only three: actually made · half made · bought and arranged." `mostly_made`
+ * is retired — it stays in the `cooking_level` enum forever so stored rows keep
+ * resolving (db/016's rule) and it is never written again.
  *
- * Her words are kept verbatim in `season_note` beside it. This mapping exists
- * only so the selection layer has something to filter and weight on; where the
- * two disagree in richness, hers is the one a human reads.
- *
- * "Late August" is `summer` rather than `high_summer` because the menu it
- * belongs to says "end of summer" in the same breath. That is a judgement, and
- * it is here, in one line, where it can be argued with.
+ * Matched EXACTLY rather than by prefix. The old file allowed a trailing escape
+ * hatch and this one does not; an exact match is what turns a stray half-edited
+ * line into a failure that names itself instead of a silently truncated value.
  */
-const SEASONS = {
-  Spring: "spring",
-  Summer: "summer",
-  "High summer": "high_summer",
-  "Late August": "summer",
-  Fall: "autumn",
-  October: "autumn",
-  Winter: "winter",
-  "Shoulder season": "shoulder",
-  "Spring or fall": "shoulder",
-  "Year-round": "year_round",
-  "Winter, works year-round": "year_round",
-};
-
-/**
- * The four authored values, longest first so that "Bought and arranged" is not
- * matched as something shorter. Everything after the phrase is the ESCAPE
- * HATCH and is kept verbatim — see db/012.
- */
-const COOKING = [
-  ["Bought and arranged", "bought_and_arranged"],
+const MAKING = new Map([
   ["Actually made", "actually_made"],
-  ["Mostly made", "mostly_made"],
   ["Half made", "half_made"],
-];
+  ["Bought and arranged", "bought_and_arranged"],
+]);
 
 function fail(message) {
   console.error(`\n[seed-menus] FAILED: ${message}`);
@@ -155,26 +141,25 @@ function parse(text) {
     if (menu.bullets.length !== 4) {
       fail(
         `menu ${menu.number} has ${menu.bullets.length} lines; the record shape ` +
-          `is exactly four: dishes, what it's for, season, how much cooking`
+          `is exactly four: dishes, what it's for, season, how much making`
       );
     }
-    const [dishes, whatItsFor, season, cooking] = menu.bullets;
+    const [dishes, whatItsFor, season, making] = menu.bullets;
 
     if (!Object.hasOwn(SEASONS, season)) {
       fail(
-        `menu ${menu.number}: season "${season}" is not in the mapping at the ` +
-          `top of scripts/seed-menus.mjs. Add it there — a new wording is a ` +
+        `menu ${menu.number}: season "${season}" is not in the mapping in ` +
+          `scripts/catalogue-vocabulary.mjs. Add it there — a new wording is a ` +
           `decision, not a default.`
       );
     }
 
-    const matched = COOKING.find(([phrase]) =>
-      cooking.toLowerCase().startsWith(phrase.toLowerCase())
-    );
-    if (!matched) {
+    if (!MAKING.has(making)) {
       fail(
-        `menu ${menu.number}: "${cooking}" does not start with one of the four ` +
-          `authored values (${COOKING.map(([p]) => p).join(" · ")})`
+        `menu ${menu.number}: "${making}" is not one of the three authored ` +
+          `values (${[...MAKING.keys()].join(" · ")}). The escape hatches were ` +
+          `removed from the catalogue in this drop and the line carries the ` +
+          `value and nothing else.`
       );
     }
 
@@ -182,13 +167,11 @@ function parse(text) {
     menu.name = whatItsFor;
     menu.seasonNote = season;
     menu.season = SEASONS[season];
-    menu.cooking = matched[1];
-    // Whatever she wrote after the value, with the joining punctuation removed
-    // and nothing else touched.
-    menu.cookingNote = cooking
-      .slice(matched[0].length)
-      .replace(/^\s*[,;—–-]\s*/, "")
-      .trim();
+    menu.cooking = MAKING.get(making);
+    // Nothing follows the value any more. The column stays — it is a real
+    // curator's note and db/012 keeps it — and this script writes it empty,
+    // which on --overwrite is how the removed hatches actually leave.
+    menu.cookingNote = "";
   }
 
   // The two claims the document makes in prose about specific menus, read from
@@ -211,7 +194,25 @@ function parse(text) {
   }
 
   if (menus.length === 0) fail("no menus found in docs/menus.md");
+  contiguous(menus);
   return menus;
+}
+
+/**
+ * The numbering is hers and is not the catalogue's identity, but a GAP in it is
+ * a menu that was dropped by a bad parse rather than by a decision. Contiguous
+ * from one is cheap to check and the failure it catches is silent otherwise.
+ */
+function contiguous(entries) {
+  const numbers = entries.map((entry) => entry.number).sort((a, b) => a - b);
+  for (let i = 0; i < numbers.length; i += 1) {
+    if (numbers[i] !== i + 1) {
+      fail(
+        `the menus are not contiguous from 1: expected ${i + 1} and found ` +
+          `${numbers[i]}. Either the document has a gap or the parser lost one.`
+      );
+    }
+  }
 }
 
 function numbersIn(text, pattern, what) {
@@ -249,7 +250,7 @@ await client.connect();
 let created = 0;
 let left = 0;
 let updated = 0;
-const missingWorlds = new Map();
+const stubbed = [];
 
 try {
   await client.query("begin");
@@ -342,24 +343,14 @@ try {
     // The destination it was written for. Never overwritten: a curator may
     // have said this menu also suits somewhere else, and this script has no
     // standing to reverse that.
-    const worldSlug = DESTINATIONS[menu.destination];
-    const { rows: world } = await client.query(
-      `select id from world where slug = $1`,
-      [worldSlug]
+    const world = await ensureWorld(client, menu.destination, "seed-menus");
+    if (world.created) stubbed.push(world.slug);
+    await client.query(
+      `insert into menu_world (menu_id, world_id, affinity, note)
+       values ($1, $2, 1.000, $3)
+       on conflict (menu_id, world_id) do nothing`,
+      [menuId, world.id, "Written for this destination. docs/menus.md."]
     );
-    if (world.length === 0) {
-      missingWorlds.set(
-        worldSlug,
-        (missingWorlds.get(worldSlug) ?? 0) + 1
-      );
-    } else {
-      await client.query(
-        `insert into menu_world (menu_id, world_id, affinity, note)
-         values ($1, $2, 1.000, $3)
-         on conflict (menu_id, world_id) do nothing`,
-        [menuId, world[0].id, "Written for this destination. docs/menus.md."]
-      );
-    }
 
     if (menu.smell) {
       await client.query(
@@ -388,15 +379,14 @@ console.log(
   `\n[seed-menus] ${menus.length} in the file: ${created} created, ` +
     `${updated} updated, ${left} left as the desk has them`
 );
-if (missingWorlds.size > 0) {
+if (stubbed.length > 0) {
   console.log(
-    `\nThese destinations have no world row yet, so those menus are general:`
-  );
-  for (const [slug, n] of missingWorlds) {
-    console.log(`  ${slug}  (${n} menu${n === 1 ? "" : "s"})`);
-  }
-  console.log(
-    `Run npm run seed:destinations once they are authored, then this again.`
+    `\nThese destinations had no world row and now have a DRAFT STUB, so the ` +
+      `menus written for them are scoped to something true:\n  ` +
+      stubbed.join("\n  ") +
+      `\nA draft destination is never chosen for a customer. Author the look ` +
+      `and the voice in src/lib/destinations.ts and run ` +
+      `npm run seed:destinations, which completes a stub in place.`
   );
 }
 if (!activate && created > 0) {

@@ -78,6 +78,10 @@ export default async function DeliverablesPage({
          from menu_world mw join menu m on m.id = mw.menu_id
         where mw.world_id = $1
        union all
+       select 'drink', dw.drink_id, d.name, dw.forbidden, dw.affinity::text, dw.note
+         from drink_world dw join drink d on d.id = dw.drink_id
+        where dw.world_id = $1
+       union all
        select 'tracklist', tw.tracklist_id, t.name, tw.forbidden,
               tw.affinity::text, tw.note
          from tracklist_world tw join tracklist t on t.id = tw.tracklist_id
@@ -89,6 +93,7 @@ export default async function DeliverablesPage({
       `select 'product' as pool, id, name from product where status = 'active'
        union all select 'game', id, name from game where status = 'active'
        union all select 'menu', id, name from menu where status = 'active'
+       union all select 'drink', id, name from drink where status = 'active'
        union all select 'tracklist', id, name from tracklist where status = 'active'
        order by 1, 3
        limit 800`
@@ -304,6 +309,7 @@ export default async function DeliverablesPage({
                 <option value="product">Products</option>
                 <option value="game">Games</option>
                 <option value="menu">Menus</option>
+                <option value="drink">Drinks</option>
                 <option value="tracklist">Soundtracks</option>
               </select>
             </div>
