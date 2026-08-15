@@ -107,8 +107,14 @@ try {
   // `world_voice` is versioned and superseded; a destination "has a voice"
   // only if a row of it is currently published. Joining rather than trusting
   // a flag is the point — see db/004.
+  // `published_at` is not decoration: db/001 constrains status='published' and
+  // published_at to be true together, so setting one without the other is
+  // refused. coalesce so a destination that was published, unpublished and
+  // published again keeps the date it first went out.
   const voiced = await client.query(
-    `update world w set status = 'published'
+    `update world w
+        set status = 'published',
+            published_at = coalesce(w.published_at, now())
       where w.status = 'draft'
         and exists (
           select 1 from world_voice v
