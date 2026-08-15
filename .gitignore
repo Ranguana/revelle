@@ -4,3 +4,7 @@ node_modules/
 !.env.example
 __pycache__/
 .DS_Store
+*.tsbuildinfo
+next-env.d.ts
+/scripts/work/
+/scripts/src-fonts/

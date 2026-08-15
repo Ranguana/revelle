@@ -1,0 +1,57 @@
+/*
+ * The three faces this app uses, self-hosted.
+ *
+ * The files come from scripts/build-fonts.py — latin + latin-ext subsets,
+ * content-hashed, licensed and attributed in public/fonts/LICENSES.txt. The
+ * hash in the filename is why next.config.ts can cache /fonts forever: a
+ * changed font is a changed URL, so a cached one can never be stale.
+ *
+ * NO ITALIC FACE IS DECLARED, AND NONE MAY BE.
+ * The identity forbids italics (they read as machine-made), and the surest way
+ * to keep one off the page is to give the browser nothing to load. globals.css
+ * then turns off synthetic obliques as well, so `em` is a colour change and a
+ * change of nothing else.
+ *
+ * font-display: swap — text is readable immediately in fallback and reflows
+ * once. A quiz that shows nothing for 200ms feels broken on a phone.
+ */
+
+@font-face {
+  font-family: "Bodoni Moda";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bodoni-moda-regular.29d77437.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bodoni Moda";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bodoni-moda-bold.89eb301f.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Karla";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/karla-regular.53cf0a3a.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Karla";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/karla-bold.f01f36b4.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/space-mono-regular.a75ecd5c.woff2") format("woff2");
+}

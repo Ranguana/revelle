@@ -1,0 +1,101 @@
+# Revelle Société — Render Blueprint
+#
+# One web service (Render's native Node runtime) + one Render Postgres.
+#
+# ─────────────────────────────────────────────────────────────────────
+# THE RULE THIS FILE EXISTS TO ENFORCE
+#
+# No step of the pipeline may depend on a developer's machine. The database
+# below has an empty ipAllowList — it is unreachable from the internet — and
+# migrations run as this service's preDeployCommand, inside Render, on the
+# private network. There is no step anyone has to remember to run locally, and
+# no laptop that has to be online for a deploy to be correct.
+# ─────────────────────────────────────────────────────────────────────
+
+databases:
+  - name: revelle-db
+    databaseName: revelle
+    user: revelle
+    # basic-256mb is the cheapest non-expiring plan. `free` also works but is
+    # deleted after 30 days, which is not a thing to build a datastore on.
+    plan: basic-256mb
+    postgresMajorVersion: "17"
+    # Empty list = no public internet access; only Render services in the same
+    # region can reach it. It stays this way. See the rule above.
+    ipAllowList: []
+    region: oregon
+
+services:
+  - type: web
+    name: revelle
+    runtime: node
+    plan: starter
+    # Must match the database's region, or DATABASE_URL's internal hostname
+    # will not resolve.
+    region: oregon
+    branch: main
+
+    # Content lives in Postgres, not in git, so every push to main is a genuine
+    # code change worth deploying.
+    autoDeploy: true
+
+    healthCheckPath: /
+
+    # `npm ci`, not `npm install`, so the committed lockfile is authoritative.
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+
+    # ── Database setup runs HERE ──────────────────────────────────────
+    #
+    # preDeployCommand runs once per deploy, after the build and before any new
+    # instance takes traffic, with this service's environment — including the
+    # internal DATABASE_URL. That is the only place the database is reachable
+    # from, which is exactly the point.
+    #
+    # `npm run migrate` is scripts/migrate.mjs: it applies any db/*.sql not yet
+    # in the schema_migrations ledger, adopting files whose objects a pre-ledger
+    # database already has, under an advisory lock so two concurrent deploys
+    # cannot double-apply. It is idempotent — a no-op once the database is
+    # current — so running it on every deploy is free.
+    #
+    # A non-zero exit here FAILS THE DEPLOY: the old instance keeps serving and
+    # the new code is never promoted. Code that expects a column the database
+    # does not have must not ship.
+    preDeployCommand: npm run migrate
+
+    envVars:
+      # Next 16 requires Node >= 20.9; 22 is what this is developed against.
+      - key: NODE_VERSION
+        value: "22"
+
+      # Internal connection string (private network, same region). src/lib/db.ts
+      # turns SSL on for any non-localhost host with rejectUnauthorized:false,
+      # correct for both Render's internal and external endpoints. If the
+      # internal endpoint ever refuses TLS, append ?sslmode=disable — the code
+      # already honours that as its escape hatch.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: revelle-db
+          property: connectionString
+
+      # The real public origin, no trailing slash. Set after the first deploy to
+      # https://<service>.onrender.com or the custom domain.
+      - key: APP_URL
+        sync: false
+
+      # The quiz confirmation email. A missing key does NOT fail a submission —
+      # her answers are stored either way — but she gets no confirmation and the
+      # deploy log says so. MAIL_FROM must be on a Resend-verified domain.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+
+      # Optional: where a reply to the confirmation lands. The email invites a
+      # reply, so this should reach a person.
+      - key: MAIL_REPLY_TO
+        sync: false
+
+      # Optional, defaults to 10 in src/lib/db.ts.
+      # - key: DATABASE_POOL_MAX
+      #   value: "10"
