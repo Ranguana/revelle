@@ -71,7 +71,7 @@ const pools = (
     `select entity_table, active_column, active_value
        from ingredient_pool
       where active_column is not null
-        -- `world` IS a pool row (db/002: join_table is null when the reference
+        -- world IS a pool row (db/002: join_table is null when the reference
         -- lives on revelle itself). It must NOT go through the generic loop,
         -- which would publish every draft destination including the ones with
         -- no voice — the exact thing this script exists to refuse. It is
