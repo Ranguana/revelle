@@ -98,6 +98,11 @@ export const DESTINATIONS = {
 export const SEASONS = {
   Spring: "spring",
   "Spring and summer": "summer",
+  // Portofino 35. Follows "Spring and summer" above rather than splitting the
+  // difference into `shoulder`, which would take it out of high season — and
+  // stuffed baked vegetables and berries are summer food wherever else they
+  // appear in the catalogue.
+  "Spring or summer": "summer",
   Summer: "summer",
   "High summer": "high_summer",
   "Late August": "summer",
