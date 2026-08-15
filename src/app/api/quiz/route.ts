@@ -1,5 +1,11 @@
-import { transaction } from "@/lib/db";
+import { pool, transaction } from "@/lib/db";
 import { EmailNotConfiguredError, sendQuizConfirmation } from "@/lib/email";
+import {
+  APPLY_BY_EMAIL,
+  APPLY_BY_IP,
+  clientAddress,
+  recordAttempt,
+} from "@/lib/rate-limit";
 import {
   FIELDS,
   QUIZ_VERSION,
@@ -80,6 +86,39 @@ export async function POST(request: Request): Promise<Response> {
 
   const email = String(answers.email).trim().toLowerCase();
   if (!isEmail(email)) return bad(["That does not look like an email address."]);
+
+  /*
+   * ── THE THROTTLE ───────────────────────────────────────────────────
+   *
+   * Last, deliberately: a malformed or stale submission should not spend
+   * anyone's allowance, and counting it would let a broken client lock out
+   * the person using it. Everything above this line is free.
+   *
+   * Before the transaction, so a refused attempt writes nothing. A genuine
+   * retry of the same submission never reaches here as a new attempt — the
+   * submission key replays further down and returns the original id.
+   *
+   * Both limits are recorded even when the first refuses, so hammering one
+   * key cannot be used to keep the other's window clear. `recordAttempt`
+   * counts a refused attempt too, which is what stops a refused caller from
+   * resetting anything by continuing.
+   */
+  const ip = clientAddress(request.headers.get("x-forwarded-for"));
+  const db = pool();
+  const [byEmail, byIp] = await Promise.all([
+    recordAttempt(db, APPLY_BY_EMAIL, email),
+    recordAttempt(db, APPLY_BY_IP, ip),
+  ]);
+  const refused = !byEmail.allowed ? byEmail : !byIp.allowed ? byIp : null;
+  if (refused) {
+    // No count, no duration, and nothing about which limit or whether the
+    // address is known to us. Retry-After is for the client, not the page.
+    console.warn("[quiz] a submission was throttled");
+    return Response.json(
+      { ok: false, errors: ["That did not go through. Try again a little later."] },
+      { status: 429, headers: { "retry-after": String(refused.retryAfterSeconds) } }
+    );
+  }
 
   let quizResponseId: string;
   let alreadyHad = false;

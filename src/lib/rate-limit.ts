@@ -65,6 +65,48 @@ export const REDEEM_BY_IP: Limit = {
   windowSeconds: 15 * 60,
 };
 
+/**
+ * ── THE APPLICATION ──────────────────────────────────────────────────
+ *
+ * POST /api/quiz was the last unauthenticated, unthrottled write in the
+ * product, and it is a heavier one than a sign-in: it inserts a customer, a
+ * taste profile and an append-only response, sends mail on our quota, and puts
+ * a row in front of a curator. A script pointed at it fills the queue with
+ * fiction and burns the mail allowance, and the curators cannot tell the
+ * fiction from the customers by looking.
+ *
+ * By address, three an hour. Applying is a considered thing done once; the
+ * second and third exist for someone who hit an error and tried again. Note
+ * that a genuine retry of the SAME submission does not reach here as a new
+ * attempt — the submission key replays and returns the original id — so this
+ * limit only counts genuinely new applications.
+ *
+ * By IP, eight an hour. Higher because a household, an office and a phone
+ * network share one, and locking out a building to slow one script is the
+ * wrong trade. Coarse on purpose: the address limit is the one doing the real
+ * work, exactly as it is for sign-in.
+ *
+ * ── ON THE TABLE'S NAME ──────────────────────────────────────────────
+ *
+ * These counters live in `sign_in_attempt`, whose name is now too narrow. That
+ * is a real wart and the honest fix is to rename the table, which is a
+ * migration — deliberately NOT done here, because several agents are writing
+ * migrations concurrently and a rename landing mid-flight is how a deploy
+ * breaks. Reusing the mechanism rather than building a second throttle is the
+ * decision that matters; the name is owed and recorded.
+ */
+export const APPLY_BY_EMAIL: Limit = {
+  bucket: "apply_email",
+  max: 3,
+  windowSeconds: 60 * 60,
+};
+
+export const APPLY_BY_IP: Limit = {
+  bucket: "apply_ip",
+  max: 8,
+  windowSeconds: 60 * 60,
+};
+
 /** Longest window in use. Anything older than this is swept. */
 const KEEP_SECONDS = 60 * 60;
 
