@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroCollage } from "./HeroCollage";
 
 import { WESTHAMPTON_1976 } from "@/lib/destinations";
 import {
@@ -30,6 +31,16 @@ import styles from "./landing.module.css";
  * hiding the deliverables, no closing principle, no bone arc, and no italics
  * anywhere. Every one of those was tried and cut; the reasoning is in the two
  * documents above and does not need repeating in a component.
+ *
+ * ── The hero is the design handoff's, structurally ───────────────────
+ *
+ * design_handoff_revelle_societe/Revelle Societe.dc.html is the source for it:
+ * masthead over a hairline, then a two-column grid set to a common baseline
+ * with the destination on the left and a 4:5 framed collage on the right, on
+ * a flat cream ground. The words are ours, the composition is the handoff's,
+ * and where the two disagreed the handoff won. It is rebuilt rather than
+ * copied — the prototype's inline styles belong to its own environment, and
+ * the collage is the one thing lifted verbatim, because it is the artwork.
  *
  * ── The three token blocks below ─────────────────────────────────────
  *
@@ -79,37 +90,48 @@ export default function Home() {
       {/* ── the hero: a destination, set like a plate ──────────────── */}
 
       <header className={`${styles.hero} ${styles.westhampton}`}>
-        {/*
-          The photography slot. A destination's hero is a photograph, and until
-          there is one the field is drawn rather than borrowed — no stock, no
-          CDN, nothing that would make this page reach outside itself. Deep
-          evening, brass off the left of frame, one cool edge.
-        */}
-        <div className={styles.heroField} aria-hidden="true" />
-
         <div className={styles.heroInner}>
           <div className={styles.masthead}>
             <p className={styles.wordmark}>Revelle Société</p>
             <p className={styles.mastheadNote}>Est. for people who host</p>
           </div>
 
-          <div className={styles.heroPlate}>
-            <p className={styles.plateIndex}>Destination No. 07</p>
-            <div className={styles.doubleRule} aria-hidden="true" />
-            <h1 className={styles.heroName}>{WESTHAMPTON.name}</h1>
-            <div className={styles.node} aria-hidden="true">
-              <span />
+          {/*
+            The handoff's hero, structurally: masthead over a hairline, then two
+            columns set to a common baseline — the destination on the left, the
+            4:5 framed collage on the right. The collage is a sibling of the
+            type and never a layer behind it, which is the whole reason nothing
+            can land on top of anything here at any width.
+          */}
+          <div className={styles.heroGrid}>
+            <div className={styles.heroPlate}>
+              <p className={styles.plateIndex}>Destination No. 07</p>
+              <h1 className={styles.heroName}>{WESTHAMPTON.name}</h1>
+              {/* No ornament between the name and the line under it. The
+                  handoff sets those two as one unit, and the page's single
+                  ornament belongs to the worked plate further down. */}
+              <p className={styles.heroTagline}>{WESTHAMPTON.tagline}</p>
+              <p className={styles.heroSociete}>A société for people who host.</p>
+
+              <div className={styles.heroActions}>
+                <Link className={`cta ${styles.ctaHero}`} href="/quiz">
+                  Apply for membership
+                </Link>
+                <p className={styles.fine}>No clipboards. No costume rule.</p>
+              </div>
             </div>
-            <p className={styles.heroTagline}>{WESTHAMPTON.tagline}</p>
-          </div>
 
-          <p className={styles.heroSociete}>A société for people who host.</p>
-
-          <div className={styles.heroActions}>
-            <Link className={`cta ${styles.ctaHero}`} href="/quiz">
-              Apply for membership
-            </Link>
-            <p className={styles.fine}>No clipboards. No costume rule.</p>
+            {/*
+              The illustration slot. Six hand-drawn vignettes clipped into one
+              4:5 plate — no stock, no CDN, no gradient standing in for a
+              photograph. If real photography ever arrives, it drops into this
+              same frame at this same ratio.
+            */}
+            <figure className={styles.heroFigure}>
+              <div className={styles.heroCollage}>
+                <HeroCollage />
+              </div>
+            </figure>
           </div>
         </div>
       </header>

@@ -23,12 +23,27 @@
  * interpretable against the question set they were actually shown.
  */
 
+// The tone vocabulary lives in src/lib/voice.ts because it is half a mapping:
+// every tone carries the voice facets it resolves to, and splitting the label
+// from the meaning would leave two lists to keep in step. This module still
+// owns how it is asked. The one dependency this file has, and it points at
+// another framework-free module.
+//
+// Imported WITH the .ts extension, like src/lib/music/*, because this module is
+// loaded directly by `node --test` and by scripts/check-facets.mjs, and Node
+// resolves real files with no extension-guessing step. See the note on
+// allowImportingTsExtensions in tsconfig.json.
+import { TONE_GROUPS, TONES } from "./voice.ts";
+
 /**
  * Stamped onto every submission. Bump on any change that alters what an answer
  * MEANS — a reworded question, a removed option, a changed min/max. Adding a
  * new option is additive and does not require a bump.
+ *
+ * 2026-08-c adds the voice question. A response written against 2026-08-b has
+ * no `voice_tones` and is not missing one.
  */
-export const QUIZ_VERSION = "2026-08-a";
+export const QUIZ_VERSION = "2026-08-c";
 
 export type QuizOption = {
   /** Permanent. Stored in the database. */
@@ -38,7 +53,15 @@ export type QuizOption = {
   hint?: string;
   /** Not used yet. See the note above. */
   image?: { src: string; alt: string };
+  /**
+   * Which run of options this belongs to, when its field is grouped. The key of
+   * an entry in `MultiField.groups`. Ignored otherwise.
+   */
+  group?: string;
 };
+
+/** A heading over a run of options. See MultiField.groups. */
+export type OptionGroup = { key: string; label: string };
 
 type BaseField = {
   id: string;
@@ -61,6 +84,28 @@ export type MultiField = BaseField & {
   options: readonly QuizOption[];
   min: number;
   max: number;
+  /**
+   * How the options are drawn. "rows" — the default — is the full-width menu
+   * every other question uses. "tiles" is a mark and a short label, for a field
+   * whose options are too many to read as a list and short enough not to need
+   * one. It is a presentation choice on DATA, not a component someone picks:
+   * the renderer branches on it exactly as it branches on `image`.
+   */
+  layout?: "rows" | "tiles";
+  /**
+   * Headings that break a long field into runs. Options carry a matching
+   * `group`. Any option whose group is missing from this list is drawn last,
+   * under no heading, so a new option cannot vanish from the page.
+   */
+  groups?: readonly OptionGroup[];
+  /**
+   * Keep the footer quiet. The running "choose one more" line is right for a
+   * field of ten she is filling in and wrong for a field of fifty she is
+   * browsing — counting is the one thing docs/copy-brief.md forbids outright,
+   * and a tally that appears the moment she taps a tile turns a browse into a
+   * form. The ceiling still holds; it is enforced by replacement, silently.
+   */
+  quiet?: boolean;
 };
 
 export type TextField = BaseField & {
@@ -160,13 +205,113 @@ const AFFINITIES: readonly QuizOption[] = [
   { code: "late", label: "Permission to stay up" },
 ];
 
-const BUDGETS: readonly QuizOption[] = [
-  { code: "under_500", label: "Under $500" },
-  { code: "from_500_to_1500", label: "$500 to $1,500" },
-  { code: "from_1500_to_3000", label: "$1,500 to $3,000" },
-  { code: "from_3000_to_6000", label: "$3,000 to $6,000" },
-  { code: "over_6000", label: "Over $6,000" },
+/**
+ * HOW HER PEOPLE TALK.
+ *
+ * The one question about the VOICE rather than the look. Everything else the
+ * application asks decides what her Revelle looks like; nothing until now
+ * decided how it reads, and the writing is the half her guests actually hold in
+ * their hands. See "The voice questions" in docs/build-checklist.md.
+ *
+ * The vocabulary is not repeated here. It is src/lib/voice.ts, where each tone
+ * also carries the voice facets it resolves to — one list, so a tone cannot
+ * exist on the page without a meaning underneath it, and a meaning cannot be
+ * edited without the label beside it.
+ */
+const VOICE_TONES: readonly QuizOption[] = TONES.map((tone) => ({
+  code: tone.code,
+  label: tone.label,
+  group: tone.group,
+}));
+
+/**
+ * How many people. A BAND, not a number typed into a box.
+ *
+ * Every other answer here is a tap, and a spinner asking for an exact integer
+ * would be the one moment the application turns into a form — for a number she
+ * usually does not have yet. A band she can answer today.
+ *
+ * The bands are still ARITHMETIC. Each one carries a low, a high and a planning
+ * number in `quiz_option_range` (db/006), so "$150 a head, nine to twelve"
+ * resolves to a real ceiling. They widen as they climb because that is where
+ * the resolution is actually needed: at six people two more changes what we
+ * buy, at forty it does not. Every closed band spans less than a factor of two.
+ *
+ * The exact number, when it is finally known, is `revelle.guest_count` — the
+ * count you print place cards from. This is what she said when she applied.
+ */
+const GUEST_COUNTS: readonly QuizOption[] = [
+  { code: "two", label: "Two of us" },
+  { code: "from_3_to_5", label: "Three to five" },
+  { code: "from_6_to_8", label: "Six to eight" },
+  { code: "from_9_to_12", label: "Nine to twelve" },
+  { code: "from_13_to_20", label: "Thirteen to twenty" },
+  { code: "from_21_to_35", label: "Twenty-one to thirty-five" },
+  { code: "from_36_to_60", label: "Thirty-six to sixty" },
+  { code: "over_60", label: "More than sixty" },
+];
+
+/**
+ * What she is spending A HEAD.
+ *
+ * This replaces a total-spend question — field `budget`, codes `under_500` …
+ * `over_6000`, asked up to QUIZ_VERSION 2026-08-a and retired rather than
+ * reworded, because the codes would otherwise have quietly changed meaning.
+ * $100 a head at six people and at forty are different products; a total is not
+ * comparable across sizes and tells the selection layer nothing until it is
+ * divided by a guest count nobody asked for. Per head is the register, and per
+ * head times guests is the ceiling.
+ *
+ * The ladder is the old one re-expressed at a table of eight — 500, 1,500,
+ * 3,000 and 6,000 divided by eight — then rounded to round numbers that double.
+ */
+const SPEND_PER_PERSON: readonly QuizOption[] = [
+  { code: "under_75", label: "Under $75" },
+  { code: "from_75_to_150", label: "$75 to $150" },
+  { code: "from_150_to_300", label: "$150 to $300" },
+  { code: "from_300_to_600", label: "$300 to $600" },
+  { code: "over_600", label: "Over $600" },
   { code: "not_sure", label: "Not sure yet", hint: "We will show you what each level buys" },
+];
+
+/**
+ * WHERE THE MUSIC PLAYS. A routing question, not a preference.
+ *
+ * The soundtrack is sequenced — arrival, dinner, the moment, late, ending — and
+ * the answer here decides how that sequence reaches her room: a link to a
+ * playlist on the société's own account, the same evening built on Apple, or a
+ * setlist printed with the rest of the paper. All three are real deliveries.
+ * See "The soundtrack — delivery" in docs/selection-spec.md and db/005.
+ *
+ * WHY PREMIUM IS NAMED. On Spotify's free tier, mobile playback forces shuffle
+ * and injects Spotify's own tracks between ours, with advertising. A sequenced
+ * arc does not survive that and there is no fix on our side, so the free tier is
+ * a DIFFERENT ROUTE rather than a worse version of the same one — she is better
+ * served by paper. The label says "Premium" because that is the only way she can
+ * answer the question correctly without being told any of this.
+ *
+ * It is not a membership requirement. Gating membership on one component of one
+ * deliverable is the wrong layer.
+ *
+ * Codes are the values of soundtrack_delivery in db/005, so the answer casts
+ * straight into quiz_response.music_service.
+ */
+const MUSIC_SERVICES: readonly QuizOption[] = [
+  {
+    code: "spotify",
+    label: "Spotify Premium",
+    hint: "A link that opens in order, and stays in order",
+  },
+  {
+    code: "apple_music",
+    label: "Apple Music",
+    hint: "The same evening, where you already listen",
+  },
+  {
+    code: "print",
+    label: "Neither",
+    hint: "Then it arrives printed — the evening in order, on paper",
+  },
 ];
 
 export const QUIZ_STEPS: readonly QuizStep[] = [
@@ -210,6 +355,37 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
     help: "Not how they should. How they do.",
     fields: [{ id: "group_fun", type: "multi", options: GROUP_FUN, min: 1, max: 4 }],
   },
+  // Immediately after how they have fun, because it is the same subject seen
+  // from the other side and she is already thinking about the same six people.
+  // Before "what would ruin it", because that question is about the evening and
+  // this one is still about them.
+  //
+  // THE CEILING IS SEVEN, and it is a judgement rather than a round number. A
+  // tone resolves to two or three voice facets, so seven tones make roughly
+  // eighteen claims across a vocabulary of twenty-six — enough to describe a
+  // voice that is dry AND warm AND loud, which real groups are, while leaving
+  // most of the space unclaimed. At a dozen almost every facet has been touched
+  // by something and the profile stops telling the difference between two
+  // destinations, which is the only job it has. The floor is one because one
+  // is a real answer: a group that is only deadpan is a group.
+  {
+    key: "voice",
+    eyebrow: "The voice",
+    title: "How do these people talk to each other?",
+    help: "Whatever sounds like them. They can be several of these at once.",
+    fields: [
+      {
+        id: "voice_tones",
+        type: "multi",
+        options: VOICE_TONES,
+        groups: TONE_GROUPS,
+        layout: "tiles",
+        quiet: true,
+        min: 1,
+        max: 7,
+      },
+    ],
+  },
   {
     key: "contrast",
     eyebrow: "The line",
@@ -251,12 +427,37 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
       },
     ],
   },
+  // Guests immediately before spend, and in that order. She cannot answer "what
+  // a head" until she has a number in her head, and the two together are what
+  // give selection a ceiling. Both are single-select rather than one combined
+  // step: two option grids on one screen is the contrast question's shape, and
+  // that one earns it by being a single question in two halves. These are two
+  // questions.
   {
-    key: "budget",
+    key: "guests",
+    eyebrow: "The table",
+    title: "How many of you are there?",
+    help: "As it stands today. Guest lists move.",
+    fields: [{ id: "guest_count_band", type: "single", options: GUEST_COUNTS }],
+  },
+  {
+    key: "spend",
     eyebrow: "The scale",
-    title: "Roughly what are you spending?",
+    title: "Roughly what are you spending a head?",
     help: "Everything except travel and the house itself.",
-    fields: [{ id: "budget", type: "single", options: BUDGETS }],
+    fields: [{ id: "spend_per_person", type: "single", options: SPEND_PER_PERSON }],
+  },
+  // Last before the address, with the other practical answers, because it is
+  // one: it decides how a thing gets to her, not what the thing is. Deliberately
+  // NOT beside "how does this group have fun" — that step is about her people,
+  // and a question about subscriptions in the middle of it would read as a
+  // clipboard.
+  {
+    key: "music",
+    eyebrow: "The music",
+    title: "Where does the music play?",
+    help: "It runs in order, from the door to the last song. This is how it reaches the room.",
+    fields: [{ id: "music_service", type: "single", options: MUSIC_SERVICES }],
   },
   {
     key: "email",

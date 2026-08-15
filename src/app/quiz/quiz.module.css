@@ -234,6 +234,137 @@
   border-color: var(--ink-faint);
 }
 
+/* ── the tiles ───────────────────────────────────────────────────────
+ *
+ * The one field that is browsed rather than filled in: fifty short lines about
+ * how her people talk, each with an engraved mark.
+ *
+ * Two columns at 390px and not one, because a single column of fifty is a
+ * scroll with no shape to it — two columns halve the distance and let the
+ * headings land as landmarks. Three from 30rem, four from 48rem, and never
+ * more: past four the labels set to two words a line and the run stops reading
+ * as a row of related things.
+ *
+ * The grid is deliberately NOT auto-fit. A run of six under a heading should
+ * break the same way every time, so the eye learns the rhythm on the first
+ * group and stops re-reading the layout on the seventh.
+ */
+
+.run {
+  margin-top: clamp(1.75rem, 5vw, 2.5rem);
+}
+
+.run:first-of-type {
+  margin-top: 1.25rem;
+}
+
+.runLabel {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 30rem) {
+  .tiles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 48rem) {
+  .tiles {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 9rem;
+  padding: 1.15rem 0.75rem 1rem;
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: var(--body);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tile:hover {
+  border-color: var(--ink-faint);
+}
+
+/* Selection is a filled block, a darker frame and a change of ink — three
+   signals, only one of which is colour. */
+.tileOn {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--ground) 55%, var(--ground2) 45%);
+}
+
+.tileTick {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 1px solid var(--ink-faint);
+  background: transparent;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.tileOn .tileTick {
+  background: var(--oxblood);
+  border-color: var(--oxblood);
+}
+
+.tileArt {
+  display: block;
+  /* Large enough that a 1.25-unit stroke is still a line at this scale. At
+     2.5rem the marks read as scratches — the engraving has to be big enough to
+     be engraving. */
+  width: 3.5rem;
+  height: 3.5rem;
+  flex: 0 0 auto;
+  opacity: 0.9;
+  transition: opacity 140ms ease;
+}
+
+.tileOn .tileArt {
+  opacity: 1;
+}
+
+.tileLabel {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  /* No text-wrap: balance. On a label this short it narrows the measure to
+     three words a line and the tile reads as a column of fragments. */
+}
+
+.tileOn .tileLabel {
+  color: var(--ink);
+}
+
 /*
  * Not used yet — there is no image library. It is here so that adding
  * `image` to an option in src/lib/quiz.ts is a data change and nothing else.

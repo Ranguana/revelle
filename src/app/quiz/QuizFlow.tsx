@@ -24,6 +24,7 @@ import {
 } from "@/lib/quiz";
 
 import styles from "./quiz.module.css";
+import { TONE_MARKS } from "./tone-marks";
 
 /**
  * The quiz, client side.
@@ -263,6 +264,8 @@ export default function QuizFlow() {
 function hint(fields: readonly QuizField[], answers: QuizAnswers): string {
   for (const field of fields) {
     if (field.type !== "multi") continue;
+    // A browsed field says nothing about how many. See MultiField.quiet.
+    if (field.quiet) continue;
     const chosen = Array.isArray(answers[field.id])
       ? (answers[field.id] as string[])
       : [];
@@ -320,7 +323,11 @@ function Field({
         </div>
       ) : null}
 
-      {field.type === "multi" ? (
+      {field.type === "multi" && field.layout === "tiles" ? (
+        <Tiles field={field} chosen={chosen} onToggle={onToggle} />
+      ) : null}
+
+      {field.type === "multi" && field.layout !== "tiles" ? (
         <div className={styles.options}>
           {field.options.map((option) => (
             <Option
@@ -365,6 +372,113 @@ function Field({
         />
       ) : null}
     </section>
+  );
+}
+
+/**
+ * A field with too many options to read as a list.
+ *
+ * Fifty rows on a phone is a wall, and a wall is read by scrolling past it. The
+ * same fifty in short runs under headings is a browse: each heading is a
+ * landmark, each run is over in a thumb-flick, and she can stop at the one that
+ * sounds like her friends without having read the rest.
+ *
+ * The headings do no work beyond that. There is no count, no progress, no
+ * "chosen so far" — the state she needs is on the tiles themselves.
+ *
+ * Options whose group is not in the list are drawn last under no heading, so a
+ * tone added to the vocabulary without a group appears on the page rather than
+ * disappearing from it.
+ */
+function Tiles({
+  field,
+  chosen,
+  onToggle,
+}: {
+  field: MultiField;
+  chosen: readonly string[];
+  onToggle: (field: MultiField, code: string) => void;
+}) {
+  const groups = field.groups ?? [];
+  const keys = new Set(groups.map((g) => g.key));
+  const ungrouped = field.options.filter(
+    (o) => o.group === undefined || !keys.has(o.group)
+  );
+
+  const runs = [
+    ...groups.map((group) => ({
+      key: group.key,
+      label: group.label,
+      options: field.options.filter((o) => o.group === group.key),
+    })),
+    ...(ungrouped.length > 0
+      ? [{ key: "rest", label: "", options: ungrouped }]
+      : []),
+  ].filter((run) => run.options.length > 0);
+
+  return (
+    <>
+      {runs.map((run) => (
+        <section key={run.key} className={styles.run}>
+          {run.label ? <h3 className={styles.runLabel}>{run.label}</h3> : null}
+          <div className={styles.tiles}>
+            {run.options.map((option) => (
+              <Tile
+                key={option.code}
+                option={option}
+                selected={chosen.includes(option.code)}
+                onClick={() => onToggle(field, option.code)}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+    </>
+  );
+}
+
+/**
+ * A mark and a short line about her friends.
+ *
+ * The drawing carries the feeling and the label carries the meaning: nobody can
+ * draw "wry" so that it reads as wry, so the mark is never asked to be read on
+ * its own. It is decorative to a screen reader for exactly that reason — the
+ * label is the whole content.
+ *
+ * Selected state is a filled block, a heavier frame and a change of ink, so it
+ * survives being seen without colour.
+ */
+function Tile({
+  option,
+  selected,
+  onClick,
+}: {
+  option: QuizOption;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const mark = TONE_MARKS[option.code];
+
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      className={`${styles.tile} ${selected ? styles.tileOn : ""}`}
+      onClick={onClick}
+    >
+      <span className={styles.tileTick} aria-hidden="true" />
+      {mark ? (
+        <svg
+          className={styles.tileArt}
+          viewBox="0 0 64 64"
+          aria-hidden="true"
+          focusable="false"
+        >
+          {mark}
+        </svg>
+      ) : null}
+      <span className={styles.tileLabel}>{option.label}</span>
+    </button>
   );
 }
 

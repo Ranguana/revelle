@@ -30,6 +30,7 @@
  */
 
 import type { Destination, Theme } from "./tokens";
+import type { ToneWeight } from "./voice";
 
 /**
  * WESTHAMPTON, 1976.
@@ -342,6 +343,55 @@ export const WESTHAMPTON_1976: Destination = {
 };
 
 /**
+ * WESTHAMPTON's voice, said in the tones a host is shown.
+ *
+ * ── WHY THE CATALOGUE IS TAGGED IN THE HOST'S VOCABULARY ─────────────
+ *
+ * The tones in src/lib/voice.ts are the whole width of the channel between a
+ * host and this library. Describing a destination in anything richer — its own
+ * private axes, tuned by hand — would leave the join between her handful of
+ * taps and that description returning mush, because she was never given a way
+ * to make most of those claims. So both sides are said in the same fifty words,
+ * and the vocabulary is falsifiable: if a destination's voice cannot be written
+ * in six to ten of them, the tones are wrong and get fixed.
+ *
+ * Every tag below points at a line in the voice above, not at an impression:
+ *
+ *   deadpan          "The house sleeps six and has slept nine."
+ *   dry_aside        "Put the arrangement first. If there is a joke it is the
+ *                     last four words."
+ *   understated      "Two beats and stop; the third beat is where a line
+ *                     starts performing."
+ *   explains_nothing "Never explain a joke, and never explain the house."
+ *   never_performs   "Never perform the period." "Never wink at the reader."
+ *   low_voices       "A card left on the hall table by someone who has already
+ *                     gone to bed."
+ *   unhurried        "Drinks at seven, dinner when it suits us."
+ *   exact_word       Hours in words, days by name, notices and not
+ *                     announcements.
+ *   nothing_sacred   "The upstairs bathroom door does not lock. It has never
+ *                     mattered." Faint on purpose: the house is disreputable
+ *                     about what happens in it and never crude in how it says
+ *                     so, which is the difference between 0.35 and 1.
+ *
+ * Formality, address and humour mode are NOT tagged here. The voice above
+ * states them outright — cordial, impersonal, dry — and they are derived from
+ * it by `statedVoiceFacets`. Saying a fact twice is how two copies of it start
+ * to disagree.
+ */
+export const WESTHAMPTON_1976_TONES: readonly ToneWeight[] = [
+  { code: "deadpan", weight: 1 },
+  { code: "understated", weight: 1 },
+  { code: "explains_nothing", weight: 0.9 },
+  { code: "never_performs", weight: 0.9 },
+  { code: "dry_aside", weight: 0.8 },
+  { code: "low_voices", weight: 0.7 },
+  { code: "unhurried", weight: 0.6 },
+  { code: "exact_word", weight: 0.5 },
+  { code: "nothing_sacred", weight: 0.35 },
+];
+
+/**
  * Every destination that exists, by slug — the same slug as `world.slug`.
  *
  * A plain object rather than a Map so it survives being imported by a script,
@@ -353,3 +403,16 @@ export const DESTINATIONS = {
 } as const satisfies Record<string, Destination>;
 
 export type DestinationKey = keyof typeof DESTINATIONS;
+
+/**
+ * How every destination sounds, by the same slug.
+ *
+ * `satisfies Record<DestinationKey, …>` is the point: a destination cannot be
+ * added without saying how it sounds in the vocabulary a host answers in, which
+ * is the mistake this file would otherwise make six destinations from now. The
+ * seed script writes these into world_facet, where a curator may then revise
+ * them without touching this module.
+ */
+export const DESTINATION_TONES = {
+  "westhampton-1976": WESTHAMPTON_1976_TONES,
+} as const satisfies Record<DestinationKey, readonly ToneWeight[]>;

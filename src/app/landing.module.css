@@ -2,9 +2,10 @@
  * The landing page.
  *
  * Designed at 390px first, like the quiz — that is the device this is read on,
- * and every grid below starts as one column and earns more. Nothing is
- * positioned absolutely except the hero field and two ornaments, so there is
- * nothing that can land on top of a line of type at a width nobody tested.
+ * and every grid below starts as one column and earns more. Nothing on this
+ * page is positioned absolutely except two ornaments and the collage inside
+ * its own frame, so there is nothing that can land on top of a line of type at
+ * a width nobody tested. The hero learned that the hard way.
  *
  * ── The rules this page keeps ────────────────────────────────────────
  *
@@ -26,85 +27,28 @@
 }
 
 /* ── the hero ──────────────────────────────────────────────────────
-   A destination, set like a plate, with the photography behind it. It opens
-   INSIDE the place rather than describing the service: what a Revelle is
-   should be legible in the first second, and a sentence explaining it would
-   take longer to read than the plate takes to land. */
+   The design handoff's header, followed as given: a masthead over a hairline,
+   then two columns set to a common baseline — the destination on the left, a
+   4:5 framed collage on the right, on cream.
+
+   The collage is a SIBLING of the type, not a layer behind it. Every version
+   of this hero that put the illustration in an absolutely positioned field
+   ended the same way: the picture on top of a border, or off the right edge,
+   or knocked back to sixteen percent until it was mud. A grid cell cannot do
+   any of those things. */
 
 .hero {
   position: relative;
-  overflow: hidden;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  background: var(--night);
-  color: var(--night-ink);
-  padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1.25rem, 5vw, 5rem)
-    clamp(2rem, 5vw, 3.5rem);
-}
-
-/*
- * The photography slot, drawn.
- *
- * A destination's hero is a photograph. Until there is one, this is the frame
- * it will drop into — deep evening, brass off the top right, one cool edge at
- * the bottom left, and a 3px horizontal screen over all of it so the field
- * reads as something printed rather than as a gradient. No image, no CDN, no
- * request that leaves the page.
- */
-.heroField {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      92% 62% at 96% 2%,
-      color-mix(in srgb, var(--gold) 62%, transparent),
-      color-mix(in srgb, var(--gold) 14%, transparent) 46%,
-      transparent 76%
-    ),
-    radial-gradient(
-      66% 52% at -8% 106%,
-      color-mix(in srgb, var(--night-aqua) 42%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      96% 64% at 30% 66%,
-      color-mix(in srgb, var(--night-oxblood) 26%, transparent),
-      transparent 76%
-    ),
-    linear-gradient(
-      168deg,
-      var(--night2) 0%,
-      var(--night) 46%,
-      var(--night2) 100%
-    );
-}
-
-/* The screen. A 3px horizontal rule at low contrast, the way a photogravure
-   sits on paper — it is what stops the field reading as a CSS gradient, and it
-   is the only thing here pretending to be a photograph. */
-.heroField::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    color-mix(in srgb, var(--night2) 62%, transparent) 0 1px,
-    transparent 1px 3px
-  );
-  box-shadow: inset 0 0 7rem 2rem
-    color-mix(in srgb, var(--night2) 42%, transparent);
+  background: var(--ground);
+  color: var(--ink);
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 5rem) 0;
+  border-bottom: 1px solid var(--rule);
 }
 
 .heroInner {
-  position: relative;
-  z-index: 1;
-  flex: 1;
   width: 100%;
   max-width: 78rem;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
 }
 
 .masthead {
@@ -113,74 +57,77 @@
   justify-content: space-between;
   align-items: baseline;
   gap: 0.4rem 1.5rem;
-  padding-bottom: clamp(1rem, 3vw, 1.5rem);
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--night-ink) 20%, transparent);
+  padding-bottom: clamp(2rem, 6vw, 4rem);
+  border-bottom: 1px solid var(--rule);
 }
 
 .wordmark {
   font-family: var(--display);
-  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.6rem);
-  letter-spacing: 0.02em;
+  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+  letter-spacing: 0.01em;
   margin: 0;
 }
 
 .mastheadNote {
   font-family: var(--mono);
-  font-size: 0.5625rem;
+  font-size: 0.625rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--night-aqua);
+  color: var(--ink-soft);
   margin: 0;
 }
 
-/* `margin-top: auto` above and `margin-bottom: auto` below centre the plate
-   and its two lines in whatever is left under the masthead, at any height,
-   without a single magic number. */
+/* The handoff's hero grid: auto-fit, so it is one column on a phone and two
+   the moment two 22rem columns fit, with no breakpoint of its own. The columns
+   end together — the CTA and the bottom of the frame sit on one line. */
+.heroGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: end;
+  padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(3rem, 7vw, 5rem);
+}
+
+/* A container, so the name below can be sized against THIS COLUMN rather than
+   against the viewport. A vw-based clamp is wrong here for a reason worth
+   writing down: the grid goes from one column to two at about 830px, so the
+   column loses half its width while the viewport gains, and any size tied to
+   vw overruns the measure exactly there. */
 .heroPlate {
-  margin-top: auto;
-  text-align: center;
-  border: 1px solid color-mix(in srgb, var(--night-ink) 30%, transparent);
-  /* The scrim. A plate laid over a photograph has to hold its own type, so the
-     field is knocked back under it rather than the type being given a shadow. */
-  background: color-mix(in srgb, var(--night2) 66%, transparent);
-  padding: clamp(1.5rem, 6vw, 3rem) clamp(1rem, 4vw, 2.5rem);
+  min-width: 0;
+  container-type: inline-size;
 }
 
 .plateIndex {
   font-family: var(--mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.24em;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--gold);
-  margin: 0;
+  color: var(--ink-soft);
+  margin: 0 0 clamp(0.75rem, 2vw, 1.1rem);
 }
 
-.doubleRule,
+/* The worked example's plate rule. There is no light-ground twin any more: the
+   hero sets its name straight, the way the handoff does. */
 .doubleRuleInk {
   height: 3px;
   margin: clamp(0.9rem, 3vw, 1.35rem) 0;
-}
-
-.doubleRule {
-  border-top: 1px solid color-mix(in srgb, var(--night-ink) 26%, transparent);
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--night-ink) 26%, transparent);
-}
-
-.doubleRuleInk {
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
 }
 
+/* The handoff's H1, at the largest size that still sets WESTHAMPTON, on one
+   line: 11.6% of the column, since the word measures 8.26em in this face and
+   capitals. So it fills the measure at every width and never breaks a word.
+   The first declaration is the fallback for a browser without container units;
+   the second wins everywhere it is understood. */
 .heroName {
   font-family: var(--display);
   font-weight: 400;
-  font-size: clamp(2rem, 1.05rem + 4.5vw, 4.75rem);
-  line-height: 1.02;
-  letter-spacing: 0.005em;
-  text-wrap: balance;
-  overflow-wrap: break-word;
+  font-size: clamp(2.25rem, 1.15rem + 3vw, 4rem);
+  font-size: min(4.25rem, 11.6cqi);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -189,7 +136,6 @@
 .node {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.6rem;
   margin: clamp(1rem, 3vw, 1.4rem) 0;
 }
@@ -209,51 +155,65 @@
   transform: rotate(45deg);
 }
 
+/* The handoff's hero destination line: display type, a third of the H1, set to
+   a 34ch measure so it breaks where a sentence would. */
 .heroTagline {
   font-family: var(--display);
-  font-size: clamp(1.05rem, 0.95rem + 0.7vw, 1.6rem);
-  line-height: 1.35;
-  color: var(--gold);
-  max-width: 30ch;
-  margin: 0 auto;
+  font-size: clamp(1.25rem, 1.05rem + 1.1vw, 2rem);
+  line-height: 1.4;
+  color: var(--ink);
+  max-width: 34ch;
+  margin: clamp(1.5rem, 4vw, 2.25rem) 0 0;
 }
 
+/* The label under the destination line, at label size. It is the smallest of
+   the three type sizes in this column on purpose: the destination is the
+   headline, the tagline seconds it, and this places the house behind both. */
 .heroSociete {
-  font-family: var(--display);
-  font-size: clamp(1.125rem, 1rem + 0.8vw, 1.75rem);
-  line-height: 1.3;
-  text-align: center;
-  margin: clamp(2rem, 6vw, 3rem) 0 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: clamp(1.25rem, 3vw, 1.75rem) 0 0;
 }
 
 .heroActions {
-  margin: clamp(1.5rem, 4vw, 2rem) 0 auto;
+  margin: clamp(2rem, 5vw, 2.5rem) 0 0;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.9rem;
-}
-
-@media (min-width: 34rem) {
-  .heroActions {
-    flex-direction: row;
-    justify-content: center;
-    gap: 1.5rem;
-  }
+  gap: 1rem 1.25rem;
 }
 
 .ctaHero {
-  align-self: center;
+  flex: 0 0 auto;
 }
 
 .fine {
   font-family: var(--mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.18em;
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--night-soft);
+  color: var(--ink-soft);
   margin: 0;
-  text-align: center;
+}
+
+/* The 4:5 frame. Its ratio is fixed, its width is the grid cell's, and the
+   collage inside fills it exactly — so it cannot bleed past a column edge or
+   over anything else no matter how narrow the viewport gets. */
+.heroFigure {
+  margin: 0;
+  min-width: 0;
+}
+
+.heroCollage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--rule);
+  background: var(--bone);
+  overflow: hidden;
 }
 
 /* ── where to ─────────────────────────────────────────────────────
@@ -547,6 +507,12 @@
   text-wrap: balance;
   overflow-wrap: break-word;
   margin: 0;
+}
+
+/* The worked example's plate is centred type, so its node is centred with it.
+   The hero's is left-aligned, because the hero's column is. */
+.nodeInk {
+  justify-content: center;
 }
 
 .nodeInk::before,

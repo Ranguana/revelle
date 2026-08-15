@@ -115,17 +115,24 @@ export async function POST(request: Request): Promise<Response> {
         [customerId]
       );
 
+      // `budget` is deliberately absent. It holds the retired total-spend
+      // answer and is null for everything submitted since db/006 — a row is
+      // priced either the old way or the new way, never both, and the table
+      // has a constraint that says so.
       const inserted = await client.query<{ id: string }>(
         `insert into quiz_response (
            customer_id, answers, quiz_version, submission_key,
            occasion, occasion_other, environment,
            taste_directions, group_fun, anti_preferences, affinities,
-           secret, budget
+           voice_tones,
+           secret, guest_count_band, spend_per_person, music_service
          ) values (
            $1, $2::jsonb, $3, $4,
            $5::occasion_type, $6, $7::environment_type,
            $8::text[], $9::text[], $10::text[], $11::text[],
-           $12, $13::budget_band
+           $12::text[],
+           $13, $14::guest_count_band, $15::spend_per_person_band,
+           $16::soundtrack_delivery
          )
          returning id`,
         [
@@ -142,8 +149,18 @@ export async function POST(request: Request): Promise<Response> {
           multi(answers, "group_fun"),
           multi(answers, "anti_preferences"),
           multi(answers, "affinities"),
+          // How her people talk. Only the tones she TAPPED are written: a tone
+          // she did not choose is not a tone she rejected, and db/007 relies on
+          // absence meaning silence rather than dislike.
+          multi(answers, "voice_tones"),
           trimmed(answers.secret),
-          answers.budget,
+          answers.guest_count_band,
+          answers.spend_per_person,
+          // Which channel her soundtrack is delivered on. Null is legal in the
+          // column (responses that predate the question), but never written
+          // here: the field is required, so a submission that reached this line
+          // has an answer. See db/005.
+          answers.music_service,
         ]
       );
 

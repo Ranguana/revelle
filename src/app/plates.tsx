@@ -134,7 +134,7 @@ export const POSTERS: Record<string, ReactNode> = {
       </g>
     </>
   ),
-  "port-clyde": (
+  "nantucket": (
     <>
       <rect width="300" height="400" fill="var(--bone)" />
       <circle cx="238" cy="76" r="30" fill="var(--gold)" opacity="0.9" />

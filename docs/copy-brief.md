@@ -8,21 +8,37 @@ written, shown to the founder, and rejected. They are not preferences.
 ## What Revelle is
 
 A creative director for your social life. A customer brings an occasion — a
-birthday, a girls' weekend, a dinner, a getaway, a holiday. Revelle returns a
-**creative world** (a point of view, a look, a reason it belongs to her people)
-plus the materials to execute it herself: the arrival, the centerpiece moment,
-the ending, the games, the soundtrack, the styling, a shopping edit with real
-products, and print-ready invitations, menus, place cards, and game materials.
+birthday, a girls' weekend, a dinner, a getaway, a holiday. Revelle designs the
+night and sends her everything she needs to run it: the look, the arrival, the
+centerpiece moment, the ending, the games, the soundtrack, the styling, a
+shopping edit with real products, and print-ready invitations, menus, place
+cards, and game materials.
 
-Human curators make the worlds. AI matches and personalizes them. A human
-approves everything that reaches a customer.
+Designs are made by people with a point of view, then matched and personalized
+to the host and her people.
 
 **The customer:** women planning elevated gatherings. She has taste and she
 hosts. She is not being taught how to throw a party.
 
+### The host is the hero — this governs everything
+
+Revelle is not a service that throws your party. It is an instrument the host
+wields. Her friends think she pulled this off, because she did. Revelle is the
+thing she had that they didn't.
+
+So the register is **what you'll be able to do**, never *what we do for you*.
+She is not a client submitting a request; she is a host with an unfair
+advantage. The curation behind it is invisible infrastructure — like a great
+concierge, she never experiences "someone is working on my file," only the
+feeling of having this.
+
+Rejected for putting Revelle on stage instead of her: *"Then a person designs
+it."* *"Then we design it."* *"We come back with a world."* Any sentence whose
+subject is Revelle and whose object is her night is suspect.
+
 **The competition she must not be confused with:** Pinterest (inspiration
 without execution), event planners (someone else runs your party), themed-party
-suppliers (costumes, kitsch), AI idea generators (fifty options, no taste).
+suppliers (costumes, kitsch), idea generators (fifty options, no taste).
 
 ---
 
@@ -34,11 +50,22 @@ people traveled to. Any headline implying "without leaving your house"
 contradicts the product and contradicts the occasion cards further down the
 same page.
 
-**2. Worlds are reusable.** They come from a curated library and are matched and
-personalized per customer. Do **not** write "no two are the same," "made only
-for you," or "one of one" — those are operational claims the business model
-does not support. The honest and stronger claim: *chosen for your group, and
-personalized to them.*
+**2. Bespoke is the right word, and it is earned.** A Savile Row tailor has a
+pattern book, a cloth merchant, and house techniques — nothing is invented from
+nothing. What makes it bespoke is that it is cut to your measurements and
+refined over fittings. Revelle works the same way: a library of designs, a taste
+profile per host, and a system that learns her across Revelles, so her second is
+better than her first because the house knows her by then.
+
+The pool is deliberately large enough that combinations do not repeat, and the
+database enforces it — an assemblage that has been issued cannot be issued
+again. So *bespoke*, *made for you*, and *no two alike* are all defensible. Say
+them.
+
+What is **not** true, and must not be implied: that every Revelle is written
+from scratch on demand. The taste is authored; the assembly is systematic.
+That distinction never needs to appear in customer copy, but do not write
+anything that would be false if a customer learned it.
 
 ---
 
@@ -97,6 +124,24 @@ Rejected: *"the good champagne, her actual music."* "Her" was appearing
 everywhere, presuming both who is being celebrated and who is reading. The
 occasion cards work on "you," "you'll," or no pronoun at all.
 
+### The word "world" is internal vocabulary — never say it to a customer
+It is how the founders describe the IP, and it is useful there. To someone
+reading the page for the first time, "a world" is not a thing she can picture,
+and she is about to pay for it. Rejected: *"We come back with a world."* *"We'll
+send a world."* *"Not a theme. A world."* The distinction between a world and a
+theme is an internal concern; the customer does not need it explained, she needs
+to see it. WESTHAMPTON, 1976 does that in two seconds.
+
+Say what actually arrives: the look, the music, the games, the table, the
+invitations, the menus. In the deliverables list, **THE WORLD** becomes **THE
+LOOK** — a plain noun matching its siblings.
+
+### Do not advertise the staff
+Rejected: *"Then a person designs it."* "A person" sounds like gig work and
+conveys neither taste nor authority. It is **"Then we design it."** — "we" is
+the house, and a brand with a point of view does not introduce its employees.
+The house speaks as a house; it does not introduce its staff.
+
 ### Do not define the product by what it is not
 "Not this / More this" is a deliberate exception — it is a real section that
 mirrors a quiz mechanic. Everywhere else, say what it is.
@@ -110,7 +155,7 @@ feelings named.
 
 > **The getaway** — A house, a heat wave, and a cast of characters you already know.
 >
-> **The weekend away** — Three days, one world, and a photograph you'll all fight over.
+> **The weekend away** — Three days, one house, and a photograph you'll all fight over.
 >
 > **The long dinner** — One table, a rule about the record player, dessert at midnight.
 >
@@ -134,7 +179,7 @@ hero  →  not this / more this  →  WESTHAMPTON 1976 + the artifacts  →  the
 **The deliverables are the argument and they are currently buried.** "Downloads"
 and "The Edit" sit at positions 8 and 9 of a ten-item accordion — the tangible
 proof of value is behind a `+` near the bottom. A photograph of the stack
-(invitation, menu, place cards, game materials, in the world's own palette and
+(invitation, menu, place cards, game materials, in the design's own palette and
 typeface) does more than any paragraph, and it is the thing that makes the
 product feel transporting rather than described.
 
@@ -144,12 +189,10 @@ Move them up. Show them as objects, not a list of file names.
 
 ## Approved, do not change without asking
 
-- **Headline:** *You bring the occasion. We create the experience.*
 - **Eyebrow:** *Est. for people who host*
 - **The bone arc** bleeding off the right edge of the hero, with the hairline
   through it. Approved after several iterations. It may evolve (masked over
   photography, gradient, motion) but it stays.
-- **The principle:** *AI powers the system. Human taste defines it.*
 - **CTA:** *Start your Revelle* — everywhere, with no duration or count.
 - **"No clipboards. No costume rule."**
 - The occasion cards above.
@@ -158,9 +201,22 @@ Move them up. Show them as objects, not a list of file names.
 
 ---
 
+## Open — the headline
+
+*"You bring the occasion. We create the experience."* was approved under the old
+service framing and does not survive host-as-hero. It splits the work and gives
+her the trivial half — she supplies a date, Revelle supplies the talent. Under
+the correct framing she creates the experience; Revelle makes it possible.
+
+Whatever replaces it must have **her** as the subject of the good verb.
+
+---
+
 ## The test
 
 Read any line and ask: **is this trying to be liked?** If yes, cut it.
+
+Then ask: **who is the hero of this sentence?** If it is Revelle, rewrite it.
 
 Then ask: **could a smart friend with great taste say this out loud without
 cringing?** If no, cut it.

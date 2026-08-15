@@ -173,9 +173,9 @@ export const LIBRARY: readonly Plate[] = [
     ],
   },
   {
-    slug: "port-clyde",
-    name: "PORT CLYDE, AUGUST",
-    caption: "Port Clyde",
+    slug: "nantucket",
+    name: "NANTUCKET, AUGUST",
+    caption: "Nantucket",
     number: "No. 08",
     occasion: "The weekend away",
     tagline: "Newspaper on the table. Butter in a saucepan.",
