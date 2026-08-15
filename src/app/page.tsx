@@ -92,8 +92,23 @@ export default function Home() {
       <header className={`${styles.hero} ${styles.westhampton}`}>
         <div className={styles.heroInner}>
           <div className={styles.masthead}>
-            <p className={styles.wordmark}>Revelle Société</p>
-            <p className={styles.mastheadNote}>Est. for people who host</p>
+            <div className={styles.mastheadName}>
+              <p className={styles.wordmark}>Revelle Société</p>
+              {/* Approved text, unchanged — it moved under the wordmark only
+                  because the right-hand corner is now the way in. */}
+              <p className={styles.mastheadNote}>Est. for people who host</p>
+            </div>
+            <nav className={styles.mastheadNav} aria-label="Société">
+              <Link className={styles.mastheadLink} href="/pricing">
+                Pricing
+              </Link>
+              {/*
+                Login goes here and is one line away. It is held back only
+                because /login does not exist yet — a door in the masthead that
+                opens onto a 404 is worse than a masthead with one door. Put it
+                back the moment the route lands.
+              */}
+            </nav>
           </div>
 
           {/*
@@ -119,6 +134,18 @@ export default function Home() {
                 </Link>
                 <p className={styles.fine}>No clipboards. No costume rule.</p>
               </div>
+              {/*
+                The founding offer. It is a count, and the brief bans counting —
+                but what the brief bans is counting the EXPERIENCE (durations,
+                question tallies) and manufactured scarcity ("247 people
+                today"). This is neither: it is a true fact about a real class
+                of membership, and "founding members" is the oldest register a
+                club has. Written as a standing, not a countdown — no "only N
+                left", no timer, nothing that would make her hurry.
+              */}
+              <p className={styles.heroFounding}>
+                The first twenty are founding members. No dues.
+              </p>
             </div>
 
             {/*

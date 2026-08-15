@@ -61,6 +61,31 @@ export const TONE_MARKS: Record<string, ReactNode> = {
   ),
 
   // Two who are close, and the small jab that only works because they are.
+  /*
+   * Two people, one arc of laughter over both of them, and no arrow between —
+   * every other mark in this group has something travelling from one dot to
+   * another, which is exactly what this tone is the absence of. The joke is
+   * over the pair, not aimed across it.
+   */
+  good_natured: (
+    <>
+      <path
+        d="M16 24 C24 14 40 14 48 24"
+        fill="none"
+        stroke="var(--gold)"
+        strokeWidth="1.25"
+      />
+      <circle cx="24" cy="38" r="3.5" fill="none" stroke="var(--oxblood)" strokeWidth="1.25" />
+      <circle cx="40" cy="38" r="3.5" fill="none" stroke="var(--oxblood)" strokeWidth="1.25" />
+      <path
+        d="M20 48 C26 53 38 53 44 48"
+        fill="none"
+        stroke="var(--aqua)"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+      />
+    </>
+  ),
   teasing: (
     <>
       <path

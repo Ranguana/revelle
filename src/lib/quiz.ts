@@ -132,21 +132,31 @@ export type QuizStep = {
 };
 
 const OCCASIONS: readonly QuizOption[] = [
-  { code: "birthday", label: "A birthday", hint: "Hers, or one she is throwing" },
+  { code: "birthday", label: "A birthday", hint: "Yours, or one you are throwing" },
   { code: "girls_weekend", label: "A girls' weekend", hint: "Two nights, one house" },
   { code: "dinner_party", label: "A dinner party", hint: "One table, one evening" },
   { code: "getaway", label: "A getaway", hint: "Somewhere that is not home" },
   { code: "anniversary", label: "An anniversary", hint: "A year worth marking" },
-  { code: "holiday", label: "A holiday", hint: "The calendar made her do it" },
+  { code: "holiday", label: "A holiday", hint: "The calendar made you do it" },
   { code: "bridal", label: "Something bridal", hint: "Shower, weekend, the night before" },
   { code: "no_reason", label: "No reason at all", hint: "The best kind" },
   { code: "other", label: "Something else", hint: "Tell us in a word or two" },
 ];
 
+/*
+ * The question is where it happens, so every answer names a PLACE. An earlier
+ * version offered "My home" against "A rented house", which asked who owns the
+ * building — a fact that changes nothing the house sends. What the answer is
+ * actually for is the kind of room: is there a kitchen and a table, or is
+ * somebody else cooking and clearing.
+ *
+ * `rented_house` is retired rather than deleted. Codes are permanent (see the
+ * note above): a stored answer still resolves through src/lib/desk/labels.ts,
+ * it simply is not offered again.
+ */
 const ENVIRONMENTS: readonly QuizOption[] = [
-  { code: "my_home", label: "My home" },
-  { code: "rented_house", label: "A rented house" },
-  { code: "city_apartment", label: "A city apartment" },
+  { code: "my_home", label: "A house" },
+  { code: "city_apartment", label: "An apartment" },
   { code: "beach", label: "The beach" },
   { code: "mountains", label: "The mountains" },
   { code: "poolside", label: "Poolside" },
@@ -420,7 +430,7 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
         id: "secret",
         type: "text",
         placeholder:
-          "Her sister will bring a guitar. Nobody has told her not to bring the guitar.",
+          "My sister will bring a guitar. Nobody has told her not to bring the guitar.",
         maxLength: 1000,
         optional: true,
         rows: 5,

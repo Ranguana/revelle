@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import QuizFlow from "./QuizFlow";
 
 export const metadata: Metadata = {
-  title: "The quiz",
+  // Not "The quiz" — the word is banned in customer-facing copy and this one
+  // was showing in the browser tab.
+  title: "Apply",
   description:
     "What you are planning, where it happens, how your people actually have fun, and the one thing we could not possibly know.",
   // Nothing here should be indexed as a landing page in its own right, and a
@@ -18,6 +20,6 @@ export const metadata: Metadata = {
  * Component, and the quiz itself has to be client-side because it owns the
  * draft in localStorage.
  */
-export default function QuizPage() {
+export default function ApplyPage() {
   return <QuizFlow />;
 }

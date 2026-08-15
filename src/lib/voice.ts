@@ -447,6 +447,34 @@ export const TONES = [
       { code: "humour_arch", weight: 0.4 },
     ],
   },
+  /*
+   * The clean one, and the group was wrong without it.
+   *
+   * Every other tone here is funny AT something — a straight face over an
+   * outrage, a muttered aside, a tease, an in-joke, a stupid premise, a
+   * pre-emptive strike at oneself, nothing off limits. A group that is warmly,
+   * plainly funny had no tile to tap, so the only way to say "we laugh a lot"
+   * was to also say "and someone is usually the target", which for many
+   * groups is simply untrue.
+   *
+   * It is the one tone in the group with `irreverence` NEGATIVE, and that sign
+   * is the whole point: it is not merely the absence of an edge, it is a
+   * positive preference against one. A host who taps this and nothing else
+   * gets writing that is funny and that nobody could be stung by — which is
+   * also the correct default for a birthday, a bridal anything, or any room
+   * holding somebody's mother.
+   */
+  {
+    code: "good_natured",
+    label: "Funny without anyone being the joke",
+    group: "funny",
+    facets: [
+      { code: "humour_warm", weight: 1 },
+      { code: "warmth", weight: 0.7 },
+      { code: "earnestness", weight: 0.4 },
+      { code: "irreverence", weight: -0.6 },
+    ],
+  },
 
   // ── how loud a room they are ───────────────────────────────────────
   {

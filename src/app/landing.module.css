@@ -61,6 +61,41 @@
   border-bottom: 1px solid var(--rule);
 }
 
+/* The wordmark and its eyebrow travel together as one block, so the right-hand
+   corner is free for the way in. */
+.mastheadName {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* The two doors: pricing for someone deciding, login for someone who already
+   belongs. Set in the mono face at the eyebrow's size, so the corner reads as
+   an address rather than as a navigation bar. */
+.mastheadNav {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.mastheadLink {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid transparent;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.mastheadLink:hover,
+.mastheadLink:focus-visible {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
 .wordmark {
   font-family: var(--display);
   font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
@@ -203,6 +238,19 @@
   text-transform: uppercase;
   color: var(--ink-soft);
   margin: 0;
+}
+
+/* The founding offer sits under the button, in the body face rather than the
+   mono one: it is a sentence the house is saying, not a caption on a control.
+   Ink rather than ink-soft, because it is the second most important thing in
+   the column and setting it faint would be coy about the one part of this
+   page that is plainly generous. */
+.heroFounding {
+  font-family: var(--body);
+  font-size: clamp(0.875rem, 0.82rem + 0.2vw, 1rem);
+  line-height: 1.5;
+  color: var(--ink);
+  margin: clamp(1rem, 2.5vw, 1.35rem) 0 0;
 }
 
 /* The 4:5 frame. Its ratio is fixed, its width is the grid cell's, and the
