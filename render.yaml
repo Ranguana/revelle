@@ -61,7 +61,33 @@ services:
     # A non-zero exit here FAILS THE DEPLOY: the old instance keeps serving and
     # the new code is never promoted. Code that expects a column the database
     # does not have must not ship.
-    preDeployCommand: npm run migrate
+    # Migrate, then SEED. Both run inside Render on the private network, which
+    # is the only place the database is reachable from — see the rule at the
+    # top of this file.
+    #
+    # The seeds are here rather than run by hand because a hand-run step is a
+    # step that does not happen: the catalogue was authored, committed and
+    # migrated for a day before anyone noticed the live database had none of
+    # it. Every seeder is idempotent (a re-run reports "0 created, 0 updated"),
+    # so running them on every deploy costs nothing and cannot drift.
+    #
+    # seed:destinations runs TWICE on purpose. The menu and drink seeders
+    # create a draft stub for a destination that has content but no authored
+    # look — and seed:destinations is what completes a stub once someone
+    # writes it. First pass publishes what is authored, the seeders attach the
+    # content, second pass adopts anything new.
+    #
+    # Fixtures and demo occasions are deliberately absent: those invent test
+    # customers and they refuse a non-local database anyway.
+    #
+    # A non-zero exit FAILS THE DEPLOY and the old instance keeps serving.
+    preDeployCommand: >-
+      npm run migrate &&
+      npm run seed:destinations &&
+      npm run seed:menus &&
+      npm run seed:drinks &&
+      npm run seed:games &&
+      npm run seed:destinations
 
     envVars:
       # Next 16 requires Node >= 20.9; 22 is what this is developed against.
