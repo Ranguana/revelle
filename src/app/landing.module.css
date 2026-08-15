@@ -78,13 +78,19 @@
 }
 
 /* The handoff's hero grid: auto-fit, so it is one column on a phone and two
-   the moment two 22rem columns fit, with no breakpoint of its own. The columns
-   end together — the CTA and the bottom of the frame sit on one line. */
+   the moment two 22rem columns fit, with no breakpoint of its own.
+
+   The columns START together, not end together. An earlier version aligned
+   them at the bottom so the CTA and the foot of the frame sat on one line,
+   which reads well in a mockup and badly on a screen: the collage is much
+   taller than the words, so bottom alignment pushed the destination's name
+   halfway down the page behind a field of empty ground. The name is the first
+   thing the page says and it now sits level with the top of the art. */
 .heroGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: clamp(2rem, 5vw, 4.5rem);
-  align-items: end;
+  align-items: start;
   padding: clamp(2.5rem, 7vw, 5rem) 0 clamp(3rem, 7vw, 5rem);
 }
 
