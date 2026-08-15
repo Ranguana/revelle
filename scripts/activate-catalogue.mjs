@@ -71,6 +71,17 @@ const pools = (
     `select entity_table, active_column, active_value
        from ingredient_pool
       where active_column is not null
+        -- `world` IS a pool row (db/002: join_table is null when the reference
+        -- lives on revelle itself). It must NOT go through the generic loop,
+        -- which would publish every draft destination including the ones with
+        -- no voice — the exact thing this script exists to refuse. It is
+        -- handled below, where the voice rule is.
+        --
+        -- db/001's world_published_has_timestamp caught this: the generic
+        -- statement sets a status and no date, and the constraint refused the
+        -- whole transaction. A check written for data integrity happened to
+        -- stop a policy violation, which is the argument for writing them.
+        and entity_table <> 'world'
       order by entity_table`
   )
 ).rows;
