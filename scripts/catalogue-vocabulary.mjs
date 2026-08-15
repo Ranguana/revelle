@@ -60,6 +60,7 @@ export const DESTINATIONS = {
   Havana: "havana",
   "Big Sur": "big-sur",
   "New Orleans": "new-orleans",
+  Portofino: "portofino",
 };
 
 /**
@@ -150,11 +151,8 @@ export function isStubRow(row) {
  *
  * ── WHY A STUB AND NOT "LEAVE IT GENERAL" ───────────────────────────
  *
- * Because general is not true, and in this schema it is also not safe.
- * `<entity>_world` (db/009) is an AFFINITY table with a `forbidden` flag — it
- * re-weights an ingredient under a destination, it does not restrict it to one.
- * A menu with no world rows at all is therefore eligible under EVERY published
- * destination at neutral weight, which is precisely how Havana's plantains
+ * Because general is not true, and a menu with no world rows at all is eligible
+ * under EVERY published destination — which is precisely how Havana's plantains
  * would end up on a table in the Dolomites.
  *
  * Scoping it to a draft stub is the honest answer and it costs nothing:
@@ -165,12 +163,13 @@ export function isStubRow(row) {
  *   · the row is visibly a placeholder and says so in its own notes column,
  *     so the authoring pass completes it rather than working around it.
  *
- * NOTE WHAT THIS DOES NOT FIX. Affinity is still a weight, so a menu scoped to
- * a stub is not FORBIDDEN elsewhere — it is merely pulled toward a destination
- * nobody can choose. Exclusive scoping ("Havana's daiquiris are not an option
- * at the Dolomites", docs/drinks.md) would be a change to the eligibility rule
- * in src/lib/selection/, across all five pools, and is a decision rather than a
- * seed's business.
+ * AND IT NOW FIXES THE OTHER HALF TOO. This note used to end by saying that
+ * affinity is a weight, so a menu scoped to a stub was not forbidden elsewhere
+ * — merely pulled toward a destination nobody could choose. db/019 settled
+ * that: the seeders write `native`, a CLAIM, and an ingredient that claims any
+ * destination is eligible only under the ones it claims. So the stub is no
+ * longer a holding pen, it is the real scoping, and "Havana's daiquiris are not
+ * an option at the Dolomites" (docs/drinks.md) is enforced rather than likely.
  *
  * @returns {{ id: string, slug: string, created: boolean }}
  */

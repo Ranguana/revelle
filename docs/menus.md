@@ -1,7 +1,7 @@
 # Revelle Société — the menus
 
 Authored by Jessica. Source of truth for the menu pool. Thirteen destinations,
-thirty-three menus. The drinks are the other half of the same drop: docs/drinks.md.
+thirty-six menus. The drinks are the other half of the same drop: docs/drinks.md.
 
 Fields per menu: **dishes in order · what it's for · season · how much making.**
 
@@ -237,6 +237,26 @@ without a machine having to read prose to find out how a menu bends.
 - A late, long brunch
 - Any
 - Half made
+
+## Portofino
+
+**34.**
+- Focaccia with olive oil, trofie pasta with pesto, grilled langoustines with lemon, lemon sorbet
+- A long lunch by the water
+- Summer
+- Half made
+
+**35.**
+- Fried calamari and shrimp, whole fish baked in a salt crust, stuffed baked vegetables, panna cotta with berries
+- A dressed-up dinner party
+- Spring or summer
+- Actually made
+
+**36.**
+- Focaccia squares, olives, chunks of parmesan, sliced cured meats, marinated anchovies, figs or stone fruit
+- Golden-hour drinks, standing
+- Summer
+- Bought and arranged
 
 ---
 

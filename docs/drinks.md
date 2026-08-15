@@ -1,7 +1,7 @@
 # Revelle Société — the drinks
 
 Authored by Jessica. Source of truth for the drinks pool. Thirteen
-destinations, twenty-three programmes. The menus are the other half of the same
+destinations, twenty-five programmes. The menus are the other half of the same
 drop: docs/menus.md.
 
 Fields per entry: **cocktails in order · mocktail mirrors · what it's for ·
@@ -219,6 +219,22 @@ finished bar as well as a finished table.
 - Any
 - Actually mixed
 
+## Portofino
+
+**24.**
+- Spritzes at golden hour, negronis, cold white wine with dinner, icy lemon liqueur after
+- Italian bitter-orange soda over ice with an orange slice, sparkling lemonade in the wine glass, icy lemon-sugar cordial in the same tiny glass
+- Golden-hour drinks into dinner
+- Summer
+- Half made
+
+**25.**
+- Cold white wine, cold beer, a thermos of espresso
+- Sparkling lemonade, chinotto (Italian bitter cola), the same espresso
+- A boat or beach day
+- Summer
+- Bought and poured
+
 ---
 
 ## Notes for the catalogue
@@ -226,8 +242,9 @@ finished bar as well as a finished table.
 **A drink is scoped to a destination** the way a menu is. Havana's daiquiris are
 not an option at the Dolomites, and the mulled wine is not an option in Tahiti.
 
-**Every destination now has a bar.** Menus and drinks cover the same thirteen
-places, so no occasion can be given a table with nothing to drink at it.
+**Every destination now has a bar, and a table.** Menus and drinks cover the
+same thirteen places, so no occasion can be given a table with nothing to
+drink at it — or a bar with nothing to eat beside it.
 
 **Havana now has a look, a voice and a plate** — HAVANA, THE SMALL HOURS,
 `havana` — written to these two programmes rather than the other way round. A
