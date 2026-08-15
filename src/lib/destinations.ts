@@ -32,6 +32,143 @@
 import type { Destination, Theme } from "./tokens";
 import type { ToneWeight } from "./voice";
 
+/* ── THE ALLOCATION ────────────────────────────────────────────────────
+ *
+ * Thirteen destinations, authored as ONE SET. Read this before adding a
+ * fourteenth or re-tagging an existing one, because the value of the tone
+ * question is not in any single destination's list — it is in the SPREAD.
+ *
+ * ── The argument ─────────────────────────────────────────────────────
+ *
+ * A host taps a handful of the fifty-one tones in src/lib/voice.ts. A
+ * destination is tagged in the same fifty-one. That join is the entire channel
+ * between her and this library, and it is only worth having if her answer
+ * CHANGES the answer. Thirteen houses that are all dry and understated make the
+ * question decorative: she taps, and every destination scores the same.
+ *
+ * So the set is allocated, not accumulated. Three properties are load-bearing,
+ * and src/lib/voice.test.ts asserts all three:
+ *
+ *   1. EVERY ONE of the fifty-one tones is claimed by at least one
+ *      destination. A tile that no destination answers to is a tile that
+ *      wastes one of her seven taps.
+ *   2. EVERY GROUP has destinations at BOTH ENDS. Someone performs
+ *      (LAS VEGAS) and someone will not (WESTHAMPTON). Someone wants a
+ *      seating plan (NEW YORK) and someone uses first names from the first
+ *      minute (NANTUCKET). Someone explains nothing (WESTHAMPTON) and someone
+ *      would rather you were told properly (DOLOMITES).
+ *   3. NO TWO destinations resolve to nearly the same vector. Two houses that
+ *      score the same against every host are one house with two palettes.
+ *
+ * ── The overlap rule ─────────────────────────────────────────────────
+ *
+ * Two destinations MAY share tones on one group. They must then differ on at
+ * least two others. Overlap on one axis is texture; overlap on three is a
+ * duplicate wearing a different name.
+ *
+ * Four destinations are slow, and that is fine, because each pays for it
+ * elsewhere: CAP FERRAT is slow and quiet and in-house; TAHITI is slow and
+ * plain and generous; BIG SUR is slow and laconic and self-deprecating; the
+ * DOLOMITES are slow and exact and told-properly. Three are warm — HAVANA
+ * loud with it, CATSKILLS teasing with it, NANTUCKET nearly silent with it.
+ *
+ * ── The catalogue leads, not the gaps ────────────────────────────────
+ *
+ * Every tag below was taken from something the founder had already written in
+ * docs/menus.md, docs/drinks.md or the plate rows in src/lib/library.ts. LAS
+ * VEGAS builds a Caesar at the table and flames cherries with the lights down
+ * (menu 19), so it is `makes_an_entrance` and `does_the_voice` because the
+ * content says so, not because the slots were empty. Where a gap and the
+ * catalogue disagreed, the catalogue won and the gap was filled somewhere it
+ * was true instead.
+ *
+ * ── The table ────────────────────────────────────────────────────────
+ *
+ * Read down for a destination, across for who else claims a tone.
+ *
+ *   FUNNY
+ *     deadpan            westhampton  · big-sur
+ *     dry_aside          westhampton
+ *     teasing            catskills    · nantucket · cap-ferrat
+ *     in_jokes           catskills
+ *     absurd             big-sur
+ *     self_deprecating   big-sur      · portofino
+ *     nothing_sacred     new-orleans  · westhampton
+ *     good_natured       havana       · nantucket
+ *   VOLUME
+ *     all_at_once        new-orleans
+ *     interrupts         new-orleans
+ *     one_conversation   portofino    · catskills · dolomites
+ *     across_the_room    las-vegas
+ *     low_voices         westhampton  · cap-ferrat
+ *     laughs_first       havana
+ *   CEREMONY
+ *     toasts             new-york
+ *     rises_to_greet     new-york
+ *     seating_plan       new-york
+ *     no_speeches        havana
+ *     dressed_up         new-york     · las-vegas
+ *     first_names        nantucket
+ *   KINDNESS
+ *     says_it_out_loud   havana
+ *     nicknames          catskills
+ *     asks_properly      havana
+ *     warm_not_loud      nantucket    · cap-ferrat · portofino · tahiti
+ *     compliments_plainly tahiti
+ *     sentimental        catskills
+ *   PRECISION
+ *     exact_word         new-york     · portofino · westhampton · havana
+ *     will_look_it_up    dolomites
+ *     corrects_gently    new-york     · dolomites
+ *     understated        westhampton
+ *     roughly_eight      cap-ferrat   · cote-dazur
+ *     long_way_round     big-sur
+ *   PACE
+ *     unhurried          tahiti · westhampton · cap-ferrat · portofino ·
+ *                        nantucket · big-sur
+ *     talks_fast         new-orleans
+ *     arrives_late       cap-ferrat   · tahiti
+ *     lingers            havana       · cote-dazur · tahiti
+ *     no_dead_air        new-orleans  · las-vegas
+ *     comfortable_silence nantucket   · dolomites · big-sur · tahiti
+ *   KNOWING
+ *     leans_in           cote-dazur
+ *     explains_nothing   westhampton
+ *     straight_to_gossip new-orleans  · cote-dazur
+ *     means_the_other_thing cote-dazur
+ *     between_us         portofino
+ *     spells_it_out      dolomites
+ *   PERFORMANCE
+ *     makes_an_entrance  las-vegas
+ *     does_the_voice     las-vegas
+ *     one_tells_it       cote-dazur
+ *     nothing_by_halves  las-vegas
+ *     never_performs     westhampton
+ *     swears_fondly      new-orleans  · catskills
+ *     impeccably_polite  dolomites
+ *
+ * ── The five poles ───────────────────────────────────────────────────
+ *
+ *   LAS VEGAS      performance. The opposite of Westhampton.
+ *   NEW YORK       ceremony. Black tie, a seating plan, one toast.
+ *   NANTUCKET      the other end of ceremony. Paper plates on purpose.
+ *   NEW ORLEANS    pace and volume. Four conversations, none of them finished.
+ *   CATSKILLS      family. Everyone has a name only this group uses.
+ *
+ * And the interior ones, distinctive without being extreme: CÔTE D'AZUR
+ * knowing and oblique, PORTOFINO private and few, CAP FERRAT the slowest,
+ * DOLOMITES exact and told properly, BIG SUR laconic, TAHITI plain and
+ * generous, HAVANA warm and late, WESTHAMPTON dry and disreputable.
+ *
+ * ── What is NOT tagged ───────────────────────────────────────────────
+ *
+ * Formality, address and humour mode, for every destination. The voice states
+ * them outright and `statedVoiceFacets` derives them; saying a fact twice is
+ * how two copies of it start to disagree. All thirteen stated triples are
+ * distinct, which is the cheapest structural guarantee that no two of these
+ * houses are the same house.
+ * ───────────────────────────────────────────────────────────────────── */
+
 /**
  * WESTHAMPTON, 1976.
  *
@@ -828,6 +965,4073 @@ export const HAVANA_TONES: readonly ToneWeight[] = [
 ];
 
 /**
+ * LAS VEGAS, 1968.
+ *
+ * The performance pole, and the destination the allocation was built outward
+ * from. Menu 19 has a Caesar salad MADE AT THE TABLE and cherries FLAMED over
+ * ice cream; drinks 13 is a bar of martinis and old fashioneds mixed to order.
+ * Every one of those is a small piece of theatre performed by somebody in front
+ * of somebody else, which is a fact about the catalogue and not a gap in the
+ * vocabulary. So this is the house that `makes_an_entrance`, `does_the_voice`
+ * and does `nothing_by_halves` — and it is the far end of the axis from
+ * WESTHAMPTON, which will not get up in front of a room at all.
+ *
+ * ── THE YEAR, AND WHAT IT IS NOT ─────────────────────────────────────
+ *
+ * The plate carries 1968 and the year stays, because unlike Havana's this one
+ * dates a ROOM rather than somebody's country: a suite, a steakhouse, a table
+ * held until midnight. What the year must not become is the impression
+ * everybody does. There is no baby, no swingin', no ring-a-ding, no finger
+ * snap. The rule is in `never`, in the room's own words, exactly where
+ * WESTHAMPTON keeps its ban on darling and groovy.
+ *
+ * The second trap is the one the catalogue already solved: menu 19's night is
+ * ONE table, ONE game, a stake agreed in advance. That is a house that arranges
+ * an evening nobody has to be rescued from, and it is why the money lines here
+ * are written straight and why gambling is never a joke.
+ */
+const LAS_VEGAS_LOOK: Theme = {
+  key: "las-vegas",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Desert dusk seen from a high floor: sand, brass, and the red of a
+    // banquette. Gold is the loudest thing here and it is still the house's
+    // gold — no neon, no purple, nothing that belongs on a slot machine.
+    ground: "#F0E2C8",
+    ground2: "#E4CFA9",
+    ink: "#241C17",
+    inkSoft: "#55483C",
+    inkFaint: "#8B7C69",
+    rule: "#D2BE99",
+    aqua: "#275F63",
+    oxblood: "#B23A2C",
+    gold: "#C99A22",
+    night: "#1B1512",
+    night2: "#12100E",
+    nightInk: "#F2E4C7",
+    nightSoft: "#B3A386",
+    nightAqua: "#6FB2AF",
+    nightOxblood: "#E4834F",
+    bone: "#F7F1DF",
+  },
+  paletteDark: {
+    ground: "#12100E",
+    ground2: "#1B1512",
+    ink: "#F2E4C7",
+    inkSoft: "#B3A386",
+    inkFaint: "#7F725D",
+    rule: "#3A3026",
+    aqua: "#6FB2AF",
+    oxblood: "#E4834F",
+    gold: "#DFAE3E",
+  },
+};
+
+export const LAS_VEGAS_1968: Destination = {
+  key: "las-vegas",
+  name: "LAS VEGAS, 1968",
+  tagline: "Everyone dressed up. Nobody in a nightclub queue.",
+  premise:
+    "A suite on a high floor, everybody ready an hour before anything opens, " +
+    "and a table held until midnight. One game, one stake, agreed upstairs so " +
+    "the night cannot get away from anybody. It ends in a booth at four in the " +
+    "morning with the good clothes still on.",
+  look: LAS_VEGAS_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The room, and whoever is running the night from it.",
+    selfReference: ["the room", "the suite"],
+    audience: "the party — people who came dressed and intend to be seen doing it",
+    address: {
+      mode: "second_person",
+      note:
+        "Everything is handed to you directly: your hour, your floor, the " +
+        "table, the stake. Second person is the register of a room that has " +
+        "already made the arrangements and is telling you where to stand. It " +
+        "is never spent on encouragement.",
+    },
+
+    register:
+      "A card left on the bar of a suite by somebody who has already booked " +
+      "the table and pressed the jacket.",
+    formality: "formal",
+    cadence:
+      "The flourish first and the flat fact under it. A long line announces, " +
+      "a short line lands. Two lines, and the second one is shorter than you " +
+      "expect.",
+    sentence: { typicalWords: 10, maxWords: 18 },
+    punctuation:
+      "Periods. A colon when a real list follows, which here it often does. No " +
+      "exclamation points — the room is loud enough without borrowing the " +
+      "mark. No ellipses, no parentheses, no dash held open for effect, and no " +
+      "quotation marks around a word being nudged.",
+    orthography:
+      "Hours in words: eight o'clock, half past eleven, four in the morning. " +
+      "Floors and rooms in numerals, because they are directions. Headings in " +
+      "full caps; nothing else is capitalised for emphasis. A dish gets its " +
+      "plain name and the plain name is already grand — shrimp cocktail, New " +
+      "York strip, cherries.",
+
+    humour: {
+      mode: "absurd",
+      mechanism:
+        "Commit to the excessive thing completely and write it down as " +
+        "procedure. The salad built at the table, the lights taken down for " +
+        "the cherries, everybody ready an hour early. The joke is that the " +
+        "room means all of it. Never a wink, never a punchline, never a second " +
+        "sentence letting you off.",
+    },
+
+    lexicon: [
+      {
+        term: "the room",
+        gloss: "the suite, and the evening being run out of it",
+        insteadOf: ["the venue", "the party", "the event"],
+      },
+      {
+        term: "downstairs",
+        gloss: "everything that is not the suite: the floor, the tables, the queue you are not in",
+        insteadOf: ["the casino", "the strip", "the club"],
+      },
+      {
+        term: "the table",
+        gloss: "the one booked for midnight, and the one game being played at",
+        insteadOf: ["the reservation", "the booking", "our spot"],
+      },
+      {
+        term: "the stake",
+        gloss:
+          "what each person agreed to lose before going down. Fixed upstairs, printed, and not revisited",
+        insteadOf: ["the budget", "the buy-in", "the bankroll"],
+      },
+      {
+        term: "the entrance",
+        gloss: "somebody's job every night. Assigned, not hoped for",
+        insteadOf: ["the grand arrival", "the reveal"],
+      },
+      {
+        term: "the late supper",
+        gloss: "steak at midnight, which is the actual dinner",
+        insteadOf: ["a late bite", "supper club", "midnight snacks"],
+      },
+      {
+        term: "breakfast at four",
+        gloss: "the ending. A booth, the good clothes, steak and eggs",
+        insteadOf: ["the after-party", "the wrap-up"],
+      },
+      {
+        term: "the good coat",
+        gloss: "whatever a person came here to be seen in",
+        insteadOf: ["outfits", "looks", "attire"],
+      },
+    ],
+
+    formulae: [
+      "{Arrangement} at {hour}, in the {room}.",
+      "{The excessive thing} is done at the table.",
+      "One table, one game, one {thing agreed upstairs}.",
+      "{Person} takes the entrance tonight.",
+      "The lights go down for {the dish}. Watch {the wrong thing}.",
+      "Everybody is ready an hour before {the thing opens}.",
+      "{Plain fact}. Nobody is being funny about it.",
+    ],
+
+    banned: [
+      "sin city",
+      "jackpot",
+      "high roller",
+      "lucky",
+      "showgirl",
+      "glitzy",
+      "razzle",
+      "baby",
+      "swingin",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The room, at eight.",
+      "Downstairs at ten.",
+      "The table is at midnight.",
+      "Breakfast is at four.",
+    ],
+
+    always: [
+      "Name the hour and the floor. A room here is a direction, not a mood.",
+      "State the excessive thing as procedure. The salad is built at the table; that is the sentence.",
+      "Give the entrance to somebody by name. It is a job and it is assigned.",
+      "Put the stake in writing, early, in the plainest words on the page.",
+      "Assume everybody is already dressed and already downstairs by the time this is read.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never do the impression. No baby, no swingin', no ring-a-ding, no finger snap. The room is 1968 and is not doing 1968.",
+      "Never make a joke of money — what a thing costs and what was agreed are written straight, in the fewest words, with no flourish.",
+      "Never write gambling as a thrill or a risk worth taking. There is one table, one game and a fixed stake, and that is a kindness rather than a rule.",
+      "Never write a woman into the room as scenery. Nobody here is decoration and nobody is described instead of addressed.",
+      "Never mention anything that did not exist in 1968. No apps, no confirming online, no phone photographs.",
+      "Never explain the joke, and never admit the room knows it is one.",
+      "Never name the feeling — no glamour, no magic, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or to be safe: a floor, a room number, a car, a hospital, what is in the food. Fact first, fewest words, no flourish.",
+      "Anything about money — the stake, the bill, what is shared and what is not.",
+      "Any message that lets someone go: a decline, an early night, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Drinks in the room at eight. The lobby is for arriving at, not for waiting in.",
+      },
+      {
+        piece: "invitation",
+        text: "Everybody is ready an hour before anything opens. That is the plan and it has never failed.",
+        note: "The whole voice: an absurd arrangement, stated as procedure, believed in completely.",
+      },
+      {
+        piece: "invitation",
+        text: "Come dressed. There is no queue anywhere in this evening.",
+      },
+      {
+        piece: "invitation",
+        text: "One table, one game, one stake, agreed upstairs before anybody goes down.",
+      },
+      {
+        piece: "menu_item",
+        text: "Shrimp cocktail. Nobody is being funny about it.",
+      },
+      {
+        piece: "menu_item",
+        text: "Caesar salad, built at the table by a man who has done it four thousand times.",
+      },
+      {
+        piece: "menu_item",
+        text: "New York strip at midnight, and a baked potato with everything on it.",
+      },
+      {
+        piece: "menu_item",
+        text: "Cherries flamed over ice cream with the lights down. Watch the ceiling, not the pan.",
+      },
+      {
+        piece: "menu_item",
+        text: "Martinis, cold, made one at a time. A gimlet for whoever would rather.",
+      },
+      {
+        piece: "menu_item",
+        text: "Steak and eggs at four, and coffee in a diner mug.",
+      },
+      {
+        piece: "notice",
+        text: "The stake was agreed upstairs. Nobody goes past it and nobody is asked why.",
+      },
+      {
+        piece: "notice",
+        text: "Nora takes the entrance tonight. Everybody else is already seated.",
+      },
+      {
+        piece: "notice",
+        text: "The table is held until midnight and not one minute after.",
+      },
+      {
+        piece: "house_note",
+        text: "You are in 1408. The ice is at the end of the hall and the room can send more.",
+      },
+      {
+        piece: "house_note",
+        text: "Press the jacket before you go down. The room does not care and the photographs will.",
+      },
+      { piece: "place_card", text: "Charles — facing the door, as agreed." },
+      {
+        piece: "place_card",
+        text: "Delphine — beside whoever is doing the toast, so it stays short.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everybody puts in the same. Whoever is up at midnight buys the late supper, and that is the end of it.",
+      },
+      {
+        piece: "bulletin",
+        text: "Saturday. The table moved to midnight. Somebody has already changed twice.",
+      },
+      { piece: "heading", text: "WHAT HAPPENS AT MIDNIGHT" },
+      { piece: "heading", text: "THE STAKE, AGREED UPSTAIRS" },
+      { piece: "sign_off", text: "The table is at midnight." },
+      { piece: "sign_off", text: "Breakfast is at four." },
+    ],
+
+    rejected: [
+      {
+        text: "What happens in Vegas stays in Vegas.",
+        why: "A borrowed joke, and one this library has already refused once on Dune Road. The room states the hour and lets the rest happen.",
+      },
+      {
+        text: "Ring-a-ding-ding. Dinner is at midnight.",
+        why: "The impression. The room is 1968 and is not doing an impression of 1968.",
+      },
+      {
+        text: "Lady luck is at our table tonight.",
+        why: "Gambling written as a thrill, and a piece of kitsch besides. There is one game and a fixed stake, which is the opposite claim.",
+      },
+      {
+        text: "Order the shrimp cocktail ironically.",
+        why: "Winks at the reader and takes the dish away from the person eating it. The line is funnier with the irony removed, which is why the exemplar says nobody is being funny about it.",
+      },
+      {
+        text: "Lose a little, win a little, who's counting.",
+        why: "Makes a joke of money, and the whole evening is arranged so that somebody is counting — upstairs, in advance, once.",
+      },
+      {
+        text: "The showgirls, the lights, the whole glittering circus.",
+        why: "People as scenery, and three feelings named in a row. Nobody in this room is furniture.",
+      },
+    ],
+  },
+};
+
+/**
+ * LAS VEGAS's voice, said in the tones a host is shown.
+ *
+ * The far end of `theatricality` from WESTHAMPTON, deliberately, because an
+ * axis with one end authored is not an axis. Every tag points at a line above:
+ *
+ *   makes_an_entrance  "Nora takes the entrance tonight." An entrance here is
+ *                      a job that gets assigned, which is the strongest claim
+ *                      to this tone anywhere in the library.
+ *   nothing_by_halves  "Everybody is ready an hour before anything opens."
+ *                      Also the baked potato with everything on it.
+ *   does_the_voice     "Caesar salad, built at the table by a man who has done
+ *                      it four thousand times." The room commits to a bit and
+ *                      then does it again at the next table.
+ *   across_the_room    "The lobby is for arriving at." A house that stages
+ *                      arrivals is a house that is heard before it is seen.
+ *   dressed_up         "Come dressed." Shared with NEW YORK at a lower weight
+ *                      there: Vegas dresses to be looked at, New York dresses
+ *                      because that is what one does.
+ *   no_dead_air        "The table is held until midnight and not one minute
+ *                      after." The night is scheduled so that nothing sags.
+ *
+ * Formality, address and humour are NOT tagged: formal, second person, absurd
+ * are stated outright above and derived by `statedVoiceFacets`.
+ */
+export const LAS_VEGAS_1968_TONES: readonly ToneWeight[] = [
+  { code: "makes_an_entrance", weight: 1 },
+  { code: "nothing_by_halves", weight: 0.9 },
+  { code: "does_the_voice", weight: 0.8 },
+  { code: "across_the_room", weight: 0.7 },
+  { code: "dressed_up", weight: 0.5 },
+  { code: "no_dead_air", weight: 0.5 },
+];
+
+/**
+ * NEW YORK, NEW YEAR'S.
+ *
+ * The ceremony pole. Menu 9 is a formal dinner party with MANHATTANS BEFORE;
+ * drinks 6 is Manhattans, very dry martinis, sidecars, and brandy after. The
+ * plate has coats piled on a bed, oysters open on the counter, a drink pressed
+ * into every hand, and a roof visited briefly at the top of the hour. That is a
+ * house with an order of service, so it is the house that keeps a seating plan,
+ * stands when somebody new arrives, and lets one person make one toast.
+ *
+ * ── WHY NOT A YEAR ───────────────────────────────────────────────────
+ *
+ * The brief that produced this pass called it NEW YORK, 1958. The catalogue
+ * does not: docs/menus.md and src/lib/library.ts both say NEW YORK, and the
+ * plate says NEW YEAR'S. The catalogue wins, and it is also right. A year here
+ * buys nothing that the occasion has not already bought — a place and an hour,
+ * exactly Havana's answer — and it costs the same thing 1957 Havana would have
+ * cost: somebody's playground, a dinner jacket doing an impression, a paperback
+ * New York that has been photographed enough. NEW YEAR'S is the one night of
+ * the year that dates itself, so the destination does not need to.
+ *
+ * ── THE FOUNDER'S OWN SIGNAL, WHICH IS EASY TO MISS ──────────────────
+ *
+ * Menu 9 says "baked oysters with spinach and breadcrumbs". It does not say
+ * oysters Rockefeller. A ceremonious house that calls its food by the plainest
+ * available name is a more interesting house than one that reaches for the
+ * restaurant word, and it is the same rule Havana keeps for a plantain. It is
+ * in `orthography` and in `always`, and it is the reason this destination can
+ * be ceremonial without being pompous.
+ */
+const NEW_YORK_LOOK: Theme = {
+  key: "new-york",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Engraved stationery and black tie: paper, ink that is nearly black, a
+    // cold window blue, and the oxblood of a good chair. The least warm ground
+    // in the library, on purpose — this is the only destination in it that is
+    // properly dressed.
+    ground: "#E8E5DD",
+    ground2: "#D9D5CA",
+    ink: "#1A1A1C",
+    inkSoft: "#4A4A4D",
+    inkFaint: "#85857F",
+    rule: "#C2BEB2",
+    aqua: "#2B4F63",
+    oxblood: "#8E2F2A",
+    gold: "#B39442",
+    night: "#121316",
+    night2: "#0C0D0F",
+    nightInk: "#EDE9DE",
+    nightSoft: "#ABA697",
+    nightAqua: "#7BA6BC",
+    nightOxblood: "#CE7150",
+    bone: "#F5F3EC",
+  },
+  paletteDark: {
+    ground: "#0C0D0F",
+    ground2: "#121316",
+    ink: "#EDE9DE",
+    inkSoft: "#ABA697",
+    inkFaint: "#7A776B",
+    rule: "#2B2D31",
+    aqua: "#7BA6BC",
+    oxblood: "#CE7150",
+    gold: "#D6B45B",
+  },
+};
+
+export const NEW_YORK: Destination = {
+  key: "new-york",
+  name: "NEW YORK, NEW YEAR'S",
+  tagline: "A rooftop, briefly. A long table, mostly.",
+  premise:
+    "An apartment with a table long enough to need a plan, coats piled on the " +
+    "bed, and oysters opened on the counter as people arrive. Dinner is " +
+    "served, one person stands up at midnight, and the last hour is the lights " +
+    "low and side two on.",
+  look: NEW_YORK_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The table, and the two people who laid it.",
+    selfReference: ["the table", "the apartment"],
+    audience: "guests, who were asked in writing and answered in writing",
+    address: {
+      mode: "third_person",
+      note:
+        "Guests are written about rather than at: guests are expected, guests " +
+        "are asked, coats are taken. It is the grammar of an engraved card and " +
+        "it holds the whole evening at a formal distance. Second person is " +
+        "spent only on the one line a person must act on, and never on warmth.",
+    },
+
+    register:
+      "A card set at each place, engraved rather than written, on the kind of " +
+      "stock that stands up by itself.",
+    formality: "ceremonial",
+    cadence:
+      "One clause, then the fact it turns on. The line is built and finished " +
+      "before it is spoken, and it does not trail. Nothing is added after the " +
+      "period.",
+    sentence: { typicalWords: 9, maxWords: 17 },
+    punctuation:
+      "Periods, and a comma where a clause genuinely closes. A colon before a " +
+      "list of dishes or hours. No exclamation points, no ellipses, no " +
+      "parentheses, no dash held open for effect, no quotation marks around a " +
+      "word being nudged. A semicolon is permitted once, in a menu, and " +
+      "nowhere else.",
+    orthography:
+      "Hours in words: eight o'clock, half past nine, midnight. Days by name. " +
+      "Headings in full caps; nothing else capitalised for emphasis. No " +
+      "contractions anywhere. Food takes its plainest name and never a " +
+      "restaurant's — oysters are baked with spinach and breadcrumbs, and they " +
+      "are not named after anybody.",
+
+    humour: {
+      mode: "dry",
+      mechanism:
+        "The joke is a piece of the arrangement, reported without comment: the " +
+        "bed that is a cloakroom, the champagne that is more than seems " +
+        "reasonable, the twelve minutes allowed on a roof. State it as part of " +
+        "the order of the evening and move to the next arrangement.",
+    },
+
+    lexicon: [
+      {
+        term: "the table",
+        gloss: "the dinner, the plan of it, and the piece of furniture that requires one",
+        insteadOf: ["the dinner party", "the seating", "the spread"],
+      },
+      {
+        term: "the plan of the table",
+        gloss: "who sits where. Made in advance, on paper, and not adjusted at the door",
+        insteadOf: ["seating chart", "table assignments", "wherever you like"],
+      },
+      {
+        term: "the roof",
+        gloss: "the short visit at the top of the hour, coats on",
+        insteadOf: ["the terrace", "the rooftop bar", "the view"],
+      },
+      {
+        term: "the toast",
+        gloss: "one, at midnight, by one person, thought about beforehand",
+        insteadOf: ["speeches", "a few words", "remarks"],
+      },
+      {
+        term: "the bed",
+        gloss: "where the coats go, and what the coats make of it",
+        insteadOf: ["the cloakroom", "coat check"],
+      },
+      {
+        term: "side two",
+        gloss: "the last hour, with the lights down. The record is not discussed",
+        insteadOf: ["the playlist", "the afters", "the wind-down"],
+      },
+      {
+        term: "the counter",
+        gloss: "where the oysters are opened, in front of everybody, as people come in",
+        insteadOf: ["the kitchen island", "the bar", "the station"],
+      },
+      {
+        term: "kindly reply",
+        gloss: "the reply convention. Guests answer, and the plan of the table depends on it",
+        insteadOf: ["RSVP", "let us know", "regrets only"],
+      },
+    ],
+
+    formulae: [
+      "Guests are expected at {hour}. {The fixed thing} is at {the later hour}.",
+      "There is a plan of the table. {What follows from that}.",
+      "{Dish}, {dish}, and {the thing there is too much of}.",
+      "One toast, at {hour}, by {one person}.",
+      "{Arrangement}. It has been arranged and will not be adjusted.",
+      "Guests are asked to {the one thing}, and nothing else is asked of them.",
+      "{Plain fact about the apartment}, which is not what it is for.",
+    ],
+
+    banned: [
+      "ring in",
+      "countdown",
+      "bubbly",
+      "soiree",
+      "gala",
+      "sparkle",
+      "glitter",
+      "old new york",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The table, at nine.",
+      "Kindly reply.",
+      "Coats on the bed.",
+      "One toast, at midnight.",
+    ],
+
+    always: [
+      "Say the hour and say what happens at it. This evening has an order and the order is the writing.",
+      "Give food its plainest name. Baked with spinach and breadcrumbs, not named after a family.",
+      "Put the arrangement in the passive and leave it there. Guests are expected; the table is laid; the coats are taken.",
+      "Let the excess be a fact rather than a boast: more champagne than seems reasonable, and nothing said about it.",
+      "Keep the one warm line for the end, and let it be short.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never a year, and never another New York. No Gatsby, no old New York, no paperback the reader has already been sold. This apartment is somebody's home on one night.",
+      "Never make a joke of the toast, the year turning, or anybody's feeling about either. The ceremony is performed straight or it is left out.",
+      "Never hedge an instruction. Black tie is black tie; optional is a different evening and should be written as one.",
+      "Never contract a word. Not in a notice, not in a menu, not on a place card.",
+      "Never name the feeling — no glamour, no magic, no unforgettable, no memories.",
+      "Never thank guests for coming in the same breath as an arrangement. Gratitude is its own line or it is not written.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or to be safe: the address, the floor, the door code, a hospital, what is in the food. Fact first, fewest words, no ceremony.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, a cancellation, a way off a list. Written plainly, in the second person, and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Guests are expected at eight. Dinner is at nine and does not wait.",
+      },
+      {
+        piece: "invitation",
+        text: "There is a plan of the table. It was made carefully and it will not be adjusted.",
+        note: "The whole voice in fifteen words: ceremony, precision, and a joke that is only the second half of the arrangement.",
+      },
+      {
+        piece: "invitation",
+        text: "Black tie. The apartment is warm and the roof is not.",
+      },
+      { piece: "invitation", text: "Kindly reply. The table is laid to the answer." },
+      {
+        piece: "menu_item",
+        text: "Oysters baked with spinach and breadcrumbs, opened on the counter as guests arrive.",
+      },
+      {
+        piece: "menu_item",
+        text: "Roast beef, cold, with bread and good butter.",
+      },
+      {
+        piece: "menu_item",
+        text: "Manhattans before dinner; brandy after, for those still standing.",
+      },
+      {
+        piece: "menu_item",
+        text: "Champagne, in more quantity than seems reasonable.",
+      },
+      { piece: "menu_item", text: "Cheesecake, and nothing after it but the record." },
+      {
+        piece: "notice",
+        text: "Coats are taken to the bed. The bed is not a cloakroom and is treated as one.",
+      },
+      {
+        piece: "notice",
+        text: "The roof at a quarter to twelve. Coats on, and back down before the champagne warms.",
+      },
+      {
+        piece: "notice",
+        text: "One toast, at midnight, by one person. It is short and it has been thought about.",
+      },
+      {
+        piece: "notice",
+        text: "Guests stand when somebody new comes to the table. This is the only rule of the evening.",
+      },
+      {
+        piece: "house_note",
+        text: "The buzzer is the second one. The stairs are cold; the lift is slow and worth waiting for.",
+      },
+      {
+        piece: "house_note",
+        text: "Somebody will correct the year of the record. Somebody will be right.",
+      },
+      { piece: "place_card", text: "Vivian — at the corner, where she can hear the room." },
+      { piece: "place_card", text: "Edward — beside the person he was asked to sit beside." },
+      {
+        piece: "game_rule",
+        text: "Each guest names one thing that will not be repeated. The list is read at midnight and then it is destroyed.",
+      },
+      {
+        piece: "bulletin",
+        text: "The last day of the year. The oysters arrived. The plan of the table has been redrawn once.",
+      },
+      { piece: "heading", text: "THE ORDER OF THE EVENING" },
+      { piece: "heading", text: "AT THE TABLE" },
+      { piece: "heading", text: "AFTER MIDNIGHT, WITH THE LIGHTS DOWN" },
+      { piece: "sign_off", text: "One toast, at midnight." },
+      { piece: "sign_off", text: "The table, at nine." },
+    ],
+
+    rejected: [
+      {
+        text: "Ring in the new year with us.",
+        why: "Join us, in a bow tie. The apartment states the hour; it does not recruit.",
+      },
+      {
+        text: "A night of old New York glamour.",
+        why: "Names the feeling and borrows a New York that has been sold already. This is one apartment on one night.",
+      },
+      {
+        text: "Auld lang syne, and nobody remembers the second verse.",
+        why: "A joke about the ceremony. The ceremony is performed straight or it is left out, which is the difference between this house and a party with a theme.",
+      },
+      {
+        text: "Black tie optional.",
+        why: "A hedged instruction, which is two evenings written as one. If it is optional it is a different destination.",
+      },
+      {
+        text: "Twelve minutes on the roof, twelve months to regret it.",
+        why: "A pun in a house whose joke is always a piece of the arrangement.",
+      },
+      {
+        text: "Oysters Rockefeller and a magnum of Dom.",
+        why: "The restaurant word and the label. Menu 9 says baked with spinach and breadcrumbs, and the plain name is the more confident one.",
+      },
+    ],
+  },
+};
+
+/**
+ * NEW YORK's voice, said in the tones a host is shown.
+ *
+ * The far end of the ceremony group from NANTUCKET, which uses first names from
+ * the first minute and puts the newspaper on the table. Every tag points at a
+ * line above:
+ *
+ *   toasts        "One toast, at midnight, by one person." The only house in
+ *                 the library where somebody stands up on purpose.
+ *   dressed_up    "Black tie. The apartment is warm and the roof is not."
+ *                 Higher here than at LAS VEGAS: Vegas dresses to be looked
+ *                 at, this table dresses because that is what one does.
+ *   seating_plan  "There is a plan of the table. It will not be adjusted."
+ *   rises_to_greet "Guests stand when somebody new comes to the table. This is
+ *                 the only rule of the evening."
+ *   corrects_gently "Somebody will correct the year of the record. Somebody
+ *                 will be right." Shared with the DOLOMITES, which correct the
+ *                 run and not the record.
+ *   exact_word    Hours in words, no contractions, and food given its plainest
+ *                 available name.
+ *
+ * Formality, address and humour are NOT tagged: ceremonial, third person, dry
+ * are stated outright and derived by `statedVoiceFacets`. It shares `dry` with
+ * WESTHAMPTON and nothing else — one is a card left on a hall table, the other
+ * is engraved and set at a place.
+ */
+export const NEW_YORK_TONES: readonly ToneWeight[] = [
+  { code: "toasts", weight: 1 },
+  { code: "dressed_up", weight: 0.9 },
+  { code: "seating_plan", weight: 0.8 },
+  { code: "rises_to_greet", weight: 0.7 },
+  { code: "corrects_gently", weight: 0.6 },
+  { code: "exact_word", weight: 0.5 },
+];
+
+/**
+ * NANTUCKET, AUGUST.
+ *
+ * The other end of the ceremony group from NEW YORK, and the destination the
+ * founder's own note points straight at: newspaper on the table, paper plates
+ * ON PURPOSE, one pie and it was bought. A house that decides in advance not to
+ * be impressive is making a claim, not saving itself work — so it takes
+ * `first_names` from the first minute, and it is the one house in the library
+ * that can sit on a dock and watch nothing happen without filling the silence.
+ *
+ * Menu 5 is a boiled dinner everybody assembles with their hands; menu 8 is the
+ * roast chicken that, as docs/menus.md notes, fills the house with smell before
+ * anybody arrives. Drinks 4 is a cooler. None of that needs a flourish, and the
+ * voice does not give it one.
+ *
+ * ── WHERE IT PARTS FROM WESTHAMPTON ──────────────────────────────────
+ *
+ * Two summer houses on two islands is exactly the collision this file exists to
+ * prevent. WESTHAMPTON is dry, knowing, impersonal, faintly disreputable, and
+ * it explains nothing. This porch uses your name, means the fond thing, argues
+ * about lobster, and is happy to be quiet with you. Cordial distance versus
+ * familiar warmth, and the tone vectors say so.
+ */
+const NANTUCKET_LOOK: Theme = {
+  key: "nantucket",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Weathered shingle, fog, a navy that has been washed, and cranberry. The
+    // greyest ground in the library, which is the point: this is the house
+    // that does not dress for dinner.
+    ground: "#E9E4D8",
+    ground2: "#DAD3C3",
+    ink: "#1E2530",
+    inkSoft: "#4C5561",
+    inkFaint: "#868D97",
+    rule: "#C4BDAC",
+    aqua: "#22506E",
+    oxblood: "#A93F35",
+    gold: "#B58A3C",
+    night: "#101922",
+    night2: "#0B1219",
+    nightInk: "#EBE4D5",
+    nightSoft: "#A9A392",
+    nightAqua: "#6CA5C0",
+    nightOxblood: "#DC8161",
+    bone: "#F4F1E8",
+  },
+  paletteDark: {
+    ground: "#0B1219",
+    ground2: "#101922",
+    ink: "#EBE4D5",
+    inkSoft: "#A9A392",
+    inkFaint: "#78766A",
+    rule: "#28343F",
+    aqua: "#6CA5C0",
+    oxblood: "#DC8161",
+    gold: "#D3A751",
+  },
+};
+
+export const NANTUCKET: Destination = {
+  key: "nantucket",
+  name: "NANTUCKET, AUGUST",
+  tagline: "Newspaper on the table. Butter in a saucepan.",
+  premise:
+    "A shingled house at the end of a lane, a porch with a bucket of ice on " +
+    "it, and a dinner everybody takes apart with their hands. Sweaters come " +
+    "out at eight whatever the day did. The night ends on the dock, watching " +
+    "nothing happen on the water.",
+  look: NANTUCKET_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The porch, and whoever is out on it.",
+    selfReference: ["the porch", "the house at the end of the lane"],
+    audience: "the people staying, called by their first names from the first minute",
+    address: {
+      mode: "second_person",
+      note:
+        "You is used freely and plainly — your room, your sweater, you will " +
+        "hear about it. It is the grammar of a house where nobody is " +
+        "introduced twice. It is never used to enthuse and never used to " +
+        "instruct at length.",
+    },
+
+    register:
+      "A note on the back of an envelope, left under the sugar bowl by " +
+      "somebody who has gone down to the beach.",
+    formality: "familiar",
+    cadence:
+      "Short and level. A statement, then the small correction that follows " +
+      "it. Lines end on an object you could pick up — a bucket, a sweater, a " +
+      "pie.",
+    sentence: { typicalWords: 9, maxWords: 16 },
+    punctuation:
+      "Periods and commas. A colon before a list of what is on the table. No " +
+      "exclamation points, no ellipses, no parentheses, no dash held open for " +
+      "effect, no quotation marks around a word being nudged.",
+    orthography:
+      "Hours in words: six o'clock, half past eight, after dark. Days by name. " +
+      "Headings in full caps; nothing else capitalised for emphasis. " +
+      "Contractions are fine here, which is most of the difference between " +
+      "this porch and a printed card. Food gets its plainest name and the " +
+      "plainest name is usually one word.",
+
+    humour: {
+      mode: "dry",
+      mechanism:
+        "A decision defended without heat. Paper plates, on purpose. One pie, " +
+        "bought. The joke is that nobody is embarrassed, and it is never " +
+        "explained, elaborated, or aimed at a person in the house.",
+    },
+
+    lexicon: [
+      {
+        term: "the porch",
+        gloss: "where dinner is, where the bucket is, and where the evening stays",
+        insteadOf: ["the deck", "the patio", "the outdoor space"],
+      },
+      {
+        term: "the bucket",
+        gloss: "beer and ice, refilled by whoever notices",
+        insteadOf: ["the cooler", "the bar", "drinks station"],
+      },
+      {
+        term: "supper",
+        gloss: "the evening meal, whatever hour it lands at",
+        insteadOf: ["dinner service", "the meal", "the feast"],
+      },
+      {
+        term: "the dock",
+        gloss: "where the last drinks go, to watch nothing happen on the water",
+        insteadOf: ["the pier", "the waterfront", "the marina"],
+      },
+      {
+        term: "sweaters",
+        gloss: "the eight o'clock fact of August here. Not a suggestion",
+        insteadOf: ["layers", "warm clothing"],
+      },
+      {
+        term: "the lane",
+        gloss: "the address. Given in place of directions, which are not given",
+        insteadOf: ["the location", "the address below"],
+      },
+      {
+        term: "the right way",
+        gloss:
+          "how a lobster is taken apart. There is one, everybody has a different one, and the argument is part of dinner",
+      },
+      {
+        term: "come when you come",
+        gloss: "the reply convention. Nobody is counted and nobody is chased",
+        insteadOf: ["RSVP", "please confirm", "let us know"],
+      },
+    ],
+
+    formulae: [
+      "{Meal} on the porch at {hour}. {The plain thing you bring}.",
+      "{Food}, {food}, {the thing there is too much of}.",
+      "{Decision}, on purpose.",
+      "{Plain fact about the weather}. It does not matter what the forecast said.",
+      "There is a right way to {the thing} and you will hear about it.",
+      "{Object} is on the porch and stays there.",
+      "Down to the dock after, to {watch nothing happen}.",
+    ],
+
+    banned: [
+      "ahoy",
+      "nautical",
+      "seafaring",
+      "quaint",
+      "charming",
+      "coastal chic",
+      "clambake experience",
+      "authentic",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The porch.",
+      "Sweaters by eight.",
+      "Come when you come.",
+      "We will be on the dock.",
+    ],
+
+    always: [
+      "Use first names. Nobody is introduced twice and nobody is announced.",
+      "Name the plain object: the bucket, the saucepan, the newspaper, the pie.",
+      "Let a decision stand as a decision. Paper plates, on purpose, and no defence after it.",
+      "Leave the silence in. A line may end without anything following it, and often should.",
+      "Say the fond thing quietly, once, at the end, in ordinary words.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never the nautical costume. No ahoy, no anchors, no ship's wheels, no whale on anything. The island is a place people live.",
+      "Never apologise for the paper plates, the bought pie or the newspaper. Explaining a decision is how it stops being one.",
+      "Never dress the food up. A lobster is a lobster, butter is in a saucepan, and no dish is named after a restaurant.",
+      "Never sell the island — no charming, no quaint, no old-money joke, nothing about who summers where.",
+      "Never fill a silence in the writing. The dock line ends where it ends.",
+      "Never name the feeling — no magic, no idyllic, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the lane, the ferry, the tide, a hospital, a shellfish allergy. Fact first, fewest words, no joke.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, a cancellation, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Friday, at the end of the lane. Come hungry and bring a sweater.",
+      },
+      {
+        piece: "invitation",
+        text: "First names at the door. Nobody is introduced twice.",
+        note: "The anti-ceremony claim, stated as a house fact rather than a value.",
+      },
+      {
+        piece: "invitation",
+        text: "Supper is on the porch at six. Come when you come.",
+      },
+      { piece: "invitation", text: "There is a bucket on the porch. Start there." },
+      {
+        piece: "menu_item",
+        text: "Lobsters, boiled. Everybody does their own.",
+      },
+      {
+        piece: "menu_item",
+        text: "Corn, lemon, butter in a saucepan. Paper plates, on purpose.",
+      },
+      {
+        piece: "menu_item",
+        text: "Steamed clams first, with the broth, and bread for the broth.",
+      },
+      {
+        piece: "menu_item",
+        text: "One pie. Bought, and better than the one we would have made.",
+      },
+      {
+        piece: "menu_item",
+        text: "Cape Codders in tall glasses. The same glass with cranberry and lime for whoever would rather.",
+      },
+      {
+        piece: "menu_item",
+        text: "Chowder if it rains, which it will.",
+      },
+      {
+        piece: "notice",
+        text: "Sweaters by eight. It does not matter what the forecast said.",
+      },
+      {
+        piece: "notice",
+        text: "There is a right way to shell a lobster and you will hear about it.",
+      },
+      {
+        piece: "notice",
+        text: "The newspaper on the table is the tablecloth. It goes in the fire after.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is over the kitchen. It is warm and it hears everything.",
+      },
+      {
+        piece: "house_note",
+        text: "The screen door bangs. Nobody has fixed it and nobody is going to.",
+      },
+      { piece: "place_card", text: "Names go on the plates, in pencil." },
+      { piece: "place_card", text: "Ellen — nearest the butter, where she asked to be." },
+      {
+        piece: "game_rule",
+        text: "Everybody says what the weather will do tomorrow. Whoever is closest does not have to clear.",
+      },
+      {
+        piece: "bulletin",
+        text: "Saturday. Fog until ten. The pie is on the counter and has been touched.",
+      },
+      { piece: "heading", text: "SUPPER ON THE PORCH" },
+      { piece: "heading", text: "DOWN TO THE DOCK" },
+      { piece: "sign_off", text: "The porch." },
+      { piece: "sign_off", text: "We will be on the dock." },
+    ],
+
+    rejected: [
+      {
+        text: "An authentic New England clambake experience.",
+        why: "Three words the house bans in one line. A clambake is a dinner, not an experience, and calling it authentic is the surest sign it is not.",
+      },
+      {
+        text: "Ahoy, and welcome aboard.",
+        why: "The costume. Nobody who lives on an island talks like a gift shop.",
+      },
+      {
+        text: "Paper plates, because we keep it real.",
+        why: "Explains the decision, and names a value while doing it. On purpose was the whole line.",
+      },
+      {
+        text: "The island at its most charming.",
+        why: "Names the feeling, and sells a place the people in the house simply live in.",
+      },
+      {
+        text: "Sunset cocktails on the dock with your besties.",
+        why: "A nickname for the room, an advertisement for the light, and a drink menu pretending to be a plan.",
+      },
+      {
+        text: "We shell, we argue, we laugh.",
+        why: "The three-item list with the feeling in the third slot. The argument is funnier reported flat, and nobody in this house narrates the laughing.",
+      },
+    ],
+  },
+};
+
+/**
+ * NANTUCKET's voice, said in the tones a host is shown.
+ *
+ * The anti-ceremony pole, and the quiet end of the volume group without being
+ * the deadpan end — this house is warm, it is simply not loud about it. Every
+ * tag points at a line above:
+ *
+ *   first_names        "First names at the door. Nobody is introduced twice."
+ *                      The exact opposite claim to New York's plan of the
+ *                      table, and the reason the ceremony group has two ends.
+ *   comfortable_silence "Down to the dock after, to watch nothing happen on
+ *                      the water." Also the rule against filling a silence.
+ *   warm_not_loud      "Say the fond thing quietly, once, at the end, in
+ *                      ordinary words."
+ *   good_natured       "Nobody is embarrassed, and it is never aimed at a
+ *                      person in the house."
+ *   teasing            "There is a right way to shell a lobster and you will
+ *                      hear about it."
+ *   unhurried          "Supper is on the porch at six. Come when you come."
+ *
+ * Formality, address and humour are NOT tagged: familiar, second person, dry
+ * are stated outright and derived by `statedVoiceFacets`.
+ */
+export const NANTUCKET_TONES: readonly ToneWeight[] = [
+  { code: "first_names", weight: 1 },
+  { code: "comfortable_silence", weight: 0.9 },
+  { code: "warm_not_loud", weight: 0.7 },
+  { code: "good_natured", weight: 0.6 },
+  { code: "teasing", weight: 0.5 },
+  { code: "unhurried", weight: 0.4 },
+];
+
+/**
+ * NEW ORLEANS, 3 A.M.
+ *
+ * The pace and volume pole. The plate says it in one line — Sazeracs "made
+ * badly and enthusiastically" in the courtyard "before anyone has said hello
+ * properly" — and menu 33 is a brunch that starts with milk punch. This is the
+ * only house in the library where four conversations run at once and nobody
+ * finishes a sentence, so it takes `all_at_once`, `interrupts` and `talks_fast`
+ * together, which no other destination gets to do.
+ *
+ * ── THE HAVANA PROBLEM, AND THE ANSWER ───────────────────────────────
+ *
+ * Two warm houses with courtyards, coffee, and something eaten after midnight.
+ * They would be one destination if the difference were not authored, so it is:
+ * HAVANA moves the table and stays in; NEW ORLEANS engineers a second wind and
+ * GOES BACK OUT. Havana is unhurried and exact about the hour. This house is
+ * fast, overlapping, and does not know who paid. Havana's joke is affection
+ * with nobody as the target; here nothing is off limits, including each other.
+ *
+ * ── THE COSTUME, WHICH IS EVERYWHERE FOR THIS ONE ────────────────────
+ *
+ * No destination in the library has more souvenir available to it. Beads,
+ * Bourbon Street, brass bands, voodoo, the Big Easy, and a spelling that
+ * performs an accent — all of it refused, on the rule Havana wrote in its own
+ * words and this house repeats: a real name is a fact, a spelling that performs
+ * an accent is a costume. Also refused: a nickname for the room. The copy brief
+ * bans "guys"; "y'all" would be the same move in a straw hat.
+ */
+const NEW_ORLEANS_LOOK: Theme = {
+  key: "new-orleans",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Courtyard green, old brick, brass on a door, and a night that goes
+    // violet rather than blue. Warm ground, hot oxblood, and the darkest
+    // night2 in the library — this destination is named after an hour.
+    ground: "#EDE0CC",
+    ground2: "#DFCDB2",
+    ink: "#26201B",
+    inkSoft: "#574C41",
+    inkFaint: "#8C8071",
+    rule: "#CDB99B",
+    aqua: "#245C4E",
+    oxblood: "#A93B2C",
+    gold: "#BE8B2A",
+    night: "#1A1620",
+    night2: "#120F17",
+    nightInk: "#EDE0CA",
+    nightSoft: "#ACA08C",
+    nightAqua: "#64AE99",
+    nightOxblood: "#DB7A56",
+    bone: "#F4EFE2",
+  },
+  paletteDark: {
+    ground: "#120F17",
+    ground2: "#1A1620",
+    ink: "#EDE0CA",
+    inkSoft: "#ACA08C",
+    inkFaint: "#7C7263",
+    rule: "#332C38",
+    aqua: "#64AE99",
+    oxblood: "#DB7A56",
+    gold: "#D8A343",
+  },
+};
+
+export const NEW_ORLEANS: Destination = {
+  key: "new-orleans",
+  name: "NEW ORLEANS, 3 A.M.",
+  tagline: "Dinner at nine. Nobody's leaving at eleven.",
+  premise:
+    "A courtyard behind a corner house, drinks made badly and made again, and " +
+    "a dinner nobody sits down to on time. At midnight there is coffee and " +
+    "something fried, and then everybody goes back out. It ends walking home " +
+    "in a loose line with the argument still running.",
+  look: NEW_ORLEANS_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The courtyard, and everybody in it talking.",
+    selfReference: ["we", "the courtyard", "the corner house"],
+    audience: "everybody coming, which is more people than were asked",
+    address: {
+      mode: "collective_first",
+      note:
+        "We, always, and the we is the whole courtyard rather than a host. We " +
+        "eat at nine, we go back out, we are still up. Second person appears " +
+        "only where a person has to do something — your room, the gate — and " +
+        "never to enthuse.",
+    },
+
+    register:
+      "A note shouted from the kitchen and written down by somebody else, " +
+      "while two other conversations are going on.",
+    formality: "familiar",
+    cadence:
+      "Fast and overlapping. A sentence starts before the last one has " +
+      "finished, joined by and, and then a short one lands on top of it. " +
+      "Nothing here waits for a gap.",
+    sentence: { typicalWords: 12, maxWords: 20 },
+    punctuation:
+      "Periods and commas, and the comma is where somebody cuts in. No " +
+      "exclamation points, no ellipses, no parentheses, no dash held open for " +
+      "effect, no quotation marks around a word being nudged. The energy is in " +
+      "the rhythm, never in the marks.",
+    orthography:
+      "Hours in words: nine o'clock, midnight, three in the morning. Days by " +
+      "name. Headings in full caps; nothing else capitalised for emphasis. " +
+      "Contractions are welcome. Food and drink take their plain names — " +
+      "gumbo is gumbo, a Sazerac is a Sazerac, and nothing on the page is " +
+      "spelled to sound like anywhere.",
+
+    humour: {
+      mode: "warm",
+      mechanism:
+        "Report the room's own excess as though it were the arrangement: the " +
+        "drink made badly and made again, the gumbo there is more of, the " +
+        "sentence nobody finished. Everybody is fair game and nobody is the " +
+        "victim, because the joke is always about all of us at once.",
+    },
+
+    lexicon: [
+      {
+        term: "the courtyard",
+        gloss: "where the night starts and keeps restarting",
+        insteadOf: ["the patio", "the yard", "the outdoor space"],
+      },
+      {
+        term: "the second wind",
+        gloss:
+          "coffee and something fried at midnight, taken on purpose so the night can go on",
+        insteadOf: ["a pit stop", "a break", "the after-party"],
+      },
+      {
+        term: "going back out",
+        gloss: "what happens after the second wind. The evening's second half",
+        insteadOf: ["hitting the town", "bar hopping", "the next venue"],
+      },
+      {
+        term: "the walk home",
+        gloss: "a loose line, everybody still talking, nobody sure who paid",
+        insteadOf: ["the journey home", "the end of the night"],
+      },
+      {
+        term: "made again",
+        gloss: "how a drink is fixed here. Badly, twice, by two different people",
+        insteadOf: ["properly made", "expertly mixed", "craft cocktails"],
+      },
+      {
+        term: "the gate",
+        gloss: "the way in. Left open, and that is the only direction anybody gets",
+        insteadOf: ["the entrance", "the address below"],
+      },
+      {
+        term: "the good champagne",
+        gloss: "opened without a speech, usually while somebody is still talking",
+        insteadOf: ["bubbly", "the toast", "a celebratory drink"],
+      },
+      {
+        term: "come at nine",
+        gloss: "the reply convention. Nobody counts, and nobody is chased",
+        insteadOf: ["RSVP", "please confirm", "let us know"],
+      },
+    ],
+
+    formulae: [
+      "{Arrangement} at {hour}. Nobody is leaving at {the reasonable hour}.",
+      "{Drink}, made badly, made again.",
+      "We {do the thing}, and then we {do the bigger thing}.",
+      "{Dish}, and there is more {dish}.",
+      "Nobody {finishes the thing}. Nobody minds.",
+      "{Plain fact}, while somebody is still talking.",
+      "Come at {hour}. Say hello later.",
+    ],
+
+    banned: [
+      "big easy",
+      "bourbon street",
+      "beads",
+      "voodoo",
+      "gris-gris",
+      "laissez",
+      "jazz hands",
+      "decadent",
+      "sultry",
+      "y'all",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The courtyard, from nine.",
+      "Nobody is leaving at eleven.",
+      "The gate is open.",
+      "We will be back out by one.",
+    ],
+
+    always: [
+      "Start the next thing before the last one has finished. That is the rhythm and it is the whole voice.",
+      "Name a real thing: the gate, the courtyard, the pan, the roux, the walk home.",
+      "Let the excess be the arrangement. There is more gumbo, and that is the sentence.",
+      "Put the whole room in it. We, not you, and never a host doing something for a guest.",
+      "Get to the good part before the coats are off, which here means the first line.",
+    ],
+
+    never: [
+      "Never an exclamation point. This house is loud on the page by rhythm alone.",
+      "Never put an accent on the page. No phonetic spelling, no borrowed slang, no word set down to sound like somewhere. A real name is a fact; a spelling that performs an accent is a costume.",
+      "Never the souvenir city. No beads, no Bourbon Street, no voodoo, no brass band hired as scenery, no Big Easy.",
+      "Never a nickname for the room. Not guys, not y'all, not everybody-listen-up.",
+      "Never write the drinking as the point, and never a line that separates the people drinking from the people who are not. The same glass, the same lemon peel, no mention.",
+      "Never make anybody the victim of the joke. Everybody is fair game because the joke is always about all of us at once.",
+      "Never explain the second wind. It is a plan, not a bit.",
+      "Never name the feeling — no decadent, no sultry, no magic, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the street, the gate, the stairs, a hospital, what is in the food. Fact first, fewest words, no joke, and nobody talking over it.",
+      "Anything about money — including who is paying for the table, which is funny in a bulletin and never funny on a bill.",
+      "Any message that lets someone go — a decline, an early night, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Dinner at nine. Nobody is leaving at eleven.",
+      },
+      {
+        piece: "invitation",
+        text: "Come at nine. Say hello later, when there is a gap.",
+        note: "The whole house in eleven words: you are welcome, and you will not be attended to.",
+      },
+      {
+        piece: "invitation",
+        text: "We are in the courtyard and you will hear us from the corner.",
+      },
+      {
+        piece: "invitation",
+        text: "The gate is open. Bring nobody who has to be up.",
+      },
+      {
+        piece: "menu_item",
+        text: "Sazeracs in the courtyard, made badly, made again.",
+      },
+      {
+        piece: "menu_item",
+        text: "Gumbo over rice, and there is more gumbo.",
+      },
+      {
+        piece: "menu_item",
+        text: "Oysters, cold beer, too much butter.",
+      },
+      {
+        piece: "menu_item",
+        text: "Bananas foster, and whoever is nearest does the pan.",
+      },
+      {
+        piece: "menu_item",
+        text: "Coffee at midnight and something fried, and then we go back out.",
+      },
+      {
+        piece: "menu_item",
+        text: "Milk punch in the morning, in the same glass, with or without.",
+      },
+      {
+        piece: "notice",
+        text: "Nobody finishes a sentence here. Nobody minds.",
+      },
+      {
+        piece: "notice",
+        text: "Somebody will swear at somebody they love before the night is out. It is not a fight.",
+      },
+      {
+        piece: "notice",
+        text: "The good champagne is opened without a speech, usually while somebody is still talking.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is off the courtyard. The courtyard does not stop, and the window shuts.",
+      },
+      {
+        piece: "house_note",
+        text: "The gate sticks. Lift it and push, and leave it open behind you.",
+      },
+      { piece: "place_card", text: "Theo — where he can hear both ends of the table." },
+      {
+        piece: "place_card",
+        text: "Adele — beside the person she has been waiting all week to hear about.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everybody starts a story. Nobody finishes their own. The person on your left finishes it and gets it wrong.",
+      },
+      {
+        piece: "bulletin",
+        text: "Sunday. The gumbo went on at ten. Two people are still arguing about the roux and neither is cooking.",
+      },
+      { piece: "heading", text: "NINE O'CLOCK, AND WHAT FOLLOWS" },
+      { piece: "heading", text: "THE SECOND WIND" },
+      { piece: "heading", text: "THE WALK HOME" },
+      { piece: "sign_off", text: "The courtyard, from nine." },
+      { piece: "sign_off", text: "Nobody is leaving at eleven." },
+    ],
+
+    rejected: [
+      {
+        text: "Laissez les bons temps rouler.",
+        why: "A phrase put on the page to prove where we are. The house does not perform a language it lives in.",
+      },
+      {
+        text: "The Big Easy at its most decadent.",
+        why: "A tourist board wrote this. It names the feeling and sells somebody's city back to them.",
+      },
+      {
+        text: "Beads, brass, and Bourbon Street.",
+        why: "Three souvenirs in a row. Nobody in this courtyard has been on that street this year.",
+      },
+      {
+        text: "Y'all come hungry.",
+        why: "A nickname for the room, in a costume. The copy brief already refused guys; this is the same move with a straw hat on.",
+      },
+      {
+        text: "We eat, we drink, we dance until the sun comes up.",
+        why: "The three-item list, and it measures the night in what was in the glass. The second wind is the plan, not the drinking.",
+      },
+      {
+        text: "One of those nights you'll never forget.",
+        why: "Names the feeling and promises it, which is the only thing a night like this cannot be told in advance.",
+      },
+    ],
+  },
+};
+
+/**
+ * NEW ORLEANS's voice, said in the tones a host is shown.
+ *
+ * The loud, fast end of two groups at once — and the reason a host who taps
+ * four conversations and a phone-free argument does not land on Havana. Every
+ * tag points at a line above:
+ *
+ *   all_at_once        "Nobody finishes a sentence here. Nobody minds."
+ *   no_dead_air        "Start the next thing before the last one has
+ *                      finished." Also the second wind, which exists so that
+ *                      the night never sags.
+ *   swears_fondly      "Somebody will swear at somebody they love before the
+ *                      night is out. It is not a fight." The claim is made
+ *                      without a swear word reaching the printed page, which
+ *                      is the correct way for a house to own this tone.
+ *   straight_to_gossip "Adele — beside the person she has been waiting all
+ *                      week to hear about." Also "get to the good part before
+ *                      the coats are off, which here means the first line".
+ *   interrupts         "The person on your left finishes it and gets it
+ *                      wrong."
+ *   talks_fast         The cadence: a sentence starting before the last one
+ *                      has finished.
+ *   nothing_sacred     "Everybody is fair game because the joke is always
+ *                      about all of us at once." Weighted below Westhampton's
+ *                      irreverence in kind rather than degree: that house is
+ *                      disreputable, this one is merely unguarded.
+ *
+ * Formality, address and humour are NOT tagged: familiar, collective first,
+ * warm are stated outright and derived by `statedVoiceFacets`.
+ */
+export const NEW_ORLEANS_TONES: readonly ToneWeight[] = [
+  { code: "all_at_once", weight: 1 },
+  { code: "no_dead_air", weight: 0.8 },
+  { code: "swears_fondly", weight: 0.8 },
+  { code: "straight_to_gossip", weight: 0.7 },
+  { code: "interrupts", weight: 0.7 },
+  { code: "talks_fast", weight: 0.6 },
+  { code: "nothing_sacred", weight: 0.5 },
+];
+
+/**
+ * CATSKILLS, LAST WEEK OF CAMP.
+ *
+ * The familial pole. The plate has bunk assignments on a card "hers included",
+ * a swim test "timed, witnessed, and entered in a ledger nobody will ever read
+ * again", and marshmallows "without irony". A place with its own procedures,
+ * its own record-keeping and no irony is a place with its own LANGUAGE, so this
+ * is the house that takes `nicknames` and `in_jokes` at full weight — and the
+ * only one that will cry at a toast and not be embarrassed.
+ *
+ * Menus 21 to 23 are family-style dinners where the pan goes on the table.
+ * Drinks 15 puts seltzer on everything and 16 is a fire. None of that is
+ * hosting; all of it is belonging.
+ *
+ * ── THE ONE LINE THIS DESTINATION MUST NEVER WRITE ───────────────────
+ *
+ * "Summer camp, but for grown-ups." It is the first line anybody reaches for,
+ * it makes the premise a gag, and a gag cannot be lived in for a weekend. The
+ * plate is already doing the harder and better thing: the host has a bunk
+ * assignment too, and nobody here is staff. It is in `rejected` so that nobody
+ * writes it back in.
+ *
+ * The second refusal: nostalgia. Not everybody went to camp, and a destination
+ * that trades on the reader's childhood excludes the people who did not have
+ * that one. Everything here is in the present tense — this week, this ledger,
+ * this last night.
+ */
+const CATSKILLS_LOOK: Theme = {
+  key: "catskills",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Canvas, pine, and the warm bulb of a string light. The greenest aqua in
+    // the set and a gold that is a lit bulb rather than brass.
+    ground: "#EDE4CE",
+    ground2: "#DFD2B6",
+    ink: "#232619",
+    inkSoft: "#525640",
+    inkFaint: "#888B72",
+    rule: "#C9BE9D",
+    aqua: "#2F6047",
+    oxblood: "#A9452B",
+    gold: "#C0902D",
+    night: "#161C15",
+    night2: "#0F1410",
+    nightInk: "#EEE4CB",
+    nightSoft: "#ABA68A",
+    nightAqua: "#78B18E",
+    nightOxblood: "#DB8452",
+    bone: "#F5F0E1",
+  },
+  paletteDark: {
+    ground: "#0F1410",
+    ground2: "#161C15",
+    ink: "#EEE4CB",
+    inkSoft: "#ABA68A",
+    inkFaint: "#7B7862",
+    rule: "#2A3527",
+    aqua: "#78B18E",
+    oxblood: "#DB8452",
+    gold: "#D6A945",
+  },
+};
+
+export const CATSKILLS: Destination = {
+  key: "catskills",
+  name: "CATSKILLS, LAST WEEK OF CAMP",
+  tagline: "Everyone swims before breakfast. The tent is decorative.",
+  premise:
+    "A lake, a row of bunks, and a week that has been run the same way for " +
+    "long enough to have its own procedures. Everybody gets a bunk and a name " +
+    "in the first hour, including whoever organised it. The last night is on " +
+    "the dock, and whoever is last up turns off the string lights.",
+  look: CATSKILLS_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The camp office, which is a table with a lamp on it.",
+    selfReference: ["the camp", "the office"],
+    audience: "campers — everybody here, including whoever organised it",
+    address: {
+      mode: "second_person",
+      note:
+        "You is used the way a bunk list uses it: your bunk, your name, your " +
+        "turn on the dock. Direct, unfussy, and never used to encourage. The " +
+        "camp assigns rather than invites, which is the joke and also the " +
+        "kindness — nobody has to decide anything.",
+    },
+
+    register:
+      "A notice pinned by the door of the office, typed on the machine that " +
+      "has always been on that table.",
+    formality: "familiar",
+    cadence:
+      "A procedure, then the human fact that undermines it. Two short lines, " +
+      "the second one warmer than the first, and neither of them long.",
+    sentence: { typicalWords: 10, maxWords: 18 },
+    punctuation:
+      "Periods and commas. A colon before a list, which here means a bunk " +
+      "list or a meal. No exclamation points, no ellipses, no parentheses, no " +
+      "dash held open for effect, no quotation marks around a word being " +
+      "nudged.",
+    orthography:
+      "Hours in words: before breakfast, half past six, after dark. Days by " +
+      "name. Bunk numbers in numerals, because they are directions. Headings " +
+      "in full caps; nothing else capitalised for emphasis. A camp name is " +
+      "spelled the way its owner spells it and is never explained.",
+
+    humour: {
+      mode: "warm",
+      mechanism:
+        "Report a procedure with complete seriousness and let the affection " +
+        "show through the seriousness — the ledger nobody reads, the bug spray " +
+        "that never leaves the door, the name you did not choose. Everybody " +
+        "gets teased and nobody is the outsider, because the teasing is the " +
+        "proof of belonging.",
+    },
+
+    lexicon: [
+      {
+        term: "the camp",
+        gloss: "the place, the week, and everybody in it, spoken of as one thing",
+        insteadOf: ["the retreat", "the venue", "the trip"],
+      },
+      {
+        term: "the bunk list",
+        gloss: "who sleeps where. Posted by the door, hers on it too",
+        insteadOf: ["room assignments", "the rooming chart"],
+      },
+      {
+        term: "your name",
+        gloss:
+          "the one the camp gives you in the first hour. You do not choose it and it does not travel home",
+        insteadOf: ["nickname", "handle", "alias"],
+      },
+      {
+        term: "the ledger",
+        gloss: "where the swim test goes. Written carefully and never read again",
+        insteadOf: ["the record", "the leaderboard", "results"],
+      },
+      {
+        term: "the swim test",
+        gloss:
+          "timed and witnessed on the first morning. Nobody fails it and everybody does it",
+        insteadOf: ["the challenge", "the competition"],
+      },
+      {
+        term: "the coals",
+        gloss: "where dinner happens. Corn, foil packets, and somebody's taken out early",
+        insteadOf: ["the grill", "the barbecue", "the fire pit"],
+      },
+      {
+        term: "the string lights",
+        gloss: "the end of the night. Whoever is last up turns them off",
+        insteadOf: ["the lighting", "the ambience"],
+      },
+      {
+        term: "the last night",
+        gloss: "the final evening on the dock, and what people say on it",
+        insteadOf: ["the farewell", "the send-off", "closing ceremony"],
+      },
+    ],
+
+    formulae: [
+      "You are in Bunk {number}. So is {who was in it before}.",
+      "{Procedure}, timed and witnessed and written down.",
+      "Everybody gets {the thing} in the first hour. You do not choose yours.",
+      "{Object} lives by {the place} and has never once {done its job}.",
+      "{Meal} at {hour}, in {the plain container}.",
+      "Whoever is last up {does the small closing thing}.",
+      "The last night is the last night. {The plain instruction}.",
+    ],
+
+    banned: [
+      "adulting",
+      "grown-up summer camp",
+      "camp vibes",
+      "bug juice",
+      "colour war",
+      "color war",
+      "nostalgia",
+      "throwback",
+      "inner child",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The camp office.",
+      "Bunk list is by the door.",
+      "Lights out when the dock is empty.",
+      "Swim before breakfast.",
+    ],
+
+    always: [
+      "Use the camp name. Everybody has one and nobody explains theirs.",
+      "Write the procedure straight. The ledger, the bunk list, the swim test — the seriousness is where the affection is.",
+      "Keep it in this week. Present tense, this lake, this last night.",
+      "Assign rather than invite. Nobody here has to decide anything.",
+      "Say the true thing on the last night, plainly, and do not make a joke of it afterwards.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never write summer camp for grown-ups, or any version of the same wink. The premise is not a gag and cannot be lived in as one.",
+      "Never trade on the reader's childhood. Not everybody went to camp, and nostalgia leaves those people outside the joke.",
+      "Never make the swim test a competition, and never write a rule that somebody could fail.",
+      "Never explain a camp name, an in-joke, or why the ledger exists. Whoever is new will have one by the first evening.",
+      "Never mock the sentiment. This is the one house in the library where somebody says the true thing out loud and nobody covers it with a line.",
+      "Never name the feeling — no magic, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a camper must act on to arrive or be safe: the road, the water, the depth, a hospital, an allergy, a medication. Fact first, fewest words, no procedure jokes.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, a night off, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "You are in Bunk 3. So is everybody who was in Bunk 3 last year.",
+      },
+      {
+        piece: "invitation",
+        text: "Everybody gets a name in the first hour. You do not choose yours.",
+        note: "The whole destination in twelve words. It is an assignment, and it is the warmest thing on the page.",
+      },
+      {
+        piece: "invitation",
+        text: "Swim before breakfast. The tent is decorative and stays up anyway.",
+      },
+      {
+        piece: "invitation",
+        text: "Bring nothing. There are enamel mugs and there is a ledger.",
+      },
+      {
+        piece: "menu_item",
+        text: "Brisket with onions, and the pan comes to the table.",
+      },
+      {
+        piece: "menu_item",
+        text: "Fried chicken cold at the lake. Watermelon after, in the water.",
+      },
+      {
+        piece: "menu_item",
+        text: "Corn and foil packets in the coals. Somebody always takes theirs out early.",
+      },
+      {
+        piece: "menu_item",
+        text: "Seltzer goes on everything. This is not negotiable and it is not a joke.",
+      },
+      {
+        piece: "menu_item",
+        text: "Tom Collinses in enamel mugs. The same mug, lime and seltzer, for whoever would rather.",
+      },
+      { piece: "menu_item", text: "Marshmallows. Nobody is above it." },
+      {
+        piece: "notice",
+        text: "The swim test is timed and witnessed and written in the ledger. The ledger is never read again.",
+      },
+      {
+        piece: "notice",
+        text: "The bug spray lives by the door and has never once been taken to the lake.",
+      },
+      {
+        piece: "notice",
+        text: "Whoever is last up turns off the string lights.",
+      },
+      {
+        piece: "notice",
+        text: "The last night is the last night. Say the thing you came to say.",
+      },
+      {
+        piece: "house_note",
+        text: "Your bunk is the second on the left. The screen is torn and the lake is louder than you think.",
+      },
+      {
+        piece: "house_note",
+        text: "The bunk list is by the door with everybody on it, including whoever organised this.",
+      },
+      { piece: "place_card", text: "Bird — top bunk, as always." },
+      { piece: "place_card", text: "Moose — nearest the door, because he is up first." },
+      {
+        piece: "game_rule",
+        text: "Everybody tells the story of the swim test. Whoever's version is furthest from the ledger wins, and the ledger stays shut.",
+      },
+      {
+        piece: "bulletin",
+        text: "Thursday. Water at sixty-six. Two of the string lights are out at the far end and nobody has owned up.",
+      },
+      { piece: "heading", text: "BEFORE BREAKFAST" },
+      { piece: "heading", text: "WHAT IS IN THE COALS" },
+      { piece: "heading", text: "THE LAST NIGHT" },
+      { piece: "sign_off", text: "The camp office." },
+      { piece: "sign_off", text: "Lights out when the dock is empty." },
+    ],
+
+    rejected: [
+      {
+        text: "Summer camp, but for grown-ups.",
+        why: "The first line anybody writes, and it turns the premise into a gag. A gag cannot be lived in for a week. The plate already does the harder thing: her name is on the bunk list too.",
+      },
+      {
+        text: "Remember the smell of the lake? So do we.",
+        why: "Nostalgia, and a question. It sells the reader her own childhood and leaves out everybody who did not have that one.",
+      },
+      {
+        text: "Adulting is cancelled for the week.",
+        why: "A joke about being a grown-up, in a house whose entire claim is that nobody here is performing an age.",
+      },
+      {
+        text: "Colour war, and may the best bunk win.",
+        why: "Invents a competition somebody can lose. The swim test is timed and witnessed and nobody fails it, which is the opposite design.",
+      },
+      {
+        text: "Bug juice, bad decisions, and a bugle at dawn.",
+        why: "The three-item list, and two of the three are somebody else's camp. This one has seltzer, a ledger and a bug spray that never moves.",
+      },
+      {
+        text: "Where the magic of summer never ends.",
+        why: "Names the feeling and promises it will not stop, when the whole destination is called the last week of camp.",
+      },
+    ],
+  },
+};
+
+/**
+ * CATSKILLS's voice, said in the tones a host is shown.
+ *
+ * The familial pole, and the only destination in the library that owns
+ * `sentimental`. Every tag points at a line above:
+ *
+ *   nicknames    "Everybody gets a name in the first hour. You do not choose
+ *                yours." No other house assigns one.
+ *   in_jokes     "Never explain a camp name, an in-joke, or why the ledger
+ *                exists."
+ *   teasing      "The bug spray lives by the door and has never once been
+ *                taken to the lake." Shared with NANTUCKET and CAP FERRAT,
+ *                highest here because the teasing is the proof of belonging.
+ *   sentimental  "The last night is the last night. Say the thing you came to
+ *                say." And the rule against covering it with a line.
+ *   one_conversation "The pan comes to the table." One table, one fire, one
+ *                dock, everybody in it.
+ *   swears_fondly Faint, and shared with NEW ORLEANS at nearly twice the
+ *                weight: this house swears in the register of somebody who has
+ *                known you since the first summer, not in the register of a
+ *                courtyard at three in the morning.
+ *
+ * Formality, address and humour are NOT tagged: familiar, second person, warm
+ * are stated outright and derived by `statedVoiceFacets`. It shares warm with
+ * HAVANA and NEW ORLEANS and is far from both — this is the house where the
+ * joke is a procedure and somebody cries on the dock.
+ */
+export const CATSKILLS_TONES: readonly ToneWeight[] = [
+  { code: "nicknames", weight: 1 },
+  { code: "in_jokes", weight: 0.9 },
+  { code: "teasing", weight: 0.8 },
+  { code: "sentimental", weight: 0.7 },
+  { code: "one_conversation", weight: 0.5 },
+  { code: "swears_fondly", weight: 0.4 },
+];
+
+/**
+ * CÔTE D'AZUR, 1962.
+ *
+ * docs/menus.md draws the line this destination lives on: "Cap Ferrat and Côte
+ * d'Azur as authored: villa and private versus PUBLIC STAGE." This is the
+ * public one. The plate has a table moved outside at the last minute in front
+ * of whoever is watching, one named cocktail served in short glasses, and a
+ * last hour on the steps. Menu 18 is caviar at midnight. That is a house that
+ * knows it can be seen from the road and never once mentions it — which is
+ * `means_the_other_thing`, and it is why this is the arch destination.
+ *
+ * ── THE YEAR, AND THE TWO WAYS IT GOES WRONG ─────────────────────────
+ *
+ * 1962 stays, because the plate carries it and because a Riviera afternoon is
+ * a real thing that happened in a real decade. What it must not become is the
+ * postcard: no starlet, no yacht, no jet set, no sun-drenched anything. And the
+ * second failure is the one Havana wrote the rule for — a French word dropped
+ * on the page to prove where we are. The road keeps its name and the cocktail
+ * keeps its name. Nothing else is spelled to sound like anywhere.
+ */
+const COTE_DAZUR_LOOK: Theme = {
+  key: "cote-dazur",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Light off the water at four in the afternoon: bleached linen, a deep
+    // sea blue rather than a swimming-pool one, terracotta, and brass.
+    ground: "#EFE7DA",
+    ground2: "#E2D8C6",
+    ink: "#1F2A33",
+    inkSoft: "#4E5C66",
+    inkFaint: "#8A949B",
+    rule: "#CBC2B2",
+    aqua: "#1D5A80",
+    oxblood: "#C2553B",
+    gold: "#C39433",
+    night: "#10202B",
+    night2: "#0B171F",
+    nightInk: "#EFE6D6",
+    nightSoft: "#ABA391",
+    nightAqua: "#6FAFCC",
+    nightOxblood: "#E28A63",
+    bone: "#F5F1E7",
+  },
+  paletteDark: {
+    ground: "#0B171F",
+    ground2: "#10202B",
+    ink: "#EFE6D6",
+    inkSoft: "#ABA391",
+    inkFaint: "#7C7565",
+    rule: "#263A47",
+    aqua: "#6FAFCC",
+    oxblood: "#E28A63",
+    gold: "#D9AD52",
+  },
+};
+
+export const COTE_DAZUR_1962: Destination = {
+  key: "cote-dazur",
+  name: "CÔTE D'AZUR, 1962",
+  tagline: "Lunch that never ended. Nobody changed for dinner.",
+  premise:
+    "A terrace above the road, a table that gets carried outside at the last " +
+    "minute, and a lunch that is still going at seven. There is one cocktail " +
+    "and everybody has it. The last hour is on the steps, when the good bottle " +
+    "is opened and it stops being a party.",
+  look: COTE_DAZUR_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The terrace, which can see the road and does not mention it.",
+    selfReference: ["the terrace", "the house above the road"],
+    audience: "the people already up here, and the ones still climbing",
+    address: {
+      mode: "second_person",
+      note:
+        "You, lightly, and always about something small: your glass, your " +
+        "room, the shutter. The terrace speaks to a person the way it would " +
+        "across a table — near, unhurried, and never raised. It does not " +
+        "instruct and it never enthuses.",
+    },
+
+    register:
+      "A note left under a glass on the terrace, by somebody who has already " +
+      "told this story once today and improved it.",
+    formality: "cordial",
+    cadence:
+      "It builds. A clause, a second clause that quietly reverses the first, " +
+      "and the real information at the end where it can be missed.",
+    sentence: { typicalWords: 13, maxWords: 22 },
+    punctuation:
+      "Periods and commas, and the comma is where the sentence turns on " +
+      "itself. A colon before a genuine list. No exclamation points, no " +
+      "ellipses, no parentheses, no dash held open for effect, and no " +
+      "quotation marks around a word being nudged — the irony is in the " +
+      "sentence or it is nowhere.",
+    orthography:
+      "Hours in words: one o'clock, half past seven, after dark. Days by name. " +
+      "Headings in full caps; nothing else capitalised for emphasis. A place " +
+      "and a drink keep their own names and their own spellings, the Ferrat " +
+      "and the road, and nothing else on the page is spelled to sound like " +
+      "anywhere.",
+
+    humour: {
+      mode: "arch",
+      mechanism:
+        "Say the polite version and let the true one sit underneath it, whole " +
+        "and unmistakable. Nobody changes for dinner; the sole sounds worse " +
+        "than it is; lunch has never once ended when it was supposed to. Never " +
+        "a wink, never quotation marks, never a second sentence confirming " +
+        "that you meant the other thing.",
+    },
+
+    lexicon: [
+      {
+        term: "the terrace",
+        gloss: "where everything happens, in view of the road below",
+        insteadOf: ["the patio", "the deck", "the outdoor space"],
+      },
+      {
+        term: "the road",
+        gloss: "how people arrive, and what the terrace can see. Never commented on",
+        insteadOf: ["the driveway", "the street", "the coast road"],
+      },
+      {
+        term: "lunch",
+        gloss: "the meal that starts at one and is still going at seven. It is also dinner",
+        insteadOf: ["the long lunch", "brunch", "the afternoon"],
+      },
+      {
+        term: "the Ferrat",
+        gloss: "the one cocktail, in short glasses. There is no second option and nobody has asked for one",
+        insteadOf: ["cocktails", "the signature drink", "the bar"],
+      },
+      {
+        term: "changing",
+        gloss: "what nobody does between lunch and dinner. Mentioned only to be dismissed",
+        insteadOf: ["dressing for dinner", "getting ready"],
+      },
+      {
+        term: "the steps",
+        gloss: "where the last hour is, once the terrace has emptied",
+        insteadOf: ["the stairs", "the porch", "outside"],
+      },
+      {
+        term: "the good bottle",
+        gloss: "opened when it stops being a party, and only then",
+        insteadOf: ["the reserve", "something special", "the nightcap"],
+      },
+      {
+        term: "come up",
+        gloss: "the reply convention. The road is the answer and nobody is counted",
+        insteadOf: ["RSVP", "please confirm", "let us know"],
+      },
+    ],
+
+    formulae: [
+      "{Meal} at {hour}, which is also {the later meal}.",
+      "Nobody {does the expected thing}. It has been tried.",
+      "{Plain fact}, which sounds worse than it is.",
+      "The table is outside unless {the small natural force} decides otherwise.",
+      "{Arrangement}, and the real reason is {the thing said last}.",
+      "One {drink}. Two is {the rest of the afternoon}.",
+      "The good bottle is opened when {it stops being a party}.",
+    ],
+
+    banned: [
+      "riviera",
+      "jet set",
+      "sun-drenched",
+      "chic",
+      "effortless",
+      "starlet",
+      "yacht",
+      "socialite",
+      "glamorous",
+      "dolce vita",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The terrace.",
+      "Come up when you like.",
+      "Lunch is at one.",
+      "We will be on the steps.",
+    ],
+
+    always: [
+      "Say the courteous version and let the true one show through it undamaged.",
+      "Name a real thing: the road, the shutter, the short glasses, the good bottle.",
+      "Put the information at the end of the sentence, where somebody has to be listening.",
+      "Let the hour do the work. One o'clock and half past seven are the same meal here.",
+      "Assume everybody can be seen from the road, and never say so.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never put French on the page to sound French. The road and the drink keep their names; nothing else is spelled to sound like anywhere.",
+      "Never perform 1962. No starlet, no yacht, no darling, no cigarette holder. The terrace is not doing an impression of its own decade.",
+      "Never mention that anybody is watching, and never mention that anybody is being watched. The terrace knows and says nothing.",
+      "Never confirm the joke. If a line means the other thing, it means it once, at full length, and is not returned to.",
+      "Never sell the coast — no view described, no light described, no sea used as an adjective.",
+      "Never name the feeling — no glamour, no romance, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the road, the gate, the steps in the dark, a hospital, what is in the food. Fact first, fewest words, and nothing meant the other way.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, a cancellation, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Lunch at one, which is also dinner. Come up the road.",
+      },
+      {
+        piece: "invitation",
+        text: "Nobody changes. It has been tried.",
+        note: "Five words, and the second sentence is the whole voice: the polite version, and the true one underneath it.",
+      },
+      {
+        piece: "invitation",
+        text: "Cold rosé before anybody sits down. That is the entire arrival.",
+      },
+      {
+        piece: "invitation",
+        text: "The table is outside unless the wind decides otherwise, and the wind is consulted late.",
+      },
+      {
+        piece: "menu_item",
+        text: "Anchovies, bread, and more lemon than anybody asked for.",
+      },
+      {
+        piece: "menu_item",
+        text: "Sole in cream sauce with grapes, which sounds worse than it is.",
+      },
+      {
+        piece: "menu_item",
+        text: "The Ferrat, in short glasses. One is the arrangement. Two is the afternoon.",
+      },
+      {
+        piece: "menu_item",
+        text: "Peach melba, and the good bottle after it stops being a party.",
+      },
+      {
+        piece: "menu_item",
+        text: "Caviar at midnight on the steps, with whatever champagne is left.",
+      },
+      {
+        piece: "notice",
+        text: "Shoes come off at the door. Nobody will say so.",
+      },
+      {
+        piece: "notice",
+        text: "Plates go outside with whoever is standing. Nobody is asked twice and nobody is asked once.",
+      },
+      {
+        piece: "notice",
+        text: "Lunch has never once ended at the hour it was meant to.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is the one with the shutter that bangs. Fold the newspaper under it and it stops.",
+      },
+      {
+        piece: "house_note",
+        text: "The steps are unlit after the terrace empties. Take a glass and take your time.",
+      },
+      {
+        piece: "place_card",
+        text: "Antoine — beside the person he has been avoiding, which he will enjoy.",
+      },
+      {
+        piece: "place_card",
+        text: "Claire — with her back to the road, at her request.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everybody tells the story of this afternoon. One of them is lying, and it is not the one you think.",
+      },
+      {
+        piece: "bulletin",
+        text: "Sunday. The wind moved the table twice. The good bottle is still standing, which is unusual by now.",
+      },
+      { piece: "heading", text: "LUNCH, AND WHAT IT BECOMES" },
+      { piece: "heading", text: "THE LAST HOUR ON THE STEPS" },
+      { piece: "sign_off", text: "The terrace." },
+      { piece: "sign_off", text: "Come up when you like." },
+    ],
+
+    rejected: [
+      {
+        text: "The French Riviera at its most glamorous.",
+        why: "Names the feeling and sells the coast. Two of the terrace's banned words in eight, and it describes a view instead of an arrangement.",
+      },
+      {
+        text: "Bonjour, and bring your appetite.",
+        why: "A word set on the page to sound French, and an instruction. The house does not perform the language it lives in.",
+      },
+      {
+        text: "Very Bardot, very 1962.",
+        why: "Performs the year and borrows a person. The terrace is 1962 and is not doing an impression of it.",
+      },
+      {
+        text: "Lunch at one, dinner at eight, drinks at eleven.",
+        why: "A schedule, in a destination whose entire claim is that lunch never ended. The plate says nobody changed for dinner; a timetable says they did.",
+      },
+      {
+        text: "Effortlessly chic, obviously.",
+        why: "Two banned words and a wink, and it names effort, which is the one thing this terrace never admits exists.",
+      },
+      {
+        text: "Everyone will be looking at your table.",
+        why: "Says the thing the terrace knows and never mentions. The moment being watched is written down, it is a performance rather than an afternoon.",
+      },
+    ],
+  },
+};
+
+/**
+ * CÔTE D'AZUR's voice, said in the tones a host is shown.
+ *
+ * The knowing, oblique interior of the set — a long way from WESTHAMPTON's dry
+ * on the axes that matter, because this house builds where that one clips, and
+ * performs where that one refuses to. Every tag points at a line above:
+ *
+ *   means_the_other_thing "Nobody changes. It has been tried." Also "which
+ *                      sounds worse than it is". The one destination whose
+ *                      humour mode is arch and whose mechanism is the polite
+ *                      version with the true one underneath.
+ *   leans_in           "Put the information at the end of the sentence, where
+ *                      somebody has to be listening."
+ *   roughly_eight      "Lunch has never once ended at the hour it was meant
+ *                      to." Shared with CAP FERRAT, which is slower still.
+ *   one_tells_it       "by somebody who has already told this story once today
+ *                      and improved it." The cadence that builds.
+ *   straight_to_gossip "Antoine — beside the person he has been avoiding,
+ *                      which he will enjoy."
+ *   lingers            Lunch at one, still going at seven.
+ *
+ * Formality, address and humour are NOT tagged: cordial, second person, arch
+ * are stated outright and derived by `statedVoiceFacets`.
+ */
+export const COTE_DAZUR_1962_TONES: readonly ToneWeight[] = [
+  { code: "means_the_other_thing", weight: 1 },
+  { code: "leans_in", weight: 0.8 },
+  { code: "roughly_eight", weight: 0.7 },
+  { code: "one_tells_it", weight: 0.6 },
+  { code: "straight_to_gossip", weight: 0.5 },
+  { code: "lingers", weight: 0.5 },
+];
+
+/**
+ * PORTOFINO, OFF-SEASON.
+ *
+ * ── THE ONE DESTINATION WITH NO CATALOGUE ────────────────────────────
+ *
+ * Worth stating plainly, because it changed how this one was written: docs/
+ * menus.md and docs/drinks.md both say "thirteen destinations" and neither
+ * contains PORTOFINO. There is no menu and no bar for it — the other twelve
+ * have both. Every other voice in this file is an answer to dishes somebody
+ * else authored; this one had to be written from the plate rows alone, and it
+ * is the thinnest evidence base in the library. When a menu and a drinks
+ * programme are written for it, this voice should be read again beside them.
+ *
+ * What the plate does give is unusually specific: a walk taken BEFORE the house
+ * is unpacked, one drink standing up, the boats counted, a lunch ordered for
+ * the table by whoever speaks the least Italian, espresso standing at the bar,
+ * and a walk back in the dark "in the order the group naturally falls into".
+ * That is a small number of people who know each other well, in a town where
+ * almost nothing is open. So: `between_us`, one conversation, and a house that
+ * is exact about small things and cheerfully bad at the language.
+ */
+const PORTOFINO_LOOK: Theme = {
+  key: "portofino",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Harbour water under cloud, ochre and rose plaster, shutters green with
+    // the paint gone. Cooler and greyer than the other Mediterranean plates,
+    // because the season is over and that is the whole proposition.
+    ground: "#E6E0D3",
+    ground2: "#D8D0BF",
+    ink: "#22261F",
+    inkSoft: "#4F5548",
+    inkFaint: "#868B7C",
+    rule: "#C0BAA6",
+    aqua: "#2E5F55",
+    oxblood: "#A8452C",
+    gold: "#B4842F",
+    night: "#131A18",
+    night2: "#0D1211",
+    nightInk: "#E9E2D2",
+    nightSoft: "#A8A292",
+    nightAqua: "#74AC9E",
+    nightOxblood: "#D67F58",
+    bone: "#F2EFE4",
+  },
+  paletteDark: {
+    ground: "#0D1211",
+    ground2: "#131A18",
+    ink: "#E9E2D2",
+    inkSoft: "#A8A292",
+    inkFaint: "#78766A",
+    rule: "#26332F",
+    aqua: "#74AC9E",
+    oxblood: "#D67F58",
+    gold: "#CE9E47",
+  },
+};
+
+export const PORTOFINO: Destination = {
+  key: "portofino",
+  name: "PORTOFINO, OFF-SEASON",
+  tagline: "The harbour to yourselves. Everything shut but the good place.",
+  premise:
+    "A house above a harbour in the month nobody comes. One restaurant is " +
+    "open and it is the good one. The walk happens before the bags are " +
+    "unpacked, lunch takes the whole of Saturday, and the way home in the dark " +
+    "is in whatever order the group falls into.",
+  look: PORTOFINO_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The house above the harbour, and whoever in it is awake first.",
+    selfReference: ["we", "the house above the harbour"],
+    audience: "the few of us who came, who have all met before",
+    address: {
+      mode: "collective_first",
+      note:
+        "We, for everything: we walk first, we order for the table, we count " +
+        "the boats. The we is small and closed and does not include a reader " +
+        "who was not asked. Second person appears only for a room, a key or a " +
+        "step in the dark.",
+    },
+
+    register:
+      "A note left on the kitchen table for whoever gets up second, written " +
+      "with a coat already on.",
+    formality: "cordial",
+    cadence:
+      "Level and quiet. One fact, then the small correct detail beside it. A " +
+      "line may end without anything following it, and often does.",
+    sentence: { typicalWords: 10, maxWords: 18 },
+    punctuation:
+      "Periods and commas, sparingly. A colon before a list of what is open. " +
+      "No exclamation points, no ellipses, no parentheses, no dash held open " +
+      "for effect, no quotation marks around a word being nudged.",
+    orthography:
+      "Hours in words: half past eight, one o'clock, after dark. Days by name. " +
+      "Headings in full caps; nothing else capitalised for emphasis. The town, " +
+      "the harbour and the good place keep their own names, and nothing on the " +
+      "page is spelled to sound like anywhere.",
+
+    humour: {
+      mode: "dry",
+      mechanism:
+        "The joke is on us and it is reported without heat: the ordering done " +
+        "by whoever speaks the least Italian, the extra bowl of pasta, the " +
+        "boat count that never comes out the same. Never a target outside the " +
+        "group and never a second sentence.",
+    },
+
+    lexicon: [
+      {
+        term: "the good place",
+        gloss: "the one restaurant open out of season. There is no second option and none is wanted",
+        insteadOf: ["the restaurant", "our favourite spot", "the local"],
+      },
+      {
+        term: "the walk",
+        gloss: "the one before the bags are unpacked, coats on, one drink standing up",
+        insteadOf: ["the stroll", "a wander", "exploring"],
+      },
+      {
+        term: "the boats",
+        gloss: "counted on the way out and again on the way back. The number changes",
+        insteadOf: ["the marina", "the yachts", "the view"],
+      },
+      {
+        term: "off-season",
+        gloss: "why we came now. Half the town is shut and that is the arrangement",
+        insteadOf: ["low season", "shoulder season", "the quiet months"],
+      },
+      {
+        term: "ordering for the table",
+        gloss:
+          "one person orders for everybody, and it is whoever speaks the least Italian",
+        insteadOf: ["family style", "sharing plates", "the tasting menu"],
+      },
+      {
+        term: "the bar",
+        gloss: "where espresso is taken standing, on the way past",
+        insteadOf: ["the cafe", "coffee shop"],
+      },
+      {
+        term: "the way back",
+        gloss: "in the dark, in the order the group falls into. Nobody arranges it",
+        insteadOf: ["the walk home", "the journey back"],
+      },
+      {
+        term: "between us",
+        gloss: "what stays at the table. Said once, at the table, and not repeated",
+        insteadOf: ["off the record", "just saying", "don't tell"],
+      },
+    ],
+
+    formulae: [
+      "{The one open thing} is open {days}. That is the whole schedule.",
+      "We {do the small thing} first and {the sensible thing} after.",
+      "{Quantity}, more than we need. Nobody has ever regretted it.",
+      "{Plain fact}, and the number changes.",
+      "{Person} orders. Nobody knows why this works.",
+      "Everything else is shut. That is why we came now.",
+      "{Small correct detail}, and nothing after it.",
+    ],
+
+    banned: [
+      "hidden gem",
+      "best-kept secret",
+      "dolce vita",
+      "ciao",
+      "yachts",
+      "the beautiful people",
+      "picturesque",
+      "quaint",
+      "authentic",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The house above the harbour.",
+      "We will be at the bar.",
+      "The walk first.",
+      "Between us.",
+    ],
+
+    always: [
+      "Keep it to the people who came. This is written for a table that has already met.",
+      "Be exact about a small thing: the hour the good place opens, which step is loose, the count.",
+      "Let the joke land on us and leave it there.",
+      "Leave the silence in. A note may stop when the fact stops.",
+      "Say what is open. Off-season, that is the only orientation anybody needs.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never put Italian on the page to sound Italian. The harbour and the good place keep their names; nothing else is spelled to sound like anywhere.",
+      "Never write the town as a picture. No yachts, no beautiful people, no hidden gem, no describing the water.",
+      "Never pretend to be local, and never pretend to be expert. Whoever speaks the least Italian orders, and that is the house's honest position.",
+      "Never write the closed season as a disappointment or as a secret. It is the reason we came and it is stated flat.",
+      "Never fill a silence in the writing, and never explain what was said at the table.",
+      "Never name the feeling — no romance, no magic, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the road up, the steps, the last boat, a hospital, what is in the food. Fact first, fewest words, no joke.",
+      "Anything about money — including who pays for the long lunch, which is settled plainly and once.",
+      "Any message that lets someone go — a decline, a cancellation, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "The house is above the harbour. Come Friday; the good place is open Friday.",
+      },
+      {
+        piece: "invitation",
+        text: "We walk first and unpack after.",
+        note: "Six words that establish the whole house: a small group with a habit, stated without explanation.",
+      },
+      {
+        piece: "invitation",
+        text: "Everything else is shut. That is why we came now.",
+      },
+      { piece: "invitation", text: "Bring a coat. The one drink is taken standing up." },
+      {
+        piece: "menu_item",
+        text: "Whatever came in, whole, with lemon.",
+      },
+      {
+        piece: "menu_item",
+        text: "One bowl of pasta more than we need. Nobody has ever regretted it.",
+      },
+      {
+        piece: "menu_item",
+        text: "Sharp white wine, cold, and a second bottle of the same.",
+      },
+      {
+        piece: "menu_item",
+        text: "Espresso at the bar, standing. Sitting down costs more and takes longer.",
+      },
+      {
+        piece: "notice",
+        text: "Whoever speaks the least Italian orders for the table. This has always worked and nobody can say why.",
+      },
+      {
+        piece: "notice",
+        text: "The boats are counted on the way out and again on the way back. The number changes.",
+      },
+      {
+        piece: "notice",
+        text: "What is said at the table stays at the table. It is a small table.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is at the top. The heating takes an hour; ask and it goes on.",
+      },
+      {
+        piece: "house_note",
+        text: "The third step down to the harbour is loose. It has been loose for years.",
+      },
+      {
+        piece: "place_card",
+        text: "The table is small enough that nobody needs a card.",
+      },
+      { piece: "place_card", text: "Ines — facing the water, which she asked for." },
+      {
+        piece: "game_rule",
+        text: "Everybody writes down the boat count before we leave. Whoever is furthest out buys the espresso.",
+      },
+      {
+        piece: "bulletin",
+        text: "Saturday. Rain until eleven. The good place has moved us to eight and kept the corner.",
+      },
+      { piece: "heading", text: "THE WALK, BEFORE ANYTHING ELSE" },
+      { piece: "heading", text: "WHAT THE GOOD PLACE HAS" },
+      { piece: "sign_off", text: "The house above the harbour." },
+      { piece: "sign_off", text: "We will be at the bar." },
+    ],
+
+    rejected: [
+      {
+        text: "Portofino's best-kept secret.",
+        why: "Sells the town and flatters the reader. Half of it is shut, which is a fact rather than a secret.",
+      },
+      {
+        text: "Ciao, and welcome to the good life.",
+        why: "A word set down to sound Italian, and then the feeling named outright.",
+      },
+      {
+        text: "The season is over and the beautiful people have gone.",
+        why: "Snobbery about who is not here. The house is small and closed, not superior.",
+      },
+      {
+        text: "We eat where the locals eat.",
+        why: "Pretends to be local. Whoever speaks the least Italian is doing the ordering, which is the honest and funnier position.",
+      },
+      {
+        text: "Just the six of us and an entire harbour.",
+        why: "Counts, and the counting is the least interesting thing in the sentence. The plate's version — the harbour to yourselves — is already the line.",
+      },
+      {
+        text: "Long lunches, deep talks, real connection.",
+        why: "Three abstractions in a row, and it explains what was said at the table. Between us means it does not leave the table, including onto a card.",
+      },
+    ],
+  },
+};
+
+/**
+ * PORTOFINO's voice, said in the tones a host is shown.
+ *
+ * The private, few end of the set. It shares quiet with NANTUCKET and slowness
+ * with CAP FERRAT and is neither: this house is closed rather than casual, and
+ * exact rather than late. Every tag points at a line above:
+ *
+ *   between_us       "What is said at the table stays at the table. It is a
+ *                    small table." The only destination that claims this.
+ *   one_conversation "The way back, in the dark, in the order the group falls
+ *                    into." One table, one walk, everybody in it.
+ *   exact_word       "The third step down to the harbour is loose." Be exact
+ *                    about a small thing — the hour, the step, the count.
+ *   warm_not_loud    A note written with a coat already on, for whoever gets
+ *                    up second.
+ *   unhurried        "We walk first and unpack after."
+ *   self_deprecating "Whoever speaks the least Italian orders for the table."
+ *
+ * Formality, address and humour are NOT tagged: cordial, collective first, dry
+ * are stated outright and derived by `statedVoiceFacets`.
+ */
+export const PORTOFINO_TONES: readonly ToneWeight[] = [
+  { code: "between_us", weight: 1 },
+  { code: "one_conversation", weight: 0.8 },
+  { code: "exact_word", weight: 0.6 },
+  { code: "warm_not_loud", weight: 0.5 },
+  { code: "unhurried", weight: 0.5 },
+  { code: "self_deprecating", weight: 0.4 },
+];
+
+/**
+ * CAP FERRAT, JULY.
+ *
+ * The private half of the pair docs/menus.md names: "Cap Ferrat and Côte
+ * d'Azur as authored: VILLA AND PRIVATE versus public stage." Nothing here is
+ * performed for a road. The plate says nobody is greeted formally, there is a
+ * jug on the table and a swim before six, and dinner is "assembled rather than
+ * cooked". Menu 14 is bought and arranged. Drinks 9 has lemon, sugar and cold
+ * water mixed at the table by whoever is drinking it.
+ *
+ * So this is the slowest destination in the library: `arrives_late` and
+ * `roughly_eight` at full weight, which no other house takes, and the far end
+ * of the precision group from NEW YORK and the DOLOMITES.
+ *
+ * ── TWO THINGS ON THE PLATE THE VOICE DELIBERATELY DOES NOT REPEAT ───
+ *
+ * The plate mentions the record player rule. That is WESTHAMPTON's signature
+ * line and it stays there; a second house saying it would be an echo rather
+ * than a cross-reference, and this file exists to stop exactly that.
+ *
+ * The plate also has the staged photograph, and that one IS the voice — but
+ * only stated the arch way round. The photograph is arranged, and nobody
+ * arranged it. Written any other way it becomes a photo shoot, which is a
+ * different and much worse holiday.
+ */
+const CAP_FERRAT_LOOK: Theme = {
+  key: "cap-ferrat",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Shuttered plaster at four in the afternoon: warm stone, pine, lemon and
+    // a green that has faded on the shutters. The warmest ground of the three
+    // French plates, because this one never goes out.
+    ground: "#F0E6D0",
+    ground2: "#E3D6BB",
+    ink: "#232A20",
+    inkSoft: "#545A47",
+    inkFaint: "#8B8E77",
+    rule: "#CDBF9F",
+    aqua: "#2A5F4F",
+    oxblood: "#B44A2E",
+    gold: "#C9992F",
+    night: "#14201A",
+    night2: "#0E1613",
+    nightInk: "#F0E5CE",
+    nightSoft: "#ADA68D",
+    nightAqua: "#71B296",
+    nightOxblood: "#DE8455",
+    bone: "#F6F1E3",
+  },
+  paletteDark: {
+    ground: "#0E1613",
+    ground2: "#14201A",
+    ink: "#F0E5CE",
+    inkSoft: "#ADA68D",
+    inkFaint: "#7D7B65",
+    rule: "#28382F",
+    aqua: "#71B296",
+    oxblood: "#DE8455",
+    gold: "#DCAA45",
+  },
+};
+
+export const CAP_FERRAT: Destination = {
+  key: "cap-ferrat",
+  name: "CAP FERRAT, JULY",
+  tagline: "A heat wave, a rented house, and a very slow schedule.",
+  premise:
+    "A house taken for the month, shutters closed until the afternoon, and a " +
+    "jug on the table that nobody admits to making. There is a swim before " +
+    "six and a photograph under the parasol that everybody claims was their " +
+    "idea. Dinner is at nine, which means half past.",
+  look: CAP_FERRAT_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The house we take, which has been taken before.",
+    selfReference: ["we", "the house we take"],
+    audience: "the same people as last July, and whoever they brought",
+    address: {
+      mode: "collective_first",
+      note:
+        "We, and the we is a household that reassembles every summer: we eat " +
+        "late, we swim before six, we do not greet anybody at the door. " +
+        "Second person is spent on a room, a shutter or a step, and never on " +
+        "encouragement.",
+    },
+
+    register:
+      "A note left on the kitchen counter under the corkscrew, at an hour " +
+      "nobody could afterwards agree on.",
+    formality: "familiar",
+    cadence:
+      "Slow and lightly built. A long line that takes its time, then a short " +
+      "one that arrives later than expected and settles the matter.",
+    sentence: { typicalWords: 12, maxWords: 21 },
+    punctuation:
+      "Periods and commas, and the comma is where the afternoon drifts. A " +
+      "colon before a real list. No exclamation points, no ellipses, no " +
+      "parentheses, no dash held open for effect, no quotation marks around a " +
+      "word being nudged.",
+    orthography:
+      "Hours in words, and approximate: nine, which means half past. Before " +
+      "six. After the swim. Days by name. Headings in full caps; nothing else " +
+      "capitalised for emphasis. The place keeps its own name and nothing else " +
+      "on the page is spelled to sound like anywhere.",
+
+    humour: {
+      mode: "arch",
+      mechanism:
+        "State the arrangement as though nobody made it. The jug that has " +
+        "never run out, the photograph nobody arranged, the schedule that is " +
+        "very slow and entirely fixed. The house is teasing itself, gently, " +
+        "and never confirms it.",
+    },
+
+    lexicon: [
+      {
+        term: "the house we take",
+        gloss: "the villa, rented again. Never called a villa",
+        insteadOf: ["the villa", "the property", "the rental", "the estate"],
+      },
+      {
+        term: "the jug",
+        gloss:
+          "what is on the table from noon. Nobody admits to making it and it never runs out",
+        insteadOf: ["the pitcher", "the punch", "the welcome drink"],
+      },
+      {
+        term: "the swim",
+        gloss: "before six. After six the water is somebody else's idea of a day",
+        insteadOf: ["a dip", "pool time", "the beach"],
+      },
+      {
+        term: "the parasol",
+        gloss: "where the photograph happens, at the hour the light goes",
+        insteadOf: ["the umbrella", "the shade", "the set-up"],
+      },
+      {
+        term: "the photograph",
+        gloss:
+          "the one taken every July, arranged by nobody, claimed afterwards by everybody",
+        insteadOf: ["the photo shoot", "the group shot", "content"],
+      },
+      {
+        term: "assembled",
+        gloss: "what happens to dinner. Not cooked, and nobody pretends otherwise",
+        insteadOf: ["prepared", "plated", "curated"],
+      },
+      {
+        term: "the shutters",
+        gloss: "closed until the afternoon. The whole architecture of the day",
+        insteadOf: ["the blinds", "the windows"],
+      },
+      {
+        term: "whenever you land",
+        gloss: "the reply convention. No hour is fixed, nobody is met, nobody is counted",
+        insteadOf: ["RSVP", "arrival time", "please confirm"],
+      },
+    ],
+
+    formulae: [
+      "{Meal} at {hour}, which means {later}.",
+      "{Object} is on the table from {hour}. Nobody made it.",
+      "{Activity} before six. After six {the small reversal}.",
+      "Nobody is {greeted, met, asked}. {The gentler consequence}.",
+      "{Dish} is assembled, not cooked.",
+      "{Plain fact}, and no apology for it.",
+      "{The arranged thing} was arranged by nobody.",
+    ],
+
+    banned: [
+      "villa life",
+      "languid",
+      "sun-kissed",
+      "riviera",
+      "jet set",
+      "poolside",
+      "wellness",
+      "detox",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The house we take.",
+      "Dinner at nine, which means half past.",
+      "Whenever you land.",
+      "The jug is on the table.",
+    ],
+
+    always: [
+      "Give the hour and then give the truth about the hour.",
+      "Let the arrangement look unarranged. Somebody made the jug and the sentence does not say who.",
+      "Name a real thing: the shutters, the parasol, the corkscrew, the ice in the wine.",
+      "Keep the volume down. Nothing here is announced, including the photograph.",
+      "Tease the house rather than a person in it.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never put French on the page to sound French. The cape keeps its name; nothing else is spelled to sound like anywhere.",
+      "Never call it a villa, and never write anything that sounds like a listing.",
+      "Never write the photograph as a shoot, and never admit it was arranged. Everybody claims it afterwards; that is the whole joke and it does not survive being explained.",
+      "Never make a virtue of the lateness. The schedule is slow and is simply reported; a joke about punctuality is a faster house pretending.",
+      "Never repeat another destination's rule. The thing about the record player belongs on Dune Road.",
+      "Never name the feeling — no languid, no idyllic, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the road, the gate code, the pool steps in the dark, a hospital, what is in the food. Fact first, fewest words, exact hours.",
+      "Anything about money — including what the house cost and how it is split.",
+      "Any message that lets someone go — a decline, a shorter stay, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "July, the house we take again. Come whenever you land.",
+      },
+      {
+        piece: "invitation",
+        text: "Dinner is at nine, which means half past.",
+        note: "The whole destination in eight words: an hour given, and then the truth about the hour.",
+      },
+      {
+        piece: "invitation",
+        text: "There is a jug on the table from noon. Nobody made it and it has never run out.",
+      },
+      {
+        piece: "invitation",
+        text: "Nobody is greeted at the door. If you want to be met, say so and somebody will stand up.",
+      },
+      { piece: "menu_item", text: "Melon with ham, and then nothing for an hour." },
+      {
+        piece: "menu_item",
+        text: "Whole sea bass with fennel, which is the only cooking anybody does all week.",
+      },
+      {
+        piece: "menu_item",
+        text: "Dinner is assembled, not cooked: peaches, cold lamb, and ice in the wine.",
+      },
+      {
+        piece: "menu_item",
+        text: "Lemon, sugar and cold water, mixed at the table by whoever is drinking it.",
+      },
+      {
+        piece: "menu_item",
+        text: "Radishes with butter and salt, which disappear before anything else arrives.",
+      },
+      {
+        piece: "notice",
+        text: "The swim is before six. After six the water is somebody else's idea of a day.",
+      },
+      {
+        piece: "notice",
+        text: "The photograph is under the parasol at the hour the light goes. Nobody arranged it.",
+      },
+      {
+        piece: "notice",
+        text: "The shutters stay closed until the afternoon. The house is cooler than the terrace and knows it.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is the one at the end with the shutters already shut. Leave them until six.",
+      },
+      {
+        piece: "house_note",
+        text: "The pool light does not work. The steps are on the left and there are four of them.",
+      },
+      {
+        piece: "place_card",
+        text: "Marguerite — under the parasol, where the photograph will happen.",
+      },
+      { piece: "place_card", text: "Luc — beside the jug, which he will refill." },
+      {
+        piece: "game_rule",
+        text: "Everybody claims the photograph was their idea. Whoever says nothing took it.",
+      },
+      {
+        piece: "bulletin",
+        text: "Tuesday. Too hot for the terrace until six. The jug has been refilled twice and nobody saw by whom.",
+      },
+      { piece: "heading", text: "BEFORE SIX" },
+      { piece: "heading", text: "THE HOUR UNDER THE PARASOL" },
+      { piece: "sign_off", text: "The house we take." },
+      { piece: "sign_off", text: "Dinner at nine, which means half past." },
+    ],
+
+    rejected: [
+      {
+        text: "Villa life at its most languid.",
+        why: "A listing wrote this. It names the feeling and calls the house a villa in the same six words.",
+      },
+      {
+        text: "The photo shoot is at seven. Everyone in white.",
+        why: "Turns the one arranged moment into a production, and announces it. Nobody arranged it is the line, and it only works unannounced.",
+      },
+      {
+        text: "Punctuality is not a virtue here.",
+        why: "A joke about the lateness. The lateness is funnier reported as a schedule — nine, which means half past.",
+      },
+      {
+        text: "A heatwave and a house full of your favourite people.",
+        why: "Names the feeling and tells the reader who her favourites are. The plate already has the better version.",
+      },
+      {
+        text: "Bonne vacances, and see you by the pool.",
+        why: "A French phrase set down to prove where we are, and a greeting nobody in this house makes.",
+      },
+      {
+        text: "Digital detox in the sun.",
+        why: "Wellness language, and it makes an arrangement out of an absence. Nothing here is being fixed.",
+      },
+    ],
+  },
+};
+
+/**
+ * CAP FERRAT's voice, said in the tones a host is shown.
+ *
+ * The slow end of the precision group, and the reason NEW YORK's plan of the
+ * table has something to be the opposite of. Every tag points at a line above:
+ *
+ *   arrives_late   "Come whenever you land." Nobody is met and no hour is
+ *                  fixed. Shared with TAHITI, which is late in a different
+ *                  register — plain and generous rather than arch.
+ *   roughly_eight  "Dinner is at nine, which means half past."
+ *   warm_not_loud  A note left under the corkscrew for people who come back
+ *                  every July. Fondness with the volume down.
+ *   unhurried      "Melon with ham, and then nothing for an hour."
+ *   teasing        "The jug has been refilled twice and nobody saw by whom."
+ *                  The house teases itself; the rule against teasing a person
+ *                  in it is in `always`.
+ *   low_voices     "Nothing here is announced, including the photograph."
+ *
+ * Formality, address and humour are NOT tagged: familiar, collective first,
+ * arch are stated outright and derived by `statedVoiceFacets`. It shares arch
+ * with CÔTE D'AZUR and is its deliberate opposite in every other respect —
+ * private where that one is public, slow where that one builds.
+ */
+export const CAP_FERRAT_TONES: readonly ToneWeight[] = [
+  { code: "arrives_late", weight: 1 },
+  { code: "roughly_eight", weight: 0.9 },
+  { code: "warm_not_loud", weight: 0.6 },
+  { code: "unhurried", weight: 0.6 },
+  { code: "teasing", weight: 0.5 },
+  { code: "low_voices", weight: 0.4 },
+];
+
+/**
+ * DOLOMITES, FIRST SNOW.
+ *
+ * The far end of the knowing group from WESTHAMPTON. That house explains
+ * nothing on principle; this one tells you properly, because on a mountain the
+ * hour of the last car and the state of a run are things a person acts on. The
+ * plate is a house that keeps times: the first gondola at eight, lunch halfway
+ * down, the last car up taken for the view and not the run, boots by the stove
+ * in a row. Menu 25 is eaten with the boots still on. Drinks 17 is something
+ * hot in a mug that has the same build with or without the brandy.
+ *
+ * `spells_it_out` at full weight is the whole design, and it is also the reason
+ * this destination reads as kind rather than officious: a house that posts the
+ * times is a house nobody has to guess in front of.
+ *
+ * ── NO YEAR, AND NO COSTUME ──────────────────────────────────────────
+ *
+ * First snow is a week, not a decade, which is the same move Havana made with
+ * an hour. The costume here is the one every mountain brochure wears — the
+ * dare, the conquest, the drinking joke, the yodel. All refused. Nobody is
+ * challenged, nobody is timed against anybody, and the German and Italian on
+ * this mountain stay as the names of real things: speck, grappa, polenta.
+ */
+const DOLOMITES_LOOK: Theme = {
+  key: "dolomites",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Snow light, stone, loden, and the copper of a pot on a stove. The
+    // coldest ground in the library, warmed only where the fire is.
+    ground: "#EBE8E1",
+    ground2: "#DBD8D0",
+    ink: "#1E242A",
+    inkSoft: "#4C545B",
+    inkFaint: "#868D93",
+    rule: "#C3C0B7",
+    aqua: "#2A5566",
+    oxblood: "#A64430",
+    gold: "#B58C3A",
+    night: "#121A20",
+    night2: "#0C1217",
+    nightInk: "#EAE6DC",
+    nightSoft: "#A6A497",
+    nightAqua: "#74A4B8",
+    nightOxblood: "#DC8158",
+    bone: "#F5F4EE",
+  },
+  paletteDark: {
+    ground: "#0C1217",
+    ground2: "#121A20",
+    ink: "#EAE6DC",
+    inkSoft: "#A6A497",
+    inkFaint: "#77776E",
+    rule: "#26313A",
+    aqua: "#74A4B8",
+    oxblood: "#DC8158",
+    gold: "#D3A64F",
+  },
+};
+
+export const DOLOMITES: Destination = {
+  key: "dolomites",
+  name: "DOLOMITES, FIRST SNOW",
+  tagline: "The first gondola at eight. Lunch halfway down.",
+  premise:
+    "A house at the bottom of the run with a stove, a drying room and the " +
+    "times posted in the hall. The day is early and the light goes at four. " +
+    "Dinner is one pot on a long table, grappa is taken standing, and the " +
+    "cards go on until the fire is banked.",
+  look: DOLOMITES_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The hall, where the times are posted.",
+    selfReference: ["the hall", "the house at the bottom of the run"],
+    audience: "the party staying, who are going up in the morning",
+    address: {
+      mode: "impersonal",
+      note:
+        "Arrangements are stated without a person in them: boots are left by " +
+        "the stove, the first car is at eight, wet things are collected at " +
+        "seven. It is the grammar of a notice board, and a notice board is the " +
+        "kindest possible way to tell somebody something they need before " +
+        "breakfast.",
+    },
+
+    register:
+      "A card pinned in the hall above the boots, retyped whenever the times " +
+      "change.",
+    formality: "formal",
+    cadence:
+      "One fact to a line, in the order a person needs them. The hour first, " +
+      "the condition second, the consequence third. Nothing is held back for " +
+      "the end.",
+    sentence: { typicalWords: 9, maxWords: 17 },
+    punctuation:
+      "Periods. Commas between conditions. A colon before a list of times or " +
+      "runs. No exclamation points, no ellipses, no parentheses, no dash held " +
+      "open for effect, no quotation marks around a word being nudged.",
+    orthography:
+      "Hours in words: eight o'clock, half past three, after dark. Depths, " +
+      "temperatures and run numbers in numerals, because they are facts " +
+      "somebody acts on. Days by name. Headings in full caps; nothing else " +
+      "capitalised for emphasis. No contractions. Speck is speck and grappa is " +
+      "grappa; nothing else on the page is spelled to sound like anywhere.",
+
+    humour: {
+      mode: "deadpan",
+      mechanism:
+        "The outrageous line delivered in the register of the timetable, at " +
+        "the same width as a snow report. The last car taken for the view. " +
+        "Nobody talking for a minute. It is never marked as a joke and it is " +
+        "never repeated.",
+    },
+
+    lexicon: [
+      {
+        term: "the times",
+        gloss: "the posted hours: first car, last car, when the kitchen stops",
+        insteadOf: ["the schedule", "the itinerary", "the programme"],
+      },
+      {
+        term: "the first car",
+        gloss: "eight o'clock. The reason anybody goes to bed",
+        insteadOf: ["first lifts", "the early gondola", "first tracks"],
+      },
+      {
+        term: "the last car up",
+        gloss: "taken for the view and not the run. The one part of the day nobody talks through",
+        insteadOf: ["the final lift", "sunset lift", "the last ride"],
+      },
+      {
+        term: "the drying room",
+        gloss: "where wet things go. Collected at seven and not before",
+        insteadOf: ["the mudroom", "the boot room"],
+      },
+      {
+        term: "the long way",
+        gloss: "the run taken when the short one is ice. Nothing is lost by it",
+        insteadOf: ["the easy route", "the beginner slope"],
+      },
+      {
+        term: "one pot",
+        gloss: "dinner. It goes on the table with bread and a knife beside it",
+        insteadOf: ["the main course", "the spread", "family style"],
+      },
+      {
+        term: "the fire is banked",
+        gloss: "the end of the evening, by whoever is nearest",
+        insteadOf: ["last call", "lights out", "closing time"],
+      },
+      {
+        term: "the boots",
+        gloss: "by the stove, in a row, toes to the wall. The first thing anybody does here",
+        insteadOf: ["gear", "kit", "equipment"],
+      },
+    ],
+
+    formulae: [
+      "The first car is at {hour}. {The condition at the later hour}.",
+      "{Fact}. {Condition}. {What to do about it}.",
+      "{Object} goes {where}, and is collected at {hour}.",
+      "The {run} is {condition} until {hour}. Take the long way and lose nothing.",
+      "{Arrangement} is for {the plain reason}. It is not for {the obvious other one}.",
+      "Nobody {does the small thing}. It is not a rule.",
+      "{Measurement} overnight. {What that means for the morning}.",
+    ],
+
+    banned: [
+      "conquer",
+      "shred",
+      "apres-ski",
+      "fearless",
+      "adrenaline",
+      "bucket list",
+      "yodel",
+      "schnapps o'clock",
+      "winter wonderland",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The hall.",
+      "The first car is at eight.",
+      "The times are in the hall.",
+      "The fire is banked at eleven.",
+    ],
+
+    always: [
+      "Tell it properly. An hour, a condition, and what to do about it, in that order.",
+      "Post the thing somebody would otherwise have to ask about at seven in the morning.",
+      "Check the fact before writing it down. The times in this hall are correct or they are not posted.",
+      "Correct an error kindly, and only where being wrong would cost somebody something.",
+      "Leave the one silent minute alone. The last car up is not written about at length.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never dare anybody. No conquering, no fearless, no run described as a test. Nobody here is measured against anybody.",
+      "Never make the drinking the joke or the point. The mug has the same build with or without, and no line separates the two.",
+      "Never the mountain costume. No yodel, no lederhosen, no phonetic German or Italian. Speck and grappa are the names of real things and stay.",
+      "Never make somebody feel slow. The long way loses nothing, and that sentence is load-bearing.",
+      "Never write a safety fact as a joke or bury it in a paragraph. It goes first, alone, in the plainest words on the page.",
+      "Never name the feeling — no magic, no wonderland, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the road, the last car, the state of a run, avalanche notices, a hospital, what is in the food. Already the register of this house, and it is written even plainer.",
+      "Anything about money — the pass, the guide, what is shared.",
+      "Any message that lets someone go — a day off the mountain, a decline, a way off a list. Written straight, with no suggestion that anybody is missing anything.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "The first car is at eight. The queue at ten is half an hour.",
+      },
+      {
+        piece: "invitation",
+        text: "Boots go by the stove, in a row, toes to the wall.",
+        note: "The house in nine words: an instruction nobody asked for, given exactly, so that nobody has to ask.",
+      },
+      {
+        piece: "invitation",
+        text: "Something hot is poured before the coats come off.",
+      },
+      {
+        piece: "invitation",
+        text: "The times are posted in the hall and they are correct.",
+      },
+      {
+        piece: "menu_item",
+        text: "Speck and mountain cheese with rye bread, before anything else.",
+      },
+      {
+        piece: "menu_item",
+        text: "Bread dumplings in broth. It is soup and it is also lunch.",
+      },
+      {
+        piece: "menu_item",
+        text: "Braised beef over polenta. One pot, bread and a knife beside it.",
+      },
+      {
+        piece: "menu_item",
+        text: "Hot spiced wine, and the same mug with hot chocolate for whoever would rather.",
+      },
+      {
+        piece: "menu_item",
+        text: "Grappa afterwards, standing, and then the cards.",
+      },
+      {
+        piece: "notice",
+        text: "The run under the cable is ice until noon. Take the long way and lose nothing.",
+      },
+      {
+        piece: "notice",
+        text: "The last car up is for the view. It is not for the run.",
+      },
+      {
+        piece: "notice",
+        text: "Nobody talks on the last car. It is not a rule and it has never once been broken.",
+      },
+      {
+        piece: "notice",
+        text: "Wet things go in the drying room and are collected at seven, not before.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is above the drying room and is the warmest in the house.",
+      },
+      {
+        piece: "house_note",
+        text: "The lamp on the stairs is on a timer of forty seconds. It is enough if you do not stop.",
+      },
+      {
+        piece: "place_card",
+        text: "Anna — nearest the stove, because she came down last.",
+      },
+      {
+        piece: "place_card",
+        text: "Peter — at the end, where the map can be spread out.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everybody writes down the temperature at the top before the first car. Whoever is closest reads the map at lunch.",
+      },
+      {
+        piece: "bulletin",
+        text: "Thursday. Twenty centimetres overnight. Wind on the ridge, and the top station is shut until ten.",
+      },
+      { piece: "heading", text: "THE TIMES" },
+      { piece: "heading", text: "AFTER THE BOOTS" },
+      { piece: "sign_off", text: "The hall." },
+      { piece: "sign_off", text: "The first car is at eight." },
+    ],
+
+    rejected: [
+      {
+        text: "Conquer the mountain before lunch.",
+        why: "A dare, and a mountain written as an opponent. Nobody in this hall is measured against anything.",
+      },
+      {
+        text: "Apres-ski from two o'clock onwards.",
+        why: "Makes the day about the drinking, and borrows a word to do it. The mug has the same build with or without.",
+      },
+      {
+        text: "Sixteen runs before lunch, if you can keep up.",
+        why: "Counts, competes, and tells somebody they might be slow. The long way loses nothing is the house's actual position.",
+      },
+      {
+        text: "The Dolomites are calling.",
+        why: "A brochure personifying a mountain range. The hall posts times; it does not summon anybody.",
+      },
+      {
+        text: "Snow report: absolutely dreamy out there.",
+        why: "A safety fact turned into a feeling. Twenty centimetres overnight, wind on the ridge, top station shut until ten — that is a snow report.",
+      },
+      {
+        text: "Schnapps o'clock in the boot room.",
+        why: "A drinking joke and a piece of costume in seven words, in the one house whose voice exists to be trusted at seven in the morning.",
+      },
+    ],
+  },
+};
+
+/**
+ * The DOLOMITES' voice, said in the tones a host is shown.
+ *
+ * The told-properly end of the knowing group, which WESTHAMPTON's
+ * `explains_nothing` needed in order to be a real axis. Every tag points at a
+ * line above:
+ *
+ *   spells_it_out    "The times are posted in the hall and they are correct."
+ *                    The only destination in the library that claims this, and
+ *                    the reason a host who wants everything told properly has
+ *                    somewhere to land.
+ *   comfortable_silence "Nobody talks on the last car. It is not a rule and it
+ *                    has never once been broken."
+ *   will_look_it_up  "Check the fact before writing it down." Twenty
+ *                    centimetres overnight, wind on the ridge.
+ *   impeccably_polite Boots in a row, toes to the wall; wet things collected
+ *                    at seven; nobody made to feel slow.
+ *   corrects_gently  "Correct an error kindly, and only where being wrong
+ *                    would cost somebody something." Shared with NEW YORK,
+ *                    which corrects the year of a record rather than the state
+ *                    of a run.
+ *   one_conversation One pot, one long table, cards until the fire is banked.
+ *
+ * Formality, address and humour are NOT tagged: formal, impersonal, deadpan
+ * are stated outright and derived by `statedVoiceFacets`. Impersonal is shared
+ * with WESTHAMPTON and means the opposite thing — that house withholds, this
+ * one posts.
+ */
+export const DOLOMITES_TONES: readonly ToneWeight[] = [
+  { code: "spells_it_out", weight: 1 },
+  { code: "comfortable_silence", weight: 0.8 },
+  { code: "will_look_it_up", weight: 0.7 },
+  { code: "impeccably_polite", weight: 0.6 },
+  { code: "corrects_gently", weight: 0.5 },
+  { code: "one_conversation", weight: 0.4 },
+];
+
+/**
+ * BIG SUR, JUNE.
+ *
+ * The laconic one, and the destination that owns `absurd` — which looks wrong
+ * for a house this quiet until you read the plate: "Someone calls a spout and
+ * everyone agrees they saw it." That is a group committing to a doubtful
+ * premise and carrying it all the way, which is exactly what the tone says, and
+ * it is funnier because nobody here raises their voice. Menu 30 is cooked over
+ * a fire and eaten on a tailgate; drinks 21 leaves the beer in a creek.
+ *
+ * `long_way_round` sits at the top because the evening here is a fire and one
+ * story at a time, told with the detours, by people who have no signal to check
+ * anything against. That is the deliberate opposite of the DOLOMITES, where
+ * somebody looks it up.
+ *
+ * ── WHAT THIS COAST IS NOT ───────────────────────────────────────────
+ *
+ * Not a retreat. No signal is a FACT about a road, not a wellness feature, and
+ * the moment it is written as disconnecting-to-reconnect the destination
+ * becomes a programme somebody is enrolled in. Also refused: the mystical Big
+ * Sur — the paperback, the institute, the coastline sold as a view. The people
+ * in the plate are parking facing out and drinking coffee off a car hood.
+ */
+const BIG_SUR_LOOK: Theme = {
+  key: "big-sur",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Fog, redwood, dry grass and a poppy. The greyest-green ground in the
+    // library: everything here is seen through weather.
+    ground: "#E4E2D6",
+    ground2: "#D5D3C4",
+    ink: "#1F241F",
+    inkSoft: "#4D5349",
+    inkFaint: "#858A7D",
+    rule: "#BEBCAB",
+    aqua: "#2C5750",
+    oxblood: "#B25232",
+    gold: "#B98C36",
+    night: "#141A18",
+    night2: "#0E1312",
+    nightInk: "#E7E3D4",
+    nightSoft: "#A6A493",
+    nightAqua: "#77AC9F",
+    nightOxblood: "#DE8A5C",
+    bone: "#F2F1E7",
+  },
+  paletteDark: {
+    ground: "#0E1312",
+    ground2: "#141A18",
+    ink: "#E7E3D4",
+    inkSoft: "#A6A493",
+    inkFaint: "#767A6C",
+    rule: "#28322D",
+    aqua: "#77AC9F",
+    oxblood: "#DE8A5C",
+    gold: "#D2A54B",
+  },
+};
+
+export const BIG_SUR: Destination = {
+  key: "big-sur",
+  name: "BIG SUR, JUNE",
+  tagline: "Fog until noon. Nobody has a signal.",
+  premise:
+    "A cabin at the end of a road, cars parked facing out, and a fog that " +
+    "lifts when it lifts. Dinner is cooked over a fire and eaten off a " +
+    "tailgate. The evening is one story at a time, told long, until the fog " +
+    "comes back in and everybody goes inside.",
+  look: BIG_SUR_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The cabin at the end of the road, and the fire outside it.",
+    selfReference: ["the cabin", "the fire"],
+    audience: "whoever drove up, which is everybody",
+    address: {
+      mode: "second_person",
+      note:
+        "You, plainly and rarely: your bed, your turn, park facing out. The " +
+        "cabin says the useful thing once and then stops. It never encourages " +
+        "and it never repeats itself.",
+    },
+
+    register:
+      "A note left on the kitchen counter of a rented cabin, in pencil, by " +
+      "somebody who has gone down to the creek.",
+    formality: "plain",
+    cadence:
+      "Flat and slow, and then a long one that wanders on purpose. Short " +
+      "lines for facts, a long line when somebody is telling it.",
+    sentence: { typicalWords: 11, maxWords: 20 },
+    punctuation:
+      "Periods and commas. No exclamation points, no ellipses, no " +
+      "parentheses, no dash held open for effect, no quotation marks around a " +
+      "word being nudged. A comma may run a sentence on a little; that is the " +
+      "detour and it is allowed.",
+    orthography:
+      "Hours in words: noon, half past five, after dark. Days by name. " +
+      "Headings in full caps; nothing else capitalised for emphasis. " +
+      "Contractions are fine. Nothing on this coast is capitalised into a " +
+      "landmark — the bridge is the bridge and the pull-off is the pull-off.",
+
+    humour: {
+      mode: "deadpan",
+      mechanism:
+        "State the doubtful thing in the same voice as the weather and let it " +
+        "stand. Somebody calls a spout and everybody agrees they saw it. The " +
+        "tailgate is the table and has been for years. Nothing is marked as a " +
+        "joke, and the second sentence is always drier than the first.",
+    },
+
+    lexicon: [
+      {
+        term: "the fog",
+        gloss: "the schedule. It burns off or it does not, and either way it comes back",
+        insteadOf: ["the marine layer", "the mist", "the weather"],
+      },
+      {
+        term: "the tailgate",
+        gloss: "the table. It has been for years and nobody has bought a table",
+        insteadOf: ["the dining setup", "the picnic table"],
+      },
+      {
+        term: "the creek",
+        gloss: "where the beer is. Cold, and that is the whole refrigeration system",
+        insteadOf: ["the cooler", "the fridge", "the stream"],
+      },
+      {
+        term: "the pull-off",
+        gloss: "the one past the bridge, taken at the hour the light goes",
+        insteadOf: ["the viewpoint", "the lookout", "the scenic overlook"],
+      },
+      {
+        term: "the spout",
+        gloss:
+          "what somebody calls and everybody agrees they saw. There is no photograph and there never has been",
+        insteadOf: ["a whale sighting", "wildlife spotting"],
+      },
+      {
+        term: "no signal",
+        gloss: "a fact about the road. Not a feature, not a policy, not an achievement",
+        insteadOf: ["digital detox", "off the grid", "unplugged"],
+      },
+      {
+        term: "facing out",
+        gloss: "how the cars are parked, so that leaving in the dark is not a manoeuvre",
+        insteadOf: ["parking arrangements"],
+      },
+      {
+        term: "the long way",
+        gloss: "how a story is told here, with the detours, at the fire",
+        insteadOf: ["storytime", "an anecdote"],
+      },
+    ],
+
+    formulae: [
+      "{Weather} until {hour}. {The flat consequence}.",
+      "{Instruction}. You will be glad {when}.",
+      "There is no {modern thing}. There is no fixing that.",
+      "{Object} is in {the natural place}. {Why that works}.",
+      "Somebody will {claim the doubtful thing}. Everybody will agree.",
+      "{Plain fact}. It has been that way for years and nobody has {fixed it}.",
+      "The fire goes until {the weather returns}. Then the cabin.",
+    ],
+
+    banned: [
+      "unplug",
+      "digital detox",
+      "disconnect",
+      "recharge",
+      "soul",
+      "healing",
+      "journey",
+      "breathtaking",
+      "majestic",
+      "bucket list",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The cabin.",
+      "There is no signal.",
+      "The fire is going.",
+      "Park facing out.",
+    ],
+
+    always: [
+      "Say the useful thing once, in the plainest words, and then stop.",
+      "Let the weather be the schedule. Fog until noon is an arrangement, not an apology.",
+      "Give a story room. One long line is allowed and is the only place this voice wanders.",
+      "Keep the joke at the group's own expense, and never mark it as a joke.",
+      "Name what is actually there: the thermos, the hood of the car, the creek, the pan.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never write the missing signal as a benefit. It is a fact about a road, and the moment it becomes a detox this is a programme rather than a weekend.",
+      "Never the mystical coast. No soul, no journey, no paperback, no institute, no coastline sold as a view.",
+      "Never dare anybody with the road, the cliff or the water.",
+      "Never turn the spout into an activity. Nobody here is whale watching; somebody called it and everybody agreed.",
+      "Never hurry a story in the writing, and never summarise one.",
+      "Never name the feeling — no breathtaking, no majestic, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the road, the last petrol, the fire rules, the water, a hospital, that there is no signal to call one with. Fact first, fewest words, no detour.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, an early drive back, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "June, the cabin at the end of the road. Fog until noon.",
+      },
+      {
+        piece: "invitation",
+        text: "Park facing out. You will be glad at midnight.",
+        note: "The whole voice: one useful sentence, one flat consequence, and nothing after it.",
+      },
+      {
+        piece: "invitation",
+        text: "There is no signal. There is no fixing that.",
+      },
+      {
+        piece: "invitation",
+        text: "Bring a jacket you do not mind smelling of smoke.",
+      },
+      {
+        piece: "menu_item",
+        text: "Coffee out of a thermos on the hood, before anybody has said good morning.",
+      },
+      {
+        piece: "menu_item",
+        text: "Whole artichokes with lemon butter, eaten with your hands.",
+      },
+      {
+        piece: "menu_item",
+        text: "Steaks over the fire. Sourdough, and butter for the sourdough.",
+      },
+      {
+        piece: "menu_item",
+        text: "The beer is in the creek. The creek is cold and that is the whole system.",
+      },
+      {
+        piece: "menu_item",
+        text: "Blackberry crisp, in the pan it was made in.",
+      },
+      {
+        piece: "menu_item",
+        text: "Hot toddies when the fog comes in, which it will. The same mug with honey and lemon for whoever would rather.",
+      },
+      {
+        piece: "notice",
+        text: "Dinner is on the tailgate. It has been for years and nobody has bought a table.",
+      },
+      {
+        piece: "notice",
+        text: "Somebody will call a spout at the pull-off. Everybody will agree they saw it.",
+      },
+      {
+        piece: "notice",
+        text: "The fire goes until the fog comes in, which it does. Then the cabin.",
+      },
+      {
+        piece: "house_note",
+        text: "Your bed is the one by the window. The window does not shut all the way and there are more blankets in the box.",
+      },
+      {
+        piece: "house_note",
+        text: "The road down is unlit and has no shoulder. Go in the morning.",
+      },
+      { piece: "place_card", text: "Names go on the mugs, in tape." },
+      { piece: "place_card", text: "Ruth — upwind, because she asked." },
+      {
+        piece: "game_rule",
+        text: "One story each, told the long way, with the detours. Nobody may hurry anybody and nobody can check a single fact.",
+      },
+      {
+        piece: "bulletin",
+        text: "Tuesday. Fog to the bridge until one. The creek is colder than yesterday and the beer knows it.",
+      },
+      { piece: "heading", text: "UNTIL THE FOG BURNS OFF" },
+      { piece: "heading", text: "DINNER ON THE TAILGATE" },
+      { piece: "sign_off", text: "The cabin." },
+      { piece: "sign_off", text: "There is no signal." },
+    ],
+
+    rejected: [
+      {
+        text: "Disconnect to reconnect.",
+        why: "Turns a fact about a road into a wellness programme, and puts the reader in it as a patient.",
+      },
+      {
+        text: "Big Sur will change you.",
+        why: "A promise about somebody's interior, from a cabin that mostly wants the cars parked facing out.",
+      },
+      {
+        text: "Whale watching at golden hour from the overlook.",
+        why: "Turns the spout into an activity with a schedule. Somebody calls it and everybody agrees; that only works when nobody went looking.",
+      },
+      {
+        text: "The most beautiful coastline on earth.",
+        why: "Sells the view, and describes what a person can see for themselves in about four minutes.",
+      },
+      {
+        text: "Pack your sense of adventure.",
+        why: "Instructs and names the feeling, and the packing list this house actually has is a jacket that can smell of smoke.",
+      },
+      {
+        text: "No wifi, no worries.",
+        why: "A rhyme, and it argues with an objection nobody raised. There is no signal, and there is no fixing that, is the entire thought.",
+      },
+    ],
+  },
+};
+
+/**
+ * BIG SUR's voice, said in the tones a host is shown.
+ *
+ * Laconic, and the only house that owns `absurd` — which is the tone a set of
+ * thirteen dry-to-warm destinations would otherwise never claim. Every tag
+ * points at a line above:
+ *
+ *   long_way_round   "One story each, told the long way, with the detours."
+ *                    Also the cadence: one long line that wanders on purpose.
+ *   self_deprecating "The tailgate is the table. It has been for years and
+ *                    nobody has bought a table."
+ *   comfortable_silence "Say the useful thing once, in the plainest words, and
+ *                    then stop." Shared with NANTUCKET, DOLOMITES and TAHITI,
+ *                    which are quiet for four different reasons.
+ *   absurd           "Somebody will call a spout. Everybody will agree they
+ *                    saw it." A doubtful premise carried all the way, by
+ *                    agreement, with no photograph in existence.
+ *   deadpan          The mechanism: the doubtful thing said in the same voice
+ *                    as the weather. Shared with WESTHAMPTON at half the
+ *                    weight, and the two houses are otherwise nothing alike —
+ *                    that one is knowing, this one has no signal to be knowing
+ *                    with.
+ *   unhurried        "Fog until noon. It burns off or it does not."
+ *
+ * Formality, address and humour are NOT tagged: plain, second person, deadpan
+ * are stated outright and derived by `statedVoiceFacets`.
+ */
+export const BIG_SUR_TONES: readonly ToneWeight[] = [
+  { code: "long_way_round", weight: 0.9 },
+  { code: "self_deprecating", weight: 0.8 },
+  { code: "comfortable_silence", weight: 0.7 },
+  { code: "absurd", weight: 0.6 },
+  { code: "deadpan", weight: 0.5 },
+  { code: "unhurried", weight: 0.4 },
+];
+
+/**
+ * TAHITI, THE LONG WAY.
+ *
+ * The plain, generous one, and the only destination in the library whose humour
+ * mode is `none` — which is a real authorial position rather than an omission.
+ * Read the plate: shoes left at the edge of the sand "whether or not anyone
+ * said to"; something cold "handed over rather than offered"; the torches lit
+ * "one at a time, by whoever is nearest, in no particular order and with no
+ * announcement"; nothing cleared until morning. There is no joke anywhere in
+ * that and it does not want one. The writing is the plainest in the set, and
+ * `compliments_plainly` is its signature: the kind thing said straight, with
+ * nothing wrapped around it.
+ *
+ * ── NO HOUR, NO YEAR, AND NO COSTUME ─────────────────────────────────
+ *
+ * The clock is a tide and the calendar is what came in on the boat, so there is
+ * nothing to date. The costume risk is the highest in the library and it is
+ * refused entirely: no tiki, no hula, no lei, no paradise, no island time as a
+ * joke, no phonetic spelling, and no Hawaiian words borrowed for a Polynesian
+ * island four thousand miles away — that last one being the exact form of the
+ * mistake Havana's rule was written to stop. A real name is a fact; a spelling
+ * that performs an accent is a costume.
+ *
+ * ── WHY IT IS NOT HAVANA ─────────────────────────────────────────────
+ *
+ * Both are warm, late and outdoors. Havana is exact about the hour, loud, and
+ * fond out loud in a house full of people. This is a table on sand with no hour
+ * at all, quiet, and fond in one plain sentence. The vectors part on precision
+ * and on volume, which is where the two destinations actually differ.
+ */
+const TAHITI_LOOK: Theme = {
+  key: "tahiti",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    // Green shade, coral, black sand and lamp oil. Deep aqua and a hot
+    // oxblood, and no turquoise anywhere — this is a working shore at dusk,
+    // not a postcard.
+    ground: "#F0E7D2",
+    ground2: "#E2D5B9",
+    ink: "#1D2620",
+    inkSoft: "#4B5747",
+    inkFaint: "#85907A",
+    rule: "#CCC0A2",
+    aqua: "#1F6357",
+    oxblood: "#C2513A",
+    gold: "#C6952B",
+    night: "#121D19",
+    night2: "#0C1412",
+    nightInk: "#F1E6CE",
+    nightSoft: "#ADA88E",
+    nightAqua: "#6BB39F",
+    nightOxblood: "#E68A5E",
+    bone: "#F7F2E4",
+  },
+  paletteDark: {
+    ground: "#0C1412",
+    ground2: "#121D19",
+    ink: "#F1E6CE",
+    inkSoft: "#ADA88E",
+    inkFaint: "#7B7A66",
+    rule: "#25352E",
+    aqua: "#6BB39F",
+    oxblood: "#E68A5E",
+    gold: "#D8A63F",
+  },
+};
+
+export const TAHITI: Destination = {
+  key: "tahiti",
+  name: "TAHITI, THE LONG WAY",
+  tagline: "Torches lit before anyone is hungry. The tide comes to the table.",
+  premise:
+    "A table set on sand, a fire beside it, and torches that go up one at a " +
+    "time long before anybody is hungry. Dinner is whatever came in today, " +
+    "eaten late and slowly. The last people move down to the sand and stay " +
+    "there, and nothing is cleared until morning.",
+  look: TAHITI_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "The table on the sand, and the fire beside it.",
+    selfReference: ["the table", "the fire"],
+    audience: "everybody who came, all of whom came a long way",
+    address: {
+      mode: "impersonal",
+      note:
+        "Arrangements have no person in them: shoes are left at the edge of " +
+        "the sand, the torches are lit, nothing is cleared until morning. The " +
+        "one exception is the plain kind sentence, which is said directly and " +
+        "only once.",
+    },
+
+    register:
+      "A note left face up on the table under a stone, written before anybody " +
+      "else was awake.",
+    formality: "plain",
+    cadence:
+      "Even and slow. Statement, statement, statement, and no line reaching " +
+      "for the next one. The rhythm is a tide rather than a build.",
+    sentence: { typicalWords: 10, maxWords: 18 },
+    punctuation:
+      "Periods and commas, and very few commas. No exclamation points, no " +
+      "ellipses, no parentheses, no dash held open for effect, no quotation " +
+      "marks around a word being nudged, no semicolons.",
+    orthography:
+      "There are no clock hours on this page. Time is said by what has " +
+      "happened: before anybody is hungry, when the boat comes in, after the " +
+      "torches, until morning. Days by name where a day matters. Headings in " +
+      "full caps; nothing else capitalised for emphasis. Every place and every " +
+      "person keeps their own name and their own spelling, and nothing else on " +
+      "the page is spelled to sound like anywhere.",
+
+    humour: {
+      mode: "none",
+      mechanism:
+        "There is no joke in this writing and it is not the poorer. The plain " +
+        "fact is the whole line — the torches lit one at a time, the fish that " +
+        "came in, the thing nobody clears. Where another house would land a " +
+        "dry aside, this one stops.",
+    },
+
+    lexicon: [
+      {
+        term: "the table",
+        gloss: "set on sand, and left there. The centre of everything for as long as it lasts",
+        insteadOf: ["the dining area", "the setup", "the beach club"],
+      },
+      {
+        term: "the torches",
+        gloss:
+          "lit one at a time by whoever is nearest, long before anybody is hungry. Nobody is in charge of them",
+        insteadOf: ["tiki torches", "the lighting", "ambience"],
+      },
+      {
+        term: "what came in",
+        gloss: "the fish, and therefore the menu. Decided by a boat rather than a plan",
+        insteadOf: ["the catch of the day", "our selection"],
+      },
+      {
+        term: "the long way",
+        gloss: "how everybody got here. Said once, as a fact, and never as an achievement",
+        insteadOf: ["the journey", "the trek", "the pilgrimage"],
+      },
+      {
+        term: "the edge of the sand",
+        gloss: "where shoes are left, whether or not anybody says so",
+        insteadOf: ["the entrance", "the threshold"],
+      },
+      {
+        term: "handed over",
+        gloss: "how a drink arrives here. Not offered, not asked about, just handed over",
+        insteadOf: ["served", "presented", "on arrival"],
+      },
+      {
+        term: "the sand",
+        gloss: "where the last people go and stay. The end of the evening, and it has no hour",
+        insteadOf: ["the beach", "the after-party"],
+      },
+      {
+        term: "until morning",
+        gloss: "when things are cleared, and the only deadline anybody has",
+        insteadOf: ["later", "in due course", "closing time"],
+      },
+    ],
+
+    formulae: [
+      "{Object} is left {where}, whether or not anybody says so.",
+      "The torches go up before {anybody is hungry}.",
+      "{Food} is {what came in today}.",
+      "{Drink} is handed over. Nobody is asked what they would like.",
+      "Nothing is {cleared, decided, hurried} until morning.",
+      "{Plain kind sentence about a person}, said once.",
+      "{Fact}. {Fact}. {Fact}.",
+    ],
+
+    banned: [
+      "paradise",
+      "tiki",
+      "hula",
+      "lei",
+      "aloha",
+      "island time",
+      "exotic",
+      "tropical",
+      "escape",
+      "castaway",
+      "postcard",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "The table on the sand.",
+      "Come when you come.",
+      "The torches are lit.",
+      "Nothing is cleared until morning.",
+    ],
+
+    always: [
+      "Say it plainly and then stop. This voice does not land a line, it finishes a fact.",
+      "Tell the time by what has happened rather than by a clock.",
+      "Hand things over. Nobody here is asked what they would like and nobody is waited on.",
+      "Say the kind thing straight, once, with nothing wrapped around it.",
+      "Name what came in today. The boat decides the menu and the page says so.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never the costume. No tiki, no hula, no lei, no aloha — that word belongs to a different ocean and borrowing it is the exact mistake this library refuses. A real name is a fact; a spelling that performs an accent is a costume.",
+      "Never paradise, never escape, never a postcard. This is somebody's home and somebody's working shore.",
+      "Never make a joke of the lateness or the distance. Island time is a slur in a good mood, and the long way is a fact, not a punchline.",
+      "Never put a clock hour on the page.",
+      "Never dress the food. Raw fish in lime and coconut is the name of the dish.",
+      "Never name the feeling — no magic, no romance, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the boat, the reef, the current, the path in the dark, a hospital, what is in the food. Fact first, fewest words, and a clock hour if one is genuinely needed.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, an earlier boat, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "There is no hour for dinner. There is a tide and there is a fire.",
+      },
+      {
+        piece: "invitation",
+        text: "The torches are lit before anybody is hungry. Come when you come.",
+        note: "The plainest invitation in the library, and the whole destination: no clock, no joke, no persuasion.",
+      },
+      {
+        piece: "invitation",
+        text: "Shoes are left at the edge of the sand.",
+      },
+      {
+        piece: "invitation",
+        text: "You came a long way. It is good that you are here.",
+        note: "The one line spoken directly to a person. It is the kind thing said with nothing wrapped around it, and it is the reason this house has no humour mode.",
+      },
+      {
+        piece: "menu_item",
+        text: "Raw fish in lime and coconut, made in the afternoon and eaten cold.",
+      },
+      {
+        piece: "menu_item",
+        text: "Whatever came in today, grilled whole over the fire.",
+      },
+      {
+        piece: "menu_item",
+        text: "Coconut rice, and more fruit than anybody will eat.",
+      },
+      {
+        piece: "menu_item",
+        text: "Rum punch from the pitcher. The same pitcher fruit, without the rum, in the same glass.",
+      },
+      {
+        piece: "menu_item",
+        text: "One bottle of something better, opened late and poured for everybody.",
+      },
+      {
+        piece: "notice",
+        text: "The torches go up one at a time, by whoever is nearest. There is no order and no announcement.",
+      },
+      {
+        piece: "notice",
+        text: "Nothing is cleared until morning.",
+      },
+      {
+        piece: "notice",
+        text: "The last people move down to the sand and stay there.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is nearest the water and the water is loud. It stops mattering on the second night.",
+      },
+      {
+        piece: "house_note",
+        text: "There is no light on the path. Take the lamp by the door and leave it at the far end for whoever comes next.",
+      },
+      {
+        piece: "place_card",
+        text: "Names are not written down. Everybody sits where they sat last night.",
+      },
+      {
+        piece: "place_card",
+        text: "Teva — at the end nearest the fire, where the cooking is.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everybody says what they would want on the last night. Whoever names something already on the table cooks tomorrow.",
+      },
+      {
+        piece: "bulletin",
+        text: "Wednesday. The boat came in with more than expected. Dinner is later than yesterday.",
+      },
+      { piece: "heading", text: "BEFORE ANYBODY IS HUNGRY" },
+      { piece: "heading", text: "WHAT CAME IN TODAY" },
+      { piece: "sign_off", text: "The table on the sand." },
+      { piece: "sign_off", text: "Nothing is cleared until morning." },
+    ],
+
+    rejected: [
+      {
+        text: "Aloha, and welcome to paradise.",
+        why: "A Hawaiian word on a Polynesian island four thousand miles away, and then the feeling named outright. Two costumes in five words.",
+      },
+      {
+        text: "Island time. Nobody is watching the clock.",
+        why: "A joke about lateness at the expense of the place. There is no clock on the page at all, which is the honest version of the same fact.",
+      },
+      {
+        text: "Tiki torches and mai tais under the stars.",
+        why: "Souvenir nouns. The torches are torches and they are lit by whoever is nearest.",
+      },
+      {
+        text: "Escape to the ends of the earth.",
+        why: "Escape, and it makes somebody's home the far end of somebody else's map.",
+      },
+      {
+        text: "The catch of the day, expertly prepared.",
+        why: "A restaurant wrote this. What came in today, grilled whole, is the same fact with nobody performing in it.",
+      },
+      {
+        text: "You will never want to leave.",
+        why: "Names the feeling and predicts it. The house says one plain kind sentence and it is about being here, not about not going.",
+      },
+    ],
+  },
+};
+
+/**
+ * TAHITI's voice, said in the tones a host is shown.
+ *
+ * The plain, generous corner of the set, and the only destination that claims
+ * `compliments_plainly`. Every tag points at a line above:
+ *
+ *   arrives_late     "There is no hour for dinner. There is a tide and there
+ *                    is a fire." Shared with CAP FERRAT, which is late and
+ *                    arch; this house is late and means nothing by it.
+ *   unhurried        "Say it plainly and then stop." The tide rather than the
+ *                    build.
+ *   compliments_plainly "You came a long way. It is good that you are here."
+ *                    The one line spoken to a person, and the reason this
+ *                    destination can carry humour mode none without being
+ *                    cold.
+ *   comfortable_silence "Where another house would land a dry aside, this one
+ *                    stops."
+ *   lingers          "The last people move down to the sand and stay there."
+ *   warm_not_loud    "Nobody here is asked what they would like and nobody is
+ *                    waited on." Fondness expressed as handing something over.
+ *
+ * Formality, address and humour are NOT tagged: plain, impersonal, none are
+ * stated outright and derived by `statedVoiceFacets`. It is the only voice in
+ * the library that resolves `humour_none` at full weight, which is what gives
+ * a host who taps `compliments_plainly` and `no_speeches` somewhere to land.
+ */
+export const TAHITI_TONES: readonly ToneWeight[] = [
+  { code: "arrives_late", weight: 1 },
+  { code: "unhurried", weight: 0.9 },
+  { code: "compliments_plainly", weight: 0.8 },
+  { code: "comfortable_silence", weight: 0.6 },
+  { code: "lingers", weight: 0.5 },
+  { code: "warm_not_loud", weight: 0.4 },
+];
+
+/**
  * Every destination that exists, by slug — the same slug as `world.slug`.
  *
  * A plain object rather than a Map so it survives being imported by a script,
@@ -837,6 +5041,17 @@ export const HAVANA_TONES: readonly ToneWeight[] = [
 export const DESTINATIONS = {
   "westhampton-1976": WESTHAMPTON_1976,
   havana: HAVANA,
+  "las-vegas": LAS_VEGAS_1968,
+  "new-york": NEW_YORK,
+  nantucket: NANTUCKET,
+  "new-orleans": NEW_ORLEANS,
+  catskills: CATSKILLS,
+  "cote-dazur": COTE_DAZUR_1962,
+  portofino: PORTOFINO,
+  "cap-ferrat": CAP_FERRAT,
+  dolomites: DOLOMITES,
+  "big-sur": BIG_SUR,
+  tahiti: TAHITI,
 } as const satisfies Record<string, Destination>;
 
 export type DestinationKey = keyof typeof DESTINATIONS;
@@ -853,4 +5068,15 @@ export type DestinationKey = keyof typeof DESTINATIONS;
 export const DESTINATION_TONES = {
   "westhampton-1976": WESTHAMPTON_1976_TONES,
   havana: HAVANA_TONES,
+  "las-vegas": LAS_VEGAS_1968_TONES,
+  "new-york": NEW_YORK_TONES,
+  nantucket: NANTUCKET_TONES,
+  "new-orleans": NEW_ORLEANS_TONES,
+  catskills: CATSKILLS_TONES,
+  "cote-dazur": COTE_DAZUR_1962_TONES,
+  portofino: PORTOFINO_TONES,
+  "cap-ferrat": CAP_FERRAT_TONES,
+  dolomites: DOLOMITES_TONES,
+  "big-sur": BIG_SUR_TONES,
+  tahiti: TAHITI_TONES,
 } as const satisfies Record<DestinationKey, readonly ToneWeight[]>;

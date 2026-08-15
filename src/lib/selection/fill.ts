@@ -14,6 +14,12 @@
  *               anything is scored. Handled in vector.ts, because it is a
  *               property of the vector rather than of the pool.
  *
+ * And a fourth, which the spec assumed and the schema did not have until
+ * db/019: a NATIVE CLAIM. "Havana's daiquiris are not an option at the
+ * Dolomites" (docs/drinks.md) is not a low score either — an ingredient written
+ * FOR a destination is eligible under the ones it claims and nowhere else. The
+ * rule is claimEligibility() in occasion.ts, over all three axes, once.
+ *
  * ── THE SEARCH (stage 4) ─────────────────────────────────────────────
  *
  * A beam search. Not an optimiser: the spec's fourth principle is sampling, not
@@ -80,7 +86,9 @@ import {
   humanOccasion,
   occasionEligibility,
   slotEligibility,
+  worldEligibility,
 } from "./occasion.ts";
+import { venueEligibility } from "./venue.ts";
 import {
   facetOverlap,
   issuanceMultiplier,
@@ -99,6 +107,7 @@ import type {
   Pick,
   Scale,
   UnitSlot,
+  Venue,
 } from "./types.ts";
 
 /** One ingredient, already scored against this destination and this customer. */
@@ -118,6 +127,14 @@ export type SlotPool = {
   candidates: ScopedCandidate[];
   /** Why the pool is empty, when it is. */
   gap: CatalogueGap | null;
+  /**
+   * WHAT THE ROOM REMOVED, by name. Empty in almost every pool.
+   *
+   * Carried so that stage 6 can tell a curator "the boil pot is not on the
+   * table because there is no outdoors", which is the sentence that makes the
+   * venue's job visible without letting it near the destination.
+   */
+  prunedByVenue: readonly string[];
 };
 
 export type Fill = {
@@ -148,11 +165,15 @@ export function scopePools(
   dealbreakers: readonly string[],
   facetLabel: (facetId: string) => string,
   scale: Scale,
+  /** THE ROOM SHE IS ACTUALLY IN. Null when the house cannot resolve it. */
+  venue: Venue | null,
   options: EngineOptions,
   now: Date
 ): Map<string, SlotPool> {
   const groupSize = scale.guestsHigh ?? scale.guestsPlanning ?? null;
   const pools = new Map<string, SlotPool>();
+  /** Which slots the room emptied, for the sentence a curator reads. */
+  const prunedBySlotCode = new Map<string, string[]>();
 
   // Filtering is per (pool, slot) and the filters do not depend on which unit
   // slot of a repeated slot we are on, so it is done once per slot_code.
@@ -168,6 +189,7 @@ export function scopePools(
     // and there are two of them" is the answer.
     const rejected: { rank: number; text: string }[] = [];
     const candidates: ScopedCandidate[] = [];
+    const prunedByVenue: string[] = [];
 
     for (const ingredient of ingredients) {
       if (ingredient.pool !== slot.pool) continue;
@@ -190,14 +212,41 @@ export function scopePools(
         continue;
       }
 
+      // THE DESTINATION AXIS, as a filter and not a weight.
+      //
+      // A `forbidden` row vetoes, a `native` row on ANY destination makes the
+      // set a whitelist, and a row that is neither only re-weights. The whole
+      // rule is claimEligibility() — the same function the two axes below run —
+      // and none of it is repeated here. See occasion.ts and db/019.
       const scope = ingredient.worlds[destination.id];
-      if (scope?.forbidden) {
-        rejected.push({
-          rank: 0,
-          text:
-            `${ingredient.name} is forbidden under ${destination.name}` +
-            (scope.note ? ` — ${scope.note}` : ""),
-        });
+      const forWorld = worldEligibility(
+        ingredient.worlds,
+        destination.id,
+        destination.name
+      );
+      if (!forWorld.eligible) {
+        rejected.push({ rank: 0, text: `${ingredient.name} is ${forWorld.reason}` });
+        continue;
+      }
+
+      // THE VENUE AXIS — the room she is physically in, as a filter and only
+      // as a filter.
+      //
+      // This is the ONLY place the venue is allowed to act, and the whole
+      // reason it is allowed to act here is that it is acting on the POOL and
+      // not on the destination. A clambake needs outdoors; a studio apartment
+      // has none; the boil-pot menu leaves. NANTUCKET does not leave, because a
+      // destination is not a place — she still gets Nantucket, and what arrives
+      // is the fog-day lunch. See venue.ts for the thesis, and vector.ts for
+      // the line that keeps `environment` out of the scoring.
+      //
+      // Rank 0, beside the other structural impossibilities: "the boil pot
+      // needs to be outdoors" is the first thing a curator needs to read in a
+      // gap, not the fourteenth.
+      const forVenue = venueEligibility(ingredient, venue);
+      if (!forVenue.eligible) {
+        rejected.push({ rank: 0, text: `${ingredient.name} is ${forVenue.reason}` });
+        prunedByVenue.push(ingredient.name);
         continue;
       }
 
@@ -261,6 +310,9 @@ export function scopePools(
 
     candidates.sort((a, b) => b.base - a.base);
     bySlotCode.set(slot.slotCode, candidates);
+    if (prunedByVenue.length > 0) {
+      prunedBySlotCode.set(slot.slotCode, prunedByVenue);
+    }
 
     gapBySlotCode.set(
       slot.slotCode,
@@ -273,7 +325,19 @@ export function scopePools(
             required: slot.required,
             detail:
               `Nothing in the ${slot.pool} pool can fill "${slot.label}" for a ` +
-              `${humanOccasion(occasion)} under ${destination.name}.` +
+              `${humanOccasion(occasion)} under ${destination.name}` +
+              // A POOL THE ROOM EMPTIED IS STILL A CATALOGUE GAP.
+              //
+              // "If venue pruning leaves a destination's pool too thin, that is
+              // the EXISTING pool-too-thin failure mode — a catalogue gap flag
+              // — and never a reason to have let venue steer selection." So the
+              // room is named in the sentence, because the work order it
+              // implies is specific ("author something that works indoors"),
+              // and the gap is filed exactly as any other.
+              (venue !== null && prunedByVenue.length > 0
+                ? ` in ${venue.label.toLowerCase()}`
+                : ``) +
+              `.` +
               (rejected.length > 0
                 ? ` ${rejected.length} were ruled out; the ones worth knowing about: ` +
                   rejected
@@ -293,6 +357,7 @@ export function scopePools(
       slot,
       candidates: bySlotCode.get(slot.slotCode) ?? [],
       gap: gapBySlotCode.get(slot.slotCode) ?? null,
+      prunedByVenue: prunedBySlotCode.get(slot.slotCode) ?? [],
     });
   }
 

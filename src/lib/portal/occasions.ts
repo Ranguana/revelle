@@ -383,6 +383,8 @@ function candidateFrom(row: RevelleRow, picks: PickRow[]): Candidate {
       dropped: [],
       swapped: [],
       budget: [],
+      emphasis: [],
+      venue: [],
       gaps: [],
       excluded: [],
       confidence: [],

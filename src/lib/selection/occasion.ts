@@ -28,6 +28,7 @@ import type {
   SlotClaim,
   SlotRule,
   UnitSlot,
+  WorldScope,
 } from "./types.ts";
 
 export type EligibilityVerdict = {
@@ -45,6 +46,9 @@ export type EligibilityVerdict = {
  *   the OCCASION axis  may this thing appear at a birthday at all
  *   the SLOT axis      may this thing fill the honouring beat, or is it
  *                      day-two material that happens to live in the same pool
+ *   the DESTINATION    may Havana's daiquiris be poured at the Dolomites
+ *                      (db/019 — the third axis, and the last one that was
+ *                      still a weight pretending to be a filter)
  *
  * The rule itself:
  *
@@ -123,6 +127,50 @@ export function slotEligibility(
 }
 
 /**
+ * THE DESTINATION AXIS — the same rule, third caller.
+ *
+ * docs/drinks.md: "A drink is scoped to a destination the way a menu is.
+ * Havana's daiquiris are not an option at the Dolomites, and the mulled wine is
+ * not an option in Tahiti." That was prose and nothing enforced it, because
+ * `<entity>_world` (db/009) held a `forbidden` flag and an `affinity` weight
+ * and no way at all to say "written for here". So a menu authored for HAVANA
+ * stayed eligible everywhere and merely scored a point lower; withdraw its
+ * competitors and it was placed. db/019 adds the missing third state and this
+ * is where it becomes a filter.
+ *
+ * The three states of a world row map one-to-one onto the three states the rule
+ * already knows:
+ *
+ *   forbidden        a veto, unchanged. It cannot be outvoted by any claim.
+ *   native           a CLAIM. Any native row makes the ingredient eligible only
+ *                    under the destinations it claims.
+ *   neither          NOT A CLAIM. `affinity` re-weights the score and says
+ *                    nothing about eligibility — which is what keeps a game
+ *                    scoped to Westhampton at +0.4 ("the house would allow it")
+ *                    playable everywhere else, and what makes this change safe
+ *                    to adopt one destination at a time.
+ *
+ * `affinity` is untouched by all of this. It is still the additive term stage 4
+ * scores with; the two questions are simply no longer the same column.
+ */
+export function worldEligibility(
+  scopes: Readonly<Record<string, WorldScope>>,
+  worldId: string,
+  /** The destination being scoped to, by name, for the sentence. */
+  here: string
+): EligibilityVerdict {
+  const claims: EligibilityClaim[] = [];
+  for (const [id, scope] of Object.entries(scopes)) {
+    if (scope.forbidden) claims.push({ key: id, fit: "forbidden", note: scope.note });
+    else if (scope.native) claims.push({ key: id, fit: "native", note: scope.note });
+  }
+
+  return claimEligibility(claims, worldId, (key) =>
+    key === worldId ? here : (scopes[key]?.name ?? "another destination")
+  );
+}
+
+/**
  * THE SLOT PLAN — occasion_slot expanded into one entry per pick.
  *
  * A slot asking for one to three items becomes three unit slots: the first
@@ -153,6 +201,16 @@ export function slotEligibility(
  * Her answer beats `required`. Required describes the occasion's shape, not an
  * obligation on her. The removal is recorded so the curator can see it if she
  * looks; it is not something to act on, and it is never a gap.
+ *
+ * ── AND THE SLOTS SHE ASKED FOR BY NAME ──────────────────────────────
+ *
+ * `guaranteed` is the other direction, and it is where "what do you want more
+ * of" lands. An emphasised slot is PROMOTED from optional to required, which is
+ * what a slot weight actually means in a beam search — see the long note in
+ * emphasis.ts on why a multiplier would have been a no-op. It can only promote
+ * a slot the occasion already has: her answer decides what matters, never what
+ * exists, and emphasising an ending at an occasion with no ending changes
+ * nothing.
  */
 export type SlotPlan = {
   slots: UnitSlot[];
@@ -164,12 +222,15 @@ export function planSlots(
   rules: readonly SlotRule[],
   shape: OccasionShape,
   scale: Scale,
-  exclusions: readonly string[] = []
+  exclusions: readonly string[] = [],
+  /** slot_kind codes her emphasis promotes. See emphasis.ts. */
+  guarantees: readonly string[] = []
 ): SlotPlan {
   const guests = scale.guestsHigh ?? scale.guestsPlanning ?? null;
   const slots: UnitSlot[] = [];
   const excluded: ExcludedSlot[] = [];
   const excludedCodes = new Set(exclusions);
+  const guaranteedCodes = new Set(guarantees);
 
   const ordered = [...rules].sort((a, b) => a.position - b.position);
 
@@ -194,6 +255,10 @@ export function planSlots(
     }
 
     const days = rule.perDay ? Math.max(1, shape.days) : 1;
+    // A guarantee cannot be removed by exclusion and cannot invent a slot: it
+    // is read AFTER the exclusion check above, and only inside a rule the
+    // occasion already carries.
+    const guaranteed = guaranteedCodes.has(rule.slotCode);
 
     for (let day = 1; day <= days; day += 1) {
       for (let n = 0; n < rule.maxCount; n += 1) {
@@ -207,12 +272,13 @@ export function planSlots(
               : rule.label,
           section: rule.section,
           pool: rule.pool,
-          required: rule.required && n < rule.minCount,
+          required: (rule.required || guaranteed) && n < rule.minCount,
           quantity: rule.perGuest ? Math.max(1, Math.round(guests ?? 1)) : 1,
           perGuest: rule.perGuest,
           dayIndex: rule.perDay ? day : null,
           position: rule.position * 100 + day * 10 + n,
           note: rule.note,
+          guaranteed: guaranteed && n < rule.minCount,
         });
       }
     }

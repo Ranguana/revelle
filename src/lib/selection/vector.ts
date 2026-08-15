@@ -58,7 +58,14 @@ import type {
   VectorTerm,
 } from "./types.ts";
 
-/** Answers that are a scale or a routing question, not a taste. */
+/**
+ * ANSWERS THAT ARE NOT A TASTE, and are therefore not in the average.
+ *
+ * Every one of these still RESOLVES through `quiz_response_facet` — db/002's
+ * rule is that a dimension excluded on purpose must be excluded by a named
+ * rule rather than by accident of not appearing — and every one of them is
+ * consumed somewhere else, as the thing it actually is.
+ */
 const NON_TASTE_DIMENSIONS = new Set([
   "guest_count",
   "spend_per_person",
@@ -66,6 +73,46 @@ const NON_TASTE_DIMENSIONS = new Set([
   // Retired by db/006. It resolves, so it must be excluded on purpose rather
   // than by accident of not appearing.
   "budget",
+
+  /*
+   * THE VENUE, AND THIS ONE IS THE PRODUCT THESIS.
+   *
+   *   "Venue never touches the destination — that's the thesis of the product.
+   *    The destination is where she's transported to; the venue is where she
+   *    physically is; the engine's whole job is mapping one onto the other.
+   *    Havana in a Brooklyn apartment isn't a compromise, it's the pitch. The
+   *    moment venue nudges destination, you're back to 'party themes that
+   *    match your space,' which is the Pinterest board you're against."
+   *
+   * ZERO WEIGHT, not a small one, and the difference is not academic. Before
+   * this line an environment term sat in the vector at the full stated weight.
+   * Even with no destination tagged in the dimension it changed every score,
+   * because facetOverlap normalises by the vector's total mass — so the room
+   * she was in was already quietly damping how well every destination matched
+   * her. And the day a curator tagged a world `beach`, the beach would have
+   * started picking destinations.
+   *
+   * It becomes a stage-3 POOL FILTER instead: src/lib/selection/venue.ts, over
+   * the structural requirements in db/020. db/020 also refuses, at the database,
+   * to let an environment facet be tagged onto a destination or a cohort, so
+   * this rule cannot be undone from the data side either.
+   */
+  "environment",
+
+  /*
+   * "WHAT DO YOU WANT MORE OF", WHICH IS AN EMPHASIS AND NOT A WEIGHT.
+   *
+   *   "Each answer points at a slot, and this question shouldn't feed the
+   *    preference vector at all. It's the only question on the quiz that tells
+   *    you which deliverable she values, and averaging it into taste weights
+   *    discards exactly that."
+   *
+   * It is read instead by src/lib/selection/emphasis.ts, which turns each
+   * answer into the deliverable it names — a guaranteed slot, an instruction to
+   * the writer, a flag on her member record, or an owed follow-up. That file
+   * carries the whole mapping and the argument for it.
+   */
+  "affinity",
 ]);
 
 export function buildVector(

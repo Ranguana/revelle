@@ -39,6 +39,8 @@ import type {
   SlotClaim,
   SlotRule,
   StatedFacet,
+  StructuralRequirement,
+  Venue,
 } from "./types.ts";
 
 export type Queryable = {
@@ -100,6 +102,7 @@ export async function loadSelectionInput(
   const ingredients = await loadIngredients(db);
   const slotRules = await loadSlotRules(db, application.occasion);
   const shape = await loadShape(db, application.occasion);
+  const venue = await loadVenue(db, application.environment);
   const issued = await loadIssuedFingerprints(db);
 
   return {
@@ -112,9 +115,94 @@ export async function loadSelectionInput(
       ingredients,
       slotRules,
       shape,
+      venue,
       issuedFingerprints: issued,
     } satisfies Catalogue,
   };
+}
+
+/**
+ * THE ROOM SHE IS IN, as a set of affordances — db/020.
+ *
+ * Read here and nowhere else, and read as a room rather than as a taste. Her
+ * answer never enters the preference vector (vector.ts lists `environment`
+ * among the non-taste dimensions and says why at length), and the database
+ * refuses to let an environment facet be tagged onto a destination at all, so
+ * this query is the only route the venue has into the engine.
+ *
+ * A NULL RESULT MEANS "the house does not know this room", not "no limits".
+ * db/020 seeds a row for every value of environment_type against every
+ * requirement, so null is reachable only from an answer written before a new
+ * environment was seeded — and nothing is pruned on it, because pruning on an
+ * unknown is how a deliverable vanishes for a reason nobody can name.
+ */
+async function loadVenue(
+  db: Queryable,
+  environment: string
+): Promise<Venue | null> {
+  if (!environment) return null;
+
+  const { rows } = await db.query(
+    `select v.environment::text as environment,
+            v.label,
+            v.requirement,
+            v.provided,
+            v.note
+       from venue_affordance_labelled v
+      where v.environment::text = $1`,
+    [environment]
+  );
+
+  if (rows.length === 0) return null;
+
+  const provides: Record<string, boolean> = {};
+  const notes: Record<string, string> = {};
+  for (const row of rows) {
+    const requirement = str(row.requirement);
+    provides[requirement] = Boolean(row.provided);
+    const note = str(row.note ?? "");
+    if (note.length > 0) notes[requirement] = note;
+  }
+
+  return {
+    environment,
+    label: str(rows[0].label),
+    provides,
+    notes,
+  };
+}
+
+/**
+ * WHAT EACH INGREDIENT NEEDS OF THE ROOM — db/020, one query for all five pools.
+ *
+ * Polymorphic on (entity_table, entity_id), exactly like `ingredient_issuance`,
+ * because a requirement is a property of a thing rather than of a pool and
+ * five near-identical tables would be five places to forget one.
+ */
+async function loadRequirements(
+  db: Queryable
+): Promise<Map<string, StructuralRequirement[]>> {
+  const { rows } = await db.query(
+    `select r.entity_table, r.entity_id, r.requirement, r.note,
+            k.label, k.demand
+       from ingredient_requirement r
+       join structural_requirement k on k.code = r.requirement
+      order by k.position, k.code`
+  );
+
+  const byEntity = new Map<string, StructuralRequirement[]>();
+  for (const row of rows) {
+    const key = `${str(row.entity_table)}:${str(row.entity_id)}`;
+    const list = byEntity.get(key) ?? [];
+    list.push({
+      code: str(row.requirement),
+      label: str(row.label),
+      demand: str(row.demand),
+      note: nullableStr(row.note),
+    });
+    byEntity.set(key, list);
+  }
+  return byEntity;
 }
 
 async function loadApplication(
@@ -459,6 +547,7 @@ const POOLS: readonly {
 
 async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
   const all: Ingredient[] = [];
+  const requirements = await loadRequirements(db);
 
   for (const spec of POOLS) {
     const idColumn = `${spec.table}_id`;
@@ -483,13 +572,23 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
                           'slot_code', sl.slot_code, 'fit', sl.fit, 'note', sl.note))
                    from ${spec.table}_slot sl where sl.${idColumn} = t.id),
                 '[]'::jsonb) as slots,
+              -- native is the CLAIM (db/019) and is what makes this a filter
+              -- rather than a weight; wd.name is carried for one sentence,
+              -- "written for HAVANA, THE SMALL HOURS, not for PORT CLYDE", and
+              -- the join is against world unfiltered on purpose — an ingredient
+              -- may well claim a destination that is still a draft, and the gap
+              -- should name it rather than say "another one".
               coalesce(
                 (select jsonb_object_agg(
                           w.world_id,
                           jsonb_build_object('forbidden', w.forbidden,
+                                             'native', w.native,
                                              'affinity', w.affinity,
+                                             'name', wd.name,
                                              'note', w.note))
-                   from ${spec.table}_world w where w.${idColumn} = t.id),
+                   from ${spec.table}_world w
+                   join world wd on wd.id = w.world_id
+                  where w.${idColumn} = t.id),
                 '{}'::jsonb) as worlds,
               ${
                 spec.printed
@@ -528,6 +627,9 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
         maxGuests: num(row.max_guests),
         shape: gameShape(row.shape),
         printedMatter: printedMatterFor(spec.pool, row),
+        // Absent and empty mean the same thing: works anywhere. That is the
+        // safe default, and it is the one the founder asked for by name.
+        requirements: requirements.get(`${spec.pool}:${str(row.id)}`) ?? [],
         isFixture: str(row.slug).startsWith("fixture-"),
       });
     }
@@ -738,7 +840,11 @@ function scopes(value: unknown): Ingredient["worlds"] {
       const row = (scope ?? {}) as Record<string, unknown>;
       out[worldId] = {
         forbidden: Boolean(row.forbidden),
+        // db/019's third state. A row written before that migration has it
+        // false, which means what it has always meant: a weight, not a claim.
+        native: Boolean(row.native),
         affinity: num(row.affinity) ?? 0,
+        name: nullableStr(row.name),
         note: nullableStr(row.note),
       };
     }

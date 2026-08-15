@@ -284,8 +284,10 @@ try {
     const world = await ensureWorld(client, drink.destination, "seed-drinks");
     if (world.created) stubbed.push(world.slug);
     await client.query(
-      `insert into drink_world (drink_id, world_id, affinity, note)
-       values ($1, $2, 1.000, $3)
+      // `native` — the claim, not a weight. docs/drinks.md: "A drink is scoped
+      // to a destination the way a menu is." See db/019 and seed-menus.mjs.
+      `insert into drink_world (drink_id, world_id, native, affinity, note)
+       values ($1, $2, true, 1.000, $3)
        on conflict (drink_id, world_id) do nothing`,
       [drinkId, world.id, "Written for this destination. docs/drinks.md."]
     );

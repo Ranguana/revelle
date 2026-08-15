@@ -29,8 +29,9 @@
  * page she will look at, you want memberRevelle(), and nothing here.
  */
 
-import { formatCents } from "./fill.ts";
+import { formatCents, type SlotPool } from "./fill.ts";
 import { humanOccasion } from "./occasion.ts";
+import { TONE_DIMENSIONS } from "./tone.ts";
 import { topMatches } from "./vector.ts";
 import type {
   Application,
@@ -38,6 +39,7 @@ import type {
   CatalogueGap,
   Destination,
   DroppedPick,
+  Emphasis,
   ExcludedSlot,
   Explanation,
   OccasionShape,
@@ -45,12 +47,22 @@ import type {
   PreferenceVector,
   Elimination,
   Swap,
+  Venue,
 } from "./types.ts";
 
 export type ExplainInput = {
   application: Application;
   shape: OccasionShape;
   vector: PreferenceVector;
+  /** Which deliverable she values. Never part of the vector. */
+  emphasis: Emphasis;
+  /** The room she is physically in. Null when the house cannot resolve it. */
+  venue: Venue | null;
+  /** Scoped pools, read only for what the room removed. */
+  pools: Map<string, SlotPool>;
+  /** How much this destination sounds like her people. Null = not judged. */
+  toneMatch: number | null;
+  toneThreshold: number;
   destination: Destination;
   destinationScore: number;
   destinationRank: number;
@@ -73,6 +85,9 @@ export function explain(input: ExplainInput): Explanation {
     application,
     shape,
     vector,
+    emphasis,
+    venue,
+    pools,
     destination,
     destinationScore,
     picks,
@@ -92,15 +107,36 @@ export function explain(input: ExplainInput): Explanation {
     `, ${picks.length} ingredient${picks.length === 1 ? "" : "s"} placed.`;
 
   // ── why this destination ───────────────────────────────────────────
-  const matches = topMatches(vector, destination.facets, 5);
-  const positives = matches.filter((m) => !m.agreesOnANo);
-  const agreements = matches.filter((m) => m.agreesOnANo);
+  //
+  // TWO TIERS, REPORTED AS TWO TIERS. The voice sentence comes first and says
+  // "cleared"; the aesthetic sentence says "ranked". Reporting them as one
+  // number would be the averaging the tier replaced, printed.
+  const matches = topMatches(vector, destination.facets, 8).filter(
+    (m) => !TONE_DIMENSIONS.has(m.facet.dimension)
+  );
+  const positives = matches.filter((m) => !m.agreesOnANo).slice(0, 5);
+  const agreements = matches.filter((m) => m.agreesOnANo).slice(0, 5);
   const why: string[] = [];
+
+  why.push(
+    input.toneMatch === null
+      ? `Voice first, EXCEPT THAT IT COULD NOT BE JUDGED HERE: either she named ` +
+        `no tones or ${destination.name} carries none. Silence is not a failing ` +
+        `score, so it was not filtered out — but nothing has checked that this ` +
+        `destination sounds like her people, and a curator should. Tagging its ` +
+        `tones in src/lib/destinations.ts is what fixes it for everybody.`
+      : `Voice first: ${destination.name} sounds like her people at ` +
+        `${input.toneMatch.toFixed(2)} against a bar of ` +
+        `${input.toneThreshold.toFixed(2)}. That is a FILTER — it decided which ` +
+        `destinations were still in the room, and the ranking below could not ` +
+        `have brought back one that failed it.`
+  );
 
   if (positives.length > 0) {
     why.push(
-      `${destination.name} matched on ${list(positives.map((m) => m.facet.label.toLowerCase()))} — ` +
-        `${(destinationScore * 100).toFixed(0)} against her preference vector.`
+      `${destination.name} then ranked on ${list(positives.map((m) => m.facet.label.toLowerCase()))} — ` +
+        `${(destinationScore * 100).toFixed(0)} against the look half of her ` +
+        `preference vector. The voice half is not in that number; it was already spent.`
     );
   } else {
     why.push(
@@ -159,11 +195,69 @@ export function explain(input: ExplainInput): Explanation {
     (entry) => `${entry.destinationName} — ${entry.reason}.`
   );
 
+  // ── which deliverable she values ───────────────────────────────────
+  //
+  // Its own section, because it is the only question on the quiz that says what
+  // she is BUYING, and because two of its six answers cannot be satisfied by
+  // choosing anything at all — they are owed follow-ups and instructions to the
+  // writer, and a curator who does not see them will not do them.
+  const emphasisSentences: string[] = [];
+  if (emphasis.codes.length === 0) {
+    emphasisSentences.push(
+      `She named nothing under "what do you want more of". No slot is guaranteed ` +
+        `and the writer gets no attention instruction.`
+    );
+  } else {
+    emphasisSentences.push(...emphasis.notes);
+
+    const placed = new Set(picks.map((pick) => pick.slot.slotCode));
+    for (const slotCode of emphasis.guaranteed) {
+      const planned = [...pools.values()].some(
+        (pool) => pool.slot.slotCode === slotCode
+      );
+      if (!planned) {
+        emphasisSentences.push(
+          `She emphasised "${slotCode.replace(/_/g, " ")}" and a ` +
+            `${occasion} has no such slot. Her answer decides what matters, never ` +
+            `what exists, so nothing was invented.`
+        );
+      } else if (!placed.has(slotCode)) {
+        emphasisSentences.push(
+          `GUARANTEED AND STILL EMPTY: "${slotCode.replace(/_/g, " ")}" is the ` +
+            `deliverable she asked for by name and the pool could not fill it. ` +
+            `That is a required-slot work order, above.`
+        );
+      }
+    }
+
+    if (emphasis.needsHerMaterial) {
+      emphasisSentences.push(
+        application.secret && application.secret.trim().length > 0
+          ? `FOLLOW-UP OWED, and there is something to work from: her free-text ` +
+            `answer is below and it is the material. Nothing in the catalogue was ` +
+            `selected to stand in for an inside joke, and nothing ever will be.`
+          : `FOLLOW-UP OWED, and there is NOTHING to work from: she asked for an ` +
+            `inside joke made real and left the free-text answer empty. Ask her ` +
+            `for the joke before this goes out. The catalogue cannot supply one.`
+      );
+    }
+  }
+
   // ── what the occasion decided ──────────────────────────────────────
   const forced: string[] = [];
   forced.push(
     `A ${occasion} has ${countSlots(picks)}. ${shapeSentence(shape, application)}`
   );
+
+  for (const pick of picks) {
+    if (pick.slot.guaranteed) {
+      forced.push(
+        `"${pick.slot.label}" was not optional here: she emphasised it, so it was ` +
+          `promoted to required and paid for out of the ceiling rather than out of ` +
+          `what she is building to.`
+      );
+    }
+  }
 
   for (const pick of picks) {
     if (pick.forced) {
@@ -224,6 +318,48 @@ export function explain(input: ExplainInput): Explanation {
   // the only signal telling the house what to write next.
   const excludedSentences = excluded.map((slot) => slot.detail);
 
+  // ── the room she is actually in ────────────────────────────────────
+  //
+  // ONLY EVER WHAT IT REMOVED. There is deliberately no sentence here about
+  // why a destination was chosen, because the venue had nothing to do with
+  // that: "the destination is where she's transported to; the venue is where
+  // she physically is". A line in this section explaining a destination would
+  // be the first crack in the thesis, and it is the kind of line somebody adds
+  // in good faith while making the page read better.
+  const venueSentences: string[] = [];
+  if (venue === null) {
+    venueSentences.push(
+      `The house could not resolve her answer to a room, so nothing was pruned ` +
+        `for it. Pruning on an unknown is how a deliverable disappears for a ` +
+        `reason nobody can name.`
+    );
+  } else {
+    const removed = new Map<string, { label: string; names: string[] }>();
+    for (const pool of pools.values()) {
+      if (pool.prunedByVenue.length === 0) continue;
+      if (removed.has(pool.slot.slotCode)) continue;
+      removed.set(pool.slot.slotCode, {
+        label: pool.slot.pool,
+        names: [...pool.prunedByVenue],
+      });
+    }
+
+    if (removed.size === 0) {
+      venueSentences.push(
+        `${venue.label} ruled nothing out. The destination was chosen without it ` +
+          `either way — venue never touches the destination.`
+      );
+    } else {
+      for (const [, entry] of removed) {
+        venueSentences.push(
+          `${venue.label} removed ${list(entry.names)} from the ${entry.label} pool. ` +
+            `The destination is unchanged by it: she is still going where she is ` +
+            `going, and this is the part of it that fits in the room.`
+        );
+      }
+    }
+  }
+
   // ── when a human must look ─────────────────────────────────────────
   const confidence: string[] = [];
   if (input.lowConfidence) {
@@ -269,6 +405,8 @@ export function explain(input: ExplainInput): Explanation {
     budget: money,
     gaps: gapSentences,
     excluded: excludedSentences,
+    emphasis: emphasisSentences,
+    venue: venueSentences,
     confidence,
     secret: application.secret,
   };

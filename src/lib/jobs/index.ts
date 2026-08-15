@@ -54,6 +54,7 @@ import "server-only";
  */
 
 import { pool } from "@/lib/db";
+import { GENERATE, generateRegistration } from "@/lib/revelle/generate";
 
 import { registerFixtures } from "./fixtures.ts";
 import * as q from "./queue.ts";
@@ -95,12 +96,17 @@ declare global {
  * The live registry.
  *
  * Fixtures are gated: they are how the queue is exercised, not something a
- * customer's database should be able to be asked to run. Generation registers
- * itself here when it lands.
+ * customer's database should be able to be asked to run. Generation is NOT
+ * gated — it is the product, and a deploy in which `revelle.generate` is not
+ * registered is a deploy in which every application enqueues a job that fails
+ * on its first claim with "no handler is registered". The runner turns that
+ * into a permanent failure rather than retrying it, which is the right
+ * behaviour and a terrible thing to discover on a Friday.
  */
 export function registry(): Registry {
   if (!globalThis.__revelleJobRegistry) {
     const built = createRegistry();
+    built.register(GENERATE, generateRegistration);
     if (process.env.JOBS_FIXTURES === "on") registerFixtures(built);
     globalThis.__revelleJobRegistry = built;
   }
@@ -165,8 +171,33 @@ export function startJobRunner(): void {
 export async function enqueueJob(
   input: EnqueueInput
 ): Promise<EnqueueResult> {
+  return enqueueJobOn(db, input);
+}
+
+/**
+ * The same thing, ON A HANDLE THE CALLER ALREADY HAS — which in practice means
+ * inside a transaction.
+ *
+ * This is the only way to keep a promise that is otherwise impossible to keep:
+ * A JOB CANNOT EXIST FOR A RESPONSE THAT WAS ROLLED BACK, AND A RESPONSE
+ * CANNOT BE WRITTEN WITHOUT ITS JOB. `enqueueJob` above takes a connection from
+ * the pool, so a caller mid-transaction would be writing the job on a different
+ * connection: commit the response and crash before the enqueue and the
+ * application is silently never generated; enqueue and then roll the response
+ * back and the queue holds a job whose subject does not exist, which fails on
+ * every attempt until it gives up.
+ *
+ * Both failures are invisible at the moment they happen and both cost a
+ * customer. Passing the transaction's own client makes them impossible instead
+ * of unlikely. See src/app/api/quiz/route.ts, which is the caller this exists
+ * for.
+ */
+export async function enqueueJobOn(
+  handle: Queryable,
+  input: EnqueueInput
+): Promise<EnqueueResult> {
   const registration = registry().get(input.type);
-  return q.enqueue(db, {
+  return q.enqueue(handle, {
     ...input,
     leaseSeconds: input.leaseSeconds ?? registration?.leaseSeconds,
     maxAttempts: input.maxAttempts ?? registration?.maxAttempts,

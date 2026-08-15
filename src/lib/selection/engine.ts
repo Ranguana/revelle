@@ -16,6 +16,7 @@
  */
 
 import { chooseDestinations } from "./destination.ts";
+import { buildEmphasis } from "./emphasis.ts";
 import { explain } from "./explain.ts";
 import { fillSlots, scopePools } from "./fill.ts";
 import { ensureNovel } from "./novelty.ts";
@@ -69,17 +70,31 @@ export function runSelection(
     options
   );
 
+  // ── stage 1½ — WHICH DELIVERABLE SHE VALUES ────────────────────────
+  //
+  // Built beside the vector and deliberately not inside it. "What do you want
+  // more of" is the only question on the quiz that names a deliverable, and
+  // averaging it into taste weights is what destroyed that information. See
+  // emphasis.ts, and the `affinity` entry in vector.ts's non-taste list.
+  const emphasis = buildEmphasis(application.stated);
+
   // ── stage 2 ────────────────────────────────────────────────────────
-  const { shortlist, eliminated, impasse } = chooseDestinations(
+  const {
+    shortlist,
+    eliminated,
+    impasse,
+    gaps: destinationGaps,
+  } = chooseDestinations(
     catalogue.destinations,
     vector,
     application.occasion,
+    catalogue.facets,
     options,
     random,
     now
   );
 
-  // ── the occasion gate, and her own exclusions ──────────────────────
+  // ── the occasion gate, her own exclusions, and her emphasis ────────
   // Planned before the impasse check returns, so that "she is not serving
   // food" is on the record even in a run that produced nothing: the curator
   // must be able to see it, and it must never look like something to author.
@@ -87,7 +102,8 @@ export function runSelection(
     catalogue.slotRules,
     catalogue.shape,
     application.scale,
-    application.exclusions
+    application.exclusions,
+    emphasis.guaranteed
   );
   const slots = plan.slots;
 
@@ -95,10 +111,13 @@ export function runSelection(
     return {
       candidates: [],
       vector,
+      emphasis,
       eliminated,
       impasse,
       seed,
-      gaps: [],
+      // A taste/voice clash is a work order whether or not anything else
+      // survived, and it is the one gap discovered before any pool is scoped.
+      gaps: destinationGaps,
       excluded: plan.excluded,
     };
   }
@@ -109,7 +128,10 @@ export function runSelection(
   const issued = new Set(catalogue.issuedFingerprints);
 
   const candidates: Candidate[] = [];
-  const allGaps: CatalogueGap[] = [];
+  // The stage-2 clash gap is already a work order and goes in first: it was
+  // discovered before a single pool was scoped, and it is the one that says
+  // which destination to author rather than which ingredient.
+  const allGaps: CatalogueGap[] = [...destinationGaps];
 
   for (let i = 0; i < options.candidateCount; i += 1) {
     // Fewer surviving destinations than candidates asked for: reuse them in
@@ -132,6 +154,10 @@ export function runSelection(
       (facetId) =>
         (catalogue.facets[facetId]?.label ?? facetId).toLowerCase(),
       application.scale,
+      // THE ROOM, and the only stage it is allowed to act on.
+      // Absent on a hand-built snapshot, which means the same as null: no room
+      // is known, so nothing is pruned.
+      catalogue.venue ?? null,
       options,
       now
     );
@@ -186,6 +212,11 @@ export function runSelection(
       application,
       shape: catalogue.shape,
       vector,
+      emphasis,
+      venue: catalogue.venue ?? null,
+      pools,
+      toneMatch: entry.toneMatch,
+      toneThreshold: options.toneThreshold,
       destination,
       destinationScore: entry.score,
       destinationRank: entry.rank,
@@ -229,6 +260,7 @@ export function runSelection(
   return {
     candidates,
     vector,
+    emphasis,
     eliminated,
     impasse: null,
     seed,

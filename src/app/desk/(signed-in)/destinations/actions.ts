@@ -182,23 +182,58 @@ export async function saveDestination(
   redirect(`/desk/destinations/${worldId}?saved=1`);
 }
 
+/**
+ * Publishing, and the one thing that can refuse it.
+ *
+ * db/019 puts a trigger on `world` that will not let a destination with no
+ * PUBLISHED voice move into 'published'. A destination is a look and a voice;
+ * everything a Revelle contains — the invitation, the menu card, the prep list
+ * — is written in that voice and there is no fallback by design, so a mute
+ * destination that reaches the engine's shortlist can only produce proposals
+ * nobody is able to approve.
+ *
+ * The refusal is CAUGHT AND SHOWN, not allowed to become a stack trace. Its
+ * words are the database's, verbatim, with the hint — the same rule the voice
+ * form states a few functions down: validate_voice() explains itself, and
+ * rewriting its sentence into something friendlier here would make it less
+ * true, and would put a second copy of the rule in TypeScript.
+ *
+ * The redirect lands on the destination's own page whichever button was
+ * pressed, including the one in the library list, because that page is where
+ * the link to write the voice is.
+ */
 export async function setDestinationStatus(form: FormData): Promise<void> {
   const staff = await requireStaff();
   const id = String(form.get("id") ?? "");
   const status = String(form.get("status") ?? "");
   if (!STATUSES.includes(status)) return;
 
-  // world_published_has_timestamp: the pair must move together or the CHECK
-  // refuses the row. Doing it in one statement is what keeps that honest.
-  await query(
-    `update world
-        set status = $2::world_status,
-            published_at = case when $2 = 'published'
-                                then coalesce(published_at, now())
-                                else null end
-      where id = $1`,
-    [id, status]
-  );
+  try {
+    // world_published_has_timestamp: the pair must move together or the CHECK
+    // refuses the row. Doing it in one statement is what keeps that honest.
+    await query(
+      `update world
+          set status = $2::world_status,
+              published_at = case when $2 = 'published'
+                                  then coalesce(published_at, now())
+                                  else null end
+        where id = $1`,
+      [id, status]
+    );
+  } catch (err) {
+    const refusal = err as { message?: string; hint?: string };
+    const said = [refusal?.message ?? String(err), refusal?.hint]
+      .filter(Boolean)
+      .join(" ");
+    await recordAction(staff, {
+      action: "destination.status_refused",
+      entityTable: "world",
+      entityId: id,
+      summary: `refused → ${status}`,
+      detail: { status, refusal: said },
+    });
+    redirect(`/desk/destinations/${id}?refused=${encodeURIComponent(said)}`);
+  }
 
   await recordAction(staff, {
     action: "destination.status_changed",

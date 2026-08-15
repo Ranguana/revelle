@@ -158,10 +158,23 @@ export type GameDependency = {
   note?: string;
 };
 
-/** How a game behaves under one destination — db/009's stage 3. */
+/**
+ * How a game behaves under one destination — db/009's stage 3, db/019's claim.
+ *
+ * The three are not degrees of the same thing:
+ *
+ *   forbidden  a veto. Never here, at any score.
+ *   native     WRITTEN FOR HERE. A whitelist — a game with any native scope is
+ *              eligible only under the destinations it claims. Leave it off
+ *              unless that is what you mean.
+ *   affinity   a weight, signed −1..1, added to the score. "The house would
+ *              allow it" is an affinity; it is not a claim, and a game carrying
+ *              only affinities stays playable everywhere.
+ */
 export type GameWorldScope = {
   world: string;
   forbidden?: boolean;
+  native?: boolean;
   affinity?: number;
   note?: string;
 };

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
+import { membership } from "@/lib/desk/acceptance";
+import { readNotice } from "@/lib/desk/notice";
 import {
   APPLICATION_STATUS,
   dollars,
@@ -10,11 +12,23 @@ import {
   stamp,
   toneLabel,
 } from "@/lib/desk/labels";
+import {
+  applicationProposals,
+  approvedRevelle,
+  latestRun,
+} from "@/lib/desk/proposals";
 
 import styles from "../../../desk.module.css";
 import Thread from "../../Thread";
-import { Chips, Fact, Head, Seam, Status } from "../../bits";
-import { setApplicationFacts, setApplicationStatus } from "../actions";
+import { Chips, Fact, Head, Status } from "../../bits";
+import Proposals from "./Proposals";
+import {
+  acceptApplicantAction,
+  deliverRevelleAction,
+  discardRevelleAction,
+  setApplicationFacts,
+  setApplicationStatus,
+} from "../actions";
 
 /**
  * One application, in full.
@@ -57,6 +71,7 @@ type Application = {
   event_date: string | null;
   guest_count_confirmed: number | null;
   answers: unknown;
+  customer_id: string;
   email: string;
   name: string | null;
   guests_low: number | null;
@@ -65,8 +80,6 @@ type Application = {
   per_person_planning: number | null;
   budget_planning: string | null;
   budget_ceiling: string | null;
-  revelle_id: string | null;
-  revelle_status: string | null;
 };
 
 export default async function ApplicationPage({
@@ -74,6 +87,13 @@ export default async function ApplicationPage({
 }: PageProps<"/desk/applications/[id]">) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
+
+  // A refusal from one of the Server Actions in ../actions.ts — "this
+  // destination has no voice", "the ratchet is down". It travels in a
+  // short-lived cookie carrying the application it belongs to; see the note
+  // above `settle` there for why that beats a query string and a client
+  // component. Ignored when it names a different application.
+  const refused = await readNotice(id);
 
   const application = await queryOne<Application>(
     `select qr.id, qr.created_at, qr.status::text as status, qr.quiz_version,
@@ -88,16 +108,15 @@ export default async function ApplicationPage({
             qr.play_appetite::text as play_appetite,
             qr.how_made::text as how_made,
             qr.event_date, qr.guest_count_confirmed, qr.answers,
+            qr.customer_id,
             c.email::text as email, c.name,
             s.guests_low, s.guests_high, s.guests_planning,
             s.per_person_planning,
             s.budget_planning::text as budget_planning,
-            s.budget_ceiling::text as budget_ceiling,
-            r.id as revelle_id, r.status::text as revelle_status
+            s.budget_ceiling::text as budget_ceiling
        from quiz_response qr
        join customer c on c.id = qr.customer_id
        left join quiz_response_scale s on s.quiz_response_id = qr.id
-       left join revelle r on r.quiz_response_id = qr.id
       where qr.id = $1`,
     [id]
   );
@@ -129,6 +148,16 @@ export default async function ApplicationPage({
     ),
   ]);
 
+  // The three reads that make this page the curator's tool rather than a
+  // viewer: what the engine proposed, where its run got to, and whether an
+  // approval has already turned one of them into a Revelle.
+  const [proposals, run, revelle, member] = await Promise.all([
+    applicationProposals(id),
+    latestRun(id),
+    approvedRevelle(id),
+    membership(application.customer_id),
+  ]);
+
   const back = `/desk/applications/${id}`;
 
   return (
@@ -142,6 +171,8 @@ export default async function ApplicationPage({
           Back to the inbox
         </Link>
       </Head>
+
+      {refused.length > 0 ? <p className={styles.error}>{refused}</p> : null}
 
       <div className={styles.panels}>
         <div>
@@ -158,6 +189,19 @@ export default async function ApplicationPage({
               <p className={styles.secretNone}>She left it empty.</p>
             )}
           </section>
+
+          {/*
+            THE WORKING SURFACE, and the reason this page exists at all. It is
+            directly under her own words because those are what a curator reads
+            the proposal against — docs/selection-spec.md keeps the free-text
+            answer "verbatim and prominent" for exactly this moment.
+          */}
+          <Proposals
+            applicationId={id}
+            proposals={proposals}
+            run={run}
+            hasRevelle={revelle !== null}
+          />
 
           <section className={styles.panel}>
             <h2 className={styles.panelHead}>
@@ -409,21 +453,112 @@ export default async function ApplicationPage({
             </form>
           </section>
 
-          <Seam title="The selection engine plugs in here">
-            Nothing on this page chooses anything. When the engine lands,
-            <code> selectForApplication(pool, &quot;{id}&quot;)</code> returns
-            ranked candidates with an explanation and a list of catalogue gaps;
-            the gaps go straight to the desk&apos;s list through{" "}
-            <code>recordCatalogueGaps()</code> in{" "}
-            <code>src/lib/desk/gaps.ts</code>. Persisting a chosen candidate
-            belongs to a job, not to this request — the engine never writes.
-            {application.revelle_id ? (
+          {/*
+            HER REVELLE, once a curator has approved one.
+            Two buttons and the whole of db/003 behind them: discarding is free
+            until the moment of delivery and impossible after it, because
+            `first_delivered_at` is a ratchet and the assemblage it claims is
+            claimed for good. The panel says which side of that line this
+            Revelle is on before it offers either.
+          */}
+          {revelle ? (
+            <section className={styles.panel}>
+              <h2 className={styles.panelHead}>
+                <span>Her Revelle</span>
+                <span>{revelle.status}</span>
+              </h2>
+
+              <div className={styles.facts}>
+                <Fact label="Delivered">
+                  {revelle.firstDeliveredAt ? (
+                    stamp(revelle.firstDeliveredAt)
+                  ) : (
+                    <em>not yet</em>
+                  )}
+                </Fact>
+                <Fact label="Voice">
+                  {revelle.voiceId ? "pinned" : <em>pinned at delivery</em>}
+                </Fact>
+              </div>
+
+              {revelle.firstDeliveredAt ? (
+                <p className={styles.hint}>
+                  This is hers. The assemblage is claimed for good — db/003 is
+                  explicit that there is no reissue, for anybody, ever,
+                  including her. Nothing at this desk can re-roll it; a
+                  different Revelle would have to vary at least one pooled
+                  ingredient, and that is a new application.
+                </p>
+              ) : (
+                <div className={styles.buttonRow}>
+                  <form action={deliverRevelleAction}>
+                    <input type="hidden" name="id" value={id} />
+                    <input
+                      type="hidden"
+                      name="revelle_id"
+                      value={revelle.id}
+                    />
+                    <button className={styles.button} type="submit">
+                      Deliver it
+                    </button>
+                  </form>
+                  <form action={discardRevelleAction}>
+                    <input type="hidden" name="id" value={id} />
+                    <button className={styles.buttonDanger} type="submit">
+                      Discard and choose again
+                    </button>
+                  </form>
+                </div>
+              )}
+            </section>
+          ) : null}
+
+          {/*
+            THE ONE DOOR. db/015 built `customer.accepted_at` and left it
+            unwired on purpose; this is the wire, and it is deliberately not a
+            consequence of anything else on this page. Moving the status to "in
+            progress" does not do it, approving a proposal does not do it, and
+            delivering does not do it — db/015's author refused to key
+            acceptance off workflow in as many words, because this column is
+            what decides whether a sign-in link is ever mailed to her.
+          */}
+          <section className={styles.panel}>
+            <h2 className={styles.panelHead}>
+              <span>Membership</span>
+              <span>customer.accepted_at</span>
+            </h2>
+            {member?.acceptedAt ? (
+              <p className={styles.ok}>
+                {member.email} is a member as of{" "}
+                {member.acceptedAt.slice(0, 10)}
+                {member.acceptedBy ? `, taken on by ${member.acceptedBy}` : ""}.
+                She can ask for a sign-in link and reach her portal.
+              </p>
+            ) : (
               <>
-                {" "}
-                This application already has a Revelle ({application.revelle_status}).
+                <p className={styles.hint}>
+                  She has applied and nothing more. A sign-in request for her
+                  address sends nothing, and there is no portal behind it. This
+                  is a decision, not a workflow step: it is never inferred from
+                  a status, and there is no undo — db/015 declines to guess
+                  what ending a membership would mean.
+                </p>
+                <form action={acceptApplicantAction}>
+                  <input type="hidden" name="id" value={id} />
+                  <input
+                    type="hidden"
+                    name="customer_id"
+                    value={application.customer_id}
+                  />
+                  <div className={styles.buttonRow}>
+                    <button className={styles.button} type="submit">
+                      Take her on
+                    </button>
+                  </div>
+                </form>
               </>
-            ) : null}
-          </Seam>
+            )}
+          </section>
 
           <Thread
             subject={{ table: "quiz_response", id }}

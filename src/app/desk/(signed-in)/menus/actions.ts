@@ -126,8 +126,13 @@ export async function saveMenu(
   );
   if (worlds.length > 0) {
     await query(
-      `insert into menu_world (menu_id, world_id, affinity, note)
-       select $1, w.id, 1.000, 'Attached at the desk.'
+      // `native` — the claim (db/019). This form's question is "which
+      // destinations was it written for", and the answer to that question is
+      // exactly what makes a menu unavailable everywhere else. `on conflict do
+      // nothing` leaves a row a curator scoped by hand at the deliverables
+      // desk alone, including its answer to this.
+      `insert into menu_world (menu_id, world_id, native, affinity, note)
+       select $1, w.id, true, 1.000, 'Attached at the desk.'
          from unnest($2::uuid[]) as w(id)
        on conflict (menu_id, world_id) do nothing`,
       [menuId, worlds]

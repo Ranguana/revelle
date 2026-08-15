@@ -43,6 +43,7 @@ import {
   type SelectionInput,
   type SlotRule,
   type StatedFacet,
+  type Venue,
 } from "./types.ts";
 
 // ── fixtures ─────────────────────────────────────────────────────────
@@ -448,6 +449,7 @@ test("an opted-out slot produces no gap; an unfillable one still does", () => {
         vector.dealbreakers,
         (id) => FACETS[id]?.label ?? id,
         SCALE,
+        null,
         OPTIONS,
         OPTIONS.now!
       ),
@@ -611,6 +613,7 @@ test("a dealbreaker eliminates, and no score is high enough to survive it", () =
     [perfect, modest],
     vector,
     "dinner_party",
+    FACETS,
     OPTIONS,
     rng(1),
     OPTIONS.now!
@@ -631,6 +634,7 @@ test("a destination that REPUDIATES a dealbreaker is not eliminated by it", () =
     [repudiates],
     vector,
     "dinner_party",
+    FACETS,
     OPTIONS,
     rng(1),
     OPTIONS.now!
@@ -648,6 +652,7 @@ test("dealbreakers eliminating everything is an impasse, not a relaxation", () =
     [only],
     vector,
     "dinner_party",
+    FACETS,
     OPTIONS,
     rng(1),
     OPTIONS.now!
@@ -674,6 +679,7 @@ function poolsFor(ingredients: Ingredient[], scale: Scale = SCALE) {
       vector.dealbreakers,
       (id) => FACETS[id]?.label ?? id,
       scale,
+      null,
       OPTIONS,
       OPTIONS.now!
     ),
@@ -692,6 +698,97 @@ test("scoping: forbidden under this destination is a filter, not a low score", (
     day1.candidates.map((c) => c.ingredient.name),
     ["Fine"]
   );
+});
+
+/**
+ * ── THE DESTINATION IS A WHITELIST, NOT A WEIGHT ─────────────────────
+ *
+ * docs/drinks.md promises "Havana's daiquiris are not an option at the
+ * Dolomites", and until db/019 the schema could not say it: `affinity` is an
+ * additive term in the score, so a drink written for HAVANA stayed eligible
+ * everywhere and merely came second. The proof that it was not a guarantee is
+ * the first test below — withdraw the competition and the thing is placed.
+ */
+
+test("scoping: an ingredient written for somewhere else is not merely outscored", () => {
+  const elsewhere = ingredient("i1", "game", "Havana's own", { [COASTAL.id]: 1 }, {
+    worlds: {
+      d2: { native: true, forbidden: false, affinity: 1, name: "HAVANA", note: null },
+    },
+  });
+
+  // The ONLY candidate in the pool. Under a weight there is nothing to lose to,
+  // and it is placed; under a claim the slot goes unfilled and the house is
+  // told the pool is thin. The second is what the document promised.
+  const { pools } = poolsFor([elsewhere]);
+  const day1 = [...pools.values()].find((p) => p.slot.slotCode === "day_material")!;
+  assert.equal(day1.candidates.length, 0);
+  assert.ok(day1.gap, "a required slot nothing may fill is a catalogue gap");
+  assert.match(day1.gap!.detail, /written for HAVANA, not for SOMEWHERE/);
+});
+
+test("scoping: a native claim to THIS destination is eligible, and still weighs", () => {
+  const home = ingredient("i1", "game", "Ours", { [COASTAL.id]: 1 }, {
+    worlds: {
+      d1: { native: true, forbidden: false, affinity: 1, name: "SOMEWHERE", note: null },
+    },
+  });
+  const { pools } = poolsFor([home]);
+  const day1 = [...pools.values()].find((p) => p.slot.slotCode === "day_material")!;
+  assert.equal(day1.candidates.length, 1);
+  assert.equal(
+    day1.candidates[0].affinity,
+    1,
+    "the claim does not consume the weight — they are different columns"
+  );
+});
+
+test("scoping: a positive affinity alone is NOT a claim", () => {
+  // ART BATTLE at WESTHAMPTON, +0.4, "the house would allow it". A permission,
+  // not an ownership claim, and reading it as one would delete the game from
+  // every other destination in the library. This is the whole reason db/019 is
+  // a column and not a threshold on the weight.
+  const allowed = ingredient("i1", "game", "Art battle", { [COASTAL.id]: 1 }, {
+    worlds: {
+      d2: { forbidden: false, affinity: 0.4, name: "WESTHAMPTON", note: null },
+    },
+  });
+  const { pools } = poolsFor([allowed]);
+  const day1 = [...pools.values()].find((p) => p.slot.slotCode === "day_material")!;
+  assert.deepEqual(
+    day1.candidates.map((c) => c.ingredient.name),
+    ["Art battle"]
+  );
+});
+
+test("scoping: an untagged ingredient stays eligible everywhere", () => {
+  const global = ingredient("i1", "game", "Anywhere", { [COASTAL.id]: 1 });
+  const { pools } = poolsFor([global]);
+  const day1 = [...pools.values()].find((p) => p.slot.slotCode === "day_material")!;
+  assert.equal(day1.candidates.length, 1);
+});
+
+test("scoping: a veto somewhere else does not become a whitelist", () => {
+  // The occasion axis behaves this way and the destination axis must match: an
+  // ingredient forbidden at one destination and silent about the rest makes no
+  // claim about the rest.
+  const vetoedElsewhere = ingredient("i1", "game", "Not there", { [COASTAL.id]: 1 }, {
+    worlds: { d2: { forbidden: true, affinity: 0, name: "WESTHAMPTON", note: null } },
+  });
+  const { pools } = poolsFor([vetoedElsewhere]);
+  const day1 = [...pools.values()].find((p) => p.slot.slotCode === "day_material")!;
+  assert.equal(day1.candidates.length, 1);
+});
+
+test("scoping: a veto here outranks a claim here", () => {
+  const contradictory = ingredient("i1", "game", "Both", { [COASTAL.id]: 1 }, {
+    worlds: {
+      d1: { native: true, forbidden: true, affinity: 1, name: "SOMEWHERE", note: "no" },
+    },
+  });
+  const { pools } = poolsFor([contradictory]);
+  const day1 = [...pools.values()].find((p) => p.slot.slotCode === "day_material")!;
+  assert.equal(day1.candidates.length, 0);
 });
 
 test("scoping: a group-size limit is a constraint, and it says so", () => {
@@ -740,6 +837,7 @@ test("the making axis reorders the pool and never empties it", () => {
       vector.dealbreakers,
       (id) => FACETS[id]?.label ?? id,
       SCALE,
+      null,
       OPTIONS,
       OPTIONS.now!
     );
@@ -1361,6 +1459,7 @@ function gamesFor(
     vector.dealbreakers,
     (id) => FACETS[id]?.label ?? id,
     scale,
+    null,
     OPTIONS,
     OPTIONS.now!
   );
@@ -1608,4 +1707,655 @@ test("an exclusion she did not state removes nothing", () => {
     "no rule in this plan is excluded by no_games"
   );
   assert.ok(result.candidates[0].picks.some((p) => p.slot.slotCode === "the_menu"));
+});
+
+// ═════════════════════════════════════════════════════════════════════
+// THREE PRODUCT DECISIONS
+//
+// Each of these is a decision somebody will otherwise "fix" back, so each one
+// fails with the reasoning in the message rather than with a diff of two
+// arrays. A test that says `expected [a,b] to equal [b,a]` teaches nobody why
+// the order mattered.
+// ═════════════════════════════════════════════════════════════════════
+
+const THESIS =
+  "VENUE NEVER TOUCHES THE DESTINATION. The destination is where she is " +
+  "transported to; the venue is where she physically is, and the engine's whole " +
+  "job is mapping one onto the other — Havana in a Brooklyn apartment is the " +
+  "pitch, not a compromise. The moment venue nudges destination you are back to " +
+  "'party themes that match your space'. If you meant to make the room matter, " +
+  "it matters at stage 3, over structural requirements, in venue.ts.";
+
+/** Every value of environment_type, as facets she could have answered with. */
+const ENVIRONMENTS = [
+  "my_home",
+  "rented_house",
+  "city_apartment",
+  "beach",
+  "mountains",
+  "poolside",
+  "garden",
+  "restaurant_or_venue",
+  "hotel",
+  "not_decided",
+].map((code) => facet(`f-env-${code}`, "environment", code));
+
+// Real tone codes from src/lib/voice.ts, so the resolution through the voice
+// vocabulary is the real one and not a fixture of itself.
+const DEADPAN = facet("f-tone-deadpan", "voice_tone", "deadpan");
+const UNDERSTATED = facet("f-tone-understated", "voice_tone", "understated");
+const SENTIMENTAL = facet("f-tone-sentimental", "voice_tone", "sentimental");
+const ALL_AT_ONCE = facet("f-tone-all-at-once", "voice_tone", "all_at_once");
+const LOW_VOICES = facet("f-tone-low-voices", "voice_tone", "low_voices");
+
+const MOMENT = facet("f-moment", "affinity", "one_moment");
+const RITUAL = facet("f-ritual", "affinity", "ritual");
+const BEAUTY = facet("f-beauty", "affinity", "beauty");
+const WIT = facet("f-wit", "affinity", "wit");
+const LATE = facet("f-late", "affinity", "late");
+
+// ── 1. VENUE NEVER TOUCHES THE DESTINATION ───────────────────────────
+
+test("the venue is not in the preference vector at all", () => {
+  const vector = buildVector(
+    [stated(COASTAL), stated(ENVIRONMENTS[2])],
+    [],
+    [],
+    FACETS,
+    OPTIONS
+  );
+
+  assert.equal(
+    vector.weights[ENVIRONMENTS[2].id],
+    undefined,
+    `an environment facet reached the preference vector. ${THESIS}`
+  );
+  assert.ok(vector.weights[COASTAL.id] > 0, "her taste answer is still there");
+});
+
+test("every venue answer produces the identical destination ranking", () => {
+  // One application, ten rooms. Nothing else moves.
+  const rankings = ENVIRONMENTS.map((room) => {
+    const result = runSelection(
+      inputFor(
+        {},
+        {
+          environment: room.code,
+          stated: [
+            stated(COASTAL),
+            stated(EASE),
+            stated(NOVELTY, "negative"),
+            stated(room),
+          ],
+        }
+      ),
+      { seed: 11 }
+    );
+    return {
+      room: room.code,
+      order: result.candidates.map(
+        (c) => `${c.destination.name}@${c.destinationScore.toFixed(6)}`
+      ),
+    };
+  });
+
+  const first = rankings[0];
+  for (const entry of rankings.slice(1)) {
+    assert.deepEqual(
+      entry.order,
+      first.order,
+      `the destination ranking moved between "${first.room}" and "${entry.room}":\n` +
+        `  ${first.room}: ${first.order.join(", ")}\n` +
+        `  ${entry.room}: ${entry.order.join(", ")}\n\n${THESIS}`
+    );
+  }
+
+  assert.ok(first.order.length > 0, "the fixture actually produced candidates");
+});
+
+test("the room prunes the pool instead, and the destination survives it", () => {
+  // The founder's worked example, in miniature: a thing that needs outdoors,
+  // and a thing that does not, in one pool, under one destination.
+  const boilPot = ingredient("m1", "menu", "The clambake", { [COASTAL.id]: 0.9 }, {
+    requirements: [
+      {
+        code: "requires_outdoors",
+        label: "Needs outdoors",
+        demand: "needs to be outdoors",
+        note: "A boil pot. There is no indoor version.",
+      },
+    ],
+  });
+  const fogDayLunch = ingredient("m2", "menu", "The fog-day lunch", {
+    [COASTAL.id]: 0.6,
+  });
+
+  const apartment: Venue = {
+    environment: "city_apartment",
+    label: "An apartment",
+    provides: { requires_outdoors: false },
+    notes: { requires_outdoors: "there is no outdoors" },
+  };
+
+  const run = (venue: Venue | null) =>
+    scopePools(
+      planSlots(SLOT_RULES, SHAPE, SCALE).slots,
+      [boilPot, fogDayLunch],
+      destination("d1", "NANTUCKET", { [COASTAL.id]: 0.9 }),
+      "girls_weekend",
+      buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS).weights,
+      [],
+      (id) => FACETS[id]?.label ?? id,
+      SCALE,
+      venue,
+      OPTIONS,
+      OPTIONS.now!
+    );
+
+  const outdoors = [...run(null).values()].find(
+    (p) => p.slot.slotCode === "the_menu"
+  )!;
+  assert.deepEqual(
+    outdoors.candidates.map((c) => c.ingredient.name),
+    ["The clambake", "The fog-day lunch"],
+    "with no room known, nothing is pruned"
+  );
+
+  const indoors = [...run(apartment).values()].find(
+    (p) => p.slot.slotCode === "the_menu"
+  )!;
+  assert.deepEqual(
+    indoors.candidates.map((c) => c.ingredient.name),
+    ["The fog-day lunch"],
+    "the boil pot dies on requires_outdoors"
+  );
+  assert.deepEqual(indoors.prunedByVenue, ["The clambake"]);
+  assert.equal(indoors.gap, null, "the pool is thinner, not empty");
+});
+
+test("an untagged ingredient works anywhere, which is the safe default", () => {
+  const anywhere = ingredient("m2", "menu", "Untagged", { [COASTAL.id]: 0.6 });
+  const everyRoom: Venue = {
+    environment: "hotel",
+    label: "A hotel",
+    provides: {
+      requires_outdoors: false,
+      requires_open_flame: false,
+      requires_full_kitchen: false,
+      noise_ceiling: false,
+      deposit_safe: false,
+    },
+    notes: {},
+  };
+
+  const pools = scopePools(
+    planSlots(SLOT_RULES, SHAPE, SCALE).slots,
+    [anywhere],
+    destination("d1", "SOMEWHERE", {}),
+    "girls_weekend",
+    buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS).weights,
+    [],
+    (id) => FACETS[id]?.label ?? id,
+    SCALE,
+    everyRoom,
+    OPTIONS,
+    OPTIONS.now!
+  );
+
+  const menu = [...pools.values()].find((p) => p.slot.slotCode === "the_menu")!;
+  assert.equal(menu.candidates.length, 1, "no claim means no restriction");
+});
+
+test("a pool the room empties is an ordinary catalogue gap, and names the room", () => {
+  const outdoorOnly = ingredient("m1", "menu", "The clambake", {}, {
+    requirements: [
+      {
+        code: "requires_outdoors",
+        label: "Needs outdoors",
+        demand: "needs to be outdoors",
+        note: null,
+      },
+    ],
+  });
+  const apartment: Venue = {
+    environment: "city_apartment",
+    label: "An apartment",
+    provides: { requires_outdoors: false },
+    notes: { requires_outdoors: "there is no outdoors" },
+  };
+
+  const pools = scopePools(
+    planSlots(SLOT_RULES, SHAPE, SCALE).slots,
+    [outdoorOnly],
+    destination("d1", "NANTUCKET", {}),
+    "girls_weekend",
+    buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS).weights,
+    [],
+    (id) => FACETS[id]?.label ?? id,
+    SCALE,
+    apartment,
+    OPTIONS,
+    OPTIONS.now!
+  );
+
+  const menu = [...pools.values()].find((p) => p.slot.slotCode === "the_menu")!;
+  assert.ok(menu.gap, "an empty pool is still a gap");
+  assert.match(menu.gap!.detail, /an apartment/i, "the room is named");
+  assert.match(menu.gap!.detail, /needs to be outdoors/);
+});
+
+// ── 2. THE EMPHASIS ──────────────────────────────────────────────────
+
+test("what she wants more of is not in the preference vector", () => {
+  const vector = buildVector([stated(COASTAL), stated(RITUAL)], [], [], FACETS, OPTIONS);
+  assert.equal(
+    vector.weights[RITUAL.id],
+    undefined,
+    `"what do you want more of" reached the preference vector. It is the only ` +
+      `question on the quiz that tells you which DELIVERABLE she values, and ` +
+      `averaging it into taste weights discards exactly that. It belongs in ` +
+      `emphasis.ts, at stage 4 and in the voice layer.`
+  );
+});
+
+test("each emphasis answer moves the deliverables and not the destination", () => {
+  const rules: SlotRule[] = [
+    { ...SLOT_RULES[0], slotCode: "the_moment", label: "The moment", pool: "game", perDay: false, required: false, position: 40 },
+    { ...SLOT_RULES[0], slotCode: "finale", label: "The ending", pool: "game", perDay: false, required: false, position: 65 },
+    { ...SLOT_RULES[0], slotCode: "soundtrack", label: "The soundtrack", pool: "tracklist", perDay: false, required: false, position: 60 },
+    { ...SLOT_RULES[1], slotCode: "table_object", label: "The table", maxCount: 1, position: 30 },
+    { ...SLOT_RULES[1] },
+  ];
+
+  const ingredients = [
+    ingredient("g1", "game", "A moment", { [COASTAL.id]: 0.8 }),
+    ingredient("g2", "game", "An ending", { [COASTAL.id]: 0.7 }),
+    ingredient("t1", "tracklist", "A soundtrack", { [COASTAL.id]: 0.6 }),
+    ingredient("p1", "product", "A table object", { [COASTAL.id]: 0.6 }),
+    ingredient("p2", "product", "An edit item", { [COASTAL.id]: 0.5 }),
+  ];
+
+  const runWith = (answers: Facet[]) =>
+    runSelection(
+      inputFor(
+        { slotRules: rules, ingredients },
+        { stated: [stated(COASTAL), ...answers.map((f) => stated(f))] }
+      ),
+      { seed: 21 }
+    );
+
+  const none = runWith([]);
+  const cases: { answer: Facet; guarantees: string; expects: RegExp }[] = [
+    { answer: MOMENT, guarantees: "the_moment", expects: /centrepiece/i },
+    { answer: RITUAL, guarantees: "finale", expects: /annualizable|next year/i },
+    { answer: BEAUTY, guarantees: "table_object", expects: /tabletop/i },
+    { answer: LATE, guarantees: "soundtrack", expects: /moves late|arc extends/i },
+  ];
+
+  for (const { answer, guarantees, expects } of cases) {
+    const run = runWith([answer]);
+
+    assert.deepEqual(
+      run.candidates.map((c) => c.destination.name),
+      none.candidates.map((c) => c.destination.name),
+      `"${answer.code}" changed WHICH DESTINATION she gets. It must change which ` +
+        `deliverable is emphasised and nothing else — this question does not ` +
+        `describe a taste.`
+    );
+
+    assert.ok(
+      run.emphasis.guaranteed.includes(guarantees),
+      `"${answer.code}" should guarantee the ${guarantees} slot`
+    );
+
+    const slot = run.candidates[0].picks.find(
+      (p) => p.slot.slotCode === guarantees
+    );
+    assert.ok(slot, `${guarantees} should have been placed`);
+    assert.ok(
+      slot!.slot.guaranteed,
+      `${guarantees} should be promoted to required by her answer`
+    );
+    assert.ok(
+      !none.candidates[0].picks.find((p) => p.slot.slotCode === guarantees)?.slot
+        .guaranteed,
+      `${guarantees} must NOT be guaranteed when she did not ask for it`
+    );
+
+    const said = run.candidates[0].explanation.emphasis.join(" ");
+    assert.match(said, expects, `the curator is told what "${answer.code}" did`);
+  }
+});
+
+test("ease emphasises The Prep rather than adding a deliverable", () => {
+  const run = runSelection(
+    inputFor({}, { stated: [stated(COASTAL), stated(EASE)] }),
+    { seed: 21 }
+  );
+  assert.deepEqual(run.emphasis.guaranteed, [], "nothing is added");
+  assert.equal(run.emphasis.prepRegister, "brief");
+  assert.ok(run.emphasis.effortless);
+  assert.match(
+    run.emphasis.attention.join(" "),
+    /Prep is written SHORT/,
+    "the writer is told, because that is where this answer lands"
+  );
+});
+
+test("an inside joke is never faked from the catalogue; a follow-up is owed", () => {
+  const withText = runSelection(
+    inputFor({}, { stated: [stated(COASTAL), stated(WIT)], secret: "The guitar." }),
+    { seed: 21 }
+  );
+  assert.deepEqual(withText.emphasis.guaranteed, []);
+  assert.ok(withText.emphasis.needsHerMaterial);
+  assert.match(
+    withText.candidates[0].explanation.emphasis.join(" "),
+    /FOLLOW-UP OWED, and there is something to work from/
+  );
+
+  const without = runSelection(
+    inputFor({}, { stated: [stated(COASTAL), stated(WIT)], secret: null }),
+    { seed: 21 }
+  );
+  assert.match(
+    without.candidates[0].explanation.emphasis.join(" "),
+    /NOTHING to work from/,
+    "an empty free text plus an inside joke is the case a curator must see"
+  );
+});
+
+test("a guarantee promotes a slot the occasion has and never invents one", () => {
+  const run = runSelection(
+    inputFor({}, { stated: [stated(COASTAL), stated(MOMENT)] }),
+    { seed: 21 }
+  );
+  assert.ok(run.emphasis.guaranteed.includes("the_moment"));
+  assert.ok(
+    !run.candidates[0].picks.some((p) => p.slot.slotCode === "the_moment"),
+    "this occasion has no moment slot, so nothing was invented"
+  );
+  assert.match(
+    run.candidates[0].explanation.emphasis.join(" "),
+    /has no such slot/,
+    "and the curator is told rather than left to notice"
+  );
+});
+
+// ── 3. VOICE IS A FILTER, AESTHETIC IS A RANK ────────────────────────
+
+/** A destination that looks right to her and sounds nothing like her people. */
+function voiceFixtures() {
+  return {
+    // Deadpan, understated. The best-looking destination in the fixture.
+    wrongVoice: destination("d-wrong", "THE AESTHETIC WINNER", {
+      [COASTAL.id]: 1,
+      [DEADPAN.id]: 1,
+      [UNDERSTATED.id]: 1,
+    }),
+    // Warm, loud, sentimental. A weaker look.
+    rightVoice: destination("d-right", "THE ONE THAT SOUNDS LIKE THEM", {
+      [COASTAL.id]: 0.2,
+      [SENTIMENTAL.id]: 1,
+      [ALL_AT_ONCE.id]: 1,
+    }),
+  };
+}
+
+/** Warm, loud, sentimental — the founder's own example of a real group. */
+const HER_TONES = [stated(SENTIMENTAL), stated(ALL_AT_ONCE)];
+
+test("the tone filter cuts the shortlist, and cuts the aesthetic winner", () => {
+  const { wrongVoice, rightVoice } = voiceFixtures();
+  const vector = buildVector(
+    [stated(COASTAL), ...HER_TONES],
+    [],
+    [],
+    FACETS,
+    OPTIONS
+  );
+
+  const result = chooseDestinations(
+    [wrongVoice, rightVoice],
+    vector,
+    "girls_weekend",
+    FACETS,
+    OPTIONS,
+    rng(1),
+    OPTIONS.now!
+  );
+
+  assert.deepEqual(
+    result.shortlist.map((s) => s.destination.name),
+    ["THE ONE THAT SOUNDS LIKE THEM"],
+    `the tone filter left ${result.shortlist.length} of 2. VOICE IS A FILTER AND ` +
+      `AESTHETIC IS A RANK — not a bigger weight, a TIER. The look that wins on ` +
+      `facets must not survive a voice it fails, because a wrong look reads as ` +
+      `"not what I pictured" and gets forgiven, and a wrong voice reads as ` +
+      `"this isn't us" and churns the member.`
+  );
+
+  const cut = result.eliminated.find((e) => e.tier === "voice");
+  assert.ok(cut, "the cut is recorded as a voice elimination, not as a low score");
+  assert.equal(cut!.destinationName, "THE AESTHETIC WINNER");
+  assert.ok(cut!.toneMatch! < OPTIONS.toneThreshold);
+});
+
+test("the aesthetic ranks WITHIN the survivors and is never averaged with voice", () => {
+  const { rightVoice } = voiceFixtures();
+  // Two destinations that both clear the bar. The look decides between them.
+  const plainer = destination("d-plain", "SOUNDS RIGHT, LOOKS LESS RIGHT", {
+    [COASTAL.id]: 0.1,
+    [SENTIMENTAL.id]: 1,
+  });
+  const vector = buildVector(
+    [stated(COASTAL), ...HER_TONES],
+    [],
+    [],
+    FACETS,
+    OPTIONS
+  );
+
+  const result = chooseDestinations(
+    [plainer, rightVoice],
+    vector,
+    "girls_weekend",
+    FACETS,
+    OPTIONS,
+    rng(1),
+    OPTIONS.now!
+  );
+
+  assert.equal(result.shortlist.length, 2, "both cleared the voice bar");
+  const ranked = result.shortlist.slice().sort((a, b) => a.rank - b.rank);
+  assert.equal(
+    ranked[0].destination.name,
+    "THE ONE THAT SOUNDS LIKE THEM",
+    "among the survivors, the better look ranks first"
+  );
+
+  // The scores must be computable from the look alone. If the voice were still
+  // in the number, the destination with the stronger tone tags would carry a
+  // score the aesthetic cannot account for.
+  for (const entry of result.shortlist) {
+    const lookOnly = facetOverlap(
+      Object.fromEntries(
+        Object.entries(vector.weights).filter(
+          ([id]) => FACETS[id]?.dimension !== "voice_tone"
+        )
+      ),
+      entry.destination.facets
+    );
+    assert.equal(
+      entry.rawScore.toFixed(9),
+      lookOnly.toFixed(9),
+      `${entry.destination.name}'s rank score includes voice points. The voice ` +
+        `was already spent deciding whether it was in the room; counting it ` +
+        `again is the averaging the tier replaced.`
+    );
+  }
+});
+
+test("the dither never resurrects a destination the tone filter killed", () => {
+  const { wrongVoice, rightVoice } = voiceFixtures();
+  const filler = Array.from({ length: 6 }, (_, i) =>
+    destination(`d-f${i}`, `FILLER ${i}`, {
+      [COASTAL.id]: 0.3 + i * 0.05,
+      [SENTIMENTAL.id]: 0.8,
+    })
+  );
+  const vector = buildVector(
+    [stated(COASTAL), ...HER_TONES],
+    [],
+    [],
+    FACETS,
+    OPTIONS
+  );
+
+  for (let seed = 0; seed < 500; seed += 1) {
+    const result = chooseDestinations(
+      [wrongVoice, rightVoice, ...filler],
+      vector,
+      "girls_weekend",
+      FACETS,
+      OPTIONS,
+      rng(seed),
+      OPTIONS.now!
+    );
+    assert.ok(
+      !result.shortlist.some((s) => s.destination.id === "d-wrong"),
+      `seed ${seed} put THE AESTHETIC WINNER back on the shortlist. Exploration ` +
+        `may trade one voice-true destination for another; it may NEVER ` +
+        `resurrect an aesthetic winner that the tone filter killed. The dither ` +
+        `operates within the tone-surviving set, and it does so because the ` +
+        `eliminated destinations are not in the array it is handed.`
+    );
+  }
+});
+
+test("a hard clash is a catalogue gap BEFORE it is an engine decision", () => {
+  const { wrongVoice } = voiceFixtures();
+  // Deliberately the BETTER LOOK — it carries both of the taste directions she
+  // asked for — and the worse voice of the two. If the fallback ranked on
+  // looks, this is the one it would take.
+  const alsoWrong = destination("d-wrong2", "THE BETTER LOOK", {
+    [COASTAL.id]: 1,
+    [DISCO.id]: 0.9,
+    [UNDERSTATED.id]: 1,
+    // Quieter still, so the two are not tied on voice: this one is the further
+    // of the two from a room that is warm and loud (−0.37 against −0.22), and
+    // the fallback therefore has a real choice to get wrong.
+    [LOW_VOICES.id]: 1,
+  });
+  const vector = buildVector(
+    [stated(COASTAL), stated(DISCO), ...HER_TONES],
+    [],
+    [],
+    FACETS,
+    OPTIONS
+  );
+
+  const result = chooseDestinations(
+    [wrongVoice, alsoWrong],
+    vector,
+    "girls_weekend",
+    FACETS,
+    OPTIONS,
+    rng(1),
+    OPTIONS.now!
+  );
+
+  assert.ok(result.voiceClash, "nothing cleared the bar");
+  assert.equal(result.gaps.length, 1, "and the house was told, first");
+  assert.equal(result.gaps[0].pool, "destination");
+  assert.match(
+    result.gaps[0].slotCode,
+    /disco_after_dark/,
+    "keyed on the look that has to be authored in her voice"
+  );
+  assert.match(
+    result.gaps[0].detail,
+    /hole in the catalogue/,
+    "the sentence says whose problem it is: the library's, not her answers'"
+  );
+
+  // AND VOICE STILL WINS. The fallback takes the CLOSEST VOICE, never the best
+  // look — otherwise the tier collapses into a weight exactly when it matters.
+  assert.ok(
+    facetOverlap(vector.weights, alsoWrong.facets) >
+      facetOverlap(vector.weights, wrongVoice.facets),
+    "the fixture is only meaningful if the two disagree about which is better"
+  );
+  assert.equal(result.shortlist.length, 1);
+  assert.equal(
+    result.shortlist[0].destination.name,
+    "THE AESTHETIC WINNER",
+    `the fallback took THE BETTER LOOK. Voice wins even when it wins by a poor ` +
+      `margin: falling back to the best-looking destination is the tier ` +
+      `collapsing into a weight at exactly the moment the tier is load-bearing, ` +
+      `and it is what would put a deadpan invitation in front of people who cry ` +
+      `at the toast.`
+  );
+});
+
+test("a woman who answered no tone question is not eliminated by silence", () => {
+  const { wrongVoice, rightVoice } = voiceFixtures();
+  const vector = buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS);
+
+  const result = chooseDestinations(
+    [wrongVoice, rightVoice],
+    vector,
+    "girls_weekend",
+    FACETS,
+    OPTIONS,
+    rng(1),
+    OPTIONS.now!
+  );
+
+  assert.ok(result.toneSilent);
+  assert.equal(
+    result.shortlist.length,
+    2,
+    "absence is silence, never a claim — she was never shown the question"
+  );
+  assert.equal(result.eliminated.filter((e) => e.tier === "voice").length, 0);
+});
+
+test("a destination nobody has tagged is not eliminated by its own silence", () => {
+  const { rightVoice } = voiceFixtures();
+  const untagged = destination("d-untagged", "NOT YET TAGGED", {
+    [COASTAL.id]: 0.9,
+  });
+  const vector = buildVector(
+    [stated(COASTAL), ...HER_TONES],
+    [],
+    [],
+    FACETS,
+    OPTIONS
+  );
+
+  const result = chooseDestinations(
+    [untagged, rightVoice],
+    vector,
+    "girls_weekend",
+    FACETS,
+    OPTIONS,
+    rng(1),
+    OPTIONS.now!
+  );
+
+  assert.equal(
+    result.shortlist.length,
+    2,
+    `an untagged destination scores 0 by construction, and 0 is below any ` +
+      `useful bar. Treating that silence as a score would delete every ` +
+      `destination the house has not got round to tagging — today that is every ` +
+      `fixture and every stub. No claim means no restriction, exactly as it does ` +
+      `on the occasion, slot, destination and venue axes.`
+  );
+  assert.equal(
+    result.shortlist.find((s) => s.destination.id === "d-untagged")!.toneMatch,
+    null,
+    "and it is carried as UNJUDGED rather than as a number nobody measured"
+  );
 });

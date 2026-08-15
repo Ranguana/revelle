@@ -19,7 +19,11 @@ export default async function DestinationPage({
 }: PageProps<"/desk/destinations/[id]">) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const saved = (await searchParams).saved === "1";
+  const search = await searchParams;
+  const saved = search.saved === "1";
+  // The database's own words when it refused a status change — db/019's voice
+  // guard, today. Shown verbatim rather than translated; see actions.ts.
+  const refused = typeof search.refused === "string" ? search.refused : null;
 
   const world = await queryOne<
     DestinationValues & { status: string; name: string; published_at: string | null }
@@ -86,6 +90,16 @@ export default async function DestinationPage({
           </button>
         </form>
       </Head>
+
+      {refused ? (
+        <p className={styles.error}>
+          {refused}{" "}
+          <Link href={`/desk/destinations/${id}/voice`} className={styles.link}>
+            Write the voice
+          </Link>
+          .
+        </p>
+      ) : null}
 
       {saved ? <p className={styles.ok}>Saved.</p> : null}
 

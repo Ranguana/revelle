@@ -271,7 +271,7 @@ const FOOD_PLANS: readonly QuizOption[] = [
  * WHETHER THEY WILL PERFORM IS NOT ASKED HERE, because it is already asked
  * twice: `perform` on the question above, which is what actually weights the
  * game pool, and the whole `performance` group of tones on the voice question,
- * which includes "Would rather die than perform".
+ * which includes "Will not get up in front of a room".
  */
 const PLAY_APPETITES: readonly QuizOption[] = [
   { code: "none", label: "None at all", hint: "The evening runs itself" },

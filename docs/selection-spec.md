@@ -116,10 +116,23 @@ borrowed from generators that have shipped:
 
 - **Forbidden**: an ingredient can be marked unusable *under this destination*.
   A structural "never," not a low score.
+- **Written for here**: an ingredient can *claim* a destination. Claiming any
+  makes the set a whitelist — the thing is eligible under the destinations it
+  claims and nowhere else. This is what "Havana's daiquiris are not an option
+  at the Dolomites" (docs/drinks.md) actually requires, and it is a **filter**
+  for the same reason forbidden is: a high enough score would otherwise sneak
+  it through. It arrived late — db/019 — and every menu and drink written
+  before it was eligible under every destination in the meantime.
 - **Re-weighted**: the same ingredient may be common in one destination and
-  rare in another.
+  rare in another. A weight, and *only* a weight: a positive affinity is not a
+  claim, because "the house would allow it" is a sentence a curator writes
+  about one destination without meaning to withdraw the thing from every other.
 - **Inherited facets**: the destination contributes its own facets to the
   preference vector, so downstream scoring pulls toward it automatically.
+
+The first two are the same rule the occasion and slot axes already run — no
+claims means eligible everywhere, any claim makes a whitelist, a veto cannot be
+outvoted — and it is implemented once, in `claimEligibility()`.
 
 ### Stage 4 — Fill the slots
 
@@ -331,3 +344,107 @@ pre-filters, and the system inherits her filter instead of learning past it.
 she pays.** Her response is the measurement: buying is a strong positive,
 asking for a change is a precise negative with a reason attached, and walking
 away is the clearest signal of all. The purchase gate is the instrument.
+
+---
+
+## Three decisions the founder made, and the reasoning that has to survive them
+
+Each of these is a decision somebody will otherwise "fix" back, so the argument
+is written down here and again in the code that implements it. In six months
+the reasoning is the part that gets lost.
+
+### 1. Venue never touches the destination
+
+> "Venue never touches the destination — that's the thesis of the product. The
+> destination is where she's transported to; the venue is where she physically
+> is; the engine's whole job is mapping one onto the other. Havana in a
+> Brooklyn apartment isn't a compromise, it's the pitch. The moment venue
+> nudges destination, you're back to 'party themes that match your space,'
+> which is the Pinterest board you're against."
+
+`environment` has **zero weight in stage 2**, not a small one. It joins
+`guest_count` and `spend_per_person` in the non-taste dimensions
+(`src/lib/selection/vector.ts`), and db/020 refuses at the database to let an
+environment facet be tagged onto a destination or a cohort at all.
+
+It becomes a **second stage-3 filter dimension** instead, mechanically
+identical to the destination's own forbidden rule. Ingredients carry structural
+requirements — `requires_outdoors`, `requires_open_flame`,
+`requires_full_kitchen`, `noise_ceiling`, `deposit_safe` — and a room either
+affords them or it does not. Untagged means works anywhere, which is the safe
+default and the one to take whenever tagging is a judgement call.
+
+The worked case: **a clambake in a studio apartment.** The boil-pot menu dies on
+`requires_outdoors`; NANTUCKET survives, because a destination is not a place;
+she gets the fog-day lunch instead.
+
+If venue pruning leaves a pool too thin, that is the **existing** pool-too-thin
+failure mode — a catalogue gap, a work order — and never a reason to have let
+the venue steer selection.
+
+### 2. "What do you want more of" is an emphasis, not a taste weight
+
+> "Each answer points at a slot, and this question shouldn't feed the preference
+> vector at all. It's the only question on the quiz that tells you which
+> deliverable she values, and averaging it into taste weights discards exactly
+> that."
+
+| Answer | What it does |
+|---|---|
+| One moment they retell | The Moment gets guaranteed inclusion and the voice layer's centrepiece attention |
+| Everything already handled | the effort answer wearing a costume: forces the sleight-of-hand tier, weights The Prep toward brevity |
+| A table worth photographing | The Table and The Edit, product budget shifted toward tabletop |
+| A ritual we repeat next year | The Ending, plus a **repeatability flag** — design something annualizable |
+| An inside joke made real | only works with her material, so it triggers a follow-up and raises her free-text answer's weight in the voice prompt; it **cannot** be satisfied from the catalogue |
+| Permission to stay up | structure, not products: the Soundtrack arc extends, the Ending moves late |
+
+`affinity` is out of the preference vector entirely. The emphasis is consumed at
+stage 4 as slot weights — which, in a beam search over required and optional
+slots, means **promoting a slot to required**; a multiplier would be a no-op,
+because every candidate in a slot moves together — and by the voice layer as
+attention allocation.
+
+**"A ritual we repeat next year" is the highest-LTV answer on the quiz**: she is
+asking for Revelle #2 before #1 has shipped. It is therefore recorded on the
+**member record** (`member_emphasis`, db/020, written by a trigger) and not only
+on the application, because it is still true next spring.
+
+### 3. Voice is a filter, aesthetic is a rank
+
+> "Voice wins because (a) the voice is the medium of every deliverable — the
+> invitation, the menu, the sequencing all speak, while the look touches fewer
+> surfaces; (b) errors split asymmetrically — a wrong look reads as 'not what I
+> pictured' and gets forgiven, a wrong voice reads as 'this isn't us' and churns
+> the member; (c) tone icons describe her people, aesthetic picks describe an
+> image she's seen somewhere — the people are ground truth, the image is usually
+> borrowed."
+
+**Not a bigger weight — a tier.** Tone facets threshold-filter destinations in
+stage 2; aesthetic facets rank within the survivors; the two are never averaged,
+because averaging produces the destination that is middling on both, which is
+the compromise that is nobody's.
+
+The **dither operates within the tone-surviving set**. Exploration may trade one
+voice-true destination for another; it may never resurrect an aesthetic winner
+the tone filter killed.
+
+A hard clash is **first a catalogue-gap entry and only second an engine
+decision**:
+
+> "supper club, disco after dark, warm, loud, sentimental isn't actually a
+> contradiction — it's a wedding-reception-register party humans throw
+> constantly. The conflict exists only because your catalog lacks that
+> destination."
+
+The gap goes through the existing `recordCatalogueGaps` seam, keyed on the look
+that has to be authored in her voice. When it fires, the engine falls back to
+the **closest voice**, never to the best-looking destination — otherwise the
+tier collapses into a weight at exactly the moment the tier is load-bearing.
+
+Silence is never a failing score, on either side: a host who was never shown the
+voice question, and a destination nobody has tagged yet, both pass unfiltered
+and are reported as unjudged.
+
+The threshold is **0.20**, argued from the real catalogue on
+`EngineOptions.toneThreshold`; `npm run check:tone-threshold` reprints the
+table it was picked from.

@@ -37,6 +37,7 @@ type Scoped = {
   entity_id: string;
   name: string;
   forbidden: boolean;
+  native: boolean;
   affinity: string;
   note: string | null;
 };
@@ -66,23 +67,26 @@ export default async function DeliverablesPage({
     // from each pool's own table.
     query<Scoped>(
       `select 'product' as pool, pw.product_id as entity_id, p.name,
-              pw.forbidden, pw.affinity::text as affinity, pw.note
+              pw.forbidden, pw.native, pw.affinity::text as affinity, pw.note
          from product_world pw join product p on p.id = pw.product_id
         where pw.world_id = $1
        union all
-       select 'game', gw.game_id, g.name, gw.forbidden, gw.affinity::text, gw.note
+       select 'game', gw.game_id, g.name, gw.forbidden, gw.native,
+              gw.affinity::text, gw.note
          from game_world gw join game g on g.id = gw.game_id
         where gw.world_id = $1
        union all
-       select 'menu', mw.menu_id, m.name, mw.forbidden, mw.affinity::text, mw.note
+       select 'menu', mw.menu_id, m.name, mw.forbidden, mw.native,
+              mw.affinity::text, mw.note
          from menu_world mw join menu m on m.id = mw.menu_id
         where mw.world_id = $1
        union all
-       select 'drink', dw.drink_id, d.name, dw.forbidden, dw.affinity::text, dw.note
+       select 'drink', dw.drink_id, d.name, dw.forbidden, dw.native,
+              dw.affinity::text, dw.note
          from drink_world dw join drink d on d.id = dw.drink_id
         where dw.world_id = $1
        union all
-       select 'tracklist', tw.tracklist_id, t.name, tw.forbidden,
+       select 'tracklist', tw.tracklist_id, t.name, tw.forbidden, tw.native,
               tw.affinity::text, tw.note
          from tracklist_world tw join tracklist t on t.id = tw.tracklist_id
         where tw.world_id = $1
@@ -230,13 +234,21 @@ export default async function DeliverablesPage({
       <section className={styles.panel}>
         <h2 className={styles.panelHead}>
           <span>The ingredients, under this destination</span>
-          <span>forbidden, or re-weighted</span>
+          <span>forbidden, written for, or re-weighted</span>
         </h2>
         <p className={styles.hint}>
           Nothing needs a row here. No row means neutral — the ingredient is
           neither pulled toward this destination nor away from it, which is the
           right default and why this list starts empty. Forbidden is structural:
           a high enough score can never sneak a forbidden thing through.
+        </p>
+        <p className={styles.hint}>
+          <strong>Written for here</strong> is the strongest thing on this
+          screen and it reaches every other destination in the library. Ticking
+          it says this menu, drink or game was authored FOR this place, and it
+          becomes ineligible everywhere else — not unlikely, ineligible.
+          Affinity is only a weight: 1.0 means &ldquo;as strongly as I can say
+          it&rdquo;, never &ldquo;and nowhere else&rdquo;.
         </p>
 
         {scoped.length === 0 ? (
@@ -248,6 +260,7 @@ export default async function DeliverablesPage({
                 <th>Pool</th>
                 <th>Thing</th>
                 <th>Forbidden</th>
+                <th>Written for</th>
                 <th>Affinity</th>
                 <th>Why</th>
                 <th />
@@ -269,6 +282,12 @@ export default async function DeliverablesPage({
                         defaultChecked={row.forbidden}
                       />
                       <input
+                        type="checkbox"
+                        name="native"
+                        defaultChecked={row.native}
+                        title="Written for this destination — and therefore ineligible everywhere else"
+                      />
+                      <input
                         type="number"
                         name="affinity"
                         step="0.05"
@@ -286,7 +305,7 @@ export default async function DeliverablesPage({
                       <button className={styles.filter}>Save</button>
                     </form>
                   </td>
-                  <td colSpan={3}>
+                  <td colSpan={4}>
                     <form action={unscopeIngredient}>
                       <input type="hidden" name="world_id" value={id} />
                       <input type="hidden" name="pool" value={row.pool} />
@@ -341,6 +360,10 @@ export default async function DeliverablesPage({
               <label className={styles.facetItem}>
                 <input type="checkbox" name="forbidden" />
                 <span>Forbidden here</span>
+              </label>
+              <label className={styles.facetItem}>
+                <input type="checkbox" name="native" />
+                <span>Written for here, and nowhere else</span>
               </label>
             </div>
           </div>

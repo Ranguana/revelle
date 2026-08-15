@@ -506,6 +506,27 @@ export type WriterBrief = {
   facts?: readonly string[];
   /** A ceiling, when the piece has a physical size. A place card is not a page. */
   maxWords?: number;
+  /**
+   * WHERE THE WRITER SPENDS ITS ATTENTION — her emphasis, resolved.
+   *
+   * "What do you want more of" is the only question on the quiz that names a
+   * deliverable, and half of what it says is an instruction to whoever writes
+   * the paper rather than to whoever picks from the pool: The Moment is the
+   * centrepiece, The Prep is short, The Ending has to survive being done again
+   * next year, her own words are the material.
+   *
+   * The lines come from `writerAttention()` in src/lib/selection/emphasis.ts,
+   * which owns the mapping. This module renders them; it does not decide them.
+   */
+  attention?: readonly string[];
+  /**
+   * HER FREE TEXT, VERBATIM, when the piece is allowed to use it.
+   *
+   * Passed only where a curator has decided it should be — an inside joke is
+   * hers and putting it in every piece would spend it. It is never summarised
+   * and never parsed on the way here; the writer is handed her sentence.
+   */
+  hers?: string | null;
 };
 
 /**
@@ -553,6 +574,22 @@ export function writerPrompt(
         .join("\n")
     ),
     "",
+    // WHAT SHE IS BUYING. Its own block, after the piece and before the
+    // instruction to return it, because it changes how the piece is written
+    // rather than what the piece is. Absent entirely when she named nothing —
+    // an empty heading would read as an instruction to do nothing in
+    // particular, which is not the same as no instruction.
+    brief.attention && brief.attention.length > 0
+      ? block("WHAT SHE IS BUYING", bullet(brief.attention)) + "\n"
+      : "",
+    brief.hers && brief.hers.trim().length > 0
+      ? block(
+          "HER OWN WORDS",
+          `  She wrote this, and it is the one part of the application nobody\n` +
+            `  should paraphrase. Use it or leave it; do not improve it.\n\n` +
+            `  ${brief.hers.trim()}`
+        ) + "\n"
+      : "",
     "Return the finished piece and nothing else. No preamble, no alternatives,",
     "no explanation of the choices, no offer to revise.",
   ].join("\n");

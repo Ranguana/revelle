@@ -346,8 +346,12 @@ try {
     const world = await ensureWorld(client, menu.destination, "seed-menus");
     if (world.created) stubbed.push(world.slug);
     await client.query(
-      `insert into menu_world (menu_id, world_id, affinity, note)
-       values ($1, $2, 1.000, $3)
+      // `native` is the CLAIM db/019 added, and it is the whole of what this
+      // row has always meant: docs/menus.md sits each menu UNDER a destination
+      // heading. It is why "Havana's plantains are not an option in the
+      // Dolomites" is now enforced instead of merely likely.
+      `insert into menu_world (menu_id, world_id, native, affinity, note)
+       values ($1, $2, true, 1.000, $3)
        on conflict (menu_id, world_id) do nothing`,
       [menuId, world.id, "Written for this destination. docs/menus.md."]
     );

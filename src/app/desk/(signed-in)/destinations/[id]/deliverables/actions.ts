@@ -20,8 +20,19 @@ import { recordAction, requireStaff } from "@/lib/staff";
  *
  *   THE INGREDIENTS   `<pool>_world` — how a product, a game, a menu, a drink
  *                     or a soundtrack behaves UNDER this destination. Stage 3 of
- *                     docs/selection-spec.md, as two columns: `forbidden` is a
- *                     structural never, `affinity` is a signed re-weighting.
+ *                     docs/selection-spec.md, as three columns:
+ *
+ *                       forbidden  a structural never.
+ *                       native     WRITTEN FOR HERE. A whitelist claim: an
+ *                                  ingredient with any native row is eligible
+ *                                  only under the destinations it claims, and
+ *                                  ticking this box takes it away from every
+ *                                  other destination in the library. db/019.
+ *                       affinity   a signed re-weighting, and ONLY that. 1.0
+ *                                  means "as strongly as I can say it", not
+ *                                  "and nowhere else" — which is exactly why
+ *                                  the claim is a box and not a number.
+ *
  *                     A missing row means neutral, which is the correct
  *                     default and why nothing is listed until it is scoped.
  */
@@ -152,26 +163,40 @@ export async function scopeIngredient(form: FormData): Promise<void> {
 
   const { table, column } = POOLS[pool];
   const forbidden = form.get("forbidden") !== null;
+  // A veto wins over a claim, and the database has a CHECK saying the two
+  // cannot both be true. Resolving it here rather than letting the constraint
+  // fire means a curator who ticks both gets the stricter reading instead of a
+  // stack trace — and the stricter reading is the right one, for the reason
+  // claimEligibility() gives: a veto that can be outvoted is not a veto.
+  const native = !forbidden && form.get("native") !== null;
   const raw = Number(String(form.get("affinity") ?? "0"));
   const affinity = Number.isFinite(raw) ? Math.max(-1, Math.min(1, raw)) : 0;
   const note = String(form.get("note") ?? "").trim() || null;
 
   await query(
-    `insert into ${table} (${column}, world_id, forbidden, affinity, note)
-     values ($1, $2, $3, $4, $5)
+    `insert into ${table} (${column}, world_id, forbidden, native, affinity, note)
+     values ($1, $2, $3, $4, $5, $6)
      on conflict (${column}, world_id) do update
        set forbidden = excluded.forbidden,
+           native = excluded.native,
            affinity = excluded.affinity,
            note = excluded.note`,
-    [entityId, worldId, forbidden, affinity, note]
+    [entityId, worldId, forbidden, native, affinity, note]
   );
 
   await recordAction(staff, {
     action: "ingredient.scoped",
     entityTable: pool,
     entityId,
-    summary: `${pool} ${forbidden ? "forbidden" : `affinity ${affinity}`} under this destination`,
-    detail: { worldId, forbidden, affinity },
+    summary:
+      `${pool} ` +
+      (forbidden
+        ? "forbidden"
+        : native
+          ? `written for this destination only (affinity ${affinity})`
+          : `affinity ${affinity}`) +
+      " under this destination",
+    detail: { worldId, forbidden, native, affinity },
   });
 
   revalidatePath(`/desk/destinations/${worldId}/deliverables`);

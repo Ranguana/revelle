@@ -154,6 +154,64 @@ export type Application = {
   createdAt: string;
 };
 
+// ── the emphasis ─────────────────────────────────────────────────────
+
+/** The six answers to "what do you want more of". AFFINITIES in quiz.ts. */
+export type EmphasisCode =
+  | "one_moment"
+  | "ease"
+  | "beauty"
+  | "ritual"
+  | "wit"
+  | "late";
+
+/**
+ * WHICH DELIVERABLE SHE VALUES — and emphatically not a taste.
+ *
+ * "It's the only question on the quiz that tells you which deliverable she
+ * values, and averaging it into taste weights discards exactly that."
+ *
+ * Built by src/lib/selection/emphasis.ts, which carries the whole mapping and
+ * the argument for it. Consumed at stage 4 (the plan promotes the guaranteed
+ * slots) and by the voice layer (`attention`). It never touches the preference
+ * vector, and `affinity` is a non-taste dimension in vector.ts so that it
+ * cannot.
+ */
+export type Emphasis = {
+  /** What she tapped, in vocabulary order. */
+  codes: EmphasisCode[];
+  /**
+   * slot_kind codes promoted from optional to required — which is what a slot
+   * weight means in a beam search. See emphasis.ts on why this is a guarantee
+   * and not a multiplier.
+   */
+  guaranteed: string[];
+  /** What the writer must spend its attention on. The voice layer's half. */
+  attention: string[];
+  /** For the curator, in the founder's own sentences. Reaches explain(). */
+  notes: string[];
+  /**
+   * "A ritual we repeat next year" — the highest-LTV answer on the quiz. Also
+   * recorded on the MEMBER RECORD by db/020, because it is a fact about her
+   * rather than about this evening.
+   */
+  repeatable: boolean;
+  /** "Everything already handled". Forces the sleight-of-hand tier. */
+  effortless: boolean;
+  /** How The Prep is written. `brief` is what `ease` buys. */
+  prepRegister: "brief" | "full";
+  /** Product budget shifted toward tabletop. */
+  tabletop: boolean;
+  /** The Soundtrack arc extends and The Ending moves late. */
+  runsLate: boolean;
+  /**
+   * "An inside joke, made real" — WHICH THE CATALOGUE CANNOT SATISFY. Her free
+   * text is weighted up in the writer prompt and a follow-up is owed. Nothing
+   * is ever selected to stand in for it.
+   */
+  needsHerMaterial: boolean;
+};
+
 /** A current taste_signal row — db/002, superseded rows already excluded. */
 export type HistorySignal = {
   facetId: string | null;
@@ -204,6 +262,50 @@ export type EligibilityClaim = {
   note: string | null;
 };
 
+/**
+ * ONE STRUCTURAL DEMAND AN INGREDIENT MAKES OF THE ROOM — db/020.
+ *
+ * NOT A TASTE, and deliberately not a facet. A facet is something she can have
+ * an opinion about and something a destination can be tagged with; "needs a
+ * kitchen" is neither. Keeping these out of the facet vocabulary is what stops
+ * them being scored by accident — `facetOverlap` and `similarity` both read
+ * `facets`, and two menus that both need an oven are not thereby similar.
+ *
+ * See src/lib/selection/venue.ts for the rule, and db/020 for the five terms.
+ */
+export type StructuralRequirement = {
+  /** structural_requirement.code — 'requires_outdoors', 'noise_ceiling', … */
+  code: string;
+  /** "Needs a full kitchen". For a curator. */
+  label: string;
+  /**
+   * The verb phrase that completes "it …" in a rejection sentence: "needs to
+   * be outdoors", "will not survive a deposit". Held on the row so the reading
+   * of a code like `noise_ceiling` is never inferred from its name.
+   */
+  demand: string;
+  /** The curator's note on THIS ingredient carrying it, when there is one. */
+  note: string | null;
+};
+
+/**
+ * THE ROOM SHE IS ACTUALLY IN — db/020's venue_affordance, for her answer.
+ *
+ * It never scores anything. It is a set of yes/no affordances, consumed once,
+ * at stage 3, as a filter over the pool. Null on the snapshot means the house
+ * does not know the room and nothing is pruned.
+ */
+export type Venue = {
+  /** environment_type. Her answer, verbatim. */
+  environment: string;
+  /** "An apartment". For a sentence. */
+  label: string;
+  /** requirement code -> does this room afford it. Missing means yes. */
+  provides: Record<string, boolean>;
+  /** requirement code -> why not, in the house's words. */
+  notes: Record<string, string>;
+};
+
 /** A published destination, with everything the engine needs to judge it. */
 export type Destination = {
   id: string;
@@ -216,11 +318,35 @@ export type Destination = {
   isFixture: boolean;
 };
 
-/** How an ingredient behaves under one destination — stage 3. */
+/**
+ * How an ingredient behaves under one destination — stage 3.
+ *
+ * THREE STATES, NOT TWO, and the third one is what makes docs/drinks.md true:
+ * "Havana's daiquiris are not an option at the Dolomites." `forbidden` vetoes,
+ * `native` CLAIMS, and a row that does neither is a weight and nothing more.
+ * The rule over the three is claimEligibility() in occasion.ts, which is the
+ * same rule the occasion and slot axes run. See db/019.
+ */
 export type WorldScope = {
   forbidden: boolean;
+  /**
+   * WRITTEN FOR THIS DESTINATION. Any native row turns the whole set into a
+   * whitelist: the ingredient is eligible only where it claims.
+   *
+   * Optional so that a snapshot assembled by hand stays valid without being
+   * edited — same concession `printedMatter` makes, and it means the same
+   * thing as false: this row makes no claim.
+   */
+  native?: boolean;
   /** Signed -1..1, consumed as an additive term. No row means zero. */
   affinity: number;
+  /**
+   * The destination's name, carried for one sentence: "written for HAVANA, THE
+   * SMALL HOURS, not for PORT CLYDE" in a catalogue gap. A read-time join
+   * result, not a second copy of anything — `Facet.label` and
+   * `Destination.name` are carried the same way and for the same reason.
+   */
+  name?: string | null;
   note: string | null;
 };
 
@@ -279,6 +405,16 @@ export type Ingredient = {
    * the same thing to every reader: this ingredient prints nothing.
    */
   printedMatter?: readonly PrintedPiece[];
+  /**
+   * WHAT THE ROOM HAS TO PROVIDE — db/020, and the venue's only lever.
+   *
+   * Optional rather than an empty array, and absent means the same as empty:
+   * this ingredient works anywhere. That is the safe default and it is the one
+   * the founder asked for by name — where tagging is a judgement call, leave it
+   * untagged rather than guess, because a wrong tag deletes a deliverable
+   * silently and a missing one costs a second look.
+   */
+  requirements?: readonly StructuralRequirement[];
   isFixture: boolean;
 };
 
@@ -371,6 +507,14 @@ export type UnitSlot = {
   dayIndex: number | null;
   position: number;
   note: string;
+  /**
+   * PROMOTED BY HER EMPHASIS — she asked for this deliverable by name.
+   *
+   * Carried separately from `required` even though it sets it, because the two
+   * are different facts and a curator reading "forced" needs to know which one
+   * she is looking at: `required` is the occasion's shape, this is her answer.
+   */
+  guaranteed?: boolean;
 };
 
 export type Catalogue = {
@@ -379,6 +523,22 @@ export type Catalogue = {
   ingredients: Ingredient[];
   slotRules: SlotRule[];
   shape: OccasionShape;
+  /**
+   * THE ROOM SHE IS IN, as affordances. Null when the house cannot resolve her
+   * answer to a row, in which case nothing is pruned.
+   *
+   * On the CATALOGUE rather than on the Application on purpose: what an
+   * apartment affords is the house's knowledge, not hers. She answered a
+   * question about a room; the mapping from that answer to "there is no
+   * outdoors" is db/020's, and it is a thing the house can be wrong about and
+   * correct without reopening her application.
+   *
+   * Optional so that a snapshot assembled by hand stays valid without being
+   * edited — the same concession `printedMatter` and `WorldScope.native` make,
+   * and it means the same thing as null: no room is known, so nothing is
+   * pruned.
+   */
+  venue?: Venue | null;
   /** Every assemblage that has actually been delivered. Stage 5. */
   issuedFingerprints: string[];
 };
@@ -483,6 +643,19 @@ export type Swap = {
 export type Elimination = {
   destinationName: string;
   reason: string;
+  /**
+   * WHICH TIER KILLED IT, and the two must never be collapsed into one list
+   * that reads as "rejected".
+   *
+   *   dealbreaker  she said this would ruin it. A veto.
+   *   occasion     the destination itself refuses this occasion.
+   *   voice        it does not sound like her people. A TIER, not a low score:
+   *                the tone filter runs before the aesthetic ranking and the
+   *                aesthetic ranking cannot bring it back. See tone.ts.
+   */
+  tier: "dealbreaker" | "occasion" | "voice";
+  /** The tone match, for a voice elimination. Null otherwise. */
+  toneMatch: number | null;
 };
 
 export type BudgetReport = {
@@ -519,6 +692,21 @@ export type Explanation = {
   gaps: string[];
   /** Slots she does not have. Not gaps, and never in the same list. */
   excluded: string[];
+  /**
+   * WHICH DELIVERABLE SHE VALUES, and what was done about it.
+   *
+   * Its own list rather than folded into `forced`, because a curator reading a
+   * candidate has to be able to see the one thing on the quiz that says what
+   * she is buying — including the two answers the catalogue cannot satisfy on
+   * its own, which arrive here as an owed follow-up rather than as silence.
+   */
+  emphasis: string[];
+  /**
+   * THE ROOM, and only ever what it removed. Never why a destination was
+   * chosen: the venue does not touch the destination, and a sentence here
+   * saying otherwise would be the first crack in the thesis.
+   */
+  venue: string[];
   confidence: string[];
   /** Her free-text answer, verbatim. Never summarised. */
   secret: string | null;
@@ -559,6 +747,8 @@ export type Candidate = {
 export type SelectionResult = {
   candidates: Candidate[];
   vector: PreferenceVector;
+  /** Which deliverable she values. Never part of the vector. */
+  emphasis: Emphasis;
   eliminated: Elimination[];
   /** Set when dealbreakers left nothing at all. */
   impasse: string | null;
@@ -596,6 +786,14 @@ export type EngineOptions = {
   inheritedFacetWeight: number;
   /** Multiplicative fuzz on rank. Published guidance is 1.5–3. */
   ditherEpsilon: number;
+  /**
+   * THE VOICE BAR — the tier, in one number. Cosine, −1..1. See tone.ts.
+   *
+   * A destination whose tone match falls below this is OUT OF STAGE 2, at any
+   * aesthetic score, and the dither cannot bring it back. Picked from the real
+   * catalogue rather than from taste; the argument is on DEFAULT_OPTIONS below.
+   */
+  toneThreshold: number;
   issuance: {
     /** exp(-α · times issued). */
     frequencyDecay: number;
@@ -624,6 +822,52 @@ export const DEFAULT_OPTIONS: EngineOptions = {
   softNegativeRatio: 0.2,
   inheritedFacetWeight: 0.35,
   ditherEpsilon: 2,
+  /**
+   * 0.20, AND HERE IS WHERE IT CAME FROM.
+   *
+   * Measured — `npm run check:tone-threshold` reprints this — against the
+   * thirteen destinations that carry authored tone tags in
+   * src/lib/destinations.ts, crossed with four thousand sampled host answers at
+   * one to seven tiles each, which is the range the quiz allows. What the
+   * number does to the surviving set is the only question worth asking of it:
+   *
+   *   bar    none    one    two   three+   median survivors
+   *   0.00   0.0%   0.0%   0.0%  100.0%   11   — not a filter at all
+   *   0.10   0.0%   0.0%   1.2%   98.8%    9
+   *   0.15   0.0%   0.1%   2.8%   97.2%    8
+   *   0.20   0.0%   0.1%   5.6%   94.3%    7   ← chosen
+   *   0.25   0.0%   2.1%   7.2%   90.6%    6
+   *   0.30   0.1%   4.6%  10.8%   84.5%    5
+   *   0.40   1.6%  13.0%  22.2%   63.3%    3
+   *   0.50   7.6%  33.0%  30.8%   28.6%    2   — a third of hosts down to one
+   *
+   * Three properties decided it, in this order:
+   *
+   *   1. IT MUST ACTUALLY CUT. At 0.20 the median host loses six of thirteen —
+   *      close to half the library. That is a tier. At 0 nothing is removed and
+   *      "voice wins" is a sentence in a comment.
+   *   2. THE SHORTLIST MUST SURVIVE IT. The curator is shown three candidates,
+   *      and the dither — the thing that stops two similar customers getting the
+   *      same Revelle — is what needs them. With fewer than three survivors
+   *      engine.ts reuses one and she is choosing between a thing and itself.
+   *      94.3% of hosts keep three or more at 0.20; that collapses past 0.30.
+   *   3. THE FALLBACK MUST BE EXCEPTIONAL. Nothing at all survives for 0.0% of
+   *      hosts at 0.20, so the hard-clash path is a rare event the house learns
+   *      from rather than a route the engine takes daily.
+   *
+   * The sanity check, on the founder's own example: a warm, loud, sentimental
+   * group scores HAVANA 0.74, CATSKILLS 0.51, LAS VEGAS 0.42, NEW ORLEANS 0.39,
+   * NEW YORK 0.32, NANTUCKET 0.25, TAHITI 0.21 — seven through — and cuts
+   * WESTHAMPTON, 1976 at −0.28, CÔTE D'AZUR at −0.08 and BIG SUR at −0.07,
+   * which are the driest and quietest destinations in the library and exactly
+   * the ones that should not be written for people who cry at the toast.
+   *
+   * REFIT IT WHEN THE LIBRARY GROWS. The right number is a property of how
+   * densely the catalogue covers the voice space, not a constant of nature. As
+   * more destinations are authored the same bar will leave more survivors, and
+   * the number to hold roughly steady is the "three+" column rather than 0.20.
+   */
+  toneThreshold: 0.2,
   issuance: {
     frequencyDecay: 0.15,
     recencyWeight: 0.6,

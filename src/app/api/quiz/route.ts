@@ -1,5 +1,7 @@
 import { pool, transaction } from "@/lib/db";
 import { EmailNotConfiguredError, sendQuizConfirmation } from "@/lib/email";
+import { enqueueJobOn } from "@/lib/jobs";
+import { GENERATE, generateDedupeKey } from "@/lib/revelle/generate";
 import {
   APPLY_BY_EMAIL,
   APPLY_BY_IP,
@@ -212,7 +214,33 @@ export async function POST(request: Request): Promise<Response> {
         ]
       );
 
-      return { id: inserted.rows[0].id, replay: false };
+      const quizResponseId = inserted.rows[0].id;
+
+      // ── AND THE JOB, IN THIS SAME TRANSACTION ──────────────────────
+      //
+      // Not after the commit, and not from the pool. The row and the work it
+      // implies are one fact about the world and must not half-exist, exactly
+      // as the customer, the response and the empty taste profile above are.
+      //
+      // Committing the response and then enqueueing separately has two failure
+      // modes and both are silent: a crash in between leaves an application
+      // nothing will ever generate — it sits in the inbox looking normal
+      // forever — and a rollback after a successful enqueue leaves a job whose
+      // subject does not exist, which fails on every attempt until it gives up.
+      // Neither is detectable at the moment it happens. Sharing the client
+      // makes both impossible rather than unlikely; that is what `enqueueJobOn`
+      // is for.
+      //
+      // The dedupe key is live-only (db/008's partial index), so it stops a
+      // double submission producing two runs and stops nothing afterwards — a
+      // curator asking for another look gets a new job.
+      await enqueueJobOn(client, {
+        type: GENERATE,
+        payload: { quizResponseId },
+        dedupeKey: generateDedupeKey(quizResponseId),
+      });
+
+      return { id: quizResponseId, replay: false };
     });
 
     quizResponseId = result.id;

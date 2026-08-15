@@ -354,13 +354,19 @@ try {
       }
 
       await client.query(
-        `insert into game_world (game_id, world_id, forbidden, affinity, note)
-         values ($1, $2, $3, $4, $5)
+        // `native` (db/019) is the CLAIM — "written for this destination and
+        // nowhere else" — and it defaults to false, which is what every
+        // authored game means today. `affinity: 0.4` on ART BATTLE says "the
+        // house would allow it", not "no other house may"; the two are
+        // different columns now precisely so that sentence stays true.
+        `insert into game_world (game_id, world_id, forbidden, native, affinity, note)
+         values ($1, $2, $3, $4, $5, $6)
          on conflict (game_id, world_id) do nothing`,
         [
           idBySlug.get(game.slug),
           world[0].id,
           scope.forbidden === true,
+          scope.native === true,
           scope.affinity ?? 0,
           scope.note ?? null,
         ]

@@ -67,7 +67,7 @@ import type { AddressMode, Formality, HumourMode, Voice } from "./tokens";
  *   recur often enough to match on; the prose stays authoritative for writing.
  *
  *   MANNER is BIPOLAR. One facet per axis, signed: `theatricality` at +1 is a
- *   group that performs, at -1 a group that would rather die than. Two facets
+ *   group that performs, at -1 a group that will not get up in front of a room. Two facets
  *   (`theatrical`, `understated`) would be the same axis said twice, and two
  *   representations of one fact drift.
  */
@@ -896,7 +896,12 @@ export const TONES = [
   },
   {
     code: "never_performs",
-    label: "Would rather die than perform",
+    // Was "Would rather die than perform". A tile a host taps about her own
+    // friends should not spend a death to make a small joke — and the plain
+    // version is the better line anyway: it is a picture rather than a
+    // flourish, which is the rule every other option on this page follows.
+    // The CODE is unchanged; labels are free to be reworded, codes are not.
+    label: "Will not get up in front of a room",
     group: "performance",
     facets: [
       { code: "theatricality", weight: -1 },

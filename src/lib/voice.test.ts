@@ -311,6 +311,189 @@ test("HAVANA, THE SMALL HOURS is a different house from Westhampton", () => {
   );
 });
 
+/* ── the set, rather than the destinations ─────────────────────────────
+ *
+ * Everything above tests a destination. These four test the CATALOGUE, and
+ * they are the tests that decide whether the voice question is worth asking at
+ * all. A library of thirteen houses that are each individually well written and
+ * collectively identical would pass every assertion above this line.
+ *
+ * The design they enforce is written out in full at the top of
+ * src/lib/destinations.ts, under THE ALLOCATION.
+ */
+
+const DESTINATION_KEYS = Object.keys(DESTINATIONS) as (keyof typeof DESTINATIONS)[];
+
+const RESOLVED = new Map(
+  DESTINATION_KEYS.map((key) => [
+    key,
+    destinationVoiceProfile(DESTINATIONS[key].voice, DESTINATION_TONES[key]),
+  ])
+);
+
+test("every tone is claimed by at least one destination", () => {
+  const claimed = new Set<string>();
+  for (const key of DESTINATION_KEYS) {
+    for (const { code } of DESTINATION_TONES[key]) claimed.add(code);
+  }
+  const orphans = ALL.filter((t) => !claimed.has(t.code)).map((t) => t.code);
+  assert.deepEqual(
+    orphans,
+    [],
+    `no destination answers to these tones, so a host who taps one has spent a ` +
+      `tap on nothing: ${orphans.join(", ")}`
+  );
+});
+
+/**
+ * Both ends of every group, mechanically.
+ *
+ * "Both ends" cannot be tested as opposite cosines, because two of the eight
+ * groups are not opposed in facet space — every tone in "how they say the kind
+ * thing" is warm, and they differ in HOW. So the check is the honest one: in
+ * each group, some facet is claimed with a positive weight by one destination
+ * and a negative weight by a different one. That is what makes the group a
+ * question with two answers rather than a shelf of synonyms.
+ */
+test("every tone group has destinations at both ends", () => {
+  for (const group of TONE_GROUPS) {
+    const codes = new Set(ALL.filter((t) => t.group === group.key).map((t) => t.code));
+    const positive = new Map<string, string>();
+    const negative = new Map<string, string>();
+    for (const key of DESTINATION_KEYS) {
+      for (const { code } of DESTINATION_TONES[key]) {
+        if (!codes.has(code)) continue;
+        const tone = ALL.find((t) => t.code === code);
+        assert.ok(tone);
+        for (const { code: facet, weight } of tone.facets) {
+          if (weight > 0 && !positive.has(facet)) positive.set(facet, key);
+          if (weight < 0 && !negative.has(facet)) negative.set(facet, key);
+        }
+      }
+    }
+    const opposed = [...positive.keys()].filter(
+      (facet) => negative.has(facet) && positive.get(facet) !== negative.get(facet)
+    );
+    assert.ok(
+      opposed.length > 0,
+      `"${group.label}" has no destination at the far end. Every house tagged ` +
+        `in this group is making the same claim, so a host's answer inside it ` +
+        `cannot change which destination she gets`
+    );
+  }
+});
+
+/**
+ * No two destinations are the same house wearing two palettes.
+ *
+ * The Havana/Westhampton assertion above is this test for one pair. Run across
+ * all seventy-eight, it is the one that fails when a fourteenth destination is
+ * written by reaching for the tones an author happens to like.
+ *
+ * The ceiling is 0.65 rather than something tighter because real destinations
+ * DO overlap — four of them are slow, three are warm — and the allocation
+ * permits sharing on one group provided two others differ. At the time of
+ * writing the closest pair is Nantucket and Portofino at 0.58: two quiet houses
+ * that part on ceremony, on knowingness and on who they are written for.
+ */
+test("no two destinations resolve to nearly the same voice", () => {
+  let worst = { a: "", b: "", score: -1 };
+  for (let i = 0; i < DESTINATION_KEYS.length; i++) {
+    for (let j = i + 1; j < DESTINATION_KEYS.length; j++) {
+      const a = DESTINATION_KEYS[i];
+      const b = DESTINATION_KEYS[j];
+      const score = voiceAffinity(RESOLVED.get(a)!, RESOLVED.get(b)!);
+      if (score > worst.score) worst = { a, b, score };
+    }
+  }
+  assert.ok(
+    worst.score < 0.65,
+    `${worst.a} and ${worst.b} resolve to nearly the same voice (${worst.score.toFixed(
+      3
+    )}). One of them is not authored, it is echoed`
+  );
+
+  // And the stated facets alone must not repeat: two houses that are both
+  // cordial, impersonal and dry have thrown away the three cheapest axes.
+  const triples = new Map<string, string>();
+  for (const key of DESTINATION_KEYS) {
+    const { formality, address, humour } = DESTINATIONS[key].voice;
+    const triple = `${formality}/${address.mode}/${humour.mode}`;
+    assert.ok(
+      !triples.has(triple),
+      `${key} and ${triples.get(triple)} state the same formality, address and ` +
+        `humour (${triple})`
+    );
+    triples.set(triple, key);
+  }
+});
+
+/**
+ * The test the whole vocabulary exists for: her answer changes the answer.
+ *
+ * Thirteen plausible groups, each described in four to six taps drawn from
+ * different regions of the page — nobody taps five tiles from one heading — and
+ * each one has to land somewhere different. If two of these collide, the
+ * catalogue has a hole in it, and the fix is to re-tag a destination rather
+ * than to loosen this number.
+ *
+ * The margins are honest rather than comfortable: at the time of writing the
+ * narrowest is a late, slow, teasing group choosing CAP FERRAT over TAHITI by
+ * 0.11, which is correct — those two really are the two slow houses, and the
+ * arch one wins a group that teases.
+ */
+test("different kinds of group land on different destinations", () => {
+  const groups: [string, string[]][] = [
+    ["loud, ceremonious, performing", ["makes_an_entrance", "across_the_room", "dressed_up", "does_the_voice", "no_dead_air"]],
+    ["black tie, seated, one toast", ["toasts", "seating_plan", "rises_to_greet", "exact_word", "impeccably_polite"]],
+    ["quiet, exact, told properly", ["comfortable_silence", "corrects_gently", "spells_it_out", "will_look_it_up", "one_conversation"]],
+    ["warm, sentimental, their own language", ["nicknames", "sentimental", "in_jokes", "says_it_out_loud", "teasing"]],
+    ["fast and irreverent", ["all_at_once", "talks_fast", "swears_fondly", "straight_to_gossip", "interrupts"]],
+    ["dry, quiet, explains nothing", ["deadpan", "understated", "low_voices", "explains_nothing", "never_performs"]],
+    ["late, slow, teasing", ["arrives_late", "roughly_eight", "lingers", "unhurried", "teasing"]],
+    ["knowing, oblique, straight to the gossip", ["means_the_other_thing", "leans_in", "one_tells_it", "straight_to_gossip", "long_way_round"]],
+    ["first names, quiet, no fuss", ["first_names", "comfortable_silence", "warm_not_loud", "good_natured", "self_deprecating"]],
+    ["fond out loud, and loud with it", ["good_natured", "laughs_first", "lingers", "says_it_out_loud", "asks_properly"]],
+    ["private, few, between us", ["between_us", "one_conversation", "low_voices", "exact_word", "warm_not_loud"]],
+    ["plain, generous, no speeches", ["compliments_plainly", "no_speeches", "unhurried", "arrives_late", "asks_properly"]],
+    ["laconic, one long story by a fire", ["long_way_round", "self_deprecating", "absurd", "comfortable_silence", "deadpan"]],
+  ];
+
+  const winners = new Map<string, string>();
+  for (const [label, codes] of groups) {
+    for (const code of codes) {
+      assert.ok(TONE_CODES.has(code), `${label} taps ${code}, which is not a tone`);
+    }
+    const hers = toneProfile(codes);
+    const ranked = DESTINATION_KEYS.map(
+      (key) => [key, voiceAffinity(hers, RESOLVED.get(key)!)] as const
+    ).sort((a, b) => b[1] - a[1]);
+
+    const [winner, top] = ranked[0];
+    const [runnerUp, second] = ranked[1];
+
+    assert.ok(
+      !winners.has(winner),
+      `"${label}" and "${winners.get(winner)}" both land on ${winner}. Two ` +
+        `different rooms are being given the same destination, which is the ` +
+        `allocation failing rather than the arithmetic`
+    );
+    winners.set(winner, label);
+
+    assert.ok(
+      top - second > 0.08,
+      `"${label}" cannot choose between ${winner} (${top.toFixed(3)}) and ` +
+        `${runnerUp} (${second.toFixed(3)})`
+    );
+  }
+
+  assert.equal(
+    winners.size,
+    groups.length,
+    "every kind of group must reach a different house"
+  );
+});
+
 test("silence is silence: unchosen tones make no claim", () => {
   const one = toneProfile(["deadpan"]);
   // Exactly the facets `deadpan` claims, and no others. Not a zero for the
