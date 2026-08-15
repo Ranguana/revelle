@@ -404,6 +404,105 @@ export const POSTERS: Record<string, ReactNode> = {
       </g>
     </>
   ),
+
+  /*
+   * The first plate in the library with a TABLE in it, laid and waiting. Every
+   * other poster draws the place; this one draws the place and the evening,
+   * which is why it can carry a long dinner as well as a getaway.
+   */
+  "tahiti": (
+    <>
+      <rect width="300" height="400" fill="var(--bone)" />
+      <circle cx="236" cy="86" r="30" fill="var(--gold-lit)" />
+      <path
+        d="M0 168 C4 150 22 128 44 112 C58 102 66 100 74 108 C94 128 116 148 132 168 Z"
+        fill="var(--night)"
+      />
+      <path
+        d="M108 168 C116 154 128 144 142 138 C154 146 164 156 172 168 Z"
+        fill="var(--night)"
+      />
+      <rect y="168" width="300" height="52" fill="var(--aqua)" />
+      <g fill="var(--bone)" opacity="0.4">
+        <rect y="182" width="300" height="2" />
+        <rect y="200" width="300" height="2" />
+      </g>
+      <rect y="220" width="300" height="180" fill="var(--ground2)" />
+      <g fill="var(--bone)" opacity="0.55">
+        <path d="M0 226 C34 218 66 222 92 232 C58 228 28 230 0 236 Z" />
+        <path d="M196 224 C226 217 258 221 284 231 C252 227 224 229 196 234 Z" />
+      </g>
+      <g>
+        <path d="M150 196 L208 268 L92 268 Z" fill="var(--oxblood)" />
+        <g stroke="var(--bone)" strokeWidth="2" opacity="0.4">
+          <path d="M138.5 214 L161.5 214" />
+          <path d="M124 232 L176 232" />
+          <path d="M109.5 250 L190.5 250" />
+        </g>
+        <rect x="86" y="268" width="128" height="7" fill="var(--gold)" />
+        <circle cx="150" cy="192" r="4" fill="var(--gold)" />
+      </g>
+      <g>
+        <rect x="102" y="275" width="6" height="58" fill="var(--gold)" />
+        <rect x="192" y="275" width="6" height="58" fill="var(--gold)" />
+        <rect x="96" y="296" width="108" height="14" fill="var(--ground2)" />
+        <rect x="96" y="310" width="108" height="5" fill="var(--oxblood)" />
+        <g stroke="var(--night)" strokeWidth="2" opacity="0.4">
+          <path d="M124 296 L124 310 M150 296 L150 310 M176 296 L176 310" />
+        </g>
+        <g fill="var(--oxblood)">
+          <rect x="112" y="278" width="9" height="18" />
+          <rect x="126" y="282" width="8" height="14" />
+        </g>
+        <rect x="180" y="280" width="9" height="16" fill="var(--gold)" />
+        <rect x="96" y="333" width="108" height="6" fill="var(--night)" />
+      </g>
+      <g>
+        <rect x="80" y="288" width="4" height="46" fill="var(--night)" />
+        <path d="M82 288 C74 279 76 266 82 257 C88 266 90 279 82 288 Z" fill="var(--oxblood)" />
+        <path d="M82 281 C78 276 79 269 82 264 C85 269 86 276 82 281 Z" fill="var(--gold-lit)" />
+        <rect x="216" y="292" width="4" height="44" fill="var(--night)" />
+        <path d="M218 292 C210 283 212 270 218 261 C224 270 226 283 218 292 Z" fill="var(--oxblood)" />
+        <path d="M218 285 C214 280 215 273 218 268 C221 273 222 280 218 285 Z" fill="var(--gold-lit)" />
+      </g>
+      <g>
+        <path
+          d="M30 348 C 38 306, 50 262, 58 226"
+          fill="none"
+          stroke="var(--oxblood)"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <g transform="translate(58 226) scale(0.78)" fill="var(--night)">
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="rotate(46)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="rotate(94)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="scale(-1 1)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="scale(-1 1) rotate(46)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="scale(-1 1) rotate(94)" />
+        </g>
+        <circle cx="58" cy="226" r="3.1" fill="var(--oxblood)" />
+      </g>
+      <g>
+        <path
+          d="M282 328 C 279 294, 274 262, 270 240"
+          fill="none"
+          stroke="var(--oxblood)"
+          strokeWidth="4.5"
+          strokeLinecap="round"
+        />
+        <g transform="translate(270 240) scale(0.6)" fill="var(--night)">
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="rotate(46)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="rotate(94)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="scale(-1 1)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="scale(-1 1) rotate(46)" />
+          <path d="M0 0 C -16 -12 -40 -15 -62 -5 C -40 6 -17 9 0 5 Z" transform="scale(-1 1) rotate(94)" />
+        </g>
+        <circle cx="270" cy="240" r="2.4" fill="var(--oxblood)" />
+      </g>
+    </>
+  ),
 };
 
 /**

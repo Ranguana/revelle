@@ -363,6 +363,36 @@ export const LIBRARY: readonly Plate[] = [
       },
     ],
   },
+  {
+    slug: "tahiti",
+    name: "TAHITI, THE LONG WAY",
+    caption: "Tahiti",
+    number: "No. 12",
+    occasion: "The long dinner",
+    tagline: "Torches lit before anyone is hungry. The tide comes to the table.",
+    rows: [
+      {
+        label: "The Arrival",
+        detail:
+          "Shoes left at the edge of the sand, whether or not anyone said to. Something cold and green, handed over rather than offered.",
+      },
+      {
+        label: "The Moment",
+        detail:
+          "The torches lit one at a time, by whoever is nearest, in no particular order and with no announcement.",
+      },
+      {
+        label: "The Table",
+        detail:
+          "Raw fish in lime and coconut, grilled whatever came in, rice, and too much fruit. Rum, and one bottle of something better.",
+      },
+      {
+        label: "The Ending",
+        detail:
+          "The last people move to the sand and stay there. Nobody clears anything until morning.",
+      },
+    ],
+  },
 ];
 
 /**
