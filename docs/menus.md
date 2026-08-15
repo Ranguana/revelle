@@ -270,6 +270,14 @@ version of them does that, and it is worth a facet of its own.
 
 Cap Ferrat and Côte d'Azur as authored: villa and private versus public stage.
 
+**Catskills is not kosher, and that is settled.** Menu 21 ends a brisket dinner
+with cheese blintzes; menu 23 is roast pork with apples. Research flagged both
+as breaking the Borscht Belt register, where the grand hotels were kosher and a
+meat dinner carried no dairy. The founder's answer: this destination is not
+that. It is the last week of camp — a lake, a tent, a swim test in a ledger
+nobody reads again — and it takes its food from the whole Catskills, not from
+the hotel dining rooms. Do not "fix" menus 21 or 23.
+
 **Havana was the first destination the catalogue asked for** rather than the
 other way round: these two menus and the two drink programmes beside them were
 authored before it had a name. It now has a look, a voice and a plate —
