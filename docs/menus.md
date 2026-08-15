@@ -1,7 +1,7 @@
 # Revelle Société — the menus
 
 Authored by Jessica. Source of truth for the menu pool. Thirteen destinations,
-thirty-six menus. The drinks are the other half of the same drop: docs/drinks.md.
+thirty-nine menus. The drinks are the other half of the same drop: docs/drinks.md.
 
 Fields per menu: **dishes in order · what it's for · season · how much making.**
 
@@ -195,6 +195,24 @@ without a machine having to read prose to find out how a menu bends.
 - A beach or pool lunch
 - Warm weather
 - Bought and arranged
+
+**37.**
+- Chickpea pancake in wedges with black pepper, chickpea batons fried in oil, warm focaccia brushed with oil and coarse salt, salted anchovies with butter on toast, olives in brine, fritters of chopped greens
+- Drinks in the cold months, standing
+- Winter
+- Bought and arranged
+
+**38.**
+- Salted anchovies with butter and toast, wide hand-cut pasta sheets with pesto, stockfish stewed with potatoes, black olives and pine nuts, black cabbage after the frost, chestnut cake with pine nuts and rosemary, new oil on the table
+- A long dinner in the cold months
+- Winter
+- Actually made
+
+**39.**
+- Layered fish and vegetable salad built on garlic-rubbed ship's biscuit with green sauce, stuffed veal breast sliced cold, anchovies marinated in lemon, focaccia, sweet fruit bread with pine nuts and candied citron, sweet wine after
+- A long lunch on a cold bright day
+- Winter
+- Half made
 
 ## Havana
 
