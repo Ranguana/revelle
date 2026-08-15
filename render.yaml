@@ -106,6 +106,11 @@ services:
       - key: STAFF_EMAILS
         sync: false
 
+      # The read-only digest token for GET /api/desk/digest. sync: false — it
+      # is a secret, and it FAILS CLOSED: unset means the route answers 404.
+      - key: DESK_DIGEST_TOKEN
+        sync: false
+
       # Optional, defaults to 10 in src/lib/db.ts.
       # - key: DATABASE_POOL_MAX
       #   value: "10"
