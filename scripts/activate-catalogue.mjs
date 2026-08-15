@@ -58,30 +58,47 @@ const pool = new pg.Pool({
 
 const client = await pool.connect();
 
-/** Which pools exist is data (db/002's ingredient_pool), not a list to keep in step. */
+/**
+ * Which pools exist, and what "offered" MEANS for each, is data — db/002's
+ * ingredient_pool carries `active_column` and `active_value` as a column/value
+ * pair rather than a predicate string, deliberately, so nothing here has to
+ * know that a menu says `status = 'active'` and guess that every other pool
+ * agrees. A pool that does not declare a pair has no draft state to leave and
+ * is skipped rather than assumed.
+ */
 const pools = (
-  await client.query(`select table_name from ingredient_pool order by table_name`)
-).rows.map((r) => r.table_name);
+  await client.query(
+    `select entity_table, active_column, active_value
+       from ingredient_pool
+      where active_column is not null
+      order by entity_table`
+  )
+).rows;
 
 let changed = 0;
 
 try {
   await client.query("begin");
 
-  for (const table of pools) {
-    // Every pool table carries `status` with a `draft` member — see the
-    // installers in db/002 and db/010. A pool that does not is a schema change
-    // that should fail loudly here rather than be skipped silently.
+  for (const p of pools) {
+    // format(%I) on the identifiers, never interpolation: these come from a
+    // table a curator could in principle write to, and db/002 makes the same
+    // point about why a predicate string was refused here.
     const { rows } = await client.query(
-      `update ${table} set status = 'active'
-        where status = 'draft'
-        returning slug`
+      `select format(
+                'update %I set %I = %L where %I = %L returning slug',
+                $1, $2, $3, $2, 'draft'
+              ) as sql`,
+      [p.entity_table, p.active_column, p.active_value]
     );
-    if (rows.length) {
-      console.log(`[activate] ${table.padEnd(10)} ${rows.length} draft -> active`);
-      changed += rows.length;
+    const done = await client.query(rows[0].sql);
+    if (done.rows.length) {
+      console.log(
+        `[activate] ${p.entity_table.padEnd(10)} ${done.rows.length} draft -> ${p.active_value}`
+      );
+      changed += done.rows.length;
     } else {
-      console.log(`[activate] ${table.padEnd(10)} nothing in draft`);
+      console.log(`[activate] ${p.entity_table.padEnd(10)} nothing in draft`);
     }
   }
 
