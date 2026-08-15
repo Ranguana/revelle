@@ -157,30 +157,32 @@ export default function QuizFlow() {
 
   if (phase === "done") return <Closing email={sentTo} />;
 
-  const progress = ((stepIndex + (canAdvance ? 1 : 0)) / QUIZ_STEPS.length) * 100;
+  // The progress figure is gone with the bar that displayed it. See the note
+  // in the header below.
   const complaint = failure ?? (showErrors && !canAdvance ? errors[0] : null);
 
   return (
     <div className={styles.shell}>
+      {/*
+        No counter and no progress bar, and both were here.
+
+        docs/copy-brief.md bans them by name — "no step tallies", "no progress
+        bars, step counters, percentage complete" — and the reason is not
+        squeamishness about numbers. A tally turns being asked good questions
+        into a task with a finish line, and a bar that fills is a promise that
+        the end is the good part. Being asked about your friends by someone
+        with taste is the pleasure, not the toll. The stylesheet's .count,
+        .track and .fill are left in place, unused, so nobody re-adds this by
+        finding an orphaned class and assuming it went missing.
+
+        What replaces it is nothing. Each step announces itself with its own
+        eyebrow and heading, which is the orientation that was ever needed.
+      */}
       <header className={styles.bar}>
         <div className={styles.barInner}>
           <Link className={styles.mark} href="/">
             Revelle Société
           </Link>
-          <span className={styles.count}>
-            {String(stepIndex + 1).padStart(2, "0")} /{" "}
-            {String(QUIZ_STEPS.length).padStart(2, "0")}
-          </span>
-        </div>
-        <div
-          className={styles.track}
-          role="progressbar"
-          aria-valuemin={1}
-          aria-valuemax={QUIZ_STEPS.length}
-          aria-valuenow={stepIndex + 1}
-          aria-label="Quiz progress"
-        >
-          <div className={styles.fill} style={{ width: `${progress}%` }} />
         </div>
       </header>
 
