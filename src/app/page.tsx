@@ -114,7 +114,7 @@ export default function Home() {
               <p className={styles.heroSociete}>A société for people who host.</p>
 
               <div className={styles.heroActions}>
-                <Link className={`cta ${styles.ctaHero}`} href="/quiz">
+                <Link className={`cta ${styles.ctaHero}`} href="/apply">
                   Apply for membership
                 </Link>
                 <p className={styles.fine}>No clipboards. No costume rule.</p>
@@ -337,7 +337,7 @@ export default function Home() {
               you&rsquo;d never do twice, so the third is sharper than the first.
             </p>
             <p className={styles.membershipTerms}>Apply once. Dues annually.</p>
-            <Link className="cta" href="/quiz">
+            <Link className="cta" href="/apply">
               Apply
             </Link>
           </div>

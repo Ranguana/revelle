@@ -109,7 +109,9 @@ export async function sendEmail(
  *
  * Plain and short on purpose: image-heavy, link-heavy mail is likelier to be
  * filtered, and this is the first thing a new customer receives from us. It
- * promises nothing about timing that a human cannot keep.
+ * promises nothing about timing, and it says nothing about who or what reads
+ * an application. The house does not introduce its staff (docs/copy-brief.md),
+ * and the opposite claim would be worse — so the question goes unanswered.
  */
 export async function sendQuizConfirmation(to: string): Promise<SendEmailResult> {
   const html = `<!doctype html>
@@ -117,9 +119,9 @@ export async function sendQuizConfirmation(to: string): Promise<SendEmailResult>
   <div style="max-width:34rem;margin:0 auto">
     <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8E8173;margin:0 0 28px">Revelle Soci&eacute;t&eacute;</p>
     <p style="font-size:26px;line-height:1.2;margin:0 0 24px">We have your answers.</p>
-    <p style="margin:0 0 18px;color:#5E5245">A person reads every one of these — not a machine. Yours is in the queue now, and we will write back with your world.</p>
-    <p style="margin:0 0 18px;color:#5E5245">If you think of the thing you forgot to tell us, reply to this email. That reply reaches the same person.</p>
-    <p style="margin:32px 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#8E8173">You bring the occasion</p>
+    <p style="margin:0 0 18px;color:#5E5245">Nothing else is needed from you. Your destination will follow.</p>
+    <p style="margin:0 0 18px;color:#5E5245">If you think of the thing you forgot to tell us, reply to this email.</p>
+    <p style="margin:32px 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#8E8173">Est. for people who host</p>
   </div>
 </body></html>`;
 
@@ -128,13 +130,11 @@ export async function sendQuizConfirmation(to: string): Promise<SendEmailResult>
     "",
     "We have your answers.",
     "",
-    "A person reads every one of these — not a machine. Yours is in the queue",
-    "now, and we will write back with your world.",
+    "Nothing else is needed from you. Your destination will follow.",
     "",
     "If you think of the thing you forgot to tell us, reply to this email.",
-    "That reply reaches the same person.",
     "",
-    "You bring the occasion.",
+    "Est. for people who host",
   ].join("\n");
 
   return sendEmail({

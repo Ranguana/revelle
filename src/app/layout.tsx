@@ -15,6 +15,26 @@ export const metadata: Metadata = {
   // did not survive host-as-hero — see docs/copy-brief.md.
   description:
     "A société for people who host. WESTHAMPTON, 1976 — vintage summer glamour, very questionable houseguests.",
+  // Declared here rather than by the app/icon.svg file convention, because the
+  // mark exists in two colourways and the convention has no way to say which
+  // one a dark browser chrome should take. Order matters: a browser walks the
+  // list and keeps the last one whose media matches, so the light SVG is
+  // stated first and the dark overrides it only where it applies. The 32px PNG
+  // is the fallback for anything that will not take an SVG.
+  icons: {
+    icon: [
+      { url: "/icons/favicon.svg", type: "image/svg+xml" },
+      {
+        url: "/icons/favicon-dark.svg",
+        type: "image/svg+xml",
+        media: "(prefers-color-scheme: dark)",
+      },
+      { url: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {

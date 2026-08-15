@@ -210,8 +210,8 @@ export default function QuizFlow() {
 
             {isLast ? (
               <p className={styles.fine}>
-                One email when your world is ready, and nothing else. No list,
-                no drip, no forwarding it on.
+                One email when your destination is ready, and nothing else. No
+                list, no drip, no forwarding it on.
               </p>
             ) : null}
           </div>
@@ -536,14 +536,19 @@ function Closing({ email }: { email: string }) {
     <div className={styles.done}>
       <div className={styles.doneInner}>
         <p className={styles.doneEyebrow}>Received</p>
+        {/*
+          No claim about who or what reads this. The house does not introduce
+          its staff (docs/copy-brief.md), and the mirror-image line — that a
+          machine does it — would be worse. Silence on the question is the only
+          version that is both true and in voice.
+        */}
         <h1 className={styles.doneTitle}>We have your answers.</h1>
         <p className={styles.doneBody}>
-          A person reads every one of these. Yours is in the queue now, and the
-          confirmation is on its way to <strong>{email || "your inbox"}</strong>.
+          Nothing else is needed from you. The confirmation is on its way to{" "}
+          <strong>{email || "your inbox"}</strong>.
         </p>
         <p className={styles.doneBody}>
           If you think of the thing you forgot to tell us, reply to that email.
-          It reaches the same person.
         </p>
       </div>
 

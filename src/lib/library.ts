@@ -262,6 +262,107 @@ export const LIBRARY: readonly Plate[] = [
       },
     ],
   },
+
+  /*
+   * The three below are the sporty end of the library — occasions where the
+   * day is the thing and dinner is what happens afterwards. They are the first
+   * plates whose art arrived finished rather than being drawn in plates.tsx.
+   *
+   * The taglines follow the house rule and are worth checking against it,
+   * because it is the rule these three could most easily break: a place and a
+   * time, then two concrete details, and never an adjective naming the
+   * feeling. "Bracing", "invigorating" and "adventurous" are exactly the words
+   * a sporty destination invites and exactly the ones that would kill it.
+   */
+  {
+    slug: "big-sur",
+    name: "BIG SUR, JUNE",
+    caption: "Big Sur",
+    number: "No. 06",
+    occasion: "The getaway",
+    tagline: "Fog until noon. Nobody has a signal.",
+    rows: [
+      {
+        label: "The Arrival",
+        detail:
+          "Everyone parks facing out. Coffee from a thermos on the hood, before anyone has said good morning.",
+      },
+      {
+        label: "The Moment",
+        detail:
+          "The pull-off past the bridge at the hour the light goes. Someone calls a spout and everyone agrees they saw it.",
+      },
+      {
+        label: "The Table",
+        detail:
+          "Sourdough, a hard cheese, beer left in the creek. Dinner on the tailgate.",
+      },
+      {
+        label: "The Ending",
+        detail:
+          "The fire until the fog comes in, which it does, and then the cabin.",
+      },
+    ],
+  },
+  {
+    slug: "catskills",
+    name: "CATSKILLS, LAST WEEK OF CAMP",
+    caption: "Catskills",
+    number: "No. 09",
+    occasion: "The weekend away",
+    tagline: "Everyone swims before breakfast. The tent is decorative.",
+    rows: [
+      {
+        label: "The Arrival",
+        detail:
+          "Bunk assignments on a card, hers included. Bug spray by the door, which is where it stays.",
+      },
+      {
+        label: "The Moment",
+        detail:
+          "The swim test. Timed, witnessed, and entered in a ledger nobody will ever read again.",
+      },
+      {
+        label: "The Table",
+        detail:
+          "Corn and foil packets in the coals, drinks in enamel mugs. Marshmallows, without irony.",
+      },
+      {
+        label: "The Ending",
+        detail:
+          "The dock after dark. Whoever is last up turns off the string lights.",
+      },
+    ],
+  },
+  {
+    slug: "dolomites",
+    name: "DOLOMITES, FIRST SNOW",
+    caption: "Dolomites",
+    number: "No. 19",
+    occasion: "The getaway",
+    tagline: "The first gondola at eight. Lunch halfway down.",
+    rows: [
+      {
+        label: "The Arrival",
+        detail:
+          "Boots by the stove in a row. Something hot poured before the coats come off.",
+      },
+      {
+        label: "The Moment",
+        detail:
+          "The last car up, taken for the view and not the run. Nobody talks for a minute.",
+      },
+      {
+        label: "The Table",
+        detail:
+          "One pot on the table, bread and a knife beside it. Grappa afterwards, standing.",
+      },
+      {
+        label: "The Ending",
+        detail: "Cards at the long table until the fire goes down.",
+      },
+    ],
+  },
 ];
 
 /**

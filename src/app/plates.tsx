@@ -245,6 +245,165 @@ export const POSTERS: Record<string, ReactNode> = {
       <rect y="382" width="300" height="18" fill="var(--aqua)" />
     </>
   ),
+
+  /*
+   * The three below came in as finished SVG rather than being drawn here, and
+   * they arrived already speaking the house palette — every fill in the source
+   * was one of the seven colours this file has a token for. The literals are
+   * swapped for tokens on the way in, per the rule at the top: a poster that
+   * names a colour is a poster that can drift.
+   *
+   *   #FBF4E7 bone   #E3C9A4 ground2   #C9922F gold   #E8A13A gold-lit
+   *   #1F6B7A aqua   #16242C night     #A83E24 oxblood
+   *
+   * The originals are kept verbatim in public/destinations/ so the art can be
+   * re-cut without reverse-engineering it back out of JSX.
+   */
+  "big-sur": (
+    <>
+      <rect width="300" height="400" fill="var(--bone)" />
+      <rect y="0" width="300" height="196" fill="var(--ground2)" />
+      <circle cx="76" cy="62" r="30" fill="var(--gold-lit)" />
+      <rect y="196" width="300" height="204" fill="var(--aqua)" />
+      <g fill="var(--bone)" opacity="0.35">
+        <rect y="232" width="300" height="2" />
+        <rect y="268" width="300" height="2" />
+        <rect y="312" width="300" height="2" />
+      </g>
+      <path d="M0 196 L0 108 C62 112 104 148 132 196 Z" fill="var(--night)" />
+      <path d="M300 196 L300 128 C258 136 226 160 208 196 Z" fill="var(--night)" />
+      <g fill="var(--oxblood)">
+        <rect x="104" y="176" width="118" height="8" />
+        <path d="M112 184 A34 34 0 0 1 180 184 L172 184 A26 26 0 0 0 120 184 Z" />
+        <rect x="112" y="184" width="5" height="16" />
+        <rect x="146" y="184" width="5" height="10" />
+        <rect x="176" y="184" width="5" height="16" />
+        <rect x="206" y="184" width="6" height="20" />
+      </g>
+      <path
+        d="M0 108 C40 120 74 148 96 188"
+        fill="none"
+        stroke="var(--gold)"
+        strokeWidth="2"
+        strokeDasharray="7 6"
+      />
+      <g fill="var(--night)">
+        <path d="M28 132 C36 132 38 112 32 94 C26 112 20 132 28 132 Z" />
+        <path d="M54 148 C62 148 64 130 58 112 C52 130 46 148 54 148 Z" />
+      </g>
+      <g fill="var(--bone)" opacity="0.9">
+        <path d="M212 340 C232 332 252 336 268 348 C246 344 228 344 212 350 Z" />
+        <path d="M40 372 C62 364 84 368 100 380 C76 374 58 376 40 382 Z" />
+      </g>
+    </>
+  ),
+
+  "catskills": (
+    <>
+      <rect width="300" height="400" fill="var(--bone)" />
+      <circle cx="70" cy="58" r="24" fill="var(--gold)" />
+      <path
+        d="M0 214 C58 168 104 186 150 166 C202 144 250 160 300 140 L300 214 Z"
+        fill="var(--aqua)"
+        opacity="0.45"
+      />
+      <path
+        d="M0 246 C54 200 108 220 156 198 C208 174 254 192 300 172 L300 246 Z"
+        fill="var(--aqua)"
+        opacity="0.75"
+      />
+      <path
+        d="M0 286 C50 240 110 262 162 238 C214 214 258 232 300 210 L300 286 Z"
+        fill="var(--night)"
+      />
+      <g
+        stroke="var(--oxblood)"
+        strokeWidth="2.25"
+        fill="none"
+        strokeLinecap="square"
+      >
+        <path d="M212 226 L219 160 M244 226 L237 160" />
+        <path d="M215 198 L241 198 M217 179 L239 179" />
+        <path d="M216 213 L240 213" />
+      </g>
+      <rect x="212" y="155" width="32" height="5" fill="var(--oxblood)" />
+      <path d="M210 155 L228 140 L246 155 Z" fill="var(--oxblood)" />
+      <rect y="286" width="300" height="114" fill="var(--ground2)" />
+      <g>
+        <path d="M56 350 L92 292 L128 350 Z" fill="var(--oxblood)" />
+        <path d="M78 350 L92 322 L106 350 Z" fill="var(--bone)" />
+        <rect x="52" y="350" width="80" height="6" fill="var(--night)" />
+      </g>
+      <g fill="var(--night)">
+        <path d="M184 336 L170 336 L184 292 L198 336 Z" />
+        <rect x="182" y="336" width="4" height="10" />
+        <path d="M216 344 L204 344 L216 306 L228 344 Z" />
+        <rect x="214" y="344" width="4" height="9" />
+        <path d="M250 336 L236 336 L250 292 L264 336 Z" />
+        <rect x="248" y="336" width="4" height="10" />
+      </g>
+      <g
+        stroke="var(--night)"
+        strokeWidth="2.5"
+        fill="none"
+        strokeDasharray="8 7"
+        strokeLinecap="round"
+      >
+        <path d="M22 386 C62 374 46 356 88 346" />
+      </g>
+      <g fill="var(--gold)">
+        <circle cx="150" cy="366" r="4" />
+        <circle cx="166" cy="382" r="4" />
+        <circle cx="134" cy="384" r="4" />
+      </g>
+    </>
+  ),
+
+  "dolomites": (
+    <>
+      <rect width="300" height="400" fill="var(--bone)" />
+      <circle cx="222" cy="70" r="26" fill="var(--gold)" />
+      <path
+        d="M0 268 L58 152 L104 218 L150 118 L214 240 L246 196 L300 268 Z"
+        fill="var(--night)"
+      />
+      <path d="M150 118 L128 152 L172 152 Z" fill="var(--bone)" />
+      <path d="M58 152 L44 178 L74 178 Z" fill="var(--bone)" />
+      <path d="M246 196 L236 214 L258 214 Z" fill="var(--bone)" />
+      <path
+        d="M0 268 L300 268 L300 292 L0 292 Z"
+        fill="var(--aqua)"
+        opacity="0.25"
+      />
+      <path d="M14 104 L286 60" stroke="var(--oxblood)" strokeWidth="1.5" />
+      <g transform="translate(150 86) rotate(-9)">
+        <rect x="-17" y="-2" width="34" height="22" fill="var(--oxblood)" />
+        <rect x="-17" y="4" width="34" height="3" fill="var(--bone)" opacity="0.9" />
+        <rect x="-2" y="-12" width="4" height="10" fill="var(--night)" />
+      </g>
+      <rect y="292" width="300" height="108" fill="var(--ground2)" />
+      <g>
+        <rect x="36" y="316" width="72" height="46" fill="var(--oxblood)" />
+        <path d="M26 316 L72 288 L118 316 Z" fill="var(--night)" />
+        <rect x="54" y="330" width="18" height="18" fill="var(--bone)" />
+        <rect x="80" y="330" width="14" height="18" fill="var(--gold)" />
+        <rect x="36" y="362" width="72" height="5" fill="var(--night)" />
+      </g>
+      <g
+        stroke="var(--night)"
+        strokeWidth="2.5"
+        fill="none"
+        strokeDasharray="8 7"
+        strokeLinecap="round"
+      >
+        <path d="M140 386 C176 372 158 348 196 336 C222 328 220 310 240 302" />
+      </g>
+      <g fill="var(--aqua)">
+        <path d="M236 300 C244 300 246 278 240 258 C234 278 228 300 236 300 Z" />
+        <path d="M266 308 C275 308 277 284 270 262 C263 284 257 308 266 308 Z" />
+      </g>
+    </>
+  ),
 };
 
 /**
