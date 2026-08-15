@@ -124,113 +124,15 @@ textarea {
 }
 
 /* ── the arc ──────────────────────────────────────────────────────
-   The one approved ornament. Bleeds off an edge and is cropped by its
-   container's overflow, so it reads as a sweep passing through rather than
-   a logo. Never more than one on a screen. */
+   Retired from the landing page, which now opens inside a destination and
+   carries one ornament of its own (the brass rule with a node). It survives
+   here for the quiz's closing panel: absolutely positioned, cropped by its
+   container's overflow, never more than one on a screen. */
 
 .arc {
   position: absolute;
   pointer-events: none;
   z-index: 0;
-}
-
-/* ── the landing ─────────────────────────────────────────────────── */
-
-.hero {
-  background: var(--night);
-  color: var(--night-ink);
-  padding: clamp(2.5rem, 8vw, 6rem) clamp(1.25rem, 5vw, 5rem)
-    clamp(3rem, 10vw, 7rem);
-  position: relative;
-  overflow: hidden;
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-}
-
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: auto -20% -60% 40%;
-  height: 90%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(111, 179, 194, 0.2),
-    transparent 65%
-  );
-  pointer-events: none;
-}
-
-.hero__inner {
-  position: relative;
-  max-width: 78rem;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.hero__copy {
-  position: relative;
-  z-index: 1;
-  max-width: min(100%, 42rem);
-}
-
-.arc--hero {
-  right: -14%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: min(64vw, 46rem);
-  aspect-ratio: 1;
-}
-
-@media (max-width: 62rem) {
-  .arc--hero {
-    right: -34%;
-    width: 92vw;
-    opacity: 0.18;
-  }
-}
-
-.hero .eyebrow {
-  color: var(--night-aqua);
-}
-
-.wordmark {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: clamp(1.5rem, 1.3rem + 1.2vw, 2.25rem);
-  letter-spacing: 0.02em;
-  margin: 0.4rem 0 clamp(2.5rem, 8vw, 6rem);
-}
-
-.hero h1 {
-  font-size: clamp(2.375rem, 1.6rem + 3.2vw, 4.25rem);
-  max-width: 16ch;
-}
-
-.hero h1 em {
-  color: var(--night-aqua);
-}
-
-.hero__lede {
-  margin: clamp(1.5rem, 4vw, 2.5rem) 0 0;
-  max-width: 46ch;
-  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
-  color: var(--night-soft);
-}
-
-.hero__lede strong {
-  color: var(--night-ink);
-  font-weight: 700;
-}
-
-.hero .cta {
-  margin-top: clamp(2rem, 5vw, 3rem);
-  background: var(--night-aqua);
-  color: #0c1615;
-}
-
-.hero .cta:hover {
-  background: #8fcdd9;
 }
 
 @media (prefers-reduced-motion: reduce) {

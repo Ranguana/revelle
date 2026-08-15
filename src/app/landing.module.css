@@ -1,0 +1,974 @@
+/*
+ * The landing page.
+ *
+ * Designed at 390px first, like the quiz — that is the device this is read on,
+ * and every grid below starts as one column and earns more. Nothing is
+ * positioned absolutely except the hero field and two ornaments, so there is
+ * nothing that can land on top of a line of type at a width nobody tested.
+ *
+ * ── The rules this page keeps ────────────────────────────────────────
+ *
+ *  · No border radius. The two exceptions are circles that are drawings: the
+ *    punched hole in a luggage label and the seal.
+ *  · Transitions are 160ms and only ever on colour, border-colour or
+ *    transform. Nothing animates on entry and nothing animates on scroll.
+ *    globals.css turns all of it off under prefers-reduced-motion.
+ *  · No italics. Not declared, not synthesised, not asked for. Emphasis is
+ *    colour, weight and scale.
+ *  · No colour is named here. Every value is a token, so a destination can
+ *    repaint a section by supplying its own set — which is exactly what the
+ *    hero and the worked example do.
+ */
+
+.wrap {
+  max-width: 78rem;
+  margin: 0 auto;
+}
+
+/* ── the hero ──────────────────────────────────────────────────────
+   A destination, set like a plate, with the photography behind it. It opens
+   INSIDE the place rather than describing the service: what a Revelle is
+   should be legible in the first second, and a sentence explaining it would
+   take longer to read than the plate takes to land. */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--night);
+  color: var(--night-ink);
+  padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1.25rem, 5vw, 5rem)
+    clamp(2rem, 5vw, 3.5rem);
+}
+
+/*
+ * The photography slot, drawn.
+ *
+ * A destination's hero is a photograph. Until there is one, this is the frame
+ * it will drop into — deep evening, brass off the top right, one cool edge at
+ * the bottom left, and a 3px horizontal screen over all of it so the field
+ * reads as something printed rather than as a gradient. No image, no CDN, no
+ * request that leaves the page.
+ */
+.heroField {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      92% 62% at 96% 2%,
+      color-mix(in srgb, var(--gold) 62%, transparent),
+      color-mix(in srgb, var(--gold) 14%, transparent) 46%,
+      transparent 76%
+    ),
+    radial-gradient(
+      66% 52% at -8% 106%,
+      color-mix(in srgb, var(--night-aqua) 42%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      96% 64% at 30% 66%,
+      color-mix(in srgb, var(--night-oxblood) 26%, transparent),
+      transparent 76%
+    ),
+    linear-gradient(
+      168deg,
+      var(--night2) 0%,
+      var(--night) 46%,
+      var(--night2) 100%
+    );
+}
+
+/* The screen. A 3px horizontal rule at low contrast, the way a photogravure
+   sits on paper — it is what stops the field reading as a CSS gradient, and it
+   is the only thing here pretending to be a photograph. */
+.heroField::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--night2) 62%, transparent) 0 1px,
+    transparent 1px 3px
+  );
+  box-shadow: inset 0 0 7rem 2rem
+    color-mix(in srgb, var(--night2) 42%, transparent);
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 78rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem 1.5rem;
+  padding-bottom: clamp(1rem, 3vw, 1.5rem);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--night-ink) 20%, transparent);
+}
+
+.wordmark {
+  font-family: var(--display);
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.6rem);
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.mastheadNote {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--night-aqua);
+  margin: 0;
+}
+
+/* `margin-top: auto` above and `margin-bottom: auto` below centre the plate
+   and its two lines in whatever is left under the masthead, at any height,
+   without a single magic number. */
+.heroPlate {
+  margin-top: auto;
+  text-align: center;
+  border: 1px solid color-mix(in srgb, var(--night-ink) 30%, transparent);
+  /* The scrim. A plate laid over a photograph has to hold its own type, so the
+     field is knocked back under it rather than the type being given a shadow. */
+  background: color-mix(in srgb, var(--night2) 66%, transparent);
+  padding: clamp(1.5rem, 6vw, 3rem) clamp(1rem, 4vw, 2.5rem);
+}
+
+.plateIndex {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0;
+}
+
+.doubleRule,
+.doubleRuleInk {
+  height: 3px;
+  margin: clamp(0.9rem, 3vw, 1.35rem) 0;
+}
+
+.doubleRule {
+  border-top: 1px solid color-mix(in srgb, var(--night-ink) 26%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--night-ink) 26%, transparent);
+}
+
+.doubleRuleInk {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.heroName {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 1.05rem + 4.5vw, 4.75rem);
+  line-height: 1.02;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  margin: 0;
+}
+
+/* The one ornament: a brass hairline with a rotated square on it. It replaces
+   the retired arc, and there is never more than one of it on a screen. */
+.node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: clamp(1rem, 3vw, 1.4rem) 0;
+}
+
+.node::before,
+.node::after {
+  content: "";
+  height: 1px;
+  flex: 0 1 5.5rem;
+  background: var(--gold);
+}
+
+.node > span {
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  transform: rotate(45deg);
+}
+
+.heroTagline {
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 0.95rem + 0.7vw, 1.6rem);
+  line-height: 1.35;
+  color: var(--gold);
+  max-width: 30ch;
+  margin: 0 auto;
+}
+
+.heroSociete {
+  font-family: var(--display);
+  font-size: clamp(1.125rem, 1rem + 0.8vw, 1.75rem);
+  line-height: 1.3;
+  text-align: center;
+  margin: clamp(2rem, 6vw, 3rem) 0 0;
+}
+
+.heroActions {
+  margin: clamp(1.5rem, 4vw, 2rem) 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+@media (min-width: 34rem) {
+  .heroActions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+}
+
+.ctaHero {
+  align-self: center;
+}
+
+.fine {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--night-soft);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── where to ─────────────────────────────────────────────────────
+   Four occasions and no caption. A house does not explain its collection. */
+
+.occasions {
+  background: var(--ground);
+  color: var(--ink);
+  padding: clamp(3rem, 8vw, 5.5rem) clamp(1.25rem, 5vw, 5rem);
+  border-bottom: 1px solid var(--rule);
+}
+
+.occasionGrid {
+  list-style: none;
+  margin: clamp(1.75rem, 5vw, 2.75rem) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.75rem, 4vw, 3rem);
+}
+
+@media (min-width: 30rem) {
+  .occasionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .occasionGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.occasion {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: start;
+}
+
+.occasionIcon {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: block;
+}
+
+.occasionName {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.occasionLine {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ── the destinations ────────────────────────────────────────────── */
+
+.library {
+  background: var(--night);
+  color: var(--night-ink);
+  padding: clamp(3.5rem, 9vw, 6.5rem) clamp(1.25rem, 5vw, 5rem);
+}
+
+.eyebrowDark {
+  color: var(--night-aqua);
+}
+
+.plates {
+  list-style: none;
+  margin: clamp(2rem, 5vw, 3.25rem) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+@media (min-width: 48rem) {
+  .plates {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.plate {
+  display: grid;
+  gap: 0.8rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.plate:focus-visible {
+  outline-offset: 4px;
+}
+
+/*
+ * The frame carries its own pinned light palette (see the token block in
+ * page.tsx), so the poster inside it keeps paper white whatever the reader's
+ * system is set to. `--gold-lit` is the only colour the house set has no name
+ * for — brass with the sun on it — and it is mixed here rather than invented.
+ */
+.plateFrame {
+  display: block;
+  --gold-lit: color-mix(in srgb, var(--gold) 58%, var(--bone));
+  border: 1px solid color-mix(in srgb, var(--night-ink) 22%, transparent);
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.plateArt {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+}
+
+.plate:hover .plateFrame {
+  border-color: color-mix(in srgb, var(--gold) 65%, transparent);
+}
+
+.plateOn .plateFrame {
+  border-color: var(--gold);
+  transform: translateY(-4px);
+}
+
+.plateCaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.plateWhere,
+.plateNo {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.plateWhere {
+  color: var(--night-ink);
+}
+
+.plateNo {
+  color: var(--night-aqua);
+}
+
+.panel {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  padding-top: clamp(1.75rem, 4vw, 2.5rem);
+  border-top: 1px solid color-mix(in srgb, var(--night-ink) 30%, transparent);
+}
+
+.panelTitle {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 1.15rem + 1.7vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  overflow-wrap: break-word;
+  margin: 0;
+}
+
+.panelMeta {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--night-aqua);
+  margin: 0.85rem 0 0;
+}
+
+.panelTagline {
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 0.98rem + 0.5vw, 1.45rem);
+  line-height: 1.35;
+  color: var(--gold);
+  max-width: 34ch;
+  margin: 1rem 0 0;
+}
+
+.panelRows {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+@media (min-width: 36rem) {
+  .panelRows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .panelRows {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.panelRow {
+  border-top: 1px solid color-mix(in srgb, var(--night-ink) 22%, transparent);
+  padding-top: 0.9rem;
+}
+
+.panelRowLabel {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--night-aqua);
+  margin: 0 0 0.5rem;
+}
+
+.panelRowDetail {
+  margin: 0;
+  color: var(--night-soft);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+/* ── the worked example ──────────────────────────────────────────
+   The same destination as the hero, in daylight and in full. It is painted
+   from WESTHAMPTON's own palette, so the cream here is not the cream of the
+   section above it — which is the whole point of a look being data. */
+
+.worked {
+  background: var(--ground2);
+  color: var(--ink);
+  padding: clamp(3.5rem, 9vw, 6.5rem) clamp(1.25rem, 5vw, 5rem);
+}
+
+.workedPlate {
+  border: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--ground) 72%, transparent);
+  padding: clamp(1.5rem, 6vw, 3.25rem) clamp(1rem, 4vw, 2.5rem);
+  text-align: center;
+}
+
+.workedTop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+@media (min-width: 44rem) {
+  .workedTop {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+}
+
+.workedWhen,
+.workedIndex {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.workedWhen {
+  color: var(--ink-faint);
+}
+
+.workedIndex {
+  color: var(--oxblood);
+}
+
+.workedName {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 1rem + 4.3vw, 4.5rem);
+  line-height: 1.03;
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  margin: 0;
+}
+
+.nodeInk::before,
+.nodeInk::after,
+.nodeInk > span {
+  background: var(--oxblood);
+}
+
+.workedTagline {
+  font-family: var(--display);
+  font-size: clamp(1.05rem, 0.95rem + 0.7vw, 1.6rem);
+  line-height: 1.35;
+  color: var(--oxblood);
+  max-width: 30ch;
+  margin: 0 auto;
+}
+
+.workedNarrative {
+  margin: clamp(1.75rem, 4vw, 2.5rem) auto 0;
+  max-width: 54ch;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+/* ── what arrives ────────────────────────────────────────────────
+   Eleven pieces in the open. The deliverables ARE the argument, so nothing
+   here is behind a `+`: an accordion would put the two pieces that prove the
+   product — The Edit and The Printed Matter — at rows nine and ten of
+   something nobody opens. */
+
+.arrives {
+  background: var(--ground);
+  color: var(--ink);
+  padding: clamp(3.5rem, 9vw, 6.5rem) clamp(1.25rem, 5vw, 5rem);
+  border-top: 1px solid var(--rule);
+}
+
+.deliverables {
+  list-style: none;
+  margin: clamp(1.75rem, 5vw, 2.75rem) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+@media (min-width: 36rem) {
+  .deliverables {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .deliverables {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.deliverable {
+  border-top: 1px solid var(--rule);
+  padding: 0.95rem 0 1.1rem;
+}
+
+.deliverableName {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+.deliverableLine {
+  margin: 0.2rem 0 0;
+  max-width: 38ch;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* ── the printed matter, as objects ─────────────────────────────── */
+
+.specimens {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.25rem, 5vw, 3rem);
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+}
+
+@media (min-width: 48rem) {
+  .specimens {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.specimen {
+  display: grid;
+  place-items: center;
+}
+
+.label,
+.menu,
+.notice {
+  min-height: 19rem;
+  background: var(--bone);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.label {
+  position: relative;
+  width: 11.5rem;
+  padding: 2.75rem 1.25rem 1.25rem;
+  text-align: center;
+  transform: rotate(-2deg);
+}
+
+.punch {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-left: -0.3rem;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  background: var(--ground);
+}
+
+.specimenMark {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--oxblood);
+  margin: 0 0 1.1rem;
+}
+
+.specimenDisplay {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.specimenRule {
+  height: 1px;
+  background: var(--rule);
+  margin: 1rem 0;
+}
+
+.specimenLines {
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+
+.specimenLines li {
+  padding: 0 0 1.6rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
+}
+
+.specimenLines li + li {
+  margin-top: 1.1rem;
+}
+
+.menu {
+  position: relative;
+  width: 13.5rem;
+  padding: 1.85rem 1.4rem;
+  text-align: center;
+}
+
+.menu::before {
+  content: "";
+  position: absolute;
+  inset: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--rule) 65%, transparent);
+  pointer-events: none;
+}
+
+.menuHeading {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.menuItems {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.menuItems li + li {
+  margin-top: 0.5rem;
+}
+
+.menuSignOff {
+  font-family: var(--display);
+  font-size: 0.875rem;
+  color: var(--oxblood);
+  margin: 0;
+}
+
+.notice {
+  width: 12.5rem;
+  padding: 1.85rem 1.35rem;
+  text-align: center;
+}
+
+.seal {
+  width: 6.5rem;
+  height: 6.5rem;
+  margin: 0 auto;
+  border: 1px solid var(--oxblood);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--oxblood);
+}
+
+.sealInner {
+  width: 5.4rem;
+  height: 5.4rem;
+  border: 1px solid color-mix(in srgb, var(--oxblood) 40%, transparent);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.sealMark {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.sealYear {
+  font-family: var(--mono);
+  font-size: 0.4375rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin: 0.4rem 0 0;
+}
+
+.noticeLines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.noticeLines li + li {
+  margin-top: 0.7rem;
+}
+
+.arrivesClose {
+  margin: clamp(2.5rem, 6vw, 3.5rem) 0 0;
+  max-width: 46ch;
+  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem);
+  line-height: 1.5;
+}
+
+/* ── not this / more this ───────────────────────────────────────── */
+
+.contrast {
+  background: var(--ground);
+  color: var(--ink);
+  padding: clamp(3rem, 8vw, 5.5rem) clamp(1.25rem, 5vw, 5rem);
+  border-top: 1px solid var(--rule);
+}
+
+.contrastGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+@media (min-width: 40rem) {
+  .contrastGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.columnHead {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin: 0 0 1.1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.columnHeadNo {
+  color: var(--ink-faint);
+}
+
+.columnHeadYes {
+  color: var(--oxblood);
+  border-bottom-color: var(--oxblood);
+}
+
+.notList,
+.moreList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+}
+
+.notList li {
+  color: var(--ink-faint);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.moreList li {
+  position: relative;
+  padding-left: 1.3rem;
+}
+
+.moreList li::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  color: var(--oxblood);
+}
+
+/* ── membership ─────────────────────────────────────────────────── */
+
+.membership {
+  background: var(--ground2);
+  color: var(--ink);
+  padding: clamp(3.5rem, 9vw, 6.5rem) clamp(1.25rem, 5vw, 5rem);
+  border-top: 1px solid var(--rule);
+}
+
+.membershipGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+@media (min-width: 64rem) {
+  .membershipGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: start;
+  }
+}
+
+.membershipTitle {
+  font-size: clamp(2rem, 1.4rem + 2.5vw, 3.5rem);
+  max-width: 14ch;
+  margin: 0.7rem 0 0;
+}
+
+.membershipBody {
+  margin: 0;
+  max-width: 54ch;
+  color: var(--ink-soft);
+}
+
+.membershipTerms {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: clamp(1.5rem, 4vw, 2rem) 0 clamp(1.1rem, 3vw, 1.5rem);
+}
+
+/* ── footer ─────────────────────────────────────────────────────── */
+
+.footer {
+  background: var(--ground2);
+  color: var(--ink);
+  padding: 0 clamp(1.25rem, 5vw, 5rem) clamp(2.5rem, 5vw, 3rem);
+}
+
+.footerRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem 1.5rem;
+  border-top: 1px solid var(--rule);
+  padding-top: clamp(1.5rem, 4vw, 2rem);
+}
+
+.footerMark {
+  font-family: var(--display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.footerNote {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0;
+}

@@ -10,8 +10,11 @@ export const metadata: Metadata = {
     default: "Revelle Société",
     template: "%s — Revelle Société",
   },
+  // The page's own words, not a description of the service. "You bring the
+  // occasion, we create the experience" was approved under the old framing and
+  // did not survive host-as-hero — see docs/copy-brief.md.
   description:
-    "A creative director for your social life. You bring the occasion, we create the experience.",
+    "A société for people who host. WESTHAMPTON, 1976 — vintage summer glamour, very questionable houseguests.",
 };
 
 export const viewport: Viewport = {
