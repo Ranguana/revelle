@@ -160,7 +160,27 @@ export default async function OccasionPage({
                     {label ? (
                       <p className={styles.pieceHead}>{piece.heading}</p>
                     ) : null}
-                    <h3 className={styles.pieceName}>{piece.name}</h3>
+                    {/*
+                      A GAME IS THE ONE PIECE WITH SOMEWHERE TO GO.
+                      The card here is a teaser and stays one; the instructions
+                      are a page, because a runbook read in a kitchen needs
+                      steps, timings and a place to look when it goes wrong.
+                      Every other piece is complete where it stands and gets no
+                      link, which is why this is a condition on the pool rather
+                      than a link on every heading.
+                    */}
+                    <h3 className={styles.pieceName}>
+                      {piece.pool === "game" ? (
+                        <Link
+                          className={styles.pieceLink}
+                          href={`/portal/occasions/${occasion.id}/games/${piece.slug}`}
+                        >
+                          {piece.name}
+                        </Link>
+                      ) : (
+                        piece.name
+                      )}
+                    </h3>
                     {piece.description ? (
                       <div className={styles.pieceBody}>
                         {paragraphs(piece.description).map((line, index) => (
@@ -182,9 +202,12 @@ export default async function OccasionPage({
             data-theme, because a printed card does not invert when the
             reader's phone does. Same judgement the landing page makes about
             its specimens.
+
+            The id is the target a game page links back to: the runbook tells
+            her to hand out the ballot, and this is where the ballot is.
           */}
           {printed.length > 0 ? (
-            <details className={styles.section} open>
+            <details className={styles.section} id="printed" open>
               <summary className={styles.sectionHead}>
                 <span className={styles.sectionName}>The Printed Matter</span>
                 <span className={styles.marker} aria-hidden="true" />

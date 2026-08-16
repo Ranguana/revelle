@@ -21,6 +21,7 @@ export {
   selectCandidates,
   selectForApplication,
   loadSelectionInput,
+  loadCatalogue,
   type Queryable,
 } from "./catalogue.ts";
 

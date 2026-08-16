@@ -137,26 +137,39 @@ export async function saveDrink(
   // second, contrary copy of a fact the columns already hold.
   await setTags("drink", drinkId, facets);
 
-  // Which destinations it was written for. Rewritten wholesale, because the
-  // checkboxes are the complete statement.
+  /*
+   * WHICH DESTINATIONS IT WAS WRITTEN FOR — and only that. Same correction as
+   * the menu form, for the same reason and in the same words: these checkboxes
+   * are the complete statement about db/019's `native` claim and say nothing
+   * about the other two states, so the delete is narrowed to the claim. A
+   * forbidden scoping set at the deliverables desk — a row this form cannot see
+   * — used to be destroyed by saving an unrelated field, and a veto a save can
+   * delete is not a veto.
+   */
   const worlds = form
     .getAll("world")
     .map((value) => String(value))
     .filter((value) => /^[0-9a-f-]{36}$/i.test(value));
 
   await query(
-    `delete from drink_world where drink_id = $1
-       and ($2::uuid[] = '{}' or world_id <> all($2::uuid[]))`,
+    `delete from drink_world
+      where drink_id = $1
+        and native
+        and ($2::uuid[] = '{}' or world_id <> all($2::uuid[]))`,
     [drinkId, worlds]
   );
   if (worlds.length > 0) {
     await query(
       // `native` — the claim (db/019). Same question and same answer as the
-      // menu form: "written for" is what makes it unavailable elsewhere.
+      // menu form: "written for" is what makes it unavailable elsewhere, and
+      // the conflict clause sets the claim on an existing re-weighting while
+      // leaving a forbidden row exactly as it is.
       `insert into drink_world (drink_id, world_id, native, affinity, note)
        select $1, w.id, true, 1.000, 'Attached at the desk.'
          from unnest($2::uuid[]) as w(id)
-       on conflict (drink_id, world_id) do nothing`,
+       on conflict (drink_id, world_id) do update
+          set native = true
+        where not drink_world.forbidden`,
       [drinkId, worlds]
     );
   }

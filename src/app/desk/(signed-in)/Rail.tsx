@@ -19,8 +19,17 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
   [
     { href: "/desk/destinations", label: "Destinations" },
     { href: "/desk/menus", label: "Menus" },
+    { href: "/desk/dishes", label: "Dishes" },
     { href: "/desk/drinks", label: "Drinks" },
     { href: "/desk/products", label: "Products" },
+  ],
+  // The three screens that show what the library DOES rather than what is in
+  // it. Their own group, above the messages, because they are the working
+  // surface of a curator tuning the engine rather than a list to maintain.
+  [
+    { href: "/desk/bench", label: "Test bench" },
+    { href: "/desk/matrix", label: "Connections" },
+    { href: "/desk/coverage", label: "Coverage" },
   ],
   [
     { href: "/desk/todo", label: "To-do" },
@@ -28,7 +37,7 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
   ],
 ];
 
-const HEADS = ["", "The library", "Between us"];
+const HEADS = ["", "The library", "What it does", "Between us"];
 
 export default function Rail({
   openTodos,

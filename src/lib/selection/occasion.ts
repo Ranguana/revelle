@@ -279,6 +279,11 @@ export function planSlots(
           position: rule.position * 100 + day * 10 + n,
           note: rule.note,
           guaranteed: guaranteed && n < rule.minCount,
+          // db/022. Carried through unchanged: which slots have to agree WITH
+          // EACH OTHER is a property of the slot kind, and expanding a rule
+          // into unit slots must not lose it — the three courses of one day
+          // are one table.
+          coherenceGroup: rule.coherenceGroup ?? null,
         });
       }
     }

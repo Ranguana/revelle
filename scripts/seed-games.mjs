@@ -24,9 +24,12 @@
  *     overwriting her work is the failure this house cares about most. What
  *     differs is REPORTED.
  *   · Facet tags, occasion claims, slot claims, supplies, requirements,
- *     printed matter, dependencies and destination scoping are added where
- *     absent and never changed where present. `on conflict do nothing`
- *     everywhere, deliberately.
+ *     printed matter, RUNBOOK STEPS, CONTINGENCIES, dependencies and
+ *     destination scoping are added where absent and never changed where
+ *     present. `on conflict do nothing` everywhere, deliberately.
+ *   · Runbook steps are written AFTER supplies and printed matter, in that
+ *     order, because a step points at both and db/025 refuses a pointer to
+ *     something the game does not have yet.
  *   · A facet code that is not in the vocabulary is a HARD FAILURE, not a
  *     skipped row. A game tagged with a term that does not exist is a game
  *     that quietly matches nobody, which is worse than a crash.
@@ -132,9 +135,10 @@ try {
            min_guests, max_guests,
            scoring, currency_label,
            external_name, external_url, caveat,
-           source_note, notes, status)
+           source_note, notes, host_role, host_note, status)
          values ($1,$2,$3,$4,$5,$6::game_shape,$7::game_sourcing,
-                 $8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,'draft')
+                 $8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,
+                 $19::host_role,$20,'draft')
          returning id`,
         [
           game.slug,
@@ -155,6 +159,8 @@ try {
           game.caveat ?? null,
           game.sourceNote ?? null,
           game.notes ?? null,
+          game.runbook.hostRole,
+          game.runbook.hostNote ?? null,
         ]
       );
       gameId = rows[0].id;
@@ -300,6 +306,78 @@ try {
         ]
       );
     }
+
+    // ── the runbook ─────────────────────────────────────────────────
+    //
+    // LAST, because a step points at a game_supply row and a
+    // game_printed_matter row, and db/025 refuses a pointer to something the
+    // game does not have. Both were written a few lines above.
+    //
+    // `position` is the array index in src/lib/games.ts and not the phase's
+    // rank: the order is the curator's, for the reason argued in db/025 and
+    // tested in src/lib/games.test.ts.
+    if (game.runbook.steps.length > 0) {
+      const { rows: written } = await client.query(
+        `insert into game_runbook_step
+           (game_id, step, phase, position, instruction, detail, say,
+            minutes, supply_item, printed_piece, note)
+         select $1, t.step, t.phase, t.position, t.instruction, t.detail,
+                t.say, t.minutes, t.supply_item, t.printed_piece, t.note
+           from unnest($2::text[], $3::text[], $4::integer[], $5::text[],
+                       $6::text[], $7::text[], $8::integer[], $9::text[],
+                       $10::text[], $11::text[])
+                as t(step, phase, position, instruction, detail, say,
+                     minutes, supply_item, printed_piece, note)
+         on conflict (game_id, step) do nothing
+         returning step`,
+        [
+          gameId,
+          game.runbook.steps.map((s) => s.step),
+          game.runbook.steps.map((s) => s.phase),
+          game.runbook.steps.map((_, i) => (i + 1) * 10),
+          game.runbook.steps.map((s) => s.instruction),
+          game.runbook.steps.map((s) => s.detail ?? ""),
+          game.runbook.steps.map((s) => s.say ?? ""),
+          game.runbook.steps.map((s) => s.minutes ?? null),
+          game.runbook.steps.map((s) => s.supplyItem ?? null),
+          game.runbook.steps.map((s) => s.printedPiece ?? null),
+          game.runbook.steps.map((s) => s.note ?? null),
+        ]
+      );
+      log(
+        `runbook  ${game.slug} ${written.length} steps written, ` +
+          `${game.runbook.steps.length - written.length} already there`
+      );
+    }
+
+    if (game.runbook.contingencies.length > 0) {
+      const kinds = game.runbook.contingencies.map((c) => c.trouble);
+      const { rows: known } = await client.query(
+        `select code from runbook_trouble_kind where code = any($1::text[])`,
+        [kinds]
+      );
+      if (known.length !== new Set(kinds).size) {
+        const found = new Set(known.map((r) => r.code));
+        throw new Error(
+          `${game.slug} answers troubles db/025 does not define: ` +
+            `${kinds.filter((k) => !found.has(k)).join(", ")}.`
+        );
+      }
+
+      await client.query(
+        `insert into game_contingency (game_id, trouble, answer, position)
+         select $1, t.trouble, t.answer, t.position
+           from unnest($2::text[], $3::text[], $4::integer[])
+                as t(trouble, answer, position)
+         on conflict (game_id, trouble) do nothing`,
+        [
+          gameId,
+          kinds,
+          game.runbook.contingencies.map((c) => c.answer),
+          game.runbook.contingencies.map((_, i) => (i + 1) * 10),
+        ]
+      );
+    }
   }
 
   // ── dependencies, after every game has an id ───────────────────────
@@ -372,6 +450,32 @@ try {
         ]
       );
     }
+  }
+
+  // ── what the runbooks say about themselves ─────────────────────────
+  //
+  // Reported, never fatal. A game whose steps do not add up to its duration is
+  // a curator's decision to make — she may have edited the duration in the tool
+  // on purpose — and src/lib/games.test.ts already fails the build when the
+  // AUTHORED runbooks disagree. This is the same question asked of whatever is
+  // actually in the database, which may not be the module any more.
+  const { rows: clock } = await client.query(
+    `select slug, planned_minutes, claimed_low, claimed_high
+       from game_runbook_clock where disagrees`
+  );
+  for (const row of clock) {
+    log(
+      `warn     ${row.slug}: the runbook adds up to ${row.planned_minutes} ` +
+        `minutes and the game claims ${row.claimed_low}–${row.claimed_high}`
+    );
+  }
+
+  const { rows: gaps } = await client.query(
+    `select slug, string_agg(trouble_label, '; ' order by trouble) as troubles
+       from game_runbook_gap group by slug`
+  );
+  for (const row of gaps) {
+    log(`warn     ${row.slug} has no answer for: ${row.troubles}`);
   }
 
   await client.query("commit");

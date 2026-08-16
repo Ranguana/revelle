@@ -3,11 +3,12 @@
  *
  *   docs/menus.md   -> scripts/seed-menus.mjs
  *   docs/drinks.md  -> scripts/seed-drinks.mjs
+ *   docs/dishes.md  -> scripts/seed-dishes.mjs
  *
  * ─────────────────────────────────────────────────────────────────────
  * WHY THIS FILE EXISTS
  *
- * The two documents are one drop. They name the same thirteen destinations and
+ * The documents are one drop. They name the same thirteen destinations and
  * they write seasons in the same words — "Warm weather", "Winter or spring",
  * "Any" appear in both — and each of those words is a JUDGEMENT about which
  * closed value in `season_band` it becomes. A judgement written down twice is a
@@ -19,10 +20,10 @@
  * So: one map, one place to argue with it.
  *
  * What is deliberately NOT here is each document's own making vocabulary. The
- * menus say "actually made" and the drinks say "actually mixed"; they are one
- * axis and two sets of words, and the words belong to the pool that speaks
- * them. Each seeder carries its own three phrases, right beside the parser that
- * matches them.
+ * menus say "actually made", the drinks say "actually mixed" and the dishes say
+ * "B", "H" and "M"; they are one axis and three sets of words, and the words
+ * belong to the pool that speaks them. Each seeder carries its own three
+ * phrases, right beside the parser that matches them.
  *
  * The one piece of BEHAVIOUR here rather than data is `ensureWorld`, at the
  * bottom, for the same reason: both seeders have to answer "what do I scope
@@ -91,9 +92,22 @@ export const DESTINATIONS = {
  *                              unambiguous, and `spring` would put the wider
  *                              answer outside high season.
  *
- * A NEW WORDING IS A DECISION AND NOT A DEFAULT. Both seeders fail loudly and
- * name the line rather than guessing, which is the only behaviour that keeps a
+ * A NEW WORDING IS A DECISION AND NOT A DEFAULT. Every seeder fails loudly and
+ * names the line rather than guessing, which is the only behaviour that keeps a
  * seed from quietly inventing content.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * docs/dishes.md ADDS EIGHT WORDINGS, FOUR OF THEM ONLY A CASE APART
+ *
+ * That document writes its seasons in lower case inside parentheses —
+ * "· M (summer)" — rather than as a capitalised bullet. Four of the eight are
+ * therefore words the map already holds with a capital, and they are listed
+ * again rather than case-folded on the way in: folding is a rule, a rule is a
+ * guess, and this file's whole argument is that a wording is a decision. The
+ * cost of the rule being wrong once is a season silently changed; the cost of
+ * listing four extra keys is four extra lines.
+ *
+ * The other four are judgements and are argued one line each, below.
  */
 export const SEASONS = {
   Spring: "spring",
@@ -121,6 +135,120 @@ export const SEASONS = {
   // older copy of the document still seeds rather than failing on a phrase
   // whose meaning was never in doubt.
   "Winter, works year-round": "year_round",
+
+  /* ── docs/dishes.md ────────────────────────────────────────────────
+   *
+   * The four that are the same word in lower case. No judgement in any of
+   * them; they are here because this map is matched exactly.
+   */
+  spring: "spring",
+  summer: "summer",
+  fall: "autumn",
+  winter: "winter",
+
+  /* The four that are judgements. */
+
+  // "early summer"  June. Soft-shell crabs, strawberry shortcake, cherry
+  //                 clafoutis — the front of the season, not the end of spring.
+  //                 `summer` and not `spring`: none of the three is spring food,
+  //                 and `season_band` splits summer only at the top end
+  //                 (`high_summer` is "August. Heat that does not break"), so
+  //                 the front of summer has exactly one band it can be in.
+  "early summer": "summer",
+
+  // "late summer"   Figs, blackberries, plums, corn. Follows the existing
+  //                 "Late August" -> summer judgement rather than reaching for
+  //                 `high_summer`: high summer is the heat itself, and this is
+  //                 the produce at the tail of it sliding toward autumn. The
+  //                 alternative reading (high_summer) is defensible and was
+  //                 rejected only for consistency with the line above it.
+  "late summer": "summer",
+
+  // "fall/winter"   She names two seasons and `season_band` holds one. `autumn`
+  //                 by the rule the map already follows twice — "Winter or
+  //                 spring" -> winter and "Shoulder season and fall" ->
+  //                 shoulder, both on the strength of which she named FIRST —
+  //                 and autumn is also the earlier of the two, so a dish tagged
+  //                 with it is available from the first cold weekend.
+  //                 `shoulder` is wrong: that value means spring-or-autumn.
+  //                 THIS ONE IS ALSO NARROWED — see SEASON_NARROWED below.
+  "fall/winter": "autumn",
+
+  // "Carnival season"  King cake, New Orleans, and the only line in 650 whose
+  //                 season is not a season. Carnival opens on Twelfth Night, 6
+  //                 January, and closes on Mardi Gras, which moves between 3
+  //                 February and 9 March — a movable feast, entirely inside
+  //                 winter in all but its last days. `winter` is the closest
+  //                 true statement `season_band` can make, her two words are
+  //                 kept verbatim in season_note beside it, and db/021 argues
+  //                 at length why a calendar-gate mechanism is NOT built for
+  //                 one dish: a gate needs a date, and the application does not
+  //                 ask for one.
+  "Carnival season": "winter",
+};
+
+/**
+ * The wordings the mapped band only PARTLY covers.
+ *
+ * Read by scripts/seed-dishes.mjs, and by nothing else today.
+ *
+ * ── THE RULE, AND WHY IT NEEDS A SECOND LIST ────────────────────────
+ *
+ * `season_strict` is db/012's hard filter: the difference between "a clambake
+ * in February is a weak match" and "a clambake in February is wrong". A dish
+ * carries a season only where it BINDS — docs/dishes.md says so at the top —
+ * so an authored season is a hard filter, and that is the seeder's default.
+ *
+ * Except where the band is smaller than what she wrote. "fall/winter" maps to
+ * `autumn` because the enum has no two-season value; hard-filtering on `autumn`
+ * would then delete JANUARY from a dish she wrote for January, which is not a
+ * narrower reading of her sentence but a contradiction of it. So a narrowed
+ * wording is a WEIGHT: it pulls toward the season it names and excludes nothing.
+ *
+ * The reverse case needs no entry. "early summer" -> `summer` and "Carnival
+ * season" -> `winter` both map to a band WIDER than the wording, and a hard
+ * filter on a wider band can never exclude a month she wanted — only include a
+ * few she did not, which is the honest failure direction.
+ *
+ * The menus' own two-season wordings ("Winter or spring", "Shoulder season and
+ * fall") are deliberately NOT listed: scripts/seed-menus.mjs takes
+ * `season_strict` from a prose list in docs/menus.md and adding them here would
+ * be a silent behaviour change to a pool this drop does not touch.
+ */
+export const SEASON_NARROWED = new Set(["fall/winter"]);
+
+/**
+ * WHAT A DISH IS FOR — her letter codes -> `meal_shape` (db/023).
+ *
+ * The fourth position on a dish line, and the only one of the four that is not
+ * already implied by where the line sits in the document. Read by
+ * scripts/seed-dishes.mjs.
+ *
+ * FIVE SHAPES, DERIVED FROM HER OWN CATALOGUE rather than invented: the "what
+ * it's for" lines across docs/menus.md (39) and docs/drinks.md (25) cluster
+ * into exactly these and no more. db/023 lists which line lands in which, and
+ * argues the three foldings — a dressed-up dinner is a long dinner at a
+ * different register, a beach lunch is a lunch in a room db/020 already models,
+ * and a midnight breakfast is a late supper with eggs.
+ *
+ * The codes are position-delimited and may repeat letters across fields without
+ * colliding, which is why `B` can mean "bought and arranged" in the making
+ * position and `BR` can mean brunch in this one.
+ *
+ * SEVERAL ARE ALLOWED, comma-separated: `- Deviled eggs · M ·  · C, BR`. A dish
+ * that honestly suits two shapes should say so rather than being filed under
+ * the likelier one.
+ *
+ * AN EMPTY FIELD MEANS ANYWHERE and is the common case — all 650 lines are
+ * three fields long today. No claims at all means eligible everywhere, which is
+ * claimEligibility()'s own default and db/019's rule for destinations.
+ */
+export const MEALS = {
+  D: "long_dinner",
+  C: "cocktails",
+  BR: "brunch",
+  L: "lunch",
+  LS: "late_supper",
 };
 
 /**

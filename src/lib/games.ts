@@ -78,6 +78,40 @@
 /** db/010. What a game does to an evening. */
 export type GameShape = "scheduled" | "ambient" | "finale";
 
+/**
+ * db/025. The arc of running a game, and the order the page prints it in.
+ *
+ *   before    what she sets out. No clock: the deadlines are already lead times
+ *   underway  what has to be happening all evening. No clock either
+ *   opening   getting the room to stop talking. The hardest moment a host has
+ *   playing   the sequence, with the clock on it
+ *   deciding  how it is scored or judged
+ *   ending    how it stops. A game that peters out is a failure
+ */
+export type RunbookPhase =
+  | "before"
+  | "underway"
+  | "opening"
+  | "playing"
+  | "deciding"
+  | "ending";
+
+/** db/025. The questions a host actually has at nine o'clock. */
+export type TroubleKind =
+  | "will_not_play"
+  | "under_minimum"
+  | "over_size"
+  | "odd_number"
+  | "running_long"
+  | "played_before"
+  | "not_landing";
+
+/**
+ * db/025. Is she playing, or running it? Several of these cannot be both, and
+ * she needs to know before she starts rather than at the moment it begins.
+ */
+export type HostRole = "runs_it" | "plays_too";
+
 /** db/010. Whether the house may print it, or only point at it. */
 export type GameSourcing = "provided" | "recommended";
 
@@ -179,12 +213,68 @@ export type GameWorldScope = {
   note?: string;
 };
 
+/**
+ * ONE STEP OF A RUNBOOK — db/025.
+ *
+ * Four fields carry the writing because they are read at four different
+ * speeds. `instruction` is what she finds when she looks down at a phone
+ * mid-sentence, so it is an imperative and it is short. `detail` is where the
+ * sentences stay hers. `say` is words out loud, and it exists because starting
+ * a game is the hardest thing a host does and being handed the sentence is
+ * worth more than being handed another rule.
+ *
+ * `supplyItem` and `printedPiece` POINT at rows that already exist rather than
+ * restating them. The seed fails on a pointer to something the game does not
+ * have, and so does the database.
+ */
+export type RunbookStep = {
+  /** Machine-stable within a game. Reordering must not change what a step is. */
+  step: string;
+  phase: RunbookPhase;
+  /** The imperative. Short enough to read at a glance. */
+  instruction: string;
+  /** Why, or the one true detail that makes it land. */
+  detail?: string;
+  /** Words she may say out loud. Never a script; the sentence she would have found. */
+  say?: string;
+  /** Minutes of the evening. Only in a phase that has a clock. */
+  minutes?: number;
+  /** A `supplies[].item` on this same game. */
+  supplyItem?: string;
+  /** A `printedMatter[].piece` on this same game. */
+  printedPiece?: string;
+  note?: string;
+};
+
+/** What she does when it goes wrong. One answer per kind of trouble. */
+export type Contingency = { trouble: TroubleKind; answer: string };
+
+/**
+ * THE GAME PAGE.
+ *
+ * The card in her Revelle is `description` and it stays a teaser. This is what
+ * she clicks through to, and it is the one thing in the product read under
+ * pressure, standing up, with people waiting. Clarity wins here where clarity
+ * and voice conflict — the structure is a runbook and the sentences stay hers.
+ */
+export type Runbook = {
+  hostRole: HostRole;
+  /** One sentence about what running it costs her. */
+  hostNote?: string;
+  steps: readonly RunbookStep[];
+  contingencies: readonly Contingency[];
+};
+
 export type Game = {
   slug: string;
   name: string;
-  /** One or two sentences. What it is, in the house's register. */
+  /** One or two sentences. What it is, in the house's register. THE CARD. */
   description: string;
-  /** How it is actually run. This is what gets printed into The Fun. */
+  /**
+   * The prose account of what the game is, read while choosing. NOT the
+   * instructions — those are `runbook`, and db/025 says why the two are
+   * different documents with different readers.
+   */
   howItWorks: string;
   /** The sentence a host reads. game_supply is the same fact, counted. */
   materials?: string;
@@ -212,6 +302,9 @@ export type Game = {
 
   sourceNote?: string;
   notes?: string;
+
+  /** db/025. How it is actually run, by a host who has never seen it. */
+  runbook: Runbook;
 
   facets: readonly GameFacet[];
   occasions: readonly GameOccasionClaim[];
@@ -270,6 +363,212 @@ const ART_BATTLE: Game = {
     "destination. The five that have been run: The Worst First Date, A " +
     "Secret Superpower, Brooklyn in 2125, Your Inner Monster, An Expensive " +
     "Mistake.",
+
+  /**
+   * THE HOLE THIS RUNBOOK HAD TO CLOSE.
+   *
+   * "The work goes up anonymously" is not a thing that can happen in a room
+   * where everyone watched everyone paint. The answer is not a better rule, it
+   * is a break: the room leaves, the wall goes up while they are gone, and the
+   * only thing that is genuinely anonymous is the BALLOT — numbers on the
+   * front, names nowhere, and one person holding the key. The room will
+   * recognise some of it, and the runbook says so rather than pretending.
+   */
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You paint in the twenty minutes like everyone else. The three jobs " +
+      "that are only yours are the clock, the wall, and the count.",
+    steps: [
+      {
+        step: "clear_the_table",
+        phase: "before",
+        instruction: "Clear a table long enough for everyone to paint at once.",
+        detail:
+          "Not in shifts. A room where half the people are waiting for a " +
+          "seat spends twenty minutes watching the other half.",
+        supplyItem: "Easels, or a long table and a wall",
+      },
+      {
+        step: "lay_out_the_canvases",
+        phase: "before",
+        instruction:
+          "Set out one canvas each and two spare, and put the paint in the middle.",
+        detail:
+          "Identical canvases. Nothing that identifies whose is whose, which " +
+          "is the first half of the anonymity and costs nothing.",
+        supplyItem: "Small canvases or thick paper",
+      },
+      {
+        step: "hide_the_stickers",
+        phase: "before",
+        instruction: "Keep the numbered stickers in your pocket, not on the table.",
+        detail:
+          "They go on the backs of the finished work while the room is out " +
+          "of it. Anyone who sees a number being written knows a number.",
+        supplyItem: "Numbered voting stickers",
+      },
+      {
+        step: "write_the_names",
+        phase: "before",
+        instruction: "Write every guest's name on a slip and fold them into the bowl.",
+        detail: "The winners do not keep their work. This is how it is given away.",
+        supplyItem: "A bowl",
+      },
+      {
+        step: "call_the_room",
+        phase: "opening",
+        instruction: "Turn the music off and stand where the light is.",
+        detail:
+          "Do not raise your voice over the room. Turn the music off, stand " +
+          "still, and wait. Six seconds of a host saying nothing does what " +
+          "shouting does not.",
+        say: "Everyone take a canvas. There is one prompt, it is the same for all of us, and you get twenty minutes.",
+        minutes: 2,
+      },
+      {
+        step: "draw_the_prompt",
+        phase: "opening",
+        instruction:
+          "Have somebody draw one prompt card from the five and read it out.",
+        detail:
+          "You do not pick it. A prompt the host chose is a prompt the host " +
+          "is answering for; a prompt the room drew belongs to the room.",
+        say: "Pick one and read it out. That is the prompt and there is no second one.",
+        minutes: 2,
+        printedPiece: "prompt_cards",
+      },
+      {
+        step: "the_two_rules",
+        phase: "opening",
+        instruction: "Say the two rules and start the clock.",
+        say: "Nothing gets signed. When I call time, put it down and leave the room.",
+        minutes: 1,
+        printedPiece: "rules_card",
+      },
+      {
+        step: "paint",
+        phase: "playing",
+        instruction: "Twenty minutes. Call ten, five, and one.",
+        detail:
+          "Paint yourself. The calls are the only job during the block, and " +
+          "a host standing over people with a clipboard makes worse paintings.",
+        minutes: 20,
+        supplyItem: "A timer",
+      },
+      {
+        step: "clear_the_room",
+        phase: "playing",
+        instruction:
+          "Call time, send everyone out for a drink, and hang the work while they are gone.",
+        detail:
+          "THIS IS THE STEP THAT MAKES IT ANONYMOUS. Number the back of each " +
+          "piece with a sticker, keep the list of numbers on you, and hang " +
+          "them out of order. The room will still recognise some of it. That " +
+          "is fine — the rule is that nobody says so.",
+        say: "Brushes down. Drinks are through there. Nobody comes back until I say.",
+        minutes: 6,
+      },
+      {
+        step: "draw_the_explanations",
+        phase: "playing",
+        instruction:
+          "Bring them back and draw numbers for who explains what.",
+        detail:
+          "Draw in front of everyone, out of the same bowl. If somebody draws " +
+          "their own, put it back and draw again — the whole round is that " +
+          "nobody explains their own work.",
+        say: "You have the piece with this number on it. It is not yours. Take a minute and be certain about it.",
+        minutes: 2,
+      },
+      {
+        step: "the_explanations",
+        phase: "playing",
+        instruction: "One minute each. Cut them off at a minute.",
+        detail:
+          "Twelve is the most this survives. Above twelve people, draw twelve " +
+          "numbers and explain those; everything on the wall is still voted on.",
+        minutes: 12,
+      },
+      {
+        step: "the_ballot",
+        phase: "deciding",
+        instruction: "Hand out the ballots and give them five minutes at the wall.",
+        detail:
+          "They vote by number, not by name. Nobody may vote for their own, " +
+          "which is the one thing on the ballot that runs on honour and the " +
+          "one nobody has ever broken.",
+        say: "Five categories, one number in each. Not your own.",
+        minutes: 5,
+        printedPiece: "voting_slips",
+      },
+      {
+        step: "the_count",
+        phase: "deciding",
+        instruction: "Count them with one other person, out loud, away from the room.",
+        detail:
+          "Two people and a pen is the whole audit, and it is what lets you " +
+          "have painted something yourself. On a tie the title is shared and " +
+          "both pieces go into the draw. Do not vote again.",
+        minutes: 3,
+      },
+      {
+        step: "the_titles_and_the_draw",
+        phase: "ending",
+        instruction:
+          "Read the five titles, then draw a name for each winning piece.",
+        detail:
+          "The artist does not hand it over and does not get a say. A name " +
+          "drawn for their own piece goes back in the bowl. Draw a name once " +
+          "and set it aside, so nobody leaves with two while somebody has none.",
+        say: "None of the winners keep their work.",
+        minutes: 5,
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Two people who will not paint are the jury. Give them the ballots " +
+          "to hold and the titles to read out at the end. Do not coax anyone " +
+          "— a room that watches somebody be talked into it paints worse for " +
+          "the next twenty minutes.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Below six, five ballots across five categories elects everything. " +
+          "Run it with two titles, Most Beautiful and Best Story, or run " +
+          "Fishbowl instead.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above twelve, draw twelve numbers to be explained rather than " +
+          "explaining all of them. Above twenty, hang the work in two rows " +
+          "and vote in one pass down each.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "Cut the number of explanations, never the painting. Six is enough " +
+          "to establish that nobody explains their own.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Somebody who has played knows the twist and will paint something " +
+          "she is willing to lose. That is the correct way to play it. Say " +
+          "nothing.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If the room is quiet through the explanations, stop taking them " +
+          "and go to the vote. The vote always works: five questions and a pen.",
+      },
+    ],
+  },
 
   facets: [
     {
@@ -346,21 +645,36 @@ const ART_BATTLE: Game = {
     },
     {
       item: "Paint, markers, and something to collage with",
+      detail:
+        "Acrylics in the primaries and black, a handful of fat markers, and " +
+        "a stack of old magazines. Nothing that needs washing out of brushes.",
       source: "host_buys",
       leadTimeDays: 7,
     },
     {
       item: "Numbered voting stickers",
+      detail: "A sheet of small round ones, numbered, from a stationer.",
       source: "host_buys",
       leadTimeDays: 3,
       note: "The ballot is printed; the stickers that go on the work are bought.",
     },
     {
       item: "Easels, or a long table and a wall",
+      detail: "Masking tape and a clear wall is the version that always works.",
       source: "on_hand",
       note: "The work has to be lookable-at all at once, or round two does not happen.",
     },
-    { item: "A timer", source: "on_hand" },
+    {
+      item: "A bowl",
+      detail: "For the prompt draw, and then for the names.",
+      source: "on_hand",
+      quantity: 1,
+    },
+    {
+      item: "A timer",
+      detail: "The kitchen one, or a phone face down.",
+      source: "on_hand",
+    },
   ],
   requirements: [
     { requirement: "table_space", note: "Cleared, and enough for everyone at once." },
@@ -426,8 +740,13 @@ const REVERSE_SCAVENGER_HUNT: Game = {
 
   shape: "scheduled",
   sourcing: "provided",
-  durationMinutes: 45,
-  durationMaxMinutes: 45,
+  // CORRECTED against the runbook, which is what db/025's clock is for. The
+  // founder's forty-five minutes is the HUNT; it was recorded as the block, and
+  // the block also has to hold getting a room of at least ten people to stop
+  // talking, scoring the lists, and paying the winner. Fifty-five minutes of
+  // that were being planned into an evening that had not been given them.
+  durationMinutes: 60,
+  durationMaxMinutes: 70,
   minGuests: 10,
   maxGuests: undefined,
 
@@ -438,6 +757,150 @@ const REVERSE_SCAVENGER_HUNT: Game = {
     "foreign coin, 20. A childhood story, 20.",
   currencyLabel: "points",
   sourceNote: HOUSE,
+  notes:
+    "The forty-five minutes is the hunt and not the block. See the duration " +
+    "note above and the runbook, which is where the other twenty went.",
+
+  runbook: {
+    hostRole: "runs_it",
+    hostNote:
+      "You are the referee. You cannot be out negotiating for a foreign coin " +
+      "and ruling on one, so do not try to do both.",
+    steps: [
+      {
+        step: "print_the_lists",
+        phase: "before",
+        instruction: "Print one list per guest and three spare.",
+        detail: "People arrive who were not on the list. They still want to play.",
+        supplyItem: "The point list",
+        printedPiece: "point_list",
+      },
+      {
+        step: "fix_the_bonus",
+        phase: "before",
+        instruction:
+          "Decide the bonus before anyone arrives: ten points, twenty-five at " +
+          "the most, and three of them all night.",
+        detail:
+          "A bonus at the host's discretion with no ceiling is an argument at " +
+          "the scoring table. Written down beforehand, it is a ruling.",
+      },
+      {
+        step: "pens_and_a_clock",
+        phase: "before",
+        instruction: "A pen each, and something that will show the time on a wall.",
+        supplyItem: "A pen each",
+      },
+      {
+        step: "call_the_room",
+        phase: "opening",
+        instruction: "Stop the music, hand out the lists face down, and wait.",
+        detail:
+          "Face down. A room reading a list is a room that has stopped " +
+          "listening, and the two rules are the only part that matters.",
+        minutes: 4,
+      },
+      {
+        step: "the_two_rules",
+        phase: "opening",
+        instruction: "Say the two rules, then say them again.",
+        detail:
+          "They are counter-intuitive and everyone gets them wrong once. " +
+          "Nothing is hidden, and nothing may be taken.",
+        say: "Nothing is hidden. Nothing may be taken. Everything on that list has to be given to you, by somebody in this room, in the next forty-five minutes.",
+        minutes: 2,
+        printedPiece: "rules_card",
+      },
+      {
+        step: "the_hunt",
+        phase: "playing",
+        instruction: "Forty-five minutes. Call the halfway and the last five.",
+        detail:
+          "Stay where people can find you and rule on things as they happen. " +
+          "A ruling made during the hunt takes ten seconds; the same ruling " +
+          "made at the scoring table takes ten minutes and somebody sulks.",
+        minutes: 45,
+        supplyItem: "A timer",
+      },
+      {
+        step: "score_in_pairs",
+        phase: "deciding",
+        instruction:
+          "Call them in, pair everyone off, and have each person score somebody " +
+          "else's list.",
+        detail:
+          "Never their own, and never their partner's if they hunted together. " +
+          "Ten people scoring in pairs takes five minutes; one host scoring " +
+          "ten lists takes twenty and the room goes flat.",
+        minutes: 8,
+      },
+      {
+        step: "settle_the_bonuses",
+        phase: "deciding",
+        instruction:
+          "Take the three best unusual things to the front and award the bonuses.",
+        detail:
+          "Out loud, with the object held up. The bonus is worth more as a " +
+          "moment than as points, which is why it is capped at three.",
+        minutes: 4,
+      },
+      {
+        step: "pay_the_winner",
+        phase: "ending",
+        instruction: "Read the top three, then pay the winner and stop.",
+        detail:
+          "Seventy-five Party Bucks where the auction is running, and the most " +
+          "ridiculous thing in the house where it is not. On a tie the two " +
+          "hold up the strangest thing they got and the room decides by noise. " +
+          "It takes forty seconds.",
+        minutes: 4,
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who will not work the room holds the clock and the bonus " +
+          "book. It is a real job, it is visible, and it is the only seat in " +
+          "the game.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under ten the list stops working — a photograph with three " +
+          "strangers needs strangers. Cut it to the five lines that do not " +
+          "need one, run it for twenty minutes, and do not pretend it is the " +
+          "same game.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above thirty, score in fours instead of pairs and read out only " +
+          "the top three. Everything else scales.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "End the hunt on the number; it is the one thing here that must not " +
+          "stretch. Cut the scoring instead — take only the lines worth " +
+          "fifteen and twenty.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Somebody who has played arrives with a foreign coin in her pocket. " +
+          "Rule it out before you start: everything has to be got tonight, in " +
+          "this room, from somebody who chose to hand it over.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If the room has not moved after five minutes, read out what one " +
+          "person already has. Nothing starts a scavenger hunt like somebody " +
+          "else being ahead.",
+      },
+    ],
+  },
 
   facets: [
     {
@@ -518,8 +981,17 @@ const REVERSE_SCAVENGER_HUNT: Game = {
       perGuest: true,
       leadTimeDays: 1,
     },
-    { item: "A pen each", source: "on_hand", perGuest: true },
-    { item: "A timer", source: "on_hand" },
+    {
+      item: "A pen each",
+      detail: "Whatever is in the drawer. They come back chewed.",
+      source: "on_hand",
+      perGuest: true,
+    },
+    {
+      item: "A timer",
+      detail: "Something with a face, where the room can see it.",
+      source: "on_hand",
+    },
   ],
   requirements: [
     {
@@ -597,6 +1069,158 @@ const LETS_MAKE_A_DEAL: Game = {
     "sock, a ketchup packet and a fruitcake behind Door B. The giant box has " +
     "held premium liquor, cash, an inflatable flamingo, a toilet paper crown " +
     "and a hundred dollars of restaurant.",
+
+  runbook: {
+    hostRole: "runs_it",
+    hostNote:
+      "A compere cannot be a contestant. This is the one game in the pool " +
+      "that spends the whole block standing up, and it is the reason it works.",
+    steps: [
+      {
+        step: "load_the_doors",
+        phase: "before",
+        instruction:
+          "Load the three doors before anyone arrives and do not let anyone " +
+          "help you.",
+        detail:
+          "A is real, B is the potato, C is the envelopes. One person who " +
+          "knows what is behind B ruins every round.",
+        supplyItem: "Three doors, screens, or curtained corners",
+      },
+      {
+        step: "write_the_envelopes",
+        phase: "before",
+        instruction: "Write the five Door C envelopes and shuffle them.",
+        detail:
+          "Swap with anyone. Double your prize. Lose everything. Steal a " +
+          "prize. A mystery gift. Nothing is written on the outside.",
+        printedPiece: "mystery_envelopes",
+        supplyItem: "Envelopes",
+      },
+      {
+        step: "hide_the_box",
+        phase: "before",
+        instruction: "Put the giant box somewhere the room will see it and not reach it.",
+        detail:
+          "It is the ending, and it works on being visible for an hour first.",
+        supplyItem: "The giant mystery box, and what goes in it",
+      },
+      {
+        step: "tickets_at_the_door",
+        phase: "before",
+        instruction: "One ticket per guest at the door, and more all evening.",
+        detail:
+          "Hand them out for joining anything — a toast, a photograph, the " +
+          "washing up. The market later is only as loud as the number of " +
+          "tickets in the room.",
+        printedPiece: "tickets",
+      },
+      {
+        step: "call_the_room",
+        phase: "opening",
+        instruction: "Stand in front of the doors and start naming them.",
+        detail:
+          "You do not need to ask for quiet. A host standing in front of " +
+          "three curtained corners pointing at them is the whole invitation.",
+        say: "Door A. Door B. Door C. One of these is worth having and I am the only person who knows which.",
+        minutes: 4,
+        printedPiece: "door_cards",
+      },
+      {
+        step: "the_market_opens",
+        phase: "opening",
+        instruction: "Say how the market works before the first door opens.",
+        detail:
+          "The audience may buy and sell tickets from the contestant, for " +
+          "sixty seconds, and then you call it closed. It is not a side rule; " +
+          "it is why the room is loud.",
+        say: "Sixty seconds. Buy from her, sell to her, and every deal goes through me.",
+        printedPiece: "rules_card",
+      },
+      {
+        step: "round_one",
+        phase: "playing",
+        instruction:
+          "Draw a name for the contestant, open the market, then open the door.",
+        detail:
+          "DRAW, do not take volunteers. The same three people volunteer for " +
+          "everything and the fourth round is where the room goes quiet. Run " +
+          "the first one slowly — everybody is learning the market by watching it.",
+        minutes: 8,
+      },
+      {
+        step: "the_rest_of_the_rounds",
+        phase: "playing",
+        instruction: "Three more rounds, faster each time.",
+        detail:
+          "Cut the talking and not the market. By round three the audience is " +
+          "running the market without you and you can just open doors.",
+        minutes: 18,
+      },
+      {
+        step: "settling_a_trade",
+        phase: "deciding",
+        instruction:
+          "Nothing is counted. What people hold at the end, they hold.",
+        detail:
+          "There is no tally in this game — the tickets are the score and they " +
+          "are in people's hands. You are the only clearing house: a trade is " +
+          "done when you say it is done, and nothing settles after a door has " +
+          "opened.",
+      },
+      {
+        step: "the_box",
+        phase: "ending",
+        instruction:
+          "Offer the giant box to anyone who will risk everything they hold.",
+        detail:
+          "Everything: tickets, prizes, the fruitcake. Take the first person " +
+          "who says yes and open it in front of them. Then stop — the box is " +
+          "the ending and there is nothing after it.",
+        say: "One box. Everything you are holding. Anybody.",
+        minutes: 6,
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Nobody has to be a contestant. The audience is the better half of " +
+          "this game and the market is where the noise comes from — a person " +
+          "who never goes near a door can still end the night holding forty " +
+          "tickets.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under twelve the market is four people and the room goes quiet " +
+          "between doors. Run two contestants and go straight to the box.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above thirty, stand on something and hand the tickets out in " +
+          "advance. Nothing else changes.",
+      },
+      {
+        trouble: "running_long",
+        answer: "Cut contestants, never the box. The box is the ending.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Somebody who has played knows Door B is a potato. Change what is " +
+          "behind it — a single sock is not a potato, and the specificity is " +
+          "the joke.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If the market is silent, do not explain it again. Buy a ticket " +
+          "yourself, loudly, for far too much.",
+      },
+    ],
+  },
 
   facets: [
     {
@@ -773,6 +1397,141 @@ const SECRET_GAME_CARDS: Game = {
     "The wicked cards are the design. Without them the deck is a list of " +
     "chores; with them, half the room is quietly being sabotaged.",
 
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You draw one at the door like everybody else. A host holding the only " +
+      "card nobody wonders about is the one person not playing.",
+    steps: [
+      {
+        step: "read_the_deck",
+        phase: "before",
+        instruction: "Read the whole deck yourself, including the wicked ones.",
+        detail:
+          "Take out anything that will not survive this particular room. You " +
+          "are the only person who will ever see all of it, and a card that " +
+          "lands badly at eleven cannot be taken back.",
+        printedPiece: "the_deck",
+      },
+      {
+        step: "the_bowl_at_the_door",
+        phase: "before",
+        instruction:
+          "Put the deck face down in a bowl by the door, with the scorecards beside it.",
+        detail:
+          "By the door, not on the table. A card handed over at the moment " +
+          "somebody arrives is a card they carry all night; a card found at " +
+          "half past ten is a chore.",
+        supplyItem: "A bowl or a hat to draw from",
+        printedPiece: "scorecards",
+      },
+      {
+        step: "one_each_at_the_door",
+        phase: "opening",
+        instruction: "One card each, drawn face down, as people come in.",
+        detail:
+          "Nine words and then let them past. This is not a briefing and the " +
+          "deck does not need one.",
+        say: "Take one. Don't read it out. It's yours all night.",
+      },
+      {
+        step: "nobody_says",
+        phase: "underway",
+        instruction: "Nobody says what is on theirs. There is no enforcement and none is needed.",
+        detail:
+          "The secret is the game — take it out and the deck is a list of " +
+          "chores. The only thing that keeps it is that telling somebody is " +
+          "obviously worse than not.",
+      },
+      {
+        step: "mark_your_own",
+        phase: "underway",
+        instruction: "A completed card is marked by the guest, on their own scorecard.",
+        detail:
+          "You do not audit this and you do not ask for proof. Somebody who " +
+          "lies about a conga line has done more work than somebody who told " +
+          "the truth about a compliment.",
+      },
+      {
+        step: "the_wicked_ones",
+        phase: "underway",
+        instruction: "Say nothing about the wicked cards, ever.",
+        detail:
+          "They are not marked and they are not announced. Somebody being " +
+          "made to swap scorecards in the middle of the kitchen is the whole " +
+          "design working, and explaining it beforehand removes it.",
+      },
+      {
+        step: "ask_once",
+        phase: "underway",
+        instruction: "Around the middle of the night, ask one person out loud how theirs is going.",
+        detail:
+          "The single failure mode of an ambient game is being forgotten. One " +
+          "question, in front of other people, restarts the whole deck.",
+      },
+      {
+        step: "twenty_a_card",
+        phase: "deciding",
+        instruction: "Twenty Party Bucks a card, counted by the guest, at the auction.",
+        detail:
+          "Not before. A deck counted at nine o'clock is a scoreboard, and a " +
+          "scoreboard makes people stop doing the hard ones.",
+        printedPiece: "scorecards",
+      },
+      {
+        step: "read_them_out",
+        phase: "ending",
+        instruction:
+          "Where there is no auction, end it near midnight: everyone reads their card out.",
+        detail:
+          "Going round the room, out loud. It is the only time the deck is " +
+          "ever heard, and half of it is people discovering what was being " +
+          "done to them all night.",
+        say: "Everybody read yours out. We'll work out who managed it.",
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "A card can be refused at the door and the deck does not notice. Do " +
+          "not offer a second one and do not explain what they are missing.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under ten the hard cards are impossible — four strangers chanting " +
+          "your name needs four strangers. Deal only the easy and the middling " +
+          "ones and leave the wicked cards in.",
+      },
+      {
+        trouble: "over_size",
+        answer: "Print more. Nothing else about it changes with the room.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "It cannot run long; it runs as long as the evening. What it can do " +
+          "is be forgotten, which is what the question in the middle of the " +
+          "night is for.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Somebody who has played will recognise a wicked card on sight. " +
+          "Deal her one — they are better in the hands of a person who knows " +
+          "exactly what she is holding.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If nobody is doing them by the second hour, complete one of yours " +
+          "visibly and badly. It gives the room permission, which is the only " +
+          "thing it was waiting for.",
+      },
+    ],
+  },
+
   facets: [
     {
       dimension: "group_fun",
@@ -919,6 +1678,219 @@ const THE_SECRET_AUCTION: Game = {
     "Duration is inferred, not given. The Golden Ticket is the one lot that " +
     "reaches into next year, and it is the reason the auction is a ritual " +
     "rather than a prize-giving.",
+
+  /**
+   * The machinery is real and most of it happens before the block starts: a
+   * currency paid out across four hours, a dependency on whichever earning
+   * games ran, and one lot that only means anything if there is a next year.
+   * The `underway` phase exists in db/025 for this game.
+   */
+  runbook: {
+    hostRole: "runs_it",
+    hostNote:
+      "You are the auctioneer and the bank for the whole block. Neither job " +
+      "can be done while bidding, and the bank is the one that cannot be " +
+      "faked.",
+    steps: [
+      {
+        step: "check_the_money_exists",
+        phase: "before",
+        instruction:
+          "Check that at least one of the earning games is actually running tonight.",
+        detail:
+          "The secret cards, the art battle, the scavenger hunt, or the game " +
+          "show. Any one of them is enough. Without one there is nothing to " +
+          "spend, and this is a prize-giving with extra steps.",
+      },
+      {
+        step: "write_the_rate",
+        phase: "before",
+        instruction: "Write the rate down and put it in your pocket.",
+        detail:
+          "Fifty for winning the art battle. Seventy-five for the scavenger " +
+          "hunt. Twenty a card. Whatever the game show paid out. Ten to thirty " +
+          "for party spirit, at your discretion. A rate remembered is a rate " +
+          "argued about at midnight.",
+      },
+      {
+        step: "hide_the_lots",
+        phase: "before",
+        instruction:
+          "Choose the lots, put them in order, and cover them with a sheet.",
+        detail:
+          "Nobody sees a lot before the auction opens; that is the whole trick " +
+          "and it is the only rule of this game that cannot be recovered from. " +
+          "Order them: something small and stupid first, the Golden Ticket " +
+          "second to last, the best thing last.",
+        supplyItem: "The real lots",
+        printedPiece: "the_lot_list",
+      },
+      {
+        step: "the_artwork_as_lots",
+        phase: "before",
+        instruction:
+          "If the art battle ran, the pieces nobody won go under the hammer.",
+        detail:
+          "Only those. The five that won titles are already somebody else's, " +
+          "given away at random an hour ago, and taking them back would undo " +
+          "the best thing that happened all night.",
+      },
+      {
+        step: "decide_about_next_year",
+        phase: "before",
+        instruction:
+          "Decide whether there is a next year before you print the Golden Ticket.",
+        detail:
+          "It buys an automatic win in the first game of next year's party. " +
+          "Name that game on the ticket, or it is an argument in twelve " +
+          "months. If there is no next year, leave it out — a ticket to " +
+          "nothing is the one lot that can make the whole currency look silly.",
+        printedPiece: "golden_ticket",
+      },
+      {
+        step: "pay_in_cash",
+        phase: "underway",
+        instruction:
+          "Pay Party Bucks on the spot, all night, out of your own pocket.",
+        detail:
+          "Never a tally, never settled later. The stack stays on you and not " +
+          "on a table. A guest holding money she can feel plays differently " +
+          "from a guest who has been told a number.",
+        printedPiece: "party_bucks",
+      },
+      {
+        step: "pay_for_spirit",
+        phase: "underway",
+        instruction:
+          "Pay ten to thirty for party spirit, and do it where people can see.",
+        detail:
+          "This is the mechanism that keeps a guest who has won nothing in " +
+          "the room at midnight, and it only works in public. Paid quietly it " +
+          "is charity; paid out loud it is a title.",
+      },
+      {
+        step: "call_the_room",
+        phase: "opening",
+        instruction:
+          "Stand on something, bang the table twice, and wait for the second silence.",
+        detail:
+          "The first silence is people stopping. The second is people turning " +
+          "round. An auction is the one game here that comes with the right " +
+          "instrument for this.",
+        minutes: 2,
+        supplyItem: "Something to bang on a table with",
+      },
+      {
+        step: "the_reveal",
+        phase: "opening",
+        instruction: "Take the sheet off and say what the money was for.",
+        detail:
+          "This is the reveal and it only happens once. Say it flat. The room " +
+          "has been earning a currency all night without being told what it " +
+          "buys, and the objects do the work.",
+        say: "Everything you have been paid tonight is spendable, once, on this table. Nothing here goes home with me.",
+        minutes: 3,
+        printedPiece: "bidding_paddles",
+      },
+      {
+        step: "the_first_lot",
+        phase: "playing",
+        instruction: "Sell something small and stupid first.",
+        detail:
+          "The first lot teaches the room how to bid and what its money is " +
+          "worth. Spend it on a trophy nobody needs; a room that overpays for " +
+          "a joke has understood the currency.",
+        minutes: 4,
+        supplyItem: "The trophies",
+      },
+      {
+        step: "the_middle",
+        phase: "playing",
+        instruction: "Work through the middle lots, and take the money before the lot leaves your hand.",
+        detail:
+          "Every time, no exceptions. It is the one rule that stops the last " +
+          "twenty minutes of the night becoming an accounting dispute.",
+        minutes: 14,
+        supplyItem: "Mystery boxes",
+      },
+      {
+        step: "the_golden_ticket",
+        phase: "playing",
+        instruction: "Sell the Golden Ticket second to last.",
+        detail:
+          "Say what it is, once, and then say nothing. It is the only lot that " +
+          "reaches into next year and it should be the most expensive thing " +
+          "in the room.",
+        minutes: 4,
+        printedPiece: "golden_ticket",
+      },
+      {
+        step: "how_a_bid_is_settled",
+        phase: "deciding",
+        instruction: "Highest paddle. You count three and it is done.",
+        detail:
+          "There are no ties at an auction — two people shouting the same " +
+          "number keep going up. If two paddles genuinely land together, take " +
+          "the one you heard first and mean it. Nobody has ever gone back over " +
+          "an auctioneer who sounded certain.",
+        printedPiece: "rules_card",
+      },
+      {
+        step: "the_last_lot",
+        phase: "ending",
+        instruction: "Sell the best thing last, then stop and do not fill the silence.",
+        detail:
+          "The gavel is the end of the night. Anything after it — a speech, a " +
+          "round of thanks, one more lot somebody found — is the evening " +
+          "ending twice, which means it did not end the first time.",
+        say: "That's the last one. Spend what's left on each other.",
+        minutes: 5,
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who does not want to bid can be the bank: they take the " +
+          "money and hand over the lot, and you never touch either. It is the " +
+          "best seat in the game and it is worth offering before anyone asks.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under twelve there is not enough money in the room and the lots go " +
+          "for nothing. Halve the number of lots rather than the prices — a " +
+          "short auction where things went for everything somebody had is the " +
+          "same evening.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above thirty, sell some lots in pairs — two of a thing, both to the " +
+          "top two bids — or half the room never wins anything and leaves.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "Cut lots out of the middle. Never the Golden Ticket and never the " +
+          "last one; those are the ending and the reason for next year.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Somebody holding last year's Golden Ticket redeems it in the first " +
+          "game of tonight, not here. Ask at the door whether anyone has one — " +
+          "a ticket nobody remembers is a ticket that was not worth printing.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If the bidding is flat, stop describing the lot. An auctioneer " +
+          "explaining what something is has already lost the room. Say a " +
+          "number and wait.",
+      },
+    ],
+  },
 
   facets: [
     {
@@ -1101,6 +2073,137 @@ const FISHBOWL: Game = {
     "may be printed. Known as the noun game, Salad Bowl, Celebrity and a " +
     "dozen other names.",
 
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You are on a team. The only job that is yours is starting the clock, " +
+      "and the other team will do that for you once it is going.",
+    steps: [
+      {
+        step: "slips_and_bowl",
+        phase: "before",
+        instruction: "Six slips and a pen at every place, and the bowl in the middle.",
+        detail:
+          "Six is the number. Four and the third round is over before it is " +
+          "funny; ten and the first round never ends.",
+        supplyItem: "Slips of paper",
+        printedPiece: "slip_sheets",
+      },
+      {
+        step: "make_the_teams",
+        phase: "opening",
+        instruction: "Count off round the table, one two one two. Do not let people pick.",
+        detail:
+          "Couples on opposite teams. A room that picks its own teams picks " +
+          "the same teams it already talks to.",
+        minutes: 3,
+      },
+      {
+        step: "everyone_writes",
+        phase: "opening",
+        instruction: "Six each, folded, into the bowl.",
+        detail:
+          "Anything somebody in this room could guess. Say that out loud — it " +
+          "is the only thing that keeps the bowl playable, and it is the fix " +
+          "for a first round that dies.",
+        say: "Six each. Anything a person at this table could guess. Fold them in half.",
+        minutes: 6,
+        supplyItem: "A bowl",
+        printedPiece: "bowl_label",
+      },
+      {
+        step: "round_one",
+        phase: "playing",
+        instruction: "Say anything except the word. A minute a turn, alternating teams.",
+        detail:
+          "Guessed slips are kept by the guessing team. Keep going until the " +
+          "bowl is empty, then refill it with the SAME slips.",
+        minutes: 10,
+        printedPiece: "rules_card",
+      },
+      {
+        step: "round_two",
+        phase: "playing",
+        instruction: "Same slips. Act it out, no words.",
+        detail:
+          "It is faster than round one because everybody now half-remembers " +
+          "what is in the bowl. That is the design, not an accident.",
+        minutes: 8,
+      },
+      {
+        step: "round_three",
+        phase: "playing",
+        instruction: "Same slips. One word each.",
+        detail:
+          "The third round is funny because of the first two, which is why the " +
+          "slips must never be replaced between them.",
+        minutes: 7,
+      },
+      {
+        step: "count_the_slips",
+        phase: "deciding",
+        instruction: "Each team counts the slips it kept. Most slips wins.",
+        detail:
+          "Count once, out loud. If it is still tied it is tied, and a tie is " +
+          "the correct result of Fishbowl.",
+        minutes: 2,
+      },
+      {
+        step: "the_last_slip",
+        phase: "ending",
+        instruction: "Read out the worst slip anybody wrote, then put the bowl away.",
+        detail:
+          "There is always one nobody could get in any round. It is the ending " +
+          "and it costs two minutes.",
+        minutes: 2,
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody can write slips and never take a turn. They still count " +
+          "for their team, and nobody at the table has to be told.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under six it is two against two and the same person clues every " +
+          "round. Play it anyway with four slips each — it is the one game " +
+          "here that survives being too small.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above thirty the wait between turns is longer than the turns. " +
+          "Split into four teams and run two bowls at two ends of the room.",
+      },
+      {
+        trouble: "odd_number",
+        answer: "The extra player goes to the team that goes second.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "Three rounds is the design and none may be cut. Cut the bowl " +
+          "instead: take half the slips out before round one starts.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Everybody has played this and it is no advantage. The slips are " +
+          "new every time and they are written by the room.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "It always lands by round two. A flat first round means the slips " +
+          "are too hard — take out anything nobody has heard of before you " +
+          "refill the bowl.",
+      },
+    ],
+  },
+
   facets: [
     { dimension: "group_fun", code: "perform", weight: 0.9 },
     { dimension: "affinity", code: "wit", weight: 0.8 },
@@ -1224,6 +2327,106 @@ const IMPOSTER: Game = {
     "The one game in the pool the house does not control. If it disappears, " +
     "the slot is refilled from the provided games and nothing else changes — " +
     "which is the argument for never letting a recommended game be required.",
+
+  /**
+   * THE ONE RUNBOOK THAT IS ALLOWED TO BE THIN, AND THE DATABASE ENFORCES IT.
+   *
+   * db/025 refuses a `playing` or `deciding` step for a recommended game, in
+   * both directions, exactly as db/010 refuses printed matter. The house may
+   * write its own part — check it still exists, charge the phones, hand it
+   * over, decide when to stop — and may not write how somebody else's game is
+   * played. There is nothing missing below; there is a line.
+   */
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "The app runs it. You are a player, and the only job that is yours is " +
+      "deciding when to stop.",
+    steps: [
+      {
+        step: "check_it_still_exists",
+        phase: "before",
+        instruction: "Open the store in the week before and check it is still there.",
+        detail:
+          "It can be pulled, renamed, paywalled or broken by an update between " +
+          "the day this was designed and tonight. Nothing on the house's side " +
+          "prevents it.",
+      },
+      {
+        step: "ask_them_to_install_it",
+        phase: "before",
+        instruction: "Ask people to have it before they arrive.",
+        detail:
+          "Twelve people downloading the same thing at once is four minutes " +
+          "of a silent room looking down, which is the exact opposite of what " +
+          "the game is for.",
+      },
+      {
+        step: "charged_and_out",
+        phase: "before",
+        instruction: "Phones charged, and a charger out where people can see it.",
+        detail:
+          "The whole game is one phone each. A dead one is a person watching.",
+      },
+      {
+        step: "hand_it_over",
+        phase: "opening",
+        instruction: "Hand it to somebody who already has it open and sit down.",
+        detail:
+          "It explains itself, and a host reading out rules that are on the " +
+          "screen in front of everybody is a host who has misunderstood which " +
+          "game this is.",
+        say: "Phones out. Whoever has it open is running it.",
+        minutes: 2,
+      },
+      {
+        step: "stop_at_three",
+        phase: "ending",
+        instruction: "Three rounds, then put the phones away.",
+        detail:
+          "This is the only game in the pool with no ending of its own, so you " +
+          "have to give it one. Stop while people still want a fourth.",
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "It needs a phone and there is no version of it for somebody without " +
+          "one. Do not run it in a room where one person would be watching.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under four there is nobody to hide among and the game does not " +
+          "work. It is not a smaller version of itself.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above twelve, split the room and run it twice. Do not add players " +
+          "to make one big round.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "Three rounds. It is a twenty-minute game that will happily eat an " +
+          "hour, and at the end of that hour everybody is on their phones.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "People who have played are better at it, which is fine. Somebody " +
+          "explaining the strategy out loud is not; ask them not to.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If the signal is gone, it is gone, and no amount of standing near " +
+          "a window fixes it. Have the Fishbowl bowl in the cupboard.",
+      },
+    ],
+  },
 
   facets: [
     {

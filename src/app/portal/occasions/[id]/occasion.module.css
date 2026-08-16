@@ -233,6 +233,25 @@
   hyphens: none;
 }
 
+/*
+ * A game's name, which is a link to its own page.
+ *
+ * Underlined and not coloured: the destination's palette is the destination's,
+ * and a link that has to pick an accent would look different in every world.
+ * The offset keeps the rule clear of the descenders in a display face.
+ */
+.pieceLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.14em;
+  transition: color 160ms ease;
+}
+
+.pieceLink:hover {
+  color: var(--ink-soft);
+}
+
 .pieceBody {
   margin: 0;
   color: var(--ink-soft);

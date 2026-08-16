@@ -21,6 +21,7 @@ import { explain } from "./explain.ts";
 import { fillSlots, scopePools } from "./fill.ts";
 import { ensureNovel } from "./novelty.ts";
 import { planSlots } from "./occasion.ts";
+import { mealShape, statedRung } from "./table.ts";
 import { arbitrarySeed, rng } from "./rng.ts";
 import { buildVector, inheritDestination } from "./vector.ts";
 import {
@@ -98,6 +99,12 @@ export function runSelection(
   // Planned before the impasse check returns, so that "she is not serving
   // food" is on the record even in a run that produced nothing: the curator
   // must be able to see it, and it must never look like something to author.
+  // WHAT KIND OF TABLE THIS EVENING IS — db/023, from the one answer that
+  // already says so. Computed beside the plan because it is the same fact: the
+  // exclusion that removes the main and the dessert is what makes it a cocktail
+  // party rather than a dinner.
+  const meal = mealShape(application.exclusions);
+
   const plan = planSlots(
     catalogue.slotRules,
     catalogue.shape,
@@ -159,13 +166,31 @@ export function runSelection(
       // is known, so nothing is pruned.
       catalogue.venue ?? null,
       options,
-      now
+      now,
+      // WHAT KIND OF TABLE THIS EVENING IS — db/023. Derived from her food
+      // plan through the exclusion it already resolves to; see table.ts.
+      meal
     );
 
     // ── stage 4 ──────────────────────────────────────────────────────
     // The occasion's shape goes in as well as her scale: it carries how many
     // blocks the evening has for a game that stops the room.
-    const fill = fillSlots(pools, application.scale, catalogue.shape, options);
+    const fill = fillSlots(pools, application.scale, catalogue.shape, options, {
+      // THE COMPOSED TABLE — db/022, db/023. Her one answer about how much she
+      // wants to make seeds the table's rung; the exemplars are her authored
+      // menus for THIS destination, as prose, for the seam in compose.ts.
+      rung: statedRung(application.stated),
+      meal,
+      destination: destination.name,
+      exemplars: catalogue.ingredients
+        .filter(
+          (ingredient) =>
+            ingredient.pool === "menu" &&
+            ingredient.worlds[destination.id]?.native === true
+        )
+        .map((ingredient) => ingredient.description),
+      chooser: options.courseChooser ?? null,
+    });
 
     const picks: Pick[] = fill.picks.map((pick) => {
       const pool = pools.get(pick.slot.key);

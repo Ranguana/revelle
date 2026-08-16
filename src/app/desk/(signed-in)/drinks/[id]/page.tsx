@@ -35,8 +35,11 @@ export default async function DrinkPage({
     query<{ id: string; name: string }>(
       `select id, name from world where status <> 'retired' order by name`
     ),
+    // THE CLAIM, not "everything that is not a veto" — the same correction as
+    // the menu form, for db/019's reason. See /desk/matrix, where all three
+    // states are set and read.
     query<{ world_id: string }>(
-      `select world_id from drink_world where drink_id = $1 and not forbidden`,
+      `select world_id from drink_world where drink_id = $1 and native`,
       [id]
     ),
   ]);

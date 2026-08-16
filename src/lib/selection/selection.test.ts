@@ -2359,3 +2359,257 @@ test("a destination nobody has tagged is not eliminated by its own silence", () 
     "and it is carried as UNJUDGED rather than as a number nobody measured"
   );
 });
+
+/* ─────────────────────────────────────────────────────────────────────
+ * THE COMPOSED TABLE — db/021, db/022, db/023
+ *
+ * The set menu is no longer the unit of selection. A table is three dishes,
+ * picked separately, and everything below asserts a PROPERTY the composition
+ * rules exist to guarantee rather than a number the constants happen to
+ * produce.
+ * ───────────────────────────────────────────────────────────────────── */
+
+function dish(
+  id: string,
+  name: string,
+  course: string,
+  making: string,
+  extra: Partial<Ingredient> = {}
+): Ingredient {
+  return ingredient(id, "dish", name, {}, {
+    course: undefined,
+    making,
+    season: "year_round",
+    meals: [],
+    slots: [{ slotCode: course, fit: "native", note: null }],
+    ...extra,
+  } as Partial<Ingredient>);
+}
+
+const COURSE_RULES: SlotRule[] = [
+  rule({
+    slotCode: "the_appetizer",
+    pool: "dish",
+    section: "details",
+    position: 11,
+    coherenceGroup: "the_table",
+  }),
+  rule({
+    slotCode: "the_main",
+    pool: "dish",
+    section: "details",
+    position: 12,
+    coherenceGroup: "the_table",
+  }),
+  rule({
+    slotCode: "the_dessert",
+    pool: "dish",
+    section: "details",
+    position: 13,
+    coherenceGroup: "the_table",
+  }),
+];
+
+function tableFor(
+  dishes: Ingredient[],
+  table: Parameters<typeof fillSlots>[4] = {},
+  meal: string | null = null
+) {
+  const vector = buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS);
+  const slots = planSlots(COURSE_RULES, SHAPE, SCALE).slots;
+  const pools = scopePools(
+    slots,
+    dishes,
+    destination("d1", "SOMEWHERE", {}),
+    "dinner_party",
+    vector.weights,
+    vector.dealbreakers,
+    (id) => FACETS[id]?.label ?? id,
+    SCALE,
+    null,
+    OPTIONS,
+    OPTIONS.now!,
+    meal
+  );
+  return fillSlots(pools, SCALE, SHAPE, OPTIONS, table);
+}
+
+test("the table: the course claim keeps an appetizer out of the main course", () => {
+  const fill = tableFor([
+    dish("a1", "Clams casino", "the_appetizer", "half_made"),
+    dish("m1", "Lobster thermidor", "the_main", "actually_made"),
+    dish("d1", "Baked alaska", "the_dessert", "actually_made"),
+  ]);
+
+  const placed = new Map(
+    fill.picks.map((pick) => [pick.slot.slotCode, pick.ingredient.name])
+  );
+  assert.deepEqual(
+    [...placed.entries()].sort(),
+    [
+      ["the_appetizer", "Clams casino"],
+      ["the_dessert", "Baked alaska"],
+      ["the_main", "Lobster thermidor"],
+    ],
+    "db/022 projects dish.course into dish_slot as a NATIVE claim, and " +
+      "claimEligibility already turns any native claim into a whitelist. No " +
+      "new mechanism, and an appetizer is not a main."
+  );
+});
+
+test("the table: two seasons cannot sit at one table", () => {
+  const fill = tableFor([
+    dish("a1", "Corn fritters", "the_appetizer", "actually_made", {
+      season: "summer",
+    }),
+    // The best main by score would be the winter one; the table is already
+    // summer, so it is refused rather than penalised.
+    dish("m1", "Venison stew with juniper", "the_main", "actually_made", {
+      season: "winter",
+    }),
+    dish("m2", "Boiled lobsters", "the_main", "actually_made", {
+      season: "summer",
+    }),
+    dish("d1", "Blueberry pie", "the_dessert", "actually_made", {
+      season: "summer",
+    }),
+  ]);
+
+  const main = fill.picks.find((p) => p.slot.slotCode === "the_main")!;
+  assert.equal(
+    main.ingredient.name,
+    "Boiled lobsters",
+    "a summer appetizer commits the table to summer, and a winter main is " +
+      "not a weak match — it is not one table"
+  );
+  assert.ok(
+    fill.dropped.some((d) => d.reason === "table_disagreed"),
+    "and the refusal is a sentence a curator can act on, never a catalogue gap"
+  );
+});
+
+test("the table: a year-round dish agrees with everything and commits nothing", () => {
+  const fill = tableFor([
+    dish("a1", "Marinated olives", "the_appetizer", "bought_and_arranged"),
+    dish("m1", "Venison stew with juniper", "the_main", "bought_and_arranged", {
+      season: "winter",
+    }),
+    dish("d1", "Chestnut cream", "the_dessert", "bought_and_arranged", {
+      season: "winter",
+    }),
+  ]);
+  assert.equal(fill.picks.length, 3, "502 of 600 dishes are year-round");
+});
+
+test("the table: high summer sits inside summer, and narrows the table to it", () => {
+  const fill = tableFor([
+    dish("a1", "Garden tomato slices", "the_appetizer", "bought_and_arranged", {
+      season: "summer",
+    }),
+    dish("m1", "One-pot clambake", "the_main", "bought_and_arranged", {
+      season: "high_summer",
+    }),
+    // Spring is inside `shoulder` and not inside `high_summer`. Once the main
+    // has narrowed the table to high summer this must be refused.
+    dish("d1", "Strawberries in red wine", "the_dessert", "bought_and_arranged", {
+      season: "spring",
+    }),
+    dish("d2", "Watermelon wedges", "the_dessert", "bought_and_arranged", {
+      season: "summer",
+    }),
+  ]);
+  const dessert = fill.picks.find((p) => p.slot.slotCode === "the_dessert")!;
+  assert.equal(dessert.ingredient.name, "Watermelon wedges");
+});
+
+test("the table: her one making answer governs every course", () => {
+  const fill = tableFor(
+    [
+      dish("a1", "Jumbo shrimp cocktail", "the_appetizer", "bought_and_arranged"),
+      dish("a2", "Vichyssoise", "the_appetizer", "actually_made"),
+      dish("m1", "Chilled seafood platter", "the_main", "bought_and_arranged"),
+      dish("m2", "Beef wellington", "the_main", "actually_made"),
+      dish("d1", "Ice cream sundae bar", "the_dessert", "bought_and_arranged"),
+      dish("d2", "Baked alaska", "the_dessert", "actually_made"),
+    ],
+    { rung: "bought_and_arranged" }
+  );
+
+  assert.deepEqual(
+    fill.picks.map((p) => p.ingredient.making),
+    ["bought_and_arranged", "bought_and_arranged", "bought_and_arranged"],
+    "she answered `how_made` once, about the whole evening. A table that is " +
+      "two-thirds bought and one-third actually made is the mean of three " +
+      "answers to a question she was asked one time."
+  );
+});
+
+test("the table: a course with nothing at her rung steps toward MADE, not away", () => {
+  // Nine of the thirteen destinations have no main that can be bought. This is
+  // that, reproduced: she wants everything to arrive finished and the main
+  // course has nothing bought in it at all.
+  const fill = tableFor(
+    [
+      dish("a1", "Jumbo shrimp cocktail", "the_appetizer", "bought_and_arranged"),
+      dish("m1", "Poached salmon", "the_main", "half_made"),
+      dish("m2", "Beef wellington", "the_main", "actually_made"),
+      dish("d1", "Ice cream sundae bar", "the_dessert", "bought_and_arranged"),
+    ],
+    { rung: "bought_and_arranged" }
+  );
+
+  const main = fill.picks.find((p) => p.slot.slotCode === "the_main")!;
+  assert.equal(
+    main.ingredient.making,
+    "half_made",
+    "ONE step toward made, and only one. A missing main is worse than a main " +
+      "one rung off, and the catalogue documents how made things bend toward " +
+      "bought and never the reverse — so a host handed slightly more work can " +
+      "order it, and a host handed something bought cannot un-buy it."
+  );
+  assert.equal(fill.picks.length, 3, "and the table is not broken");
+});
+
+test("the table: nothing repeats within it", () => {
+  // One dish claiming two courses is not a thing db/022 can produce — the
+  // projection writes one claim — but the search's own `used` set is what
+  // guarantees it, and it is worth asserting where the guarantee lives.
+  const both = dish("x1", "The one dish", "the_appetizer", "half_made", {
+    slots: [
+      { slotCode: "the_appetizer", fit: "native", note: null },
+      { slotCode: "the_main", fit: "native", note: null },
+    ],
+  });
+  const fill = tableFor([
+    both,
+    dish("m2", "Something else", "the_main", "half_made"),
+    dish("d1", "A dessert", "the_dessert", "half_made"),
+  ]);
+  const names = fill.picks.map((p) => p.ingredient.name);
+  assert.equal(new Set(names).size, names.length);
+});
+
+test("what a dish is for: no claim means every shape, any claim is a whitelist", () => {
+  const dishes = [
+    dish("a1", "Untagged", "the_appetizer", "half_made"),
+    dish("a2", "Brunch only", "the_appetizer", "half_made", { meals: ["brunch"] }),
+    dish("m1", "A main", "the_main", "half_made"),
+    dish("d1", "A dessert", "the_dessert", "half_made"),
+  ];
+
+  const anywhere = tableFor(dishes, {}, null);
+  assert.equal(
+    anywhere.picks.filter((p) => p.slot.slotCode === "the_appetizer").length,
+    1,
+    "a caller that does not know the meal shape filters nothing"
+  );
+
+  const dinner = tableFor(dishes, {}, "long_dinner");
+  const first = dinner.picks.find((p) => p.slot.slotCode === "the_appetizer")!;
+  assert.equal(
+    first.ingredient.name,
+    "Untagged",
+    "650 authored lines carry no fourth field and are eligible everywhere; " +
+      "the one dish tagged for brunch is not at a long dinner"
+  );
+});

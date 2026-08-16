@@ -35,8 +35,13 @@ export default async function MenuPage({
     query<{ id: string; name: string }>(
       `select id, name from world where status <> 'retired' order by name`
     ),
+    // THE CLAIM, and not "everything that is not a veto". The box beside it
+    // asks "which destinations was it written for", which is db/019's `native`
+    // column exactly; reading `not forbidden` ticked it for a row that is only
+    // a re-weighting and then let a save turn that weight into a claim. The
+    // three states round-trip through /desk/matrix.
     query<{ world_id: string }>(
-      `select world_id from menu_world where menu_id = $1 and not forbidden`,
+      `select world_id from menu_world where menu_id = $1 and native`,
       [id]
     ),
   ]);

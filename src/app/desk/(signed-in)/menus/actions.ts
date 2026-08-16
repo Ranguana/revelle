@@ -112,29 +112,52 @@ export async function saveMenu(
   // second, contrary copy of a fact the columns already hold.
   await setTags("menu", menuId, facets);
 
-  // Which destinations it was written for. Rewritten wholesale, because the
-  // checkboxes are the complete statement.
+  /*
+   * WHICH DESTINATIONS IT WAS WRITTEN FOR — and only that.
+   *
+   * These checkboxes are the complete statement about ONE of the three states a
+   * `menu_world` row can be in: db/019's `native` claim. They say nothing about
+   * the other two, and until now the delete below did not know that — it removed
+   * every row not in the list, which meant a forbidden scoping set at the
+   * deliverables desk (a row this form cannot see, because the read is
+   * `where native`) was silently destroyed by saving an unrelated field. A veto
+   * that a save can delete is not a veto.
+   *
+   * So the delete is narrowed to the claim. A forbidden row survives — the
+   * database's own CHECK guarantees `not (forbidden and native)`, so it cannot
+   * be in this set. A re-weighting survives, because a weight is not a claim.
+   * Unticking a box removes the claim, which is what unticking it means.
+   */
   const worlds = form
     .getAll("world")
     .map((value) => String(value))
     .filter((value) => /^[0-9a-f-]{36}$/i.test(value));
 
   await query(
-    `delete from menu_world where menu_id = $1
-       and ($2::uuid[] = '{}' or world_id <> all($2::uuid[]))`,
+    `delete from menu_world
+      where menu_id = $1
+        and native
+        and ($2::uuid[] = '{}' or world_id <> all($2::uuid[]))`,
     [menuId, worlds]
   );
   if (worlds.length > 0) {
     await query(
       // `native` — the claim (db/019). This form's question is "which
       // destinations was it written for", and the answer to that question is
-      // exactly what makes a menu unavailable everywhere else. `on conflict do
-      // nothing` leaves a row a curator scoped by hand at the deliverables
-      // desk alone, including its answer to this.
+      // exactly what makes a menu unavailable everywhere else.
+      //
+      // ON CONFLICT SETS THE CLAIM AND TOUCHES NOTHING ELSE. A row that already
+      // exists as a re-weighting keeps its affinity and its curator's note and
+      // gains the claim, which is what ticking the box says. The `where` clause
+      // is the veto winning: a forbidden row is left exactly as it is, the
+      // database's CHECK is never provoked, and the box simply reads unticked
+      // again on the next load — because it is.
       `insert into menu_world (menu_id, world_id, native, affinity, note)
        select $1, w.id, true, 1.000, 'Attached at the desk.'
          from unnest($2::uuid[]) as w(id)
-       on conflict (menu_id, world_id) do nothing`,
+       on conflict (menu_id, world_id) do update
+          set native = true
+        where not menu_world.forbidden`,
       [menuId, worlds]
     );
   }

@@ -95,30 +95,51 @@ export async function loadSelectionInput(
   // where this is slow, and accepting either handle is worth more than the
   // parallelism.
   const application = await loadApplication(db, applicationId);
-  const facets = await loadFacets(db);
   const history = await loadHistory(db, application.customerId, applicationId);
   const cohorts = await loadCohorts(db, application.customerId);
+  const catalogue = await loadCatalogue(
+    db,
+    application.occasion,
+    application.environment
+  );
+
+  return { application, history, cohorts, catalogue };
+}
+
+/**
+ * THE CATALOGUE AS OF NOW, for one occasion and one room.
+ *
+ * Split out of `loadSelectionInput` so that a caller who has an APPLICATION
+ * SHAPE but no stored application — the curators' test bench in
+ * src/lib/desk/bench.ts — reads exactly the same catalogue the real run reads,
+ * through exactly this code. The alternative was a second loader, and a second
+ * loader is a second thing to keep in step with db/019 the next time a state is
+ * added to a scoping row.
+ *
+ * Still a pure read. Nothing in this file writes.
+ */
+export async function loadCatalogue(
+  db: Queryable,
+  occasion: OccasionCode,
+  environment: string
+): Promise<Catalogue> {
+  const facets = await loadFacets(db);
   const destinations = await loadDestinations(db);
   const ingredients = await loadIngredients(db);
-  const slotRules = await loadSlotRules(db, application.occasion);
-  const shape = await loadShape(db, application.occasion);
-  const venue = await loadVenue(db, application.environment);
+  const slotRules = await loadSlotRules(db, occasion);
+  const shape = await loadShape(db, occasion);
+  const venue = await loadVenue(db, environment);
   const issued = await loadIssuedFingerprints(db);
 
   return {
-    application,
-    history,
-    cohorts,
-    catalogue: {
-      facets,
-      destinations,
-      ingredients,
-      slotRules,
-      shape,
-      venue,
-      issuedFingerprints: issued,
-    } satisfies Catalogue,
-  };
+    facets,
+    destinations,
+    ingredients,
+    slotRules,
+    shape,
+    venue,
+    issuedFingerprints: issued,
+  } satisfies Catalogue;
 }
 
 /**
@@ -452,6 +473,25 @@ const POOLS: readonly {
   price: string | null;
   minGuests: string | null;
   maxGuests: string | null;
+  /**
+   * THE TWO AXES A COMPOSED TABLE HAS TO AGREE ON — db/022.
+   *
+   * `season` is season_band, carried by the three food-and-drink pools and by
+   * nothing else. `making` is the making axis under whichever name its own
+   * migration gave it — `menu.cooking` (db/012), `drink.making` (db/017),
+   * `dish.making` (db/021) — which is why this is a column NAME per pool and
+   * not one shared string. Same members, same ladder, three column names, and
+   * db/017 explains at length why the names were not unified.
+   */
+  season: string | null;
+  making: string | null;
+  /**
+   * The table of meal-shape claims this pool has — `dish_meal`, db/023. Null in
+   * a pool that makes no claim about what kind of table it is for, which is
+   * every pool but dishes: a menu and a drink both say what they are for in a
+   * `name` column, in her own words, and that sentence is richer than an enum.
+   */
+  meals: string | null;
   /** game.shape — db/010. Only the game pool has one. */
   shape: string | null;
   /**
@@ -470,6 +510,9 @@ const POOLS: readonly {
     price: "price_cents",
     minGuests: null,
     maxGuests: null,
+    season: null,
+    making: null,
+    meals: null,
     shape: null,
     printed: null,
     active: "t.status = 'active'",
@@ -482,6 +525,9 @@ const POOLS: readonly {
     price: "price_cents",
     minGuests: "min_guests",
     maxGuests: "max_guests",
+    season: null,
+    making: null,
+    meals: null,
     shape: "shape",
     printed: "game_printed_matter",
     active: "t.status = 'active'",
@@ -494,6 +540,9 @@ const POOLS: readonly {
     price: null,
     minGuests: null,
     maxGuests: null,
+    season: null,
+    making: null,
+    meals: null,
     shape: null,
     printed: null,
     active: "t.status = 'active'",
@@ -516,6 +565,10 @@ const POOLS: readonly {
     price: null,
     minGuests: null,
     maxGuests: null,
+    season: "season",
+    // db/012's older name for db/016's axis. Same members, same ladder.
+    making: "cooking",
+    meals: null,
     shape: null,
     printed: null,
     active: "t.status = 'active'",
@@ -539,6 +592,51 @@ const POOLS: readonly {
     price: null,
     minGuests: null,
     maxGuests: null,
+    season: "season",
+    making: "making",
+    meals: null,
+    shape: null,
+    printed: null,
+    active: "t.status = 'active'",
+  },
+  // DISHES — db/021's pool, and the first that is REGISTERED HERE WITHOUT A
+  // SLOT TO FILL. Both halves of that are deliberate.
+  //
+  // Registered, because a pool the engine cannot see is a pool that reports a
+  // phantom gap forever: the menu pool was missing from this list once, and
+  // `the_menu` recorded a catalogue gap on every occasion that had one however
+  // full the pool was. An entry here costs one query and is the difference
+  // between a gap that names a real hole and a gap that names this file.
+  //
+  // No slot, because db/021 ships none — no `slot_kind` row, no `occasion_slot`
+  // row, `typical_draw` 0 — and the argument is at the top of that migration:
+  // `the_menu` is already required on the one-evening occasions, so a dish slot
+  // beside it serves two dinners, and three independent picks average out the
+  // single answer a host gave about how much she wants to make. Until a slot
+  // exists, `loadIngredients` returns these candidates and `fill.ts` has
+  // nowhere to put them, which is exactly the intended behaviour and not a
+  // half-finished wiring.
+  //
+  // `describe` is the dish's own name, because a dish has no description
+  // column and does not want one: the line IS the thing, which is db/012's
+  // ruling applied one level down. The name is therefore both the label and the
+  // sentence, and printedMatterFor returns nothing for this pool — a dish is
+  // not a card. When it becomes part of one, it will be part of the MENU card.
+  //
+  // No price, for db/012's reason unchanged: docs/dishes.md carries no cost and
+  // inventing one per plate would be a number nobody authored driving a budget
+  // nobody checked.
+  {
+    pool: "dish",
+    table: "dish",
+    describe: "name",
+    mirror: null,
+    price: null,
+    minGuests: null,
+    maxGuests: null,
+    season: "season",
+    making: "making",
+    meals: "dish_meal",
     shape: null,
     printed: null,
     active: "t.status = 'active'",
@@ -558,6 +656,16 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
               ${spec.minGuests ? `t.${spec.minGuests}` : "null::integer"} as min_guests,
               ${spec.maxGuests ? `t.${spec.maxGuests}` : "null::integer"} as max_guests,
               ${spec.shape ? `t.${spec.shape}::text` : "null::text"} as shape,
+              ${spec.season ? `t.${spec.season}::text` : "null::text"} as season,
+              ${spec.making ? `t.${spec.making}::text` : "null::text"} as making,
+              ${
+                spec.meals
+                  ? `coalesce(
+                (select jsonb_agg(m.meal::text order by m.meal)
+                   from ${spec.meals} m where m.${idColumn} = t.id),
+                '[]'::jsonb)`
+                  : "'[]'::jsonb"
+              } as meals,
               coalesce(
                 (select jsonb_object_agg(x.facet_id, x.weight)
                    from ${spec.table}_facet x where x.${idColumn} = t.id),
@@ -626,6 +734,14 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
         minGuests: num(row.min_guests),
         maxGuests: num(row.max_guests),
         shape: gameShape(row.shape),
+        // The two coherence axes, as columns. See the note on POOLS: these
+        // CONSTRAIN a set, the facets projected from them SCORE an ingredient,
+        // and keeping the two reads apart is what lets either change alone.
+        season: nullableStr(row.season),
+        making: nullableStr(row.making),
+        // db/023. Empty means every shape — the default an untagged claim has
+        // on all four axes in this schema.
+        meals: Array.isArray(row.meals) ? row.meals.map((m) => str(m)) : [],
         printedMatter: printedMatterFor(spec.pool, row),
         // Absent and empty mean the same thing: works anywhere. That is the
         // safe default, and it is the one the founder asked for by name.
@@ -644,7 +760,7 @@ async function loadSlotRules(
 ): Promise<SlotRule[]> {
   const { rows } = await db.query(
     `select os.slot_code, sk.label, sk.description, sk.section, sk.per_guest,
-            sk.excluded_by,
+            sk.excluded_by, sk.coherence_group,
             os.pool, os.min_count, os.max_count, os.required, os.per_day,
             os.position, os.note
        from occasion_slot os
@@ -668,6 +784,9 @@ async function loadSlotRules(
     position: Number(row.position),
     note: str(row.note ?? ""),
     excludedBy: nullableStr(row.excluded_by),
+    // db/022. Which slots have to agree WITH EACH OTHER rather than each with
+    // her — the three courses share 'the_table'.
+    coherenceGroup: nullableStr(row.coherence_group),
   }));
 }
 

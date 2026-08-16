@@ -31,6 +31,7 @@ const TAGGABLE = {
   game: { join: "game_facet", column: "game_id" },
   menu: { join: "menu_facet", column: "menu_id" },
   drink: { join: "drink_facet", column: "drink_id" },
+  dish: { join: "dish_facet", column: "dish_id" },
 } as const;
 
 export type Taggable = keyof typeof TAGGABLE;
@@ -89,6 +90,10 @@ const NOT_OFFERED_FOR: Readonly<Record<string, ReadonlySet<string>>> = {
   // from drink.making by db/017's trigger, and a checkbox beside it would be a
   // second contrary copy of a fact the column already holds.
   drink: new Set(["making"]),
+  // And again for a dish, from dish.making by db/021's trigger. Three pools now
+  // project onto one facet through one scalar ladder, and none of the three may
+  // also be tagged in it by hand.
+  dish: new Set(["making"]),
 };
 
 /**

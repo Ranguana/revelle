@@ -84,6 +84,17 @@ export type MemberPiece = {
   section: SectionKind;
   name: string;
   description: string;
+  /**
+   * Which pool it came from, and its slug.
+   *
+   * Not house-only information and not a score: it is the address of the thing
+   * itself, and a surface needs it to link a game to its own page (db/025).
+   * Nothing here reveals what was rejected, what was dropped, or what the
+   * catalogue could not supply — the wall is about the SEARCH, not about the
+   * identity of what she was given.
+   */
+  pool: string;
+  slug: string;
   /** How many of the object: her guest count on a per-head piece, else 1. */
   quantity: number;
   perGuest: boolean;
@@ -167,6 +178,8 @@ export function memberRevelle(candidate: Candidate): MemberRevelle {
       section: pick.slot.section,
       name: pick.ingredient.name,
       description: pick.ingredient.description,
+      pool: pick.ingredient.pool,
+      slug: pick.ingredient.slug,
       quantity: pick.slot.quantity,
       perGuest: pick.slot.perGuest,
       dayIndex: pick.slot.dayIndex,

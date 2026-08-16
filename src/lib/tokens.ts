@@ -590,6 +590,25 @@ export function writerPrompt(
             `  ${brief.hers.trim()}`
         ) + "\n"
       : "",
+    // THE ONE THING A DESTINATION MAY NOT SUPPLY.
+    //
+    // Found in real output, which is the only place it was going to be found:
+    // asked for an invitation carrying "Friday, seven o'clock, bring a
+    // swimsuit", WESTHAMPTON returned a perfectly in-voice card headed DUNE
+    // ROAD, LABOR DAY WEEKEND — because Labor Day weekend is in its premise.
+    // Every word of it was right and it would have sent six people to a house
+    // on the wrong weekend.
+    //
+    // So the line below draws the only border that matters between the world
+    // and the job: the destination owns the place, the register and the
+    // detail — Dune Road IS the address, and its lexicon says so — and the
+    // brief owns everything a guest has to act on. A house may say the heat
+    // has not broken. It may not say which weekend she is having.
+    "Every date, hour, address and instruction a guest must act on comes from",
+    "the facts above and from nowhere else. The destination supplies the place",
+    "and its detail; it does not supply arrangements. Where a fact was not",
+    "given, leave it out rather than furnishing one from the premise.",
+    "",
     "Return the finished piece and nothing else. No preamble, no alternatives,",
     "no explanation of the choices, no offer to revise.",
   ].join("\n");

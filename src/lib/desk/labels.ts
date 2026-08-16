@@ -114,6 +114,56 @@ export const MIXING_LEVELS: readonly MakingLevel[] = [
   { code: "mostly_made", label: "Mostly mixed (retired)", retired: true },
 ];
 
+/**
+ * making_level in db/016 on a DISH — docs/dishes.md's B · H · M.
+ *
+ * THE SAME LIST as COOKING_LEVELS, aliased rather than copied, because a dish
+ * is food and speaks the menus' words: her document glosses its own letters as
+ * "B = bought and arranged · H = half made · M = actually made", which is the
+ * menu vocabulary exactly. The alias exists so that a reader of the dish
+ * screens is not left wondering why a `making_level` column is labelled from a
+ * constant named for `cooking_level`. Writing the three words out a third time
+ * is how a vocabulary starts to disagree with itself.
+ */
+export const DISH_LEVELS: readonly MakingLevel[] = COOKING_LEVELS;
+
+/**
+ * `meal_shape` in db/023 — what a table IS, in the order a day runs.
+ *
+ * Derived from the founder's own "what it's for" lines across docs/menus.md and
+ * docs/drinks.md rather than invented; db/023 lists which line lands in which
+ * and argues the three foldings. Her letter codes are the fourth field of a
+ * dish line and are carried here so the desk and the document agree on sight.
+ *
+ * NO CLAIM MEANS EVERY SHAPE, which is why a dish with none of these ticked is
+ * complete rather than unfinished.
+ */
+export const MEAL_SHAPES: readonly {
+  code: string;
+  label: string;
+  letter: string;
+}[] = [
+  { code: "brunch", label: "Brunch", letter: "BR" },
+  { code: "lunch", label: "Lunch", letter: "L" },
+  { code: "cocktails", label: "Standing drinks", letter: "C" },
+  { code: "long_dinner", label: "A long dinner", letter: "D" },
+  { code: "late_supper", label: "A late supper", letter: "LS" },
+];
+
+/**
+ * `course` in db/021 — closed and structural, exactly as season_band is.
+ *
+ * In the order a meal runs. Not a facet and never offered in a tag picker:
+ * nobody prefers appetizers, and db/016's test for whether a term earns a facet
+ * is whether a host can answer in it. db/022 projects it into `dish_slot` as a
+ * native claim, which is how an appetizer stays out of the main course.
+ */
+export const COURSES: readonly { code: string; label: string }[] = [
+  { code: "appetizer", label: "Appetizer" },
+  { code: "main", label: "Main" },
+  { code: "dessert", label: "Dessert" },
+];
+
 /** occasion_type in db/001, in the order the application offers them. */
 export const OCCASIONS: readonly string[] = [
   "birthday",

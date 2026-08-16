@@ -1,0 +1,396 @@
+/*
+ * THE GAME PAGE.
+ *
+ * The one screen in the product read UNDER PRESSURE: standing up, on a phone,
+ * one-handed, with people in the next room waiting. Every rule below is written
+ * for that and the desk layout is the adaptation.
+ *
+ * What that decides, concretely:
+ *   · the instruction is the largest thing on the page and never truncated;
+ *   · a step is a tap target the width of the screen, because she is not aiming;
+ *   · the clock sits at the left edge of the step, so scanning down the page
+ *     answers "what is next and how long is it" without reading a word;
+ *   · nothing is behind a hover, a tooltip, or a second tap that is not a
+ *     <details> she can leave open;
+ *   · the trouble list is closed by default and everything else is open. It is
+ *     the only part of this page she looks for on purpose.
+ *
+ * Colours are the DESTINATION'S, written into the head by the page under
+ * `.page`. This file describes shape and rhythm and does not know what colour
+ * Westhampton is. House rules unchanged: no border radius, no italics,
+ * transitions only on colour.
+ */
+
+.page {
+  min-height: 100dvh;
+  background: var(--ground);
+  color: var(--ink);
+  padding: calc(1.5rem + env(safe-area-inset-top)) 1.25rem
+    calc(4rem + env(safe-area-inset-bottom));
+}
+
+.inner {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+/* ── the masthead ─────────────────────────────────────────────────── */
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.back {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: color 160ms ease;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.rule {
+  height: 1px;
+  background: var(--rule);
+  margin: 1rem 0 1.75rem;
+}
+
+/* ── what it is ───────────────────────────────────────────────────── */
+
+.name {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2rem, 1.5rem + 2.4vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+  text-wrap: balance;
+}
+
+.teaser {
+  margin: 0 0 1.25rem;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/*
+ * THE FACTS ROW. How long, how many people, and whether she is playing.
+ *
+ * A grid rather than a sentence because it is READ AT A GLANCE and the answer
+ * to "am I running this" must be in the same place on every game page.
+ */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.875rem 1.25rem;
+  margin: 0 0 1.5rem;
+  padding: 0.875rem 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.fact {
+  min-width: 0;
+}
+
+.factLabel {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.25rem;
+}
+
+.factValue {
+  display: block;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+/* The one sentence about what running it costs her. Set apart because it is
+   the thing she needs to know before she starts and not after. */
+.hostNote {
+  margin: 0 0 1.75rem;
+  padding: 0.75rem 0 0.75rem 1rem;
+  border-left: 2px solid var(--accent, var(--ink-faint));
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* ── the sections ─────────────────────────────────────────────────── */
+
+.section {
+  border-top: 1px solid var(--rule);
+  padding: 0.25rem 0 1.25rem;
+}
+
+.sectionHead {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  /* A summary on a phone is a tap target the width of the page. */
+  padding: 1rem 0;
+}
+
+.sectionHead::-webkit-details-marker {
+  display: none;
+}
+
+.sectionName {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.sectionNote {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.marker {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+/* Back to the objects themselves. Underlined and not coloured, for the reason
+   the occasion page gives about its own links: the palette is the
+   destination's. */
+.printedLink {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  transition: color 160ms ease;
+}
+
+.printedLink:hover {
+  color: var(--ink);
+}
+
+/* ── the steps ────────────────────────────────────────────────────── */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/*
+ * A step: the clock in a fixed left column, everything else in the second.
+ * On a narrow phone the clock moves above the instruction rather than
+ * squeezing it — a two-word instruction wrapped over four lines is worse than
+ * a clock on its own line.
+ */
+.step {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  gap: 0 1rem;
+}
+
+@media (max-width: 24rem) {
+  .step {
+    grid-template-columns: 1fr;
+    gap: 0.375rem 0;
+  }
+}
+
+.clock {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  padding-top: 0.3125rem;
+  white-space: nowrap;
+}
+
+.instruction {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.detail {
+  margin: 0.5rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/*
+ * WORDS TO SAY OUT LOUD.
+ *
+ * The most useful thing on the page and set like it: larger, on the
+ * destination's paper, and visibly a quotation. Pinned to the light values with
+ * data-theme on the element, because a thing that is quoted does not invert
+ * when the reader's phone does — the same judgement the occasion page makes
+ * about its printed matter.
+ */
+.say {
+  margin: 0.75rem 0 0;
+  background: var(--paper, var(--ground2));
+  color: var(--ink);
+  padding: 0.75rem 0.875rem;
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  border-left: 2px solid var(--rule);
+}
+
+.sayMark {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.375rem;
+}
+
+/* The supply or printed piece a step points at, resolved. Never a second
+   description of it — the count and the deadline come from the row. */
+.attached {
+  margin: 0.625rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.attached a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.attached a:hover {
+  color: var(--ink);
+}
+
+/* ── what to get, and what to print ───────────────────────────────── */
+
+.things {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.thing {
+  min-width: 0;
+}
+
+.thingName {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.thingDetail {
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.thingWhen {
+  margin: 0.3125rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.buy {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.buy a,
+.buy span {
+  display: inline-block;
+  border: 1px solid var(--rule);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.buy a:hover {
+  border-color: var(--ink-soft);
+}
+
+/* ── when it goes wrong ───────────────────────────────────────────── */
+
+.troubles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.troubleName {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.troubleAnswer {
+  margin: 0.3125rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* ── the caveat on a recommended game ─────────────────────────────── */
+
+.caveat {
+  margin: 0 0 1.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--rule);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.caveat a {
+  color: var(--ink);
+}

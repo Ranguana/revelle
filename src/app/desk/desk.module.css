@@ -478,7 +478,19 @@
   outline-offset: 1px;
 }
 
-.button {
+/*
+ * THE THREE BUTTONS SHARE A SHAPE.
+ *
+ * `.buttonQuiet` and `.buttonDanger` are written as modifiers, and every one of
+ * the nine places that use them applies the modifier ALONE — so until this
+ * selector existed they were browser-default buttons with a recoloured border,
+ * sitting beside a `.button` in the same row and half a centimetre shorter. The
+ * shape is shared here rather than by asking nine call sites to remember two
+ * class names.
+ */
+.button,
+.buttonQuiet,
+.buttonDanger {
   font-family: var(--mono);
   font-size: 0.625rem;
   letter-spacing: 0.14em;
@@ -490,6 +502,7 @@
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
+  border-radius: 0;
 }
 
 .button:hover:not(:disabled) {
@@ -768,6 +781,320 @@
   display: block;
   margin-bottom: 0.25rem;
   font-weight: 400;
+}
+
+/* ── the test bench ───────────────────────────────────────────────── */
+
+/*
+ * THE CONTROLS STAY ON SCREEN.
+ *
+ * The application is built from QUIZ_STEPS, and QUIZ_STEPS currently runs to
+ * fifty-one voice tiles and fourteen ways to have fun — well over two screens
+ * at 1440px. With the buttons at the bottom of the form, changing the occasion
+ * at the top meant scrolling past all of it to press Run, and then scrolling
+ * back to read the result. Sticky, so the seed and the three buttons are
+ * reachable from anywhere on the page, including from the middle of a result.
+ */
+.benchBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--ground);
+  border: 1px solid var(--rule);
+  border-top: 0;
+  padding: 0.625rem 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/*
+ * TWO RUNS, SIDE BY SIDE. Not a diff view with the old one hidden behind a
+ * toggle: the question a curator is asking is "did my change do that", and she
+ * answers it by reading the same list twice in the same shape. Equal columns,
+ * same order, same typography, so the eye finds the one line that differs.
+ */
+.compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.875rem;
+}
+
+@media (max-width: 62rem) {
+  .compare {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compareSide {
+  border: 1px solid var(--rule);
+  padding: 0.5rem 0.625rem;
+  min-width: 0;
+}
+
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.line {
+  padding: 0.1875rem 0 0.1875rem 0.5rem;
+  border-left: 2px solid transparent;
+  overflow-wrap: anywhere;
+}
+
+/* The one thing that moved. Colour and weight, never a badge. */
+.lineMoved {
+  border-left-color: var(--oxblood);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.lineGone {
+  border-left-color: var(--rule);
+  color: var(--ink-faint);
+}
+
+/* ── the matrix ───────────────────────────────────────────────────── */
+
+/*
+ * The grid scrolls inside its own box rather than widening the page. Thirteen
+ * destinations fit at 1440px; the fourteenth must not push the ingredient names
+ * off the left edge, because the row label is the only thing that makes a cell
+ * mean anything.
+ */
+.matrixScroll {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+}
+
+.matrix {
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.matrix th,
+.matrix td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0;
+}
+
+.matrixName {
+  padding: 0.25rem 0.625rem 0.25rem 0.5rem;
+  min-width: 15rem;
+  max-width: 22rem;
+  text-align: left;
+  font-weight: 400;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  border-right: 1px solid var(--rule);
+}
+
+/*
+ * Vertical headings. Thirteen destination names will not fit across a screen
+ * horizontally and abbreviating them would mean a curator matching a cell to a
+ * place by memory — which is exactly the mistake this screen exists to stop.
+ */
+/*
+ * NO FIXED HEIGHT. A rotated heading in a box shorter than its own text is
+ * clipped without a scrollbar or an ellipsis to say so, and "HAVANA, THE SMALL
+ * HOURS" read as "HAVANA, THE SMALL HOU" for exactly as long as this rule said
+ * 9rem. The longest destination name sets the height of the row, which is the
+ * only value that cannot be wrong.
+ */
+.matrixHead {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  padding: 0.5rem 0.25rem;
+  vertical-align: bottom;
+  font-weight: 400;
+}
+
+/* The legend. Each mark sits with its own words and never runs into the next. */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.legend li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.legendMark {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  width: 1rem;
+  text-align: center;
+}
+
+.matrixCell {
+  width: 2.25rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/*
+ * One button, three states, one click. The state is drawn rather than written
+ * because a grid of words is not a grid you can read at a glance, and the
+ * legend above the table says what each mark is.
+ */
+.cell {
+  width: 100%;
+  height: 1.75rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1;
+  color: var(--ink-faint);
+}
+
+.cell:hover {
+  background: var(--ground2);
+}
+
+.cellNative {
+  color: var(--ink);
+  background: var(--ground2);
+  font-weight: 700;
+}
+
+.cellForbidden {
+  color: var(--oxblood);
+}
+
+.cellWeighted {
+  color: var(--aqua);
+}
+
+/* The consequence strip under the grid: what each destination can draw on. */
+.matrixFoot td,
+.matrixFoot th {
+  border-bottom: 0;
+  border-top: 1px solid var(--ink);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--ink-soft);
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.matrixFoot th {
+  text-align: left;
+  padding-left: 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.5625rem;
+  color: var(--ink-faint);
+}
+
+/*
+ * A DESTINATION THAT CAN FILL A SLOT WITH NOTHING. Selected through
+ * `.matrixFoot` rather than on its own, because the strip's own rule sets a
+ * colour and a bare class loses to it — the first version of this printed a
+ * quiet grey zero, which is the one number on the strip that has to be seen.
+ */
+.matrixFoot td.poolEmpty {
+  color: var(--oxblood);
+}
+
+/* ── the coverage board ───────────────────────────────────────────── */
+
+.board {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+/*
+ * Every column has a floor, so that a cell holding one character does not
+ * collapse until its heading touches the next one. "GAMES OCCASION SPREAD" ran
+ * together as one word at 1440px before this existed.
+ */
+.board th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 400;
+  padding: 0.25rem 1rem 0.375rem 0.375rem;
+  border-bottom: 1px solid var(--ink);
+  vertical-align: bottom;
+  min-width: 5rem;
+}
+
+.board th:first-child {
+  padding-left: 0;
+  min-width: 12rem;
+}
+
+.board td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0 0.625rem 0 0;
+  vertical-align: top;
+}
+
+.board td:first-child {
+  padding: 0.375rem 0.75rem 0.375rem 0;
+}
+
+/*
+ * A cell is a link, and the link is the point: a thin column is only useful if
+ * the thing that would fill it is one click away.
+ */
+.boardCell {
+  display: block;
+  padding: 0.375rem 0.5rem 0.375rem 0.375rem;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border-left: 3px solid var(--rule);
+  min-height: 2.5rem;
+}
+
+.boardCell:hover {
+  background: var(--ground2);
+  color: var(--ink);
+}
+
+.boardFilled {
+  border-left-color: var(--aqua);
+  color: var(--ink);
+}
+
+.boardThin {
+  border-left-color: var(--gold);
+}
+
+.boardEmpty {
+  border-left-color: var(--oxblood);
+  color: var(--oxblood);
+}
+
+.boardWhat {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-top: 0.0625rem;
+  overflow-wrap: anywhere;
 }
 
 /* ── sign in ──────────────────────────────────────────────────────── */

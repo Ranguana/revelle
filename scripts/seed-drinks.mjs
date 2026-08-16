@@ -28,6 +28,34 @@
  * pitcher fruit", "self-mixed at the table", "in a gimlet glass" — so the line
  * is stored exactly as written, in her punctuation, whole.
  *
+ * ─────────────────────────────────────────────────────────────────────
+ * A PROGRAMME CAN BELONG TO SEVERAL DESTINATIONS
+ *
+ * The founder: "Drinks need to be destination picked though some can cross
+ * reference." So a programme is scoped, as it always was, and it can now be
+ * scoped to MORE THAN ONE house — one row with several `native = true`
+ * `drink_world` rows, exactly the rule scripts/seed-dishes.mjs follows for the
+ * dish pool. One rule between the two pools, which is the point.
+ *
+ * There are two ways to say it and the parser takes both:
+ *
+ *   REPEAT THE ENTRY under a second `## Heading`, word for word. Two entries
+ *     are ONE programme when their cocktails line and their mocktail line MATCH
+ *     — the authored content, never a resemblance. A Cap Ferrat kir and a Côte
+ *     d'Azur kir royale are different drinks and stay two rows, and inferring a
+ *     cross-reference from similarity would quietly merge them. Cross-
+ *     referencing is HER decision, expressed by writing the same thing twice.
+ *
+ *   ADD A SIXTH BULLET, `Also at: Vegas, Catskills`. Repeating five lines to
+ *     name one more destination is tedious authoring, and tedious authoring is
+ *     how a catalogue stops being edited. The record shape stays five bullets
+ *     or six, position-delimited like everything else she writes, and a sixth
+ *     bullet that does not begin "Also at" is an error rather than a guess.
+ *
+ * NOTHING IN docs/drinks.md USES EITHER TODAY. Seeding the file as it stands
+ * produces twenty-five programmes with one destination each, and the run says
+ * so. This removes a limitation; it changes no data.
+ *
  * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL.
  */
 import { readFileSync } from "node:fs";
@@ -121,15 +149,51 @@ function parse(text) {
   }
 
   for (const drink of drinks) {
-    if (drink.bullets.length !== 5) {
+    if (drink.bullets.length !== 5 && drink.bullets.length !== 6) {
       fail(
         `drink ${drink.number} has ${drink.bullets.length} lines; the record ` +
-          `shape is exactly five: cocktails, mocktail mirrors, what it's for, ` +
-          `season, how much mixing. A drink without its mirror is not a drink ` +
-          `this house serves — see the top of docs/drinks.md.`
+          `shape is five: cocktails, mocktail mirrors, what it's for, season, ` +
+          `how much mixing — with an optional sixth, "Also at: <destination>, ` +
+          `<destination>". A drink without its mirror is not a drink this ` +
+          `house serves — see the top of docs/drinks.md.`
       );
     }
-    const [cocktails, mocktails, whatItsFor, season, mixing] = drink.bullets;
+    const [cocktails, mocktails, whatItsFor, season, mixing, alsoAt] =
+      drink.bullets;
+
+    // THE SIXTH BULLET, when there is one. An unrecognised sixth line is an
+    // error rather than a skip, for the reason an unknown heading is: a typo
+    // that silently drops a destination is far worse than a failed run.
+    drink.also = [];
+    if (alsoAt !== undefined) {
+      const match = /^Also at:?\s*(.+)$/i.exec(alsoAt);
+      if (!match) {
+        fail(
+          `drink ${drink.number}: the sixth line is "${alsoAt}". The only ` +
+            `sixth line a drink record has is "Also at: <destination>, ` +
+            `<destination>".`
+        );
+      }
+      for (const raw of match[1].split(",")) {
+        const heading = raw.trim();
+        if (heading.length === 0) continue;
+        if (!Object.hasOwn(DESTINATIONS, heading)) {
+          fail(
+            `drink ${drink.number}: "${heading}" is not a destination this ` +
+              `catalogue knows. Add it to DESTINATIONS in ` +
+              `scripts/catalogue-vocabulary.mjs — docs/new-destination.md §5 ` +
+              `is about exactly this step.`
+          );
+        }
+        if (heading === drink.destination) {
+          fail(
+            `drink ${drink.number}: "Also at" names ${heading}, which is the ` +
+              `heading it already sits under.`
+          );
+        }
+        if (!drink.also.includes(heading)) drink.also.push(heading);
+      }
+    }
 
     if (mocktails.length === 0) {
       fail(`drink ${drink.number}: the mocktail mirror is empty.`);
@@ -166,7 +230,71 @@ function parse(text) {
 
   if (drinks.length === 0) fail("no drinks found in docs/drinks.md");
   contiguous(drinks);
-  return drinks;
+  return collapse(drinks);
+}
+
+/**
+ * TWO ENTRIES ARE ONE PROGRAMME WHEN SHE WROTE THEM THE SAME WAY.
+ *
+ * The key is the AUTHORED CONTENT — the cocktails line and the mocktail line,
+ * exactly — and nothing else. Not a similarity score, not a normalised name,
+ * not the "what it's for" line. Martinis at New York and martinis at Vegas are
+ * one programme only if the two records match; a Cap Ferrat kir and a Côte
+ * d'Azur kir royale differ by a word and stay two rows, which is correct,
+ * because they are two drinks.
+ *
+ * The slug comes from the FIRST occurrence's number, so a cross-referenced
+ * programme keeps the identity it already had in the database and a re-seed
+ * recognises it. The later numbers are simply not used — which is why
+ * contiguous() runs before this, on the raw entries: a gap in her numbering is
+ * still a dropped record, and it has to be caught before the collapse hides it.
+ *
+ * Everything else about the two entries must match as well. A repeated
+ * programme whose season or making level differs between the two headings is
+ * one of the two being wrong, and it fails rather than picking a winner — the
+ * same rule scripts/seed-dishes.mjs applies to a repeated dish's making level.
+ */
+function collapse(entries) {
+  const byContent = new Map();
+
+  for (const drink of entries) {
+    const key = `${drink.cocktails}\u0000${drink.mocktails}`;
+    const first = byContent.get(key);
+
+    if (!first) {
+      drink.destinations = [drink.destination, ...drink.also];
+      byContent.set(key, drink);
+      continue;
+    }
+
+    for (const [field, label] of [
+      ["name", "what it's for"],
+      ["season", "season"],
+      ["seasonNote", "the season wording"],
+      ["making", "how much mixing"],
+    ]) {
+      if (first[field] !== drink[field]) {
+        fail(
+          `drink ${drink.number} repeats drink ${first.number} word for word ` +
+            `but disagrees about ${label}: "${first[field]}" against ` +
+            `"${drink[field]}". A cross-referenced programme is one record; ` +
+            `two answers for one record is one of the two being wrong.`
+        );
+      }
+    }
+
+    for (const heading of [drink.destination, ...drink.also]) {
+      if (first.destinations.includes(heading)) {
+        fail(
+          `drink ${drink.number}: ${heading} is already claimed by drink ` +
+            `${first.number}, which is the same programme.`
+        );
+      }
+      first.destinations.push(heading);
+    }
+  }
+
+  return [...byContent.values()];
 }
 
 /** A gap in the numbering is an entry a bad parse dropped. See seed-menus. */
@@ -200,6 +328,7 @@ await client.connect();
 let created = 0;
 let left = 0;
 let updated = 0;
+let scoped = 0;
 const stubbed = [];
 
 try {
@@ -281,16 +410,22 @@ try {
       }
     }
 
-    const world = await ensureWorld(client, drink.destination, "seed-drinks");
-    if (world.created) stubbed.push(world.slug);
-    await client.query(
-      // `native` — the claim, not a weight. docs/drinks.md: "A drink is scoped
-      // to a destination the way a menu is." See db/019 and seed-menus.mjs.
-      `insert into drink_world (drink_id, world_id, native, affinity, note)
-       values ($1, $2, true, 1.000, $3)
-       on conflict (drink_id, world_id) do nothing`,
-      [drinkId, world.id, "Written for this destination. docs/drinks.md."]
-    );
+    // EVERY destination this programme was written under. One row each, all
+    // `native` — the claim, not a weight. docs/drinks.md: "A drink is scoped to
+    // a destination the way a menu is", and the founder: "some can cross
+    // reference". See db/019 and scripts/seed-dishes.mjs, which does this
+    // identically for six hundred dishes.
+    for (const heading of drink.destinations) {
+      const world = await ensureWorld(client, heading, "seed-drinks");
+      if (world.created && !stubbed.includes(world.slug)) stubbed.push(world.slug);
+      const { rowCount } = await client.query(
+        `insert into drink_world (drink_id, world_id, native, affinity, note)
+         values ($1, $2, true, 1.000, $3)
+         on conflict (drink_id, world_id) do nothing`,
+        [drinkId, world.id, "Written for this destination. docs/drinks.md."]
+      );
+      scoped += rowCount;
+    }
   }
 
   await client.query("commit");
@@ -302,10 +437,20 @@ try {
   await client.end();
 }
 
+const claims = drinks.reduce((n, drink) => n + drink.destinations.length, 0);
+const crossed = drinks.filter((drink) => drink.destinations.length > 1);
+
 console.log(
-  `\n[seed-drinks] ${drinks.length} in the file: ${created} created, ` +
-    `${updated} updated, ${left} left as the desk has them`
+  `\n[seed-drinks] ${drinks.length} programme(s) in the file: ${created} ` +
+    `created, ${updated} updated, ${left} left as the desk has them. ` +
+    `${claims} destination claim(s) authored, ${scoped} written, ` +
+    `${crossed.length} programme(s) cross-referenced.`
 );
+for (const drink of crossed) {
+  console.log(
+    `  drink-${String(drink.number).padStart(2, "0")} — ${drink.destinations.join(" · ")}`
+  );
+}
 if (stubbed.length > 0) {
   console.log(
     `\nThese destinations had no world row and now have a DRAFT STUB, so the ` +

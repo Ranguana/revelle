@@ -80,6 +80,24 @@
  * When the cap binds the extra game is simply NOT PLACED. Per member.ts, that
  * is invisible to her — the deliverable does not exist in her Revelle, and no
  * heading is printed over an empty body.
+ *
+ * ── AND THE TABLE HAS TO AGREE WITH ITSELF ───────────────────────────
+ *
+ * db/022 made the table a COMPOSITION: an appetizer, a main and a dessert, each
+ * picked separately from the dish pool. Three independent picks are three
+ * independent answers, and a table that is summer at one end and winter at the
+ * other — or two-thirds bought and one-third actually made — is not an evening.
+ *
+ * So a third thing is carried on the state beside the money and the blocks: for
+ * each `slot_kind.coherence_group`, the season and the rung of the making axis
+ * that group has committed to. Same class of rule as the other two — a property
+ * of the SET rather than of any one ingredient — and enforced in the same place
+ * for the same reason: a rule checked at the end is a rule that produces a set
+ * nobody can use.
+ *
+ * The judgements themselves (which seasons contain which, which way the rung
+ * falls back when a course has nothing at hers) are in table.ts. This file
+ * carries them; it does not decide them.
  */
 
 import {
@@ -88,6 +106,21 @@ import {
   slotEligibility,
   worldEligibility,
 } from "./occasion.ts";
+import {
+  chooseCourse,
+  courseOption,
+  type CourseChooser,
+  type CourseOption,
+} from "./compose.ts";
+import {
+  axesOf,
+  groupOf,
+  mealAgrees,
+  narrowSeason,
+  rungPreference,
+  seasonAgrees,
+  type TableCommitment,
+} from "./table.ts";
 import { venueEligibility } from "./venue.ts";
 import {
   facetOverlap,
@@ -137,6 +170,25 @@ export type SlotPool = {
   prunedByVenue: readonly string[];
 };
 
+/**
+ * The composed table's context — see fillSlots.
+ *
+ * `chooser` is the seam described in compose.ts: rules narrow, a model chooses.
+ * Absent means the deterministic answer, which is the best-scoring survivor and
+ * is what the search would have taken anyway.
+ */
+export type TableContext = {
+  /** Her `how_made` answer as a rung. Seeds every coherence group. */
+  rung?: string | null;
+  /** db/023's meal_shape — what kind of table this evening is. */
+  meal?: string | null;
+  /** The destination's name, for the chooser's request. */
+  destination?: string;
+  /** Her authored menus for this destination, as prose, verbatim. */
+  exemplars?: readonly string[];
+  chooser?: CourseChooser | null;
+};
+
 export type Fill = {
   picks: Pick[];
   dropped: DroppedPick[];
@@ -168,7 +220,13 @@ export function scopePools(
   /** THE ROOM SHE IS ACTUALLY IN. Null when the house cannot resolve it. */
   venue: Venue | null,
   options: EngineOptions,
-  now: Date
+  now: Date,
+  /**
+   * WHAT KIND OF TABLE THIS EVENING IS — db/023's meal_shape, from
+   * mealShape() in table.ts. Null for a caller that does not care, which every
+   * fixture written before db/023 is.
+   */
+  meal: string | null = null
 ): Map<string, SlotPool> {
   const groupSize = scale.guestsHigh ?? scale.guestsPlanning ?? null;
   const pools = new Map<string, SlotPool>();
@@ -247,6 +305,21 @@ export function scopePools(
       if (!forVenue.eligible) {
         rejected.push({ rank: 0, text: `${ingredient.name} is ${forVenue.reason}` });
         prunedByVenue.push(ingredient.name);
+        continue;
+      }
+
+      // WHAT KIND OF TABLE THIS IS — db/023, and a filter for the same reason
+      // the occasion axis is one: a brunch dish at a long dinner is not a weak
+      // match. No claims at all means every shape, so this removes nothing
+      // until the founder tags a dish, which is why 650 untagged lines are
+      // correct rather than incomplete.
+      if (meal !== null && !mealAgrees(ingredient.meals, meal)) {
+        rejected.push({
+          rank: 1,
+          text:
+            `${ingredient.name} is written for ` +
+            `${(ingredient.meals ?? []).join(" or ")} and this is a ${meal}`,
+        });
         continue;
       }
 
@@ -373,6 +446,14 @@ type State = {
   chosenFacets: FacetTags[];
   /** Blocks of the evening spent. Ambient and finale games spend none. */
   scheduled: number;
+  /**
+   * WHAT EACH COHERENCE GROUP HAS COMMITTED TO — db/022, and empty in every
+   * search that has no such group, which is every occasion until the courses.
+   *
+   * Copied on extend() rather than mutated, because a beam holds several live
+   * states at once and two of them may have set very different tables.
+   */
+  table: Map<string, TableCommitment>;
 };
 
 /** Does placing this thing take one of the evening's blocks? */
@@ -385,8 +466,19 @@ export function fillSlots(
   pools: Map<string, SlotPool>,
   scale: Scale,
   shape: OccasionShape,
-  options: EngineOptions
+  options: EngineOptions,
+  /**
+   * EVERYTHING THE COMPOSED TABLE NEEDS THAT IS NOT A SLOT OR A POOL — db/022,
+   * db/023, and one object rather than four parameters because they arrive
+   * together and mean nothing apart.
+   *
+   * Optional in full: a caller that has no coherence group in its plan — every
+   * occasion before db/022, and every fixture in selection.test.ts — passes
+   * nothing and behaves exactly as it did.
+   */
+  table: TableContext = {}
 ): Fill {
+  const tableRung = table.rung ?? null;
   const ceiling = toCents(scale.budgetCeiling);
   const planning = toCents(scale.budgetPlanning);
   const blocks = Math.max(0, shape.scheduledGameMax);
@@ -433,6 +525,7 @@ export function fillSlots(
       used: new Set(),
       chosenFacets: [],
       scheduled: 0,
+      table: new Map(),
     },
   ];
 
@@ -453,10 +546,150 @@ export function fillSlots(
         null;
       let weakest: { name: string; score: number } | null = null;
       let blockedByShape: string | null = null;
+      let refusedByTable: { name: string; why: string } | null = null;
 
-      for (const candidate of entry.candidates) {
+      // ── WHAT THIS TABLE HAS ALREADY COMMITTED TO ─────────────────────
+      //
+      // Read once per (state, slot) rather than per candidate, because it does
+      // not change while this slot is being decided.
+      const group = groupOf(slot);
+      const committed = group === null ? undefined : state.table.get(group);
+      const seasonHeld = committed?.season ?? null;
+      const rungHeld = committed?.making ?? tableRung;
+
+      // THE RUNG THIS COURSE WILL ACTUALLY USE.
+      //
+      // The table's rung when anything can fill the course at it, and otherwise
+      // the first rung in table.ts's fallback order that something can. Decided
+      // BEFORE the candidate loop rather than inside it, because "fall back one
+      // step" is a statement about the whole course and cannot be evaluated one
+      // candidate at a time — the second-best dish at her rung must beat the
+      // best dish one rung off, and a per-candidate test would let score decide
+      // that.
+      let rungForThisCourse: string | null = null;
+      if (group !== null && rungHeld !== null) {
+        for (const rung of rungPreference(rungHeld)) {
+          const reachable = entry.candidates.some((candidate) => {
+            const axes = axesOf(candidate.ingredient);
+            return (
+              !state.used.has(
+                `${candidate.ingredient.pool}:${candidate.ingredient.id}`
+              ) &&
+              seasonAgrees(seasonHeld, axes.season) &&
+              (axes.making === null || axes.making === rung)
+            );
+          });
+          if (reachable) {
+            rungForThisCourse = rung;
+            break;
+          }
+        }
+        // Nothing at any rung. Left null, so the rung stops constraining and
+        // the season, the budget and the required-slot fallback below decide
+        // alone. A table with a main in it at the wrong rung beats a table with
+        // no main, and this is the same judgement one step further out.
+      }
+
+      // ── RULES NARROW, A MODEL CHOOSES — compose.ts ───────────────────
+      //
+      // Everything above this line is the rules: destination, course, meal
+      // shape, room, group size, season, rung, and nothing already used. What
+      // is left is a handful of dishes that are all permitted, and which of
+      // them makes an EVENING beside what is already on the table is the one
+      // judgement no rule here holds.
+      //
+      // With no chooser configured this is a no-op that costs one array pass:
+      // chooseCourse returns the best-scoring survivor, which is the candidate
+      // the loop below would have reached first anyway. Absence is a route.
+      let first: string | null = null;
+      if (group !== null && table.chooser) {
+        const survivors: CourseOption[] = [];
+        for (const candidate of entry.candidates) {
+          const axes = axesOf(candidate.ingredient);
+          if (
+            state.used.has(
+              `${candidate.ingredient.pool}:${candidate.ingredient.id}`
+            ) ||
+            !seasonAgrees(seasonHeld, axes.season) ||
+            (rungForThisCourse !== null &&
+              axes.making !== null &&
+              axes.making !== rungForThisCourse)
+          ) {
+            continue;
+          }
+          survivors.push(
+            courseOption(candidate.ingredient, survivors.length)
+          );
+        }
+        if (survivors.length > 0) {
+          first = chooseCourse(
+            {
+              destination: table.destination ?? "",
+              meal: table.meal ?? "",
+              season: seasonHeld,
+              making: rungForThisCourse,
+              slot,
+              placed: state.picks
+                .filter((pick) => groupOf(pick.slot) === group)
+                .map((pick, index) => courseOption(pick.ingredient, index)),
+              survivors,
+              exemplars: table.exemplars ?? [],
+            },
+            table.chooser
+          ).id;
+        }
+      }
+
+      // The chosen dish is tried FIRST and everything else in score order after
+      // it. Not "only the chosen dish": the budget, the ceiling and the beam
+      // are still the search's to enforce, and a chooser that names something
+      // unaffordable must not empty the slot.
+      const ordered =
+        first === null
+          ? entry.candidates
+          : [
+              ...entry.candidates.filter((c) => c.ingredient.id === first),
+              ...entry.candidates.filter((c) => c.ingredient.id !== first),
+            ];
+
+      for (const candidate of ordered) {
         const key = `${candidate.ingredient.pool}:${candidate.ingredient.id}`;
         if (state.used.has(key)) continue;
+
+        // ── THE TABLE HAS TO AGREE WITH ITSELF ───────────────────────
+        //
+        // Before the budget and before the score, beside the evening's blocks,
+        // because it is the same kind of rule: a summer dish next to a winter
+        // one is not a weak match, it is not one table. A year-round dish
+        // agrees with everything and 502 of the 600 are year-round, so this
+        // bites rarely and exactly where it should.
+        if (group !== null) {
+          const axes = axesOf(candidate.ingredient);
+          if (!seasonAgrees(seasonHeld, axes.season)) {
+            if (refusedByTable === null) {
+              refusedByTable = {
+                name: candidate.ingredient.name,
+                why: `it is written for ${axes.season} and the table is already ${seasonHeld}`,
+              };
+            }
+            continue;
+          }
+          if (
+            rungForThisCourse !== null &&
+            axes.making !== null &&
+            axes.making !== rungForThisCourse
+          ) {
+            if (refusedByTable === null) {
+              refusedByTable = {
+                name: candidate.ingredient.name,
+                why:
+                  `it is ${axes.making} and this table is being set at ` +
+                  `${rungForThisCourse}`,
+              };
+            }
+            continue;
+          }
+        }
 
         // THE EVENING HAS RUN OUT OF BLOCKS.
         //
@@ -500,7 +733,9 @@ export function fillSlots(
           continue;
         }
 
-        next.push(extend(state, pick, cost, key, candidate.ingredient.facets));
+        next.push(
+          extend(state, pick, cost, key, candidate.ingredient.facets, group)
+        );
         placed += 1;
         if (placed >= options.beamWidth) break;
       }
@@ -558,6 +793,28 @@ export function fillSlots(
         }
       }
 
+      // THE TABLE REFUSING SOMETHING IS WORTH A SENTENCE. A curator looking at
+      // a composed table and wondering why the obvious dessert is not on it is
+      // owed the reason, and "the table is already summer" is a reason she can
+      // act on — by writing a year-round dessert for that destination, or by
+      // deciding the season tag was wrong. Never a CatalogueGap: the pool was
+      // not thin, the table was.
+      if (refusedByTable !== null && placed > 0) {
+        const note: DroppedPick = {
+          slot,
+          ingredientName: refusedByTable.name,
+          lineCost: null,
+          reason: "table_disagreed",
+          detail:
+            `not placed in "${slot.label}": ${refusedByTable.why}. A table ` +
+            `that is two seasons or two rungs of work is not an evening — see ` +
+            `db/022. Something that agrees took the course.`,
+        };
+        for (let c = childrenFrom; c < next.length; c += 1) {
+          next[c] = { ...next[c], dropped: [...next[c].dropped, note] };
+        }
+      }
+
       if (slot.required) {
         // A required slot that could not be filled within the ceiling still has
         // to be filled: the spec's answer to "budget can't be met" is the
@@ -567,7 +824,9 @@ export function fillSlots(
           const { candidate, cost } = cheapestFallback;
           const key = `${candidate.ingredient.pool}:${candidate.ingredient.id}`;
           const pick = scorePick(candidate, slot, state, options);
-          next.push(extend(state, pick, cost, key, candidate.ingredient.facets));
+          next.push(
+            extend(state, pick, cost, key, candidate.ingredient.facets, group)
+          );
           placed += 1;
         }
         // Nothing at all could fill it: a catalogue gap, or an evening with no
@@ -683,10 +942,29 @@ function extend(
   pick: Pick,
   cost: number,
   key: string,
-  facets: FacetTags
+  facets: FacetTags,
+  /** The coherence group this pick joins, or null. db/022. */
+  group: string | null
 ): State {
   const used = new Set(state.used);
   used.add(key);
+
+  // THE TABLE, NARROWED. A new Map per state rather than a mutation, because
+  // the beam holds several live states and two of them may have set very
+  // different tables from the same parent.
+  const table = new Map(state.table);
+  if (group !== null) {
+    const axes = axesOf(pick.ingredient);
+    const held = table.get(group) ?? { season: null, making: null };
+    table.set(group, {
+      season: narrowSeason(held.season, axes.season),
+      // The first course to name a rung settles it. A dish with no rung at all
+      // — no pool has one today, and a hand-built fixture may — settles
+      // nothing rather than settling null over a real answer.
+      making: held.making ?? axes.making ?? null,
+    });
+  }
+
   return {
     picks: [...state.picks, pick],
     dropped: state.dropped,
@@ -695,6 +973,7 @@ function extend(
     used,
     chosenFacets: [...state.chosenFacets, facets],
     scheduled: state.scheduled + (takesABlock(pick.ingredient) ? 1 : 0),
+    table,
   };
 }
 

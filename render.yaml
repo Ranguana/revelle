@@ -71,7 +71,7 @@ services:
     # it. Every seeder is idempotent (a re-run reports "0 created, 0 updated"),
     # so running them on every deploy costs nothing and cannot drift.
     #
-    # seed:destinations runs TWICE on purpose. The menu and drink seeders
+    # seed:destinations runs TWICE on purpose. The menu, drink and dish seeders
     # create a draft stub for a destination that has content but no authored
     # look — and seed:destinations is what completes a stub once someone
     # writes it. First pass publishes what is authored, the seeders attach the
@@ -86,6 +86,7 @@ services:
       npm run seed:destinations &&
       npm run seed:menus &&
       npm run seed:drinks &&
+      npm run seed:dishes &&
       npm run seed:games &&
       npm run seed:destinations
 

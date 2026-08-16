@@ -11,6 +11,8 @@
  * See docs/selection-spec.md. Stage numbers below are that document's.
  */
 
+import type { CourseChooser } from "./compose.ts";
+
 /** occasion_type in db/001. */
 export type OccasionCode =
   | "birthday"
@@ -397,6 +399,39 @@ export type Ingredient = {
    */
   shape: GameShape | null;
   /**
+   * THE TWO AXES A COMPOSED TABLE HAS TO AGREE ON — db/022.
+   *
+   * `season` is season_band and `making` is making_level (cooking_level on a
+   * menu, which has the same members and is the same axis under db/012's older
+   * name). Both are null in a pool that carries neither, which is products,
+   * games and tracklists.
+   *
+   * READ AS COLUMNS RATHER THAN DUG OUT OF `facets`, even though both are also
+   * projected there. The facet is what SCORES — a weight against her vector,
+   * exactly as db/016 insists — and these are what CONSTRAIN a set: three
+   * courses have to land on one season and one rung or they are not one table.
+   * Reading a constraint back out of a scoring weight would make the two
+   * inseparable, and the first change to either would silently be a change to
+   * both.
+   *
+   * Optional, so that a snapshot assembled by hand — every fixture in
+   * selection.test.ts — stays valid without being edited. Absent means the same
+   * as null: this ingredient makes no claim on that axis and agrees with
+   * anything.
+   */
+  season?: string | null;
+  making?: string | null;
+  /**
+   * WHICH SHAPES OF TABLE THIS CLAIMS — `dish_meal`, db/023. Dishes only.
+   *
+   * EMPTY MEANS EVERY SHAPE, which is claimEligibility()'s own default and the
+   * reason 650 authored lines that carry no fourth field are correct rather
+   * than incomplete. Any claim makes the set a whitelist.
+   *
+   * Optional, and absent means the same as empty.
+   */
+  meals?: readonly string[];
+  /**
    * WHAT GETS PRINTED, when this ingredient brings objects with it.
    *
    * Optional rather than an empty array, so that a snapshot assembled by hand
@@ -442,6 +477,16 @@ export type SlotRule = {
    * fill this slot" data rather than code.
    */
   excludedBy: string | null;
+  /**
+   * slot_kind.coherence_group — db/022. Slots that must agree WITH EACH OTHER
+   * rather than each agreeing with her separately. The three courses share
+   * 'the_table': one season and one rung of the making axis across all of them,
+   * because a table that is two-thirds bought and one-third actually made is
+   * not an answer to a question she was asked once.
+   *
+   * Optional, and absent means the same as null: this slot answers to nobody.
+   */
+  coherenceGroup?: string | null;
 };
 
 export type OccasionShape = {
@@ -515,6 +560,8 @@ export type UnitSlot = {
    * she is looking at: `required` is the occasion's shape, this is her answer.
    */
   guaranteed?: boolean;
+  /** slot_kind.coherence_group — db/022. Carried from the rule unchanged. */
+  coherenceGroup?: string | null;
 };
 
 export type Catalogue = {
@@ -610,7 +657,16 @@ export type DroppedPick = {
     | "collision"
     | "no_good_match"
     /** The evening had no block left. See occasion_shape.scheduled_game_max. */
-    | "scheduled_cap";
+    | "scheduled_cap"
+    /**
+     * A COMPOSED TABLE COULD NOT AGREE WITH ITSELF — db/022.
+     *
+     * The dish was eligible, affordable and well scored, and it was refused
+     * because the season or the rung of the making axis the other courses had
+     * already committed to is not its own. Never a CatalogueGap: the pool was
+     * not thin, the table was.
+     */
+    | "table_disagreed";
   detail: string;
 };
 
@@ -813,6 +869,21 @@ export type EngineOptions = {
   lowConfidenceScore: number;
   seed: number | null;
   now: Date | null;
+  /**
+   * THE SEAM WHERE A MODEL CHOOSES — src/lib/selection/compose.ts, and absent
+   * by default.
+   *
+   * "Rules narrow. A model chooses." Everything that narrows is deterministic
+   * and runs whether this is set or not; this decides only which of the
+   * survivors makes an EVENING rather than three individually permitted
+   * dishes. Absent means the best-scoring survivor, which is what the search
+   * takes on its own — absence is a ROUTE, not a fault, the same discipline
+   * src/lib/music/ applies to Spotify.
+   *
+   * Optional rather than nullable-and-required so that DEFAULT_OPTIONS and
+   * every hand-built options object stay valid unedited.
+   */
+  courseChooser?: CourseChooser | null;
 };
 
 export const DEFAULT_OPTIONS: EngineOptions = {
