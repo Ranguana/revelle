@@ -49,6 +49,8 @@ multiple destination tags at import.
 - Beef stroganoff · M
 - Tarragon roast chicken · M
 - Lobster salad in avocado halves · H (summer)
+- Cold poached salmon, whole, with dill sauce · B (summer)
+- A shrimp and crab platter on ice · B (summer)
 
 ### Desserts
 - Baked alaska · M
@@ -107,6 +109,8 @@ multiple destination tags at import.
 - Roast pork with cranberry · M (fall)
 - Scallop and corn stew · M (late summer)
 - Fish chowder as a main · M
+- Lobsters boiled at the fish market, split and buttered · B (summer)
+- Chowder and lobster rolls brought in from the fish market · B
 
 ### Desserts
 - Blueberry pie · M (summer)
@@ -281,6 +285,8 @@ multiple destination tags at import.
 - Veal chops with tarragon · M
 - Whole roasted fish with herbs · M
 - Late-night omelette with fine herbs · M
+- Roast chicken from the market with olives and lemon · B
+- Cold veal sliced thin with tuna sauce · B
 
 ### Desserts
 - Peach melba · H (summer)
@@ -339,6 +345,8 @@ multiple destination tags at import.
 - Double-cut lamb chops · M
 - Chicken parmesan · M
 - Patty melts at midnight · M
+- Steakhouse takeout — strip steaks, creamed spinach, baked potatoes · B
+- A shrimp cocktail tower and cold cracked crab · B
 
 ### Desserts
 - Cherries jubilee, flamed · H
@@ -397,6 +405,8 @@ multiple destination tags at import.
 - Roast pork with apples and onions · M (fall)
 - Roast duck with cherry sauce · M
 - Cold poached salmon with dill · M (summer)
+- Rotisserie chickens and sides from the good deli · B
+- A deli spread — corned beef, rye, half-sours, mustard · B
 
 ### Desserts
 - Cheese blintzes with berries · M
@@ -455,6 +465,8 @@ multiple destination tags at import.
 - Roast chicken with rosemary potatoes · M
 - Short ribs braised in red wine · M (winter)
 - Mushroom risotto · M
+- Roast chicken and potatoes from the rotisserie · B
+- Sausages and sauerkraut brought hot from the butcher · B (winter)
 
 ### Desserts
 - Apple strudel with cream · M
@@ -571,6 +583,8 @@ multiple destination tags at import.
 - Stuffed peppers with rice and beef · M
 - Baked fish with peppers and olives · M
 - Black beans and rice with all the fixings · M
+- Roast pork, black beans and yellow rice, brought in · B
+- Pressed sandwiches brought in, cut and stacked · B
 
 ### Desserts
 - Flan · M
@@ -629,6 +643,8 @@ multiple destination tags at import.
 - Campfire chili · M (winter)
 - Fish tacos with cabbage and lime · M
 - Whole roasted cauliflower with tahini · M
+- Rotisserie chickens, sourdough, and a bag of salad from the market · B
+- Smoked salmon, sourdough and cheese for a cold supper · B
 
 ### Desserts
 - Blackberry crisp · M (late summer)
@@ -745,6 +761,8 @@ multiple destination tags at import.
 - Mussels in tomato broth with bread · M
 - Veal with lemon · M
 - Grilled squid over greens · H
+- Focaccia, cold cuts, cheese and marinated vegetables from the alimentari · B
+- Roast chicken and potatoes from the rosticceria · B
 
 ### Desserts
 - Panna cotta with berries · M
