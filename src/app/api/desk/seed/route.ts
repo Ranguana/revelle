@@ -48,9 +48,12 @@ const STEPS: readonly (readonly [string, ...string[]])[] = [
   ["seed:destinations"],
   ["seed:menus"],
   ["seed:drinks"],
+  // 650 authored lines into 600 dish rows. By far the longest step here, and
+  // still well inside maxDuration — it is one transaction of small writes.
+  ["seed:dishes"],
   ["seed:games"],
-  // Twice on purpose: the menu and drink seeders create a draft stub for a
-  // destination that has content and no authored look, and this is what
+  // Twice on purpose: the menu, drink and dish seeders create a draft stub for
+  // a destination that has content and no authored look, and this is what
   // completes a stub once somebody writes the voice.
   ["seed:destinations"],
 ];
@@ -68,6 +71,27 @@ const STEPS: readonly (readonly [string, ...string[]])[] = [
  */
 const ACTIVATE: readonly (readonly [string, ...string[]])[] = [
   ["activate:catalogue", "--", "--yes"],
+];
+
+/**
+ * One Revelle a curator can actually open, and the link to open it with.
+ *
+ * Nothing connects an application to a stored Revelle for a REAL member yet —
+ * generation proposes, a curator approves, and until somebody applies there is
+ * nothing in the portal to look at. This composes one by hand from the real
+ * authored catalogue so the screen membership actually buys can be seen.
+ *
+ * It creates a DEMO MEMBER and mints a working sign-in link for her, which is
+ * why the script refuses a non-local database unless forced. Forcing it here is
+ * deliberate and narrow: this is the only way to look at the portal on the only
+ * database that has the catalogue in it. `--remove` takes it back out, and the
+ * member is an example.invalid address that can never receive mail.
+ *
+ * Separate call — POST {"demo": true} — so it can never happen as a side
+ * effect of seeding the catalogue.
+ */
+const DEMO: readonly (readonly [string, ...string[]])[] = [
+  ["seed:occasion", "--", "--force"],
 ];
 
 function sameSecret(given: string, expected: string): boolean {
@@ -118,8 +142,16 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   // A body is optional; a malformed one is not a reason to fail.
-  const body = (await request.json().catch(() => null)) as { activate?: unknown } | null;
-  const steps = body?.activate === true ? [...STEPS, ...ACTIVATE] : STEPS;
+  const body = (await request.json().catch(() => null)) as
+    | { activate?: unknown; demo?: unknown }
+    | null;
+  // `demo` stands alone: it composes one Revelle and does not re-seed anything.
+  const steps =
+    body?.demo === true
+      ? DEMO
+      : body?.activate === true
+        ? [...STEPS, ...ACTIVATE]
+        : STEPS;
 
   const results: { script: string; code: number; output: string }[] = [];
   for (const step of steps) {
