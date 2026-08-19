@@ -73,7 +73,7 @@ Ten facets, each answerable as a scene rather than an adjective.
 | `dress` | everyone dressed up · nobody changes |
 | `food` | cooked by us · bought and arranged · whatever arrived |
 | `ending` | it stops cleanly · it dissolves · it goes until morning |
-| `hour` | early · afternoon · late |
+| `starts` | morning · afternoon · evening |
 | `size` | few · one table · a crowd |
 
 ## The matrix
@@ -179,6 +179,18 @@ absorbed.
 
 `dress` is genuinely weak but earns its place, because it is the single most
 legible question that can be asked of a host.
+
+**`hour` is replaced by `starts`.** It declared early/afternoon/late, which mixes
+WHEN THE PARTY BEGINS with HOW LATE IT RUNS — and how late it runs is already
+`ending`. One facet cannot answer two questions, and a host cannot answer it
+either: "late" is not a time of day. Replaced with morning · afternoon ·
+evening, measured only from when the thing starts.
+
+The swap is free. Separation is identical on every measure — four failures,
+seven zero-margin pairs, mean 4.76 — so the muddle was buying nothing. Keeping
+BOTH facets would cut zero-margin pairs from seven to four, which is real margin
+if the corrected matrix still runs tight, but the two are heavily correlated and
+a ninth facet should earn its place rather than inherit it.
 
 **`schedule` has a dead level.** The set declares three and uses two: every
 destination is `posted` or `none`, and "one fixed anchor" maps to nothing. A

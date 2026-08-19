@@ -11,12 +11,12 @@ pairs each cell is currently holding up are noted where it matters.
 Read down a destination, not across a facet — the judgments are faster in the
 voice you are already in.
 
-## Start here: ten cells, not ninety-six
+## Start here: eight cells, not ninety-six
 
-Nine of these resolve every failing and fragile pair. The rest are a
+Eight of these resolve every failing and fragile pair. The rest are a
 confirmation sweep and can wait.
 
-**Six cells whose evidence is an ABSENCE** — marked ⚠ in the tables below. These
+**Five cells whose evidence is an ABSENCE** — marked ⚠ in the tables below. These
 were inferred from what a paragraph did not mention, which is the retro-tagging
 failure mode this project exists to escape, running in miniature. They are the
 likeliest to be wrong:
@@ -24,9 +24,8 @@ likeliest to be wrong:
 | cell | why it matters |
 |---|---|
 | Nantucket `ending` | one of nine cells in the pair sitting at distance **0** |
-| Nantucket `hour` | the other one — **check these two first** |
+| Nantucket `starts` | the other one — **check these two first** |
 | Westhampton `schedule` | Westhampton is at distance 3 from Portofino |
-| Westhampton `hour` | inferred from "turns into something else" |
 | Tahiti `arrival` | Tahiti is at distance 3 from both Havana and New Orleans |
 | New Orleans `schedule` | New Orleans is at distance 0 from Havana |
 
@@ -65,7 +64,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **dressed** | tagline: vintage summer glamour |  |
 | `food` | **bought** | lexicon is drinks / the ice / the record player, nothing cooked |  |
 | `ending` | **dissolves** | premise: a long dinner that turns into something else |  |
-| `hour` | **late** | "turns into something else" implies the evening runs on | **⚠ absence** |
+| `starts` | **evening** | a long dinner — a positive fact, no longer inferred from lateness |  |
 | `size` | **few** | premise: a rented house that sleeps six |  |
 
 ## HAVANA, 1957
@@ -78,7 +77,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | formality plain; period kitsch expressly banned |  |
 | `food` | **cooked** | premise: a second supper nobody planned |  |
 | `ending` | **until_morning** | lexicon: first light |  |
-| `hour` | **late** | tagline: supper again at three |  |
+| `starts` | **evening** | dinner runs until the table is carried back |  |
 | `size` | **crowd** | the table is pushed back for the dancing |  |
 
 ## LAS VEGAS, 1960
@@ -91,7 +90,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **dressed** | dressed_up 0.5; lexicon: the good coat |  |
 | `food` | **bought** | the salad built at the table is performed for you, not by you |  |
 | `ending` | **until_morning** | lexicon: breakfast at four |  |
-| `hour` | **late** | table held until midnight |  |
+| `starts` | **evening** | ready an hour before anything opens |  |
 | `size` | **one_table** | one game, one stake, one table |  |
 
 ## NEW YORK, 1938
@@ -104,7 +103,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **dressed** | dressed_up; black tie |  |
 | `food` | **bought** | oysters opened on the counter as people arrive |  |
 | `ending` | **dissolves** | premise: the last hour is the lights low and side two on |  |
-| `hour` | **late** | midnight toast |  |
+| `starts` | **evening** | dinner is served, one person stands at midnight |  |
 | `size` | **one_table** | a long table, mostly |  |
 
 ## NANTUCKET, 1972
@@ -117,7 +116,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | tagline: newspaper on the table, butter in a saucepan |  |
 | `food` | **cooked** | butter in a saucepan |  |
 | `ending` | **clean_stop** | no late-hour material anywhere | **⚠ absence** |
-| `hour` | **afternoon** | daylight register throughout | **⚠ absence** |
+| `starts` | **afternoon** | daylight register throughout | **⚠ absence** |
 | `size` | **few** | paper plates on purpose; a house, not a crowd |  |
 
 ## NEW ORLEANS, 1956
@@ -130,7 +129,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | formality plain |  |
 | `food` | **cooked** | lexicon: made again; "the gumbo there is more of" |  |
 | `ending` | **until_morning** | lexicon: the second wind, going back out, the walk home |  |
-| `hour` | **late** | tagline: dinner at nine, nobody leaving at eleven |  |
+| `starts` | **evening** | tagline: dinner at nine |  |
 | `size` | **crowd** | four conversations, none of them finished |  |
 
 ## CATSKILLS, 1963
@@ -143,7 +142,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | tagline: the tent is decorative |  |
 | `food` | **cooked** | lexicon: the coals |  |
 | `ending` | **dissolves** | whoever is last up turns off the string lights |  |
-| `hour` | **early** | tagline: everyone swims before breakfast |  |
+| `starts` | **morning** | tagline: everyone swims before breakfast |  |
 | `size` | **crowd** | a row of bunks |  |
 
 ## CÔTE D'AZUR, 1962
@@ -156,7 +155,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | tagline: nobody changed for dinner — stated outright |  |
 | `food` | **bought** | the Ferrat; a table carried outside at the last minute |  |
 | `ending` | **dissolves** | the last hour is on the steps, when it stops being a party |  |
-| `hour` | **afternoon** | lunch at one, still going at seven |  |
+| `starts` | **afternoon** | lunch at one |  |
 | `size` | **one_table** | one table carried outside |  |
 
 ## PORTOFINO, 1961
@@ -169,7 +168,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | formality cordial, off-season |  |
 | `food` | **bought** | one restaurant is open and it is the good one; ordering for the table |  |
 | `ending` | **dissolves** | the way home in the dark in whatever order the group falls into |  |
-| `hour` | **afternoon** | lunch takes the whole of Saturday |  |
+| `starts` | **afternoon** | lunch takes the whole of Saturday |  |
 | `size` | **few** | the harbour to yourselves |  |
 
 ## DOLOMITES, 1956
@@ -182,7 +181,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | formality formal but the room is boots and a drying room |  |
 | `food` | **cooked** | premise: dinner is one pot on a long table |  |
 | `ending` | **clean_stop** | the cards go on until the fire is banked |  |
-| `hour` | **early** | tagline: the first gondola at eight |  |
+| `starts` | **morning** | tagline: the first gondola at eight |  |
 | `size` | **one_table** | one pot on a long table |  |
 
 ## BIG SUR, 1971
@@ -195,7 +194,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | formality plain |  |
 | `food` | **cooked** | dinner cooked over a fire and eaten off a tailgate |  |
 | `ending` | **clean_stop** | until the fog comes back in and everybody goes inside |  |
-| `hour` | **afternoon** | fog until noon |  |
+| `starts` | **afternoon** | fog until noon |  |
 | `size` | **few** | a cabin, cars parked facing out |  |
 
 ## TAHITI, 1961
@@ -208,7 +207,7 @@ it is winning nothing by more than the minimum.
 | `dress` | **unchanged** | formality plain |  |
 | `food` | **arrived** | premise: dinner is whatever came in today |  |
 | `ending` | **until_morning** | nothing is cleared until morning |  |
-| `hour` | **late** | eaten late and slowly |  |
+| `starts` | **evening** | torches go up before anybody is hungry |  |
 | `size` | **one_table** | a table set on sand |  |
 
 ## The cells doing the most work
