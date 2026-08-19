@@ -36,8 +36,23 @@ different stage and must not leak into this matrix.
 
 ## The test a facet has to pass
 
-*Can a host answer it without knowing the destinations exist, and would two
-different hosts plausibly answer differently?*
+**One.** *Can a host answer it without knowing the destinations exist, and
+would two different hosts plausibly answer differently?*
+
+**Two.** *Does the shape of the evening constrain it, or does it travel with the
+guests unchanged?*
+
+The second test is the one `no_speeches` failed and the one `teasing` failed
+after it. A facet has to describe the EVENING. If it describes the guests, it is
+true of them at every party they will ever attend, so it cannot sort
+destinations — it can only describe the applicant. Worse, the guests are already
+measured one layer down, where humour mode and warmth are stated axes on every
+destination, so a guest-property in this matrix duplicates the voice layer and
+guarantees the two disagree on real input.
+
+`volume` looks like the same category and survives: a table of six on a terrace
+cannot be four-conversation loud, so `size` and `hour` genuinely constrain it.
+Nothing structural constrains whether friends tease each other.
 
 If the answer is a fact about the prose rather than about the host, it is a
 writing distinction, not a sorting one. It stays in the voice document and out
@@ -60,7 +75,6 @@ Ten facets, each answerable as a scene rather than an adjective.
 | `ending` | it stops cleanly · it dissolves · it goes until morning |
 | `hour` | early · afternoon · late |
 | `size` | few · one table · a crowd |
-| `teasing` | the group teases each other · never |
 
 ## The matrix
 
@@ -164,6 +178,14 @@ destination is `posted` or `none`, and "one fixed anchor" maps to nothing. A
 three-option question with an option that reaches no destination wastes a third
 of a tap. Either a room really is anchor-shaped — Côte d'Azur, where lunch
 happens and nothing else does, is the candidate — or the level goes.
+
+**`teasing` is cut.** It separated 35 of 66 pairs and rescued exactly ZERO —
+every pair it touched was already clear by three or more, so it was padding on
+pairs that did not need it. It also fails the second acceptance test: a group
+that teases does so at a Dolomites dinner and in a Vegas suite alike. Cutting it
+takes Havana/New Orleans from 1 to 0, which is not a loss but the audit telling
+the truth: on the SHAPE OF THE EVENING those two really are the same night, and
+what separates them is voice. That is what the tier is for.
 
 **Two levels are fingerprint buttons.** `arrival=assigned` is Catskills alone
 and `food=arrived` is Tahiti alone. A host who taps either has chosen a
