@@ -11,17 +11,61 @@ pairs each cell is currently holding up are noted where it matters.
 Read down a destination, not across a facet — the judgments are faster in the
 voice you are already in.
 
+## Start here: ten cells, not ninety-six
+
+Nine of these resolve every failing and fragile pair. The rest are a
+confirmation sweep and can wait.
+
+**Six cells whose evidence is an ABSENCE** — marked ⚠ in the tables below. These
+were inferred from what a paragraph did not mention, which is the retro-tagging
+failure mode this project exists to escape, running in miniature. They are the
+likeliest to be wrong:
+
+| cell | why it matters |
+|---|---|
+| Nantucket `ending` | one of nine cells in the pair sitting at distance **0** |
+| Nantucket `hour` | the other one — **check these two first** |
+| Westhampton `schedule` | Westhampton is at distance 3 from Portofino |
+| Westhampton `hour` | inferred from "turns into something else" |
+| Tahiti `arrival` | Tahiti is at distance 3 from both Havana and New Orleans |
+| New Orleans `schedule` | New Orleans is at distance 0 from Havana |
+
+Nantucket `ending` and `hour` are the cheapest possible rescue in the whole
+matrix: if either was guessed wrong, Nantucket/Big Sur separates without needing
+a new facet at all.
+
+**Three cells holding a pair on their own** — listed at the bottom of this file.
+
+## Portofino is the decision, not Côte d'Azur
+
+The audit named Côte d'Azur/Portofino as a failing pair and stopped there. The
+fuller picture: Portofino has the most fragile column in the matrix — minimum
+distance 1, and FOUR pairs at distance 3 or less, more than any other room. It
+is in three of the seven pairs that clear the gate with zero margin, so any
+single corrected cell in its column can push a passing pair down to 2.
+
+And the two measurement systems agree independently. In voice space, Nantucket
+and Portofino are the closest pair in the entire catalogue at 0.580 — the
+ceiling is 0.65 — which is a different instrument reaching the same verdict.
+
+So the question this pass is actually answering is not "merge Côte d'Azur and
+Portofino." It is: **does Portofino have a reason to exist**, or is it the quiet
+Mediterranean residue that Nantucket, Big Sur and Westhampton already cover
+between them. "Off-season, few, the harbour to yourselves" is a legitimate
+answer and a distinct party — but it has to be won in the cells, and at present
+it is winning nothing by more than the minimum.
+
 ## WESTHAMPTON, 1976
 
 | facet | value | why | ok? |
 |---|---|---|---|
 | `arrival` | **absorbed** | register: a card left on the hall table by someone who has already gone to bed |  |
-| `schedule` | **none** | no hour appears anywhere in premise or lexicon |  |
+| `schedule` | **none** | no hour appears anywhere in premise or lexicon | **⚠ absence** |
 | `volume` | **quiet** | low_voices 0.7, understated 1 |  |
 | `dress` | **dressed** | tagline: vintage summer glamour |  |
 | `food` | **bought** | lexicon is drinks / the ice / the record player, nothing cooked |  |
 | `ending` | **dissolves** | premise: a long dinner that turns into something else |  |
-| `hour` | **late** | "turns into something else" implies the evening runs on |  |
+| `hour` | **late** | "turns into something else" implies the evening runs on | **⚠ absence** |
 | `size` | **few** | premise: a rented house that sleeps six |  |
 
 ## HAVANA, 1957
@@ -72,8 +116,8 @@ voice you are already in.
 | `volume` | **quiet** | comfortable_silence, warm_not_loud |  |
 | `dress` | **unchanged** | tagline: newspaper on the table, butter in a saucepan |  |
 | `food` | **cooked** | butter in a saucepan |  |
-| `ending` | **clean_stop** | no late-hour material anywhere |  |
-| `hour` | **afternoon** | daylight register throughout |  |
+| `ending` | **clean_stop** | no late-hour material anywhere | **⚠ absence** |
+| `hour` | **afternoon** | daylight register throughout | **⚠ absence** |
 | `size` | **few** | paper plates on purpose; a house, not a crowd |  |
 
 ## NEW ORLEANS, 1956
@@ -81,7 +125,7 @@ voice you are already in.
 | facet | value | why | ok? |
 |---|---|---|---|
 | `arrival` | **absorbed** | lexicon: come at nine |  |
-| `schedule` | **none** | no posted hour |  |
+| `schedule` | **none** | no posted hour | **⚠ absence** |
 | `volume` | **overlapping** | all_at_once 1, interrupts 0.7, talks_fast 0.6 |  |
 | `dress` | **unchanged** | formality plain |  |
 | `food` | **cooked** | lexicon: made again; "the gumbo there is more of" |  |
@@ -158,7 +202,7 @@ voice you are already in.
 
 | facet | value | why | ok? |
 |---|---|---|---|
-| `arrival` | **absorbed** | no greeting anywhere in the premise |  |
+| `arrival` | **absorbed** | no greeting anywhere in the premise | **⚠ absence** |
 | `schedule` | **none** | torches go up long before anybody is hungry |  |
 | `volume` | **quiet** | comfortable_silence 0.6, humour none |  |
 | `dress` | **unchanged** | formality plain |  |

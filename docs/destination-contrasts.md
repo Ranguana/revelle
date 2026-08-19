@@ -117,6 +117,13 @@ has a signal and one story gets told long. What the ten facets miss is
 *reachability* and *whether the evening has a teller*. Add those and the pair
 separates without touching a word of either voice.
 
+**Evidence grade matters, and this draft mixes two.** "The table is pushed back
+for the dancing" is a positive fact. "No late-hour material anywhere" is an
+inference from silence — a claim about what a paragraph did not mention, which
+is the retro-tagging failure mode this project exists to escape, running in
+miniature. Six cells are absence-graded and they are marked in
+docs/matrix-correction.md. Two of them are in the pair that sits at distance 0.
+
 **The two destinations really are the same party.** That is the Cap Ferrat case,
 and it was resolved by merging.
 
