@@ -1,7 +1,8 @@
 # Matrix correction pass
 
-**108 cells. Nine facets, twelve destinations.** `speech` has been cut (zero
-marginal information against `arrival`), so this is what remains.
+**96 cells. Eight facets, twelve destinations.** Two facets have been cut since the first draft: `speech` (zero marginal
+information against `arrival`) and `teasing` (separated 35 pairs, rescued none,
+and describes the guests rather than the evening). This is what remains.
 
 Each cell shows the value and the evidence that produced it. Mark it and move on;
 write prose only where you disagree. A flipped cell changes the audit, so the
@@ -22,7 +23,6 @@ voice you are already in.
 | `ending` | **dissolves** | premise: a long dinner that turns into something else |  |
 | `hour` | **late** | "turns into something else" implies the evening runs on |  |
 | `size` | **few** | premise: a rented house that sleeps six |  |
-| `teasing` | **teases** | nothing_sacred 0.35; dry and disreputable |  |
 
 ## HAVANA, 1957
 
@@ -36,7 +36,6 @@ voice you are already in.
 | `ending` | **until_morning** | lexicon: first light |  |
 | `hour` | **late** | tagline: supper again at three |  |
 | `size` | **crowd** | the table is pushed back for the dancing |  |
-| `teasing` | **never** | mechanism: "Nobody in the house is the target — the night is"; no teasing tone |  |
 
 ## LAS VEGAS, 1960
 
@@ -50,7 +49,6 @@ voice you are already in.
 | `ending` | **until_morning** | lexicon: breakfast at four |  |
 | `hour` | **late** | table held until midnight |  |
 | `size` | **one_table** | one game, one stake, one table |  |
-| `teasing` | **never** | humour absurd, aimed at the room's own excess |  |
 
 ## NEW YORK, 1938
 
@@ -64,7 +62,6 @@ voice you are already in.
 | `ending` | **dissolves** | premise: the last hour is the lights low and side two on |  |
 | `hour` | **late** | midnight toast |  |
 | `size` | **one_table** | a long table, mostly |  |
-| `teasing` | **never** | humour dry, reported without comment |  |
 
 ## NANTUCKET, 1972
 
@@ -78,7 +75,6 @@ voice you are already in.
 | `ending` | **clean_stop** | no late-hour material anywhere |  |
 | `hour` | **afternoon** | daylight register throughout |  |
 | `size` | **few** | paper plates on purpose; a house, not a crowd |  |
-| `teasing` | **teases** | listed under teasing in the tone table |  |
 
 ## NEW ORLEANS, 1956
 
@@ -92,7 +88,6 @@ voice you are already in.
 | `ending` | **until_morning** | lexicon: the second wind, going back out, the walk home |  |
 | `hour` | **late** | tagline: dinner at nine, nobody leaving at eleven |  |
 | `size` | **crowd** | four conversations, none of them finished |  |
-| `teasing` | **teases** | mechanism: "Everybody is fair game and nobody is the victim" |  |
 
 ## CATSKILLS, 1963
 
@@ -106,7 +101,6 @@ voice you are already in.
 | `ending` | **dissolves** | whoever is last up turns off the string lights |  |
 | `hour` | **early** | tagline: everyone swims before breakfast |  |
 | `size` | **crowd** | a row of bunks |  |
-| `teasing` | **teases** | teasing 0.8; "the teasing is the proof of belonging" |  |
 
 ## CÔTE D'AZUR, 1962
 
@@ -120,7 +114,6 @@ voice you are already in.
 | `ending` | **dissolves** | the last hour is on the steps, when it stops being a party |  |
 | `hour` | **afternoon** | lunch at one, still going at seven |  |
 | `size` | **one_table** | one table carried outside |  |
-| `teasing` | **teases** | straight_to_gossip 0.5; humour arch |  |
 
 ## PORTOFINO, 1961
 
@@ -134,7 +127,6 @@ voice you are already in.
 | `ending` | **dissolves** | the way home in the dark in whatever order the group falls into |  |
 | `hour` | **afternoon** | lunch takes the whole of Saturday |  |
 | `size` | **few** | the harbour to yourselves |  |
-| `teasing` | **teases** | self_deprecating 0.4 — the joke is on us |  |
 
 ## DOLOMITES, 1956
 
@@ -148,7 +140,6 @@ voice you are already in.
 | `ending` | **clean_stop** | the cards go on until the fire is banked |  |
 | `hour` | **early** | tagline: the first gondola at eight |  |
 | `size` | **one_table** | one pot on a long table |  |
-| `teasing` | **never** | impeccably_polite 0.6 |  |
 
 ## BIG SUR, 1971
 
@@ -162,7 +153,6 @@ voice you are already in.
 | `ending` | **clean_stop** | until the fog comes back in and everybody goes inside |  |
 | `hour` | **afternoon** | fog until noon |  |
 | `size` | **few** | a cabin, cars parked facing out |  |
-| `teasing` | **teases** | self_deprecating 0.8 |  |
 
 ## TAHITI, 1961
 
@@ -176,16 +166,17 @@ voice you are already in.
 | `ending` | **until_morning** | nothing is cleared until morning |  |
 | `hour` | **late** | eaten late and slowly |  |
 | `size` | **one_table** | a table set on sand |  |
-| `teasing` | **never** | humour mode is none — there is no joke in this writing |  |
 
 ## The cells doing the most work
 
-These four hold a failing or near-failing pair on their own. If one flips, the
+These three hold a failing or near-failing pair on their own. Havana / New
+Orleans no longer appears here: with `teasing` cut it sits at **0** on evening
+shape, and nothing in this matrix is holding it up. It is separated by voice or
+it is not separated at all. If one flips, the
 pair below it collapses further and the proposed facets stop being optional.
 
 | cell | holds up | if it flips |
 |---|---|---|
-| Havana `teasing = never` | Havana / New Orleans at distance 1 | the pair goes to **0** and only `who cooks` / `telling` can save it |
 | Portofino `size = few` | Côte d'Azur / Portofino at distance 1 | the pair goes to **0** and the Cap Ferrat precedent applies |
 | Vegas `volume = overlapping` | Las Vegas / New York at distance 2 | drops to 1 |
 | Vegas `ending = until_morning` | Las Vegas / New York at distance 2 | drops to 1 |
