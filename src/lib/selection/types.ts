@@ -916,8 +916,16 @@ export const DEFAULT_OPTIONS: EngineOptions = {
   /**
    * 0.20, AND HERE IS WHERE IT CAME FROM.
    *
+   * STALE AS PRINTED. The table below was measured against THIRTEEN
+   * destinations. CAP FERRAT has since been folded into CÔTE D'AZUR and the
+   * library is twelve, so every row is a measurement of a catalogue that no
+   * longer exists. The numbers are kept rather than edited because they are a
+   * record of a measurement, not a claim about today — re-run
+   * `npm run check:tone-threshold` and replace the block wholesale. See the
+   * REFIT note at the bottom of this comment, which anticipated exactly this.
+   *
    * Measured — `npm run check:tone-threshold` reprints this — against the
-   * thirteen destinations that carry authored tone tags in
+   * thirteen destinations that carried authored tone tags in
    * src/lib/destinations.ts, crossed with four thousand sampled host answers at
    * one to seven tiles each, which is the range the quiz allows. What the
    * number does to the surviving set is the only question worth asking of it:

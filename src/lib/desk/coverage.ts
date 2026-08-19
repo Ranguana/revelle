@@ -11,7 +11,7 @@ import { COOKING_LEVELS, OCCASIONS, SEASONS, optionLabel } from "./labels.ts";
  *
  * Not a board of applications. There are none, and a kanban of empty columns
  * would be a screen about work that does not exist. The thing that needs a
- * board is the LIBRARY: thirteen destinations, and for each of them the seven
+ * board is the LIBRARY: twelve destinations, and for each of them the seven
  * facts that decide whether it can be given to anybody, filled or thin or
  * empty, with the thing that would fill it one click away.
  *
@@ -342,7 +342,7 @@ function occasionCell(worldId: string, things: readonly Scoped[]): Cell {
   if (claimed.size === 0) {
     // Said in three words rather than a sentence, because when the whole
     // library is untagged this cell appears on every row and a paragraph
-    // repeated thirteen times stops being read. The page carries the
+    // repeated twelve times stops being read. The page carries the
     // explanation once, above the table.
     return {
       state: "thin",

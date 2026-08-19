@@ -59,6 +59,28 @@ import styles from "./landing.module.css";
 
 const WESTHAMPTON = WESTHAMPTON_1976;
 
+/**
+ * The hero line, and it is NOT a destination tagline.
+ *
+ * WESTHAMPTON.tagline — "Vintage summer glamour. Very questionable
+ * houseguests." — describes one destination, and it still runs on the worked
+ * plate below and on the library card, where that is exactly its job. It was
+ * the wrong thing to open with, because it sells a house rather than the
+ * product.
+ *
+ * This line is the thesis, in the founder's words: two destinations and then
+ * the room the reader actually owns. It is the same argument
+ * src/lib/selection/destination.ts makes in code — "Venue never touches the
+ * destination… Havana in a Brooklyn apartment isn't a compromise, it's the
+ * pitch." The third clause is the one doing the work. Do not "improve" it by
+ * making the third place exotic too.
+ *
+ * The forms are deliberately unlike each other — a year, a season, a weekday —
+ * so the three land as a range rather than a list.
+ */
+const HERO_LINE =
+  "Westhampton, 1976. Portofino, off-season. Your dining room, Saturday.";
+
 /** "Labor Day. Six friends. A rented house." and the rest — docs/copy.md. */
 const WORKED_NARRATIVE =
   "They wanted glamour without a theme, and a long dinner that turned into " +
@@ -127,7 +149,7 @@ export default function Home() {
               {/* No ornament between the name and the line under it. The
                   handoff sets those two as one unit, and the page's single
                   ornament belongs to the worked plate further down. */}
-              <p className={styles.heroTagline}>{WESTHAMPTON.tagline}</p>
+              <p className={styles.heroTagline}>{HERO_LINE}</p>
               <p className={styles.heroSociete}>A société for people who host.</p>
 
               <div className={styles.heroActions}>
