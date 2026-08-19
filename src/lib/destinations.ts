@@ -38,6 +38,131 @@ import type { ToneWeight } from "./voice";
  * fourteenth or re-tagging an existing one, because the value of the tone
  * question is not in any single destination's list — it is in the SPREAD.
  *
+ * ── THE SEAM: WHICH LAYER OWNS THE ANSWER ────────────────────────────
+ *
+ * Two instruments can each name a destination, and this is the paragraph that
+ * says how they compose. NOT YET IMPLEMENTED — see the gap at the end.
+ *
+ *   VOICE FILTERS, SOFTLY. The tiles are about her PEOPLE. A destination is
+ *   removed only on actively NEGATIVE affinity — repulsion, not a weak match —
+ *   and only when she tapped enough tiles for the signal to mean anything, and
+ *   never below the survivor floor. Silence removes nothing.
+ *
+ *   STRUCTURE RANKS THE SURVIVORS. The matrix is about the EVENING: when it
+ *   starts, who cooked, how it ends, how many. Log-odds over the facets in
+ *   docs/destination-contrasts.md, nothing eliminated.
+ *
+ *   WITHIN AN EPSILON TIE, VOICE ORDERS IT. Two rows can be structurally
+ *   identical and still be different houses.
+ *
+ *   THEY NEVER AVERAGE. The average of two axes is the destination that is
+ *   middling on both, which is the compromise that is nobody's.
+ *
+ *   THE REVEAL IS TWO OR THREE, NOT ONE. Rank sharply, surface generously.
+ *   The host chooses among the finalists and HER PICK IS LOGGED as first-class
+ *   signal into the corrections pipeline — it is the only per-host data that
+ *   will ever say whether the voice layer or the structural layer is
+ *   mis-weighted. Framing is "the société has pulled these rooms for you":
+ *   verdicts, plural. Never a browse, never a catalogue, never a filter she
+ *   operates.
+ *
+ * ── Generosity at the reveal is not softness at the engine ───────────
+ *
+ * These are different surfaces and the distinction is load-bearing.
+ * Discrimination is MEASURED AT THE ENGINE — src/lib/voice.test.ts still
+ * asserts that distinct host profiles produce distinct winners and that the top
+ * two are separated by a real margin. Those assertions do not relax because the
+ * reveal shows three. A shortlist must never become the excuse for a mushy
+ * matrix: if two rooms tie at the engine, that is a catalogue defect to fix,
+ * not a choice to hand the host.
+ *
+ * It also does not reopen the question of whether SHE picks the destination.
+ * docs/selection-spec.md settled that: "If she chooses from a shortlist, the
+ * profile learns her self-image. If the curator chooses and she reacts, it
+ * learns her taste." Two or three finalists with a logged pick is a reaction,
+ * captured — not a menu.
+ *
+ * ── Why the tiebreak sentence is not optional ────────────────────────
+ *
+ * HAVANA and NEW ORLEANS. Structurally they are the same night — crowded,
+ * cooked-for, evening, until morning — at distance 1 on the drafted matrix and
+ * possibly 0 once it is corrected. A warm, loud, late group clears the voice
+ * filter for BOTH, because a filter keeps and does not order. Structure is then
+ * asked to sort two identical rows, ties, and the winner is iteration order:
+ * the exact accident this block exists to prevent. With the tiebreak, the pair
+ * is decided by "Nobody in the house is the target" against "Everybody is fair
+ * game" — the right instrument, because evening-shape genuinely cannot tell
+ * those two apart.
+ *
+ * ── Why the filter must be SOFT, which is an error-tolerance argument ─
+ *
+ * The rule is that one odd tap must never destroy the right answer, and it was
+ * written about the ROBUST instrument. The tiles are the NOISY one: sparse, at
+ * most seven of fifty-one, quiet by design, browsed, endorsement-suppressed and
+ * optional. Giving the weak signal an unconditional veto and the strong signal
+ * only ranking power is backwards. A host who taps three tiles slightly wrong
+ * would eliminate her actual destination at the gate, and no amount of care
+ * downstream can resurrect what the gate deleted.
+ *
+ * ── And why voice filters rather than the reverse ────────────────────
+ *
+ * This direction is FORCED, not merely preferred. The tile question is
+ * skippable and `toneProfile([])` returns {} — a silent host makes no claim, so
+ * she passes everything through and structure ranks the full field. Invert it —
+ * structure filters, voice ranks — and a zero-tap host arrives at the ranking
+ * stage with an empty ranker and no way to order anything. The OPTIONAL
+ * instrument must be the layer that no-ops on silence.
+ *
+ * This is also consistent with precedent rather than novel. The earlier
+ * decision in src/lib/selection/tone.ts — "Not a bigger weight, a TIER" —
+ * settled voice against AESTHETIC. This settles voice against STRUCTURE. Same
+ * shape, different pair. Anyone hunting for a contradiction between the two
+ * will not find one.
+ *
+ * A note on what is NOT the argument: `facetOverlap` currently returns 0 for
+ * every authored destination, because seed-destinations.mjs writes only voice
+ * tags, so the ranking stage is inert and there is an empty socket the matrix
+ * happens to fit. That is evidence about where the code has room, not about
+ * which design is right. Sockets are cheaper to change than allocations, and
+ * this decision would stand if the socket were full.
+ *
+ * ── The two numbers, and why they are not yet chosen ─────────────────
+ *
+ * SURVIVOR FLOOR is 3, and it is derived rather than picked: the curator is
+ * shown three candidates (src/lib/selection/types.ts), so below three the
+ * shortlist is padded by reuse and the dither has nothing to dither. A
+ * tap pattern hostile to everything must degrade to "structure decides",
+ * never to an empty room.
+ *
+ * MINIMUM TAPS is 3. The quiz permits one. A one-tap profile is a single
+ * tone's facet vector, so a cosine against it measures that tone rather than a
+ * voice; two is not much better. Three is the first count at which the
+ * question is answering about a GROUP.
+ *
+ * REVEAL COUNT is 2-3, and 3 is where the engine already lives: the curator is
+ * shown three candidates, so the surface and the engine agree without a new
+ * number. One is brittle for exactly the reason the tiebreak exists — at a
+ * near-tie, a top-1 reveal is a coin-flip presented as a verdict. Larger sets
+ * are worse, not better: the recommender literature finds long lists increase
+ * choice difficulty and dissatisfaction against short ones, and a long list is
+ * a browse, which is the thing this product is not.
+ *
+ * EPSILON IS NOT SET, and must not be guessed. Like the 0.20 tone threshold it
+ * is a property of how densely the catalogue covers the space, and that
+ * threshold was MEASURED (npm run check:tone-threshold) rather than chosen. Two
+ * properties fix it: large enough that structurally identical rows — distance 0
+ * and 1 — always reach the tiebreak, and small enough that a genuine structural
+ * preference is never overturned by voice. Neither can be measured until the
+ * structural scorer exists.
+ *
+ * ── THE GAP, STATED PLAINLY ──────────────────────────────────────────
+ *
+ * None of the above is implemented. Today src/lib/selection/destination.ts
+ * filters HARD at tone >= 0.20 with no tap minimum and no survivor floor, ranks
+ * on aesthetic facets that no authored destination carries, and has no
+ * tiebreak. The three tests marked `todo` in src/lib/voice.test.ts are this
+ * paragraph made mechanical, and they are the definition of done.
+ *
  * ── The argument ─────────────────────────────────────────────────────
  *
  * A host taps a handful of the fifty-one tones in src/lib/voice.ts. A

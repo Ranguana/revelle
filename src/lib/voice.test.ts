@@ -525,3 +525,38 @@ test("silence is silence: unchosen tones make no claim", () => {
   assert.deepEqual(toneProfile([]), {});
   assert.deepEqual(toneProfile(["not_a_tone"]), {});
 });
+
+/**
+ * ── THE SEAM, MADE MECHANICAL ────────────────────────────────────────
+ *
+ * Three cases define how the two instruments compose, and the argument they
+ * enforce is written out in full under THE SEAM in src/lib/destinations.ts.
+ *
+ * They are `todo` rather than skipped, and rather than failing, because NONE of
+ * the machinery exists yet. There is no structural scorer: the facets live in
+ * docs/destination-contrasts.md and no destination is tagged in them. The voice
+ * filter is still a hard bar at 0.20 with no tap minimum, no survivor floor and
+ * no tiebreak. A test cannot exercise a function nobody has written.
+ *
+ * They are here anyway because they are the definition of done. When the
+ * structural layer lands, these three stop being todo and start being the
+ * thing that stops the seam rotting back into iteration order.
+ *
+ * NOTE what is deliberately NOT changed below: the unique-winner assertion and
+ * the top-two margin. Discrimination is measured at the engine; generosity
+ * happens at the reveal. A shortlist of three is not a licence for two rooms to
+ * tie at the engine — that is a catalogue defect, and these tests must keep
+ * catching it.
+ */
+
+test("SEAM: a warm, loud, late group lands on Havana or New Orleans deterministically", {
+  todo: "needs the structural scorer and the voice tiebreak",
+});
+
+test("SEAM: a quiet host gets Nantucket ranked over Portofino, both surviving the filter", {
+  todo: "needs the structural scorer; today the ranking stage is inert",
+});
+
+test("SEAM: a zero-tap host gets a complete structural ranking of the full field", {
+  todo: "needs the soft filter — silence must remove nothing",
+});
