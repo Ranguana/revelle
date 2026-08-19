@@ -358,22 +358,39 @@ test("every tone is claimed by at least one destination", () => {
 test("every tone group has destinations at both ends", () => {
   for (const group of TONE_GROUPS) {
     const codes = new Set(ALL.filter((t) => t.group === group.key).map((t) => t.code));
-    const positive = new Map<string, string>();
-    const negative = new Map<string, string>();
+    // EVERY claimant of each sign, not the first.
+    //
+    // This was two Map<facet, destination> and first-write-wins, which is a
+    // real bug and not a tidy-up: one destination can claim the same facet
+    // positively and negatively through two DIFFERENT tones, which is legal —
+    // the duplicate check is per tone, not per destination. When it does, it
+    // takes both slots, `positive.get(f) !== negative.get(f)` is false, and a
+    // genuine opposition from a second destination is discarded. The test then
+    // fails on a catalogue that satisfies the property it is testing for, and
+    // which catalogue triggers it depends on iteration order.
+    const claims = new Map<string, { pos: Set<string>; neg: Set<string> }>();
     for (const key of DESTINATION_KEYS) {
       for (const { code } of DESTINATION_TONES[key]) {
         if (!codes.has(code)) continue;
         const tone = ALL.find((t) => t.code === code);
         assert.ok(tone);
         for (const { code: facet, weight } of tone.facets) {
-          if (weight > 0 && !positive.has(facet)) positive.set(facet, key);
-          if (weight < 0 && !negative.has(facet)) negative.set(facet, key);
+          let entry = claims.get(facet);
+          if (!entry) claims.set(facet, (entry = { pos: new Set(), neg: new Set() }));
+          if (weight > 0) entry.pos.add(key);
+          if (weight < 0) entry.neg.add(key);
         }
       }
     }
-    const opposed = [...positive.keys()].filter(
-      (facet) => negative.has(facet) && positive.get(facet) !== negative.get(facet)
-    );
+    // An opposition needs two DIFFERENT destinations at the two ends. One
+    // house holding both ends of a facet by itself is not a question with two
+    // answers, so the single-claimant-both-signs case is still excluded.
+    const opposed = [...claims.entries()]
+      .filter(([, s]) => {
+        if (s.pos.size === 0 || s.neg.size === 0) return false;
+        return !(s.pos.size === 1 && s.neg.size === 1 && [...s.pos][0] === [...s.neg][0]);
+      })
+      .map(([facet]) => facet);
     assert.ok(
       opposed.length > 0,
       `"${group.label}" has no destination at the far end. Every house tagged ` +
