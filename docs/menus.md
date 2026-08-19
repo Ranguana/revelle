@@ -94,7 +94,7 @@ without a machine having to read prose to find out how a menu bends.
 - Winter
 - Actually made
 
-## Cap Ferrat
+## Côte d'Azur
 
 **13.**
 - Melon with ham, composed tuna-and-vegetable salad, whole grilled sea bass with fennel, lemon tart, white wine throughout
@@ -113,8 +113,6 @@ without a machine having to read prose to find out how a menu bends.
 - A quiet dinner
 - October
 - Half made
-
-## Côte d'Azur
 
 **16.**
 - Kir royales, cheese puffs, sole in cream sauce with grapes, steamed potatoes, green beans, peach melba
@@ -286,7 +284,7 @@ without a machine having to read prose to find out how a menu bends.
 Menus 8 and 12 fill the house with smell before anyone arrives. No delivered
 version of them does that, and it is worth a facet of its own.
 
-Cap Ferrat and Côte d'Azur as authored: villa and private versus public stage.
+Côte d'Azur carries both registers, which is why its section is twice the length of the others: the villa lunch that never ended (13, 14, 15) and the terrace in view of the road (16, 17, 18). Menus 13 to 15 were authored under a separate CAP FERRAT destination, folded in here because Cap Ferrat is on the Côte d'Azur and the two were the same coast twice.
 
 **Catskills is not kosher, and that is settled.** Menu 21 ends a brisket dinner
 with cheese blintzes; menu 23 is roast pork with apples. Research flagged both

@@ -114,36 +114,6 @@ export const LIBRARY: readonly Plate[] = [
     ],
   },
   {
-    slug: "cap-ferrat",
-    name: "CAP FERRAT, JULY",
-    caption: "Cap Ferrat",
-    number: "No. 11",
-    occasion: "The getaway",
-    tagline: "A heat wave, a rented house, and a very slow schedule.",
-    rows: [
-      {
-        label: "The Arrival",
-        detail:
-          "Nobody is greeted formally. There is a jug of something on the table and a swim before six.",
-      },
-      {
-        label: "The Moment",
-        detail:
-          "The staged photograph under the parasol at golden hour. Everyone claims it was their idea.",
-      },
-      {
-        label: "The Table",
-        detail:
-          "Dinner assembled rather than cooked. Peaches, cold lamb, ice in the wine and no apology.",
-      },
-      {
-        label: "The Ending",
-        detail:
-          "Cards on the terrace, the record player rule in force, lights out when the music stops.",
-      },
-    ],
-  },
-  {
     slug: "new-orleans",
     name: "NEW ORLEANS, 3 A.M.",
     caption: "New Orleans",

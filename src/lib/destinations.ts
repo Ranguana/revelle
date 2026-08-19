@@ -67,9 +67,9 @@ import type { ToneWeight } from "./voice";
  * duplicate wearing a different name.
  *
  * Four destinations are slow, and that is fine, because each pays for it
- * elsewhere: CAP FERRAT is slow and quiet and in-house; TAHITI is slow and
- * plain and generous; BIG SUR is slow and laconic and self-deprecating; the
- * DOLOMITES are slow and exact and told-properly. Three are warm — HAVANA
+ * elsewhere: CÔTE D'AZUR is slow and knowing and in view of a road; TAHITI is
+ * slow and plain and generous; BIG SUR is slow and laconic and
+ * self-deprecating; the DOLOMITES are slow and exact and told-properly. Three are warm — HAVANA
  * loud with it, CATSKILLS teasing with it, NANTUCKET nearly silent with it.
  *
  * ── The catalogue leads, not the gaps ────────────────────────────────
@@ -89,7 +89,7 @@ import type { ToneWeight } from "./voice";
  *   FUNNY
  *     deadpan            westhampton  · big-sur
  *     dry_aside          westhampton
- *     teasing            catskills    · nantucket · cap-ferrat
+ *     teasing            catskills    · nantucket
  *     in_jokes           catskills
  *     absurd             big-sur
  *     self_deprecating   big-sur      · portofino
@@ -100,7 +100,7 @@ import type { ToneWeight } from "./voice";
  *     interrupts         new-orleans
  *     one_conversation   portofino    · catskills · dolomites
  *     across_the_room    las-vegas
- *     low_voices         westhampton  · cap-ferrat
+ *     low_voices         westhampton
  *     laughs_first       havana
  *   CEREMONY
  *     toasts             new-york
@@ -113,7 +113,7 @@ import type { ToneWeight } from "./voice";
  *     says_it_out_loud   havana
  *     nicknames          catskills
  *     asks_properly      havana
- *     warm_not_loud      nantucket    · cap-ferrat · portofino · tahiti
+ *     warm_not_loud      nantucket    · portofino · tahiti
  *     compliments_plainly tahiti
  *     sentimental        catskills
  *   PRECISION
@@ -121,13 +121,13 @@ import type { ToneWeight } from "./voice";
  *     will_look_it_up    dolomites
  *     corrects_gently    new-york     · dolomites
  *     understated        westhampton
- *     roughly_eight      cap-ferrat   · cote-dazur
+ *     roughly_eight      cote-dazur
  *     long_way_round     big-sur
  *   PACE
- *     unhurried          tahiti · westhampton · cap-ferrat · portofino ·
- *                        nantucket · big-sur
+ *     unhurried          tahiti · westhampton · portofino · nantucket ·
+ *                        big-sur · cote-dazur
  *     talks_fast         new-orleans
- *     arrives_late       cap-ferrat   · tahiti
+ *     arrives_late       tahiti
  *     lingers            havana       · cote-dazur · tahiti
  *     no_dead_air        new-orleans  · las-vegas
  *     comfortable_silence nantucket   · dolomites · big-sur · tahiti
@@ -156,7 +156,7 @@ import type { ToneWeight } from "./voice";
  *   CATSKILLS      family. Everyone has a name only this group uses.
  *
  * And the interior ones, distinctive without being extreme: CÔTE D'AZUR
- * knowing and oblique, PORTOFINO private and few, CAP FERRAT the slowest,
+ * knowing and oblique, PORTOFINO private and few,
  * DOLOMITES exact and told properly, BIG SUR laconic, TAHITI plain and
  * generous, HAVANA warm and late, WESTHAMPTON dry and disreputable.
  *
@@ -164,7 +164,7 @@ import type { ToneWeight } from "./voice";
  *
  * Formality, address and humour mode, for every destination. The voice states
  * them outright and `statedVoiceFacets` derives them; saying a fact twice is
- * how two copies of it start to disagree. All thirteen stated triples are
+ * how two copies of it start to disagree. All twelve stated triples are
  * distinct, which is the cheapest structural guarantee that no two of these
  * houses are the same house.
  * ───────────────────────────────────────────────────────────────────── */
@@ -2833,11 +2833,18 @@ export const CATSKILLS_TONES: readonly ToneWeight[] = [
 /**
  * CÔTE D'AZUR, 1962.
  *
- * docs/menus.md draws the line this destination lives on: "Cap Ferrat and Côte
- * d'Azur as authored: villa and private versus PUBLIC STAGE." This is the
- * public one. The plate has a table moved outside at the last minute in front
- * of whoever is watching, one named cocktail served in short glasses, and a
- * last hour on the steps. Menu 18 is caviar at midnight. That is a house that
+ * The house that knows it can be seen. The plate has a table moved outside at
+ * the last minute in front of whoever is watching, one named cocktail served
+ * in short glasses, and a last hour on the steps.
+ *
+ * It used to be half a pair. docs/menus.md set CAP FERRAT against it — villa
+ * and private versus public stage — and that destination has since been
+ * folded in here, because Cap Ferrat is ON the Côte d'Azur and the pair was
+ * the same coast written twice. So the private register now lives in this
+ * house too: menus 13 to 15, drinks 9 and 10, and the villa half of the
+ * dishes. The voice did NOT merge — this terrace stays second person and
+ * cordial and building, where the villa was collective first and familiar
+ * and slow. One coast, one voice, and the slow lunch is now the only lunch. Menu 18 is caviar at midnight. That is a house that
  * knows it can be seen from the road and never once mentions it — which is
  * `means_the_other_thing`, and it is why this is the arch destination.
  *
@@ -3177,7 +3184,12 @@ export const COTE_DAZUR_1962: Destination = {
  *   leans_in           "Put the information at the end of the sentence, where
  *                      somebody has to be listening."
  *   roughly_eight      "Lunch has never once ended at the hour it was meant
- *                      to." Shared with CAP FERRAT, which is slower still.
+ *                      to." Held alone, now that CAP FERRAT has been folded
+ *                      in: this is the only house on a slow lunch.
+ *   unhurried          "near, unhurried, and never raised", in `address`.
+ *                      Taken over from CAP FERRAT, which the terrace
+ *                      absorbed, and which its own address note already
+ *                      said in as many words.
  *   one_tells_it       "by somebody who has already told this story once today
  *                      and improved it." The cadence that builds.
  *   straight_to_gossip "Antoine — beside the person he has been avoiding,
@@ -3190,10 +3202,11 @@ export const COTE_DAZUR_1962: Destination = {
 export const COTE_DAZUR_1962_TONES: readonly ToneWeight[] = [
   { code: "means_the_other_thing", weight: 1 },
   { code: "leans_in", weight: 0.8 },
-  { code: "roughly_eight", weight: 0.7 },
+  { code: "roughly_eight", weight: 0.9 },
   { code: "one_tells_it", weight: 0.6 },
   { code: "straight_to_gossip", weight: 0.5 },
   { code: "lingers", weight: 0.5 },
+  { code: "unhurried", weight: 0.5 },
 ];
 
 /**
@@ -3545,368 +3558,6 @@ export const PORTOFINO_TONES: readonly ToneWeight[] = [
   { code: "warm_not_loud", weight: 0.5 },
   { code: "unhurried", weight: 0.5 },
   { code: "self_deprecating", weight: 0.4 },
-];
-
-/**
- * CAP FERRAT, JULY.
- *
- * The private half of the pair docs/menus.md names: "Cap Ferrat and Côte
- * d'Azur as authored: VILLA AND PRIVATE versus public stage." Nothing here is
- * performed for a road. The plate says nobody is greeted formally, there is a
- * jug on the table and a swim before six, and dinner is "assembled rather than
- * cooked". Menu 14 is bought and arranged. Drinks 9 has lemon, sugar and cold
- * water mixed at the table by whoever is drinking it.
- *
- * So this is the slowest destination in the library: `arrives_late` and
- * `roughly_eight` at full weight, which no other house takes, and the far end
- * of the precision group from NEW YORK and the DOLOMITES.
- *
- * ── TWO THINGS ON THE PLATE THE VOICE DELIBERATELY DOES NOT REPEAT ───
- *
- * The plate mentions the record player rule. That is WESTHAMPTON's signature
- * line and it stays there; a second house saying it would be an echo rather
- * than a cross-reference, and this file exists to stop exactly that.
- *
- * The plate also has the staged photograph, and that one IS the voice — but
- * only stated the arch way round. The photograph is arranged, and nobody
- * arranged it. Written any other way it becomes a photo shoot, which is a
- * different and much worse holiday.
- */
-const CAP_FERRAT_LOOK: Theme = {
-  key: "cap-ferrat",
-  type: {
-    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
-    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
-    mono: '"Space Mono", ui-monospace, Menlo, monospace',
-  },
-  palette: {
-    // Shuttered plaster at four in the afternoon: warm stone, pine, lemon and
-    // a green that has faded on the shutters. The warmest ground of the three
-    // French plates, because this one never goes out.
-    ground: "#F0E6D0",
-    ground2: "#E3D6BB",
-    ink: "#232A20",
-    inkSoft: "#545A47",
-    inkFaint: "#8B8E77",
-    rule: "#CDBF9F",
-    aqua: "#2A5F4F",
-    oxblood: "#B44A2E",
-    gold: "#C9992F",
-    night: "#14201A",
-    night2: "#0E1613",
-    nightInk: "#F0E5CE",
-    nightSoft: "#ADA68D",
-    nightAqua: "#71B296",
-    nightOxblood: "#DE8455",
-    bone: "#F6F1E3",
-  },
-  paletteDark: {
-    ground: "#0E1613",
-    ground2: "#14201A",
-    ink: "#F0E5CE",
-    inkSoft: "#ADA68D",
-    inkFaint: "#7D7B65",
-    rule: "#28382F",
-    aqua: "#71B296",
-    oxblood: "#DE8455",
-    gold: "#DCAA45",
-  },
-};
-
-export const CAP_FERRAT: Destination = {
-  key: "cap-ferrat",
-  name: "CAP FERRAT, JULY",
-  tagline: "A heat wave, a rented house, and a very slow schedule.",
-  premise:
-    "A house taken for the month, shutters closed until the afternoon, and a " +
-    "jug on the table that nobody admits to making. There is a swim before " +
-    "six and a photograph under the parasol that everybody claims was their " +
-    "idea. Dinner is at nine, which means half past.",
-  look: CAP_FERRAT_LOOK,
-  voiceVersion: 1,
-  voice: {
-    speaker: "The house we take, which has been taken before.",
-    selfReference: ["we", "the house we take"],
-    audience: "the same people as last July, and whoever they brought",
-    address: {
-      mode: "collective_first",
-      note:
-        "We, and the we is a household that reassembles every summer: we eat " +
-        "late, we swim before six, we do not greet anybody at the door. " +
-        "Second person is spent on a room, a shutter or a step, and never on " +
-        "encouragement.",
-    },
-
-    register:
-      "A note left on the kitchen counter under the corkscrew, at an hour " +
-      "nobody could afterwards agree on.",
-    formality: "familiar",
-    cadence:
-      "Slow and lightly built. A long line that takes its time, then a short " +
-      "one that arrives later than expected and settles the matter.",
-    sentence: { typicalWords: 12, maxWords: 21 },
-    punctuation:
-      "Periods and commas, and the comma is where the afternoon drifts. A " +
-      "colon before a real list. No exclamation points, no ellipses, no " +
-      "parentheses, no dash held open for effect, no quotation marks around a " +
-      "word being nudged.",
-    orthography:
-      "Hours in words, and approximate: nine, which means half past. Before " +
-      "six. After the swim. Days by name. Headings in full caps; nothing else " +
-      "capitalised for emphasis. The place keeps its own name and nothing else " +
-      "on the page is spelled to sound like anywhere.",
-
-    humour: {
-      mode: "arch",
-      mechanism:
-        "State the arrangement as though nobody made it. The jug that has " +
-        "never run out, the photograph nobody arranged, the schedule that is " +
-        "very slow and entirely fixed. The house is teasing itself, gently, " +
-        "and never confirms it.",
-    },
-
-    lexicon: [
-      {
-        term: "the house we take",
-        gloss: "the villa, rented again. Never called a villa",
-        insteadOf: ["the villa", "the property", "the rental", "the estate"],
-      },
-      {
-        term: "the jug",
-        gloss:
-          "what is on the table from noon. Nobody admits to making it and it never runs out",
-        insteadOf: ["the pitcher", "the punch", "the welcome drink"],
-      },
-      {
-        term: "the swim",
-        gloss: "before six. After six the water is somebody else's idea of a day",
-        insteadOf: ["a dip", "pool time", "the beach"],
-      },
-      {
-        term: "the parasol",
-        gloss: "where the photograph happens, at the hour the light goes",
-        insteadOf: ["the umbrella", "the shade", "the set-up"],
-      },
-      {
-        term: "the photograph",
-        gloss:
-          "the one taken every July, arranged by nobody, claimed afterwards by everybody",
-        insteadOf: ["the photo shoot", "the group shot", "content"],
-      },
-      {
-        term: "assembled",
-        gloss: "what happens to dinner. Not cooked, and nobody pretends otherwise",
-        insteadOf: ["prepared", "plated", "curated"],
-      },
-      {
-        term: "the shutters",
-        gloss: "closed until the afternoon. The whole architecture of the day",
-        insteadOf: ["the blinds", "the windows"],
-      },
-      {
-        term: "whenever you land",
-        gloss: "the reply convention. No hour is fixed, nobody is met, nobody is counted",
-        insteadOf: ["RSVP", "arrival time", "please confirm"],
-      },
-    ],
-
-    formulae: [
-      "{Meal} at {hour}, which means {later}.",
-      "{Object} is on the table from {hour}. Nobody made it.",
-      "{Activity} before six. After six {the small reversal}.",
-      "Nobody is {greeted, met, asked}. {The gentler consequence}.",
-      "{Dish} is assembled, not cooked.",
-      "{Plain fact}, and no apology for it.",
-      "{The arranged thing} was arranged by nobody.",
-    ],
-
-    banned: [
-      "villa life",
-      "languid",
-      "sun-kissed",
-      "riviera",
-      "jet set",
-      "poolside",
-      "wellness",
-      "detox",
-      "curated",
-      "elevated",
-      "experience",
-      "vibe",
-      "iconic",
-      "unforgettable",
-      "magical",
-      "memories",
-      "guys",
-      "hosted by",
-      "join us",
-    ],
-
-    signOffs: [
-      "The house we take.",
-      "Dinner at nine, which means half past.",
-      "Whenever you land.",
-      "The jug is on the table.",
-    ],
-
-    always: [
-      "Give the hour and then give the truth about the hour.",
-      "Let the arrangement look unarranged. Somebody made the jug and the sentence does not say who.",
-      "Name a real thing: the shutters, the parasol, the corkscrew, the ice in the wine.",
-      "Keep the volume down. Nothing here is announced, including the photograph.",
-      "Tease the house rather than a person in it.",
-    ],
-
-    never: [
-      "Never an exclamation point.",
-      "Never put French on the page to sound French. The cape keeps its name; nothing else is spelled to sound like anywhere.",
-      "Never call it a villa, and never write anything that sounds like a listing.",
-      "Never write the photograph as a shoot, and never admit it was arranged. Everybody claims it afterwards; that is the whole joke and it does not survive being explained.",
-      "Never make a virtue of the lateness. The schedule is slow and is simply reported; a joke about punctuality is a faster house pretending.",
-      "Never repeat another destination's rule. The thing about the record player belongs on Dune Road.",
-      "Never name the feeling — no languid, no idyllic, no unforgettable, no memories.",
-      "Never use italics.",
-    ],
-
-    breaksCharacterFor: [
-      "Anything a guest must act on to arrive or be safe: the road, the gate code, the pool steps in the dark, a hospital, what is in the food. Fact first, fewest words, exact hours.",
-      "Anything about money — including what the house cost and how it is split.",
-      "Any message that lets someone go — a decline, a shorter stay, a way off a list. Written straight and made easy.",
-    ],
-
-    exemplars: [
-      {
-        piece: "invitation",
-        text: "July, the house we take again. Come whenever you land.",
-      },
-      {
-        piece: "invitation",
-        text: "Dinner is at nine, which means half past.",
-        note: "The whole destination in eight words: an hour given, and then the truth about the hour.",
-      },
-      {
-        piece: "invitation",
-        text: "There is a jug on the table from noon. Nobody made it and it has never run out.",
-      },
-      {
-        piece: "invitation",
-        text: "Nobody is greeted at the door. If you want to be met, say so and somebody will stand up.",
-      },
-      { piece: "menu_item", text: "Melon with ham, and then nothing for an hour." },
-      {
-        piece: "menu_item",
-        text: "Whole sea bass with fennel, which is the only cooking anybody does all week.",
-      },
-      {
-        piece: "menu_item",
-        text: "Dinner is assembled, not cooked: peaches, cold lamb, and ice in the wine.",
-      },
-      {
-        piece: "menu_item",
-        text: "Lemon, sugar and cold water, mixed at the table by whoever is drinking it.",
-      },
-      {
-        piece: "menu_item",
-        text: "Radishes with butter and salt, which disappear before anything else arrives.",
-      },
-      {
-        piece: "notice",
-        text: "The swim is before six. After six the water is somebody else's idea of a day.",
-      },
-      {
-        piece: "notice",
-        text: "The photograph is under the parasol at the hour the light goes. Nobody arranged it.",
-      },
-      {
-        piece: "notice",
-        text: "The shutters stay closed until the afternoon. The house is cooler than the terrace and knows it.",
-      },
-      {
-        piece: "house_note",
-        text: "Your room is the one at the end with the shutters already shut. Leave them until six.",
-      },
-      {
-        piece: "house_note",
-        text: "The pool light does not work. The steps are on the left and there are four of them.",
-      },
-      {
-        piece: "place_card",
-        text: "Marguerite — under the parasol, where the photograph will happen.",
-      },
-      { piece: "place_card", text: "Luc — beside the jug, which he will refill." },
-      {
-        piece: "game_rule",
-        text: "Everybody claims the photograph was their idea. Whoever says nothing took it.",
-      },
-      {
-        piece: "bulletin",
-        text: "Tuesday. Too hot for the terrace until six. The jug has been refilled twice and nobody saw by whom.",
-      },
-      { piece: "heading", text: "BEFORE SIX" },
-      { piece: "heading", text: "THE HOUR UNDER THE PARASOL" },
-      { piece: "sign_off", text: "The house we take." },
-      { piece: "sign_off", text: "Dinner at nine, which means half past." },
-    ],
-
-    rejected: [
-      {
-        text: "Villa life at its most languid.",
-        why: "A listing wrote this. It names the feeling and calls the house a villa in the same six words.",
-      },
-      {
-        text: "The photo shoot is at seven. Everyone in white.",
-        why: "Turns the one arranged moment into a production, and announces it. Nobody arranged it is the line, and it only works unannounced.",
-      },
-      {
-        text: "Punctuality is not a virtue here.",
-        why: "A joke about the lateness. The lateness is funnier reported as a schedule — nine, which means half past.",
-      },
-      {
-        text: "A heatwave and a house full of your favourite people.",
-        why: "Names the feeling and tells the reader who her favourites are. The plate already has the better version.",
-      },
-      {
-        text: "Bonne vacances, and see you by the pool.",
-        why: "A French phrase set down to prove where we are, and a greeting nobody in this house makes.",
-      },
-      {
-        text: "Digital detox in the sun.",
-        why: "Wellness language, and it makes an arrangement out of an absence. Nothing here is being fixed.",
-      },
-    ],
-  },
-};
-
-/**
- * CAP FERRAT's voice, said in the tones a host is shown.
- *
- * The slow end of the precision group, and the reason NEW YORK's plan of the
- * table has something to be the opposite of. Every tag points at a line above:
- *
- *   arrives_late   "Come whenever you land." Nobody is met and no hour is
- *                  fixed. Shared with TAHITI, which is late in a different
- *                  register — plain and generous rather than arch.
- *   roughly_eight  "Dinner is at nine, which means half past."
- *   warm_not_loud  A note left under the corkscrew for people who come back
- *                  every July. Fondness with the volume down.
- *   unhurried      "Melon with ham, and then nothing for an hour."
- *   teasing        "The jug has been refilled twice and nobody saw by whom."
- *                  The house teases itself; the rule against teasing a person
- *                  in it is in `always`.
- *   low_voices     "Nothing here is announced, including the photograph."
- *
- * Formality, address and humour are NOT tagged: familiar, collective first,
- * arch are stated outright and derived by `statedVoiceFacets`. It shares arch
- * with CÔTE D'AZUR and is its deliberate opposite in every other respect —
- * private where that one is public, slow where that one builds.
- */
-export const CAP_FERRAT_TONES: readonly ToneWeight[] = [
-  { code: "arrives_late", weight: 1 },
-  { code: "roughly_eight", weight: 0.9 },
-  { code: "warm_not_loud", weight: 0.6 },
-  { code: "unhurried", weight: 0.6 },
-  { code: "teasing", weight: 0.5 },
-  { code: "low_voices", weight: 0.4 },
 ];
 
 /**
@@ -5048,7 +4699,6 @@ export const DESTINATIONS = {
   catskills: CATSKILLS,
   "cote-dazur": COTE_DAZUR_1962,
   portofino: PORTOFINO,
-  "cap-ferrat": CAP_FERRAT,
   dolomites: DOLOMITES,
   "big-sur": BIG_SUR,
   tahiti: TAHITI,
@@ -5075,7 +4725,6 @@ export const DESTINATION_TONES = {
   catskills: CATSKILLS_TONES,
   "cote-dazur": COTE_DAZUR_1962_TONES,
   portofino: PORTOFINO_TONES,
-  "cap-ferrat": CAP_FERRAT_TONES,
   dolomites: DOLOMITES_TONES,
   "big-sur": BIG_SUR_TONES,
   tahiti: TAHITI_TONES,

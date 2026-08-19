@@ -77,27 +77,6 @@ export const POSTERS: Record<string, ReactNode> = {
       </g>
     </>
   ),
-  "cap-ferrat": (
-    <>
-      <rect width="300" height="400" fill="var(--bone)" />
-      <rect y="150" width="300" height="250" fill="var(--aqua)" />
-      <rect y="150" width="300" height="2" fill="var(--night)" opacity="0.5" />
-      <path d="M0 400 L0 214 C64 214 116 260 150 400 Z" fill="var(--ground2)" />
-      <path d="M0 400 L0 258 C48 262 88 300 112 400 Z" fill="var(--oxblood)" />
-      <g fill="var(--night)">
-        <path d="M40 216 C48 216 50 190 44 168 C38 190 32 216 40 216 Z" />
-        <path d="M68 222 C77 222 79 192 72 166 C65 192 59 222 68 222 Z" />
-        <path d="M96 236 C104 236 106 212 100 190 C94 212 88 236 96 236 Z" />
-      </g>
-      <g>
-        <path d="M186 268 A54 54 0 0 1 294 268 Z" fill="var(--bone)" />
-        <path d="M240 214 A54 54 0 0 1 267 221 L240 268 Z" fill="var(--oxblood)" />
-        <path d="M186 268 A54 54 0 0 1 213 221 L240 268 Z" fill="var(--oxblood)" />
-        <rect x="238.5" y="268" width="3" height="88" fill="var(--night)" />
-      </g>
-      <circle cx="242" cy="112" r="30" fill="none" stroke="var(--gold)" strokeWidth="3" />
-    </>
-  ),
   "new-orleans": (
     <>
       <rect width="300" height="400" fill="var(--bone)" />

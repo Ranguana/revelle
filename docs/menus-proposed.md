@@ -92,6 +92,8 @@ New York's original street food.
 
 ## Cap Ferrat
 
+**Folded into Côte d'Azur.** Cap Ferrat is on the Côte d'Azur and the two were authored as the same coast twice, so the destination was retired and menus 13, 14 and 15 now sit under Côte d'Azur. This section is kept as the record of the proposal round and of the Nice research below; anything taken from it should be proposed against Côte d'Azur.
+
 Existing: 13, 14, 15.
 
 **43.**

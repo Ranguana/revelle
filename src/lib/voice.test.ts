@@ -431,16 +431,19 @@ test("no two destinations resolve to nearly the same voice", () => {
 /**
  * The test the whole vocabulary exists for: her answer changes the answer.
  *
- * Thirteen plausible groups, each described in four to six taps drawn from
+ * Twelve plausible groups, each described in four to six taps drawn from
  * different regions of the page — nobody taps five tiles from one heading — and
  * each one has to land somewhere different. If two of these collide, the
  * catalogue has a hole in it, and the fix is to re-tag a destination rather
  * than to loosen this number.
  *
- * The margins are honest rather than comfortable: at the time of writing the
- * narrowest is a late, slow, teasing group choosing CAP FERRAT over TAHITI by
- * 0.11, which is correct — those two really are the two slow houses, and the
- * arch one wins a group that teases.
+ * There were thirteen. The thirteenth was a late, slow, teasing group, and it
+ * was written for CAP FERRAT, which has been folded into CÔTE D'AZUR because
+ * the two were the same coast twice. With that room gone the group has no
+ * home of its own: it lands on TAHITI, which is the other slow house, and
+ * collides with the plain and generous group already sitting there. A group
+ * per destination is the whole point of this test, so the group left with the
+ * room. Do not add a fourteenth without adding a destination for it.
  */
 test("different kinds of group land on different destinations", () => {
   const groups: [string, string[]][] = [
@@ -450,7 +453,6 @@ test("different kinds of group land on different destinations", () => {
     ["warm, sentimental, their own language", ["nicknames", "sentimental", "in_jokes", "says_it_out_loud", "teasing"]],
     ["fast and irreverent", ["all_at_once", "talks_fast", "swears_fondly", "straight_to_gossip", "interrupts"]],
     ["dry, quiet, explains nothing", ["deadpan", "understated", "low_voices", "explains_nothing", "never_performs"]],
-    ["late, slow, teasing", ["arrives_late", "roughly_eight", "lingers", "unhurried", "teasing"]],
     ["knowing, oblique, straight to the gossip", ["means_the_other_thing", "leans_in", "one_tells_it", "straight_to_gossip", "long_way_round"]],
     ["first names, quiet, no fuss", ["first_names", "comfortable_silence", "warm_not_loud", "good_natured", "self_deprecating"]],
     ["fond out loud, and loud with it", ["good_natured", "laughs_first", "lingers", "says_it_out_loud", "asks_properly"]],

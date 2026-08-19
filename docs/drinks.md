@@ -96,7 +96,7 @@ finished bar as well as a finished table.
 - Winter
 - Bought and poured
 
-## Cap Ferrat
+## Côte d'Azur
 
 **9.**
 - Kir (white wine, crème de cassis), pastis with water, cold rosé through lunch
@@ -111,8 +111,6 @@ finished bar as well as a finished table.
 - A quiet off-season dinner
 - October
 - Bought and poured
-
-## Côte d'Azur
 
 **11.**
 - Kir royales, French 75s (gin, lemon, champagne), cold rosé

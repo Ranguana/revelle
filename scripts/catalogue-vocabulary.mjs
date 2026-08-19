@@ -52,7 +52,6 @@ export const DESTINATIONS = {
   Westhampton: "westhampton-1976",
   Nantucket: "nantucket",
   "New York": "new-york",
-  "Cap Ferrat": "cap-ferrat",
   "Côte d'Azur": "cote-dazur",
   Vegas: "las-vegas",
   Catskills: "catskills",

@@ -186,64 +186,6 @@ multiple destination tags at import.
 - Chocolate babka · B
 - Italian ices · B (summer)
 
-## Cap Ferrat
-
-### Appetizers
-- Tapenade with raw vegetables · H
-- Onion-anchovy tart squares · H
-- Radishes with butter and salt · B
-- Chilled langoustines with garlic mayonnaise · H
-- Melon with ham · B (summer)
-- Little composed tuna-and-vegetable salads · H
-- Fish soup in cups with garlic-saffron mayonnaise · H
-- Marinated olives · B
-- Anchovy-garlic dip with vegetables · M
-- Braised artichokes · M (spring)
-- Tomato tart · M (summer)
-- Goat cheese with honey · B
-- Sardine spread on toasts · H
-- Oysters with shallot vinegar · B
-- Shaved fennel salad with lemon · H
-- Fried zucchini blossoms · M (summer)
-- Cold leek and potato soup · M
-- Hard-boiled eggs with herbed mayonnaise · M
-
-### Mains
-- Whole grilled sea bass with fennel · M
-- Sole in brown butter · M
-- Roast chicken with olives and lemon · M
-- Slow beef stew in red wine · M (fall/winter)
-- Fish stew with saffron broth · M
-- Grilled lamb chops with herbs · H
-- Ratatouille with baked eggs · M (summer)
-- Grilled tuna with tomatoes and capers · H (summer)
-- Veal with lemon · M
-- Chilled seafood platter · B
-- Pasta with basil-garlic sauce · M
-- Stuffed tomatoes and peppers · M (summer)
-- Grilled prawns with garlic butter · H
-- Poached salmon with green herb sauce · M
-- Roast pork with figs · M (fall)
-- Duck with olives · M
-- Rabbit with mustard · M
-- Omelette with fine herbs · M
-
-### Desserts
-- Lemon tart · M
-- Pears poached in red wine · M (fall/winter)
-- Apricot tart · M (summer)
-- Crème caramel · M
-- Fresh figs with honey and cream · B (late summer)
-- Strawberries in red wine · H (spring)
-- Cheese course with fruit · B
-- Chocolate mousse · M
-- Peach gratin · M (summer)
-- Almond cake · M
-- Cherry clafoutis · M (early summer)
-- Melon with lime · B (summer)
-- Honey ice cream · B
-- Nougat and candied fruit plate · B
-
 ## Côte d'Azur
 
 ### Appetizers
@@ -265,6 +207,22 @@ multiple destination tags at import.
 - Duck liver mousse on toasts · B
 - Baked tomatoes with breadcrumbs · M (summer)
 - Green olive and almond bowls · B
+- Tapenade with raw vegetables · H
+- Chilled langoustines with garlic mayonnaise · H
+- Melon with ham · B (summer)
+- Little composed tuna-and-vegetable salads · H
+- Fish soup in cups with garlic-saffron mayonnaise · H
+- Marinated olives · B
+- Anchovy-garlic dip with vegetables · M
+- Braised artichokes · M (spring)
+- Tomato tart · M (summer)
+- Goat cheese with honey · B
+- Sardine spread on toasts · H
+- Oysters with shallot vinegar · B
+- Shaved fennel salad with lemon · H
+- Fried zucchini blossoms · M (summer)
+- Cold leek and potato soup · M
+- Hard-boiled eggs with herbed mayonnaise · M
 
 ### Mains
 - Sole in cream sauce with grapes · M
@@ -287,6 +245,23 @@ multiple destination tags at import.
 - Late-night omelette with fine herbs · M
 - Roast chicken from the market with olives and lemon · B
 - Cold veal sliced thin with tuna sauce · B
+- Whole grilled sea bass with fennel · M
+- Roast chicken with olives and lemon · M
+- Slow beef stew in red wine · M (fall/winter)
+- Fish stew with saffron broth · M
+- Grilled lamb chops with herbs · H
+- Ratatouille with baked eggs · M (summer)
+- Grilled tuna with tomatoes and capers · H (summer)
+- Veal with lemon · M
+- Chilled seafood platter · B
+- Pasta with basil-garlic sauce · M
+- Stuffed tomatoes and peppers · M (summer)
+- Grilled prawns with garlic butter · H
+- Poached salmon with green herb sauce · M
+- Roast pork with figs · M (fall)
+- Duck with olives · M
+- Rabbit with mustard · M
+- Omelette with fine herbs · M
 
 ### Desserts
 - Peach melba · H (summer)
@@ -303,6 +278,20 @@ multiple destination tags at import.
 - Seasonal fruit plateau · B
 - Rum baba · B
 - Strawberry charlotte · M (spring)
+- Lemon tart · M
+- Pears poached in red wine · M (fall/winter)
+- Apricot tart · M (summer)
+- Crème caramel · M
+- Fresh figs with honey and cream · B (late summer)
+- Strawberries in red wine · H (spring)
+- Cheese course with fruit · B
+- Chocolate mousse · M
+- Peach gratin · M (summer)
+- Almond cake · M
+- Cherry clafoutis · M (early summer)
+- Melon with lime · B (summer)
+- Honey ice cream · B
+- Nougat and candied fruit plate · B
 
 ## Vegas
 
