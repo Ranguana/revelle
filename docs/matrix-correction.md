@@ -1,0 +1,195 @@
+# Matrix correction pass
+
+**108 cells. Nine facets, twelve destinations.** `speech` has been cut (zero
+marginal information against `arrival`), so this is what remains.
+
+Each cell shows the value and the evidence that produced it. Mark it and move on;
+write prose only where you disagree. A flipped cell changes the audit, so the
+pairs each cell is currently holding up are noted where it matters.
+
+Read down a destination, not across a facet — the judgments are faster in the
+voice you are already in.
+
+## WESTHAMPTON, 1976
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | register: a card left on the hall table by someone who has already gone to bed |  |
+| `schedule` | **none** | no hour appears anywhere in premise or lexicon |  |
+| `volume` | **quiet** | low_voices 0.7, understated 1 |  |
+| `dress` | **dressed** | tagline: vintage summer glamour |  |
+| `food` | **bought** | lexicon is drinks / the ice / the record player, nothing cooked |  |
+| `ending` | **dissolves** | premise: a long dinner that turns into something else |  |
+| `hour` | **late** | "turns into something else" implies the evening runs on |  |
+| `size` | **few** | premise: a rented house that sleeps six |  |
+| `teasing` | **teases** | nothing_sacred 0.35; dry and disreputable |  |
+
+## HAVANA, 1957
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | lexicon: the door is open |  |
+| `schedule` | **none** | two halves, but no clock anywhere |  |
+| `volume` | **overlapping** | laughs_first 0.7, says_it_out_loud 0.6 |  |
+| `dress` | **unchanged** | formality plain; period kitsch expressly banned |  |
+| `food` | **cooked** | premise: a second supper nobody planned |  |
+| `ending` | **until_morning** | lexicon: first light |  |
+| `hour` | **late** | tagline: supper again at three |  |
+| `size` | **crowd** | the table is pushed back for the dancing |  |
+| `teasing` | **never** | mechanism: "Nobody in the house is the target — the night is"; no teasing tone |  |
+
+## LAS VEGAS, 1960
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **ceremony** | makes_an_entrance 1; lexicon: the entrance |  |
+| `schedule` | **posted** | premise: ready an hour before anything opens, table held until midnight |  |
+| `volume` | **overlapping** | no_dead_air 0.5, across_the_room 0.7 |  |
+| `dress` | **dressed** | dressed_up 0.5; lexicon: the good coat |  |
+| `food` | **bought** | the salad built at the table is performed for you, not by you |  |
+| `ending` | **until_morning** | lexicon: breakfast at four |  |
+| `hour` | **late** | table held until midnight |  |
+| `size` | **one_table** | one game, one stake, one table |  |
+| `teasing` | **never** | humour absurd, aimed at the room's own excess |  |
+
+## NEW YORK, 1938
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **ceremony** | rises_to_greet; coats piled on the bed as a cloakroom |  |
+| `schedule` | **posted** | seating_plan; one person stands at midnight |  |
+| `volume` | **one_conv** | a table long enough to need a plan |  |
+| `dress` | **dressed** | dressed_up; black tie |  |
+| `food` | **bought** | oysters opened on the counter as people arrive |  |
+| `ending` | **dissolves** | premise: the last hour is the lights low and side two on |  |
+| `hour` | **late** | midnight toast |  |
+| `size` | **one_table** | a long table, mostly |  |
+| `teasing` | **never** | humour dry, reported without comment |  |
+
+## NANTUCKET, 1972
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | first_names |  |
+| `schedule` | **none** | no schedule in premise or lexicon |  |
+| `volume` | **quiet** | comfortable_silence, warm_not_loud |  |
+| `dress` | **unchanged** | tagline: newspaper on the table, butter in a saucepan |  |
+| `food` | **cooked** | butter in a saucepan |  |
+| `ending` | **clean_stop** | no late-hour material anywhere |  |
+| `hour` | **afternoon** | daylight register throughout |  |
+| `size` | **few** | paper plates on purpose; a house, not a crowd |  |
+| `teasing` | **teases** | listed under teasing in the tone table |  |
+
+## NEW ORLEANS, 1956
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | lexicon: come at nine |  |
+| `schedule` | **none** | no posted hour |  |
+| `volume` | **overlapping** | all_at_once 1, interrupts 0.7, talks_fast 0.6 |  |
+| `dress` | **unchanged** | formality plain |  |
+| `food` | **cooked** | lexicon: made again; "the gumbo there is more of" |  |
+| `ending` | **until_morning** | lexicon: the second wind, going back out, the walk home |  |
+| `hour` | **late** | tagline: dinner at nine, nobody leaving at eleven |  |
+| `size` | **crowd** | four conversations, none of them finished |  |
+| `teasing` | **teases** | mechanism: "Everybody is fair game and nobody is the victim" |  |
+
+## CATSKILLS, 1963
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **assigned** | premise: everybody gets a bunk and a name in the first hour |  |
+| `schedule` | **posted** | the swim test, the ledger, the bunk list |  |
+| `volume` | **one_conv** | one_conversation 0.5 |  |
+| `dress` | **unchanged** | tagline: the tent is decorative |  |
+| `food` | **cooked** | lexicon: the coals |  |
+| `ending` | **dissolves** | whoever is last up turns off the string lights |  |
+| `hour` | **early** | tagline: everyone swims before breakfast |  |
+| `size` | **crowd** | a row of bunks |  |
+| `teasing` | **teases** | teasing 0.8; "the teasing is the proof of belonging" |  |
+
+## CÔTE D'AZUR, 1962
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | lexicon: come up — the road is the answer and nobody is counted |  |
+| `schedule` | **none** | lunch has never once ended when it was supposed to |  |
+| `volume` | **one_conv** | one_tells_it 0.6 |  |
+| `dress` | **unchanged** | tagline: nobody changed for dinner — stated outright |  |
+| `food` | **bought** | the Ferrat; a table carried outside at the last minute |  |
+| `ending` | **dissolves** | the last hour is on the steps, when it stops being a party |  |
+| `hour` | **afternoon** | lunch at one, still going at seven |  |
+| `size` | **one_table** | one table carried outside |  |
+| `teasing` | **teases** | straight_to_gossip 0.5; humour arch |  |
+
+## PORTOFINO, 1961
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | lexicon: between us |  |
+| `schedule` | **none** | lunch takes the whole of Saturday |  |
+| `volume` | **one_conv** | one_conversation 0.8, between_us 1 |  |
+| `dress` | **unchanged** | formality cordial, off-season |  |
+| `food` | **bought** | one restaurant is open and it is the good one; ordering for the table |  |
+| `ending` | **dissolves** | the way home in the dark in whatever order the group falls into |  |
+| `hour` | **afternoon** | lunch takes the whole of Saturday |  |
+| `size` | **few** | the harbour to yourselves |  |
+| `teasing` | **teases** | self_deprecating 0.4 — the joke is on us |  |
+
+## DOLOMITES, 1956
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | the times are posted; nobody greets anybody |  |
+| `schedule` | **posted** | lexicon: the times, the first car, the last car up |  |
+| `volume` | **quiet** | comfortable_silence 0.8 |  |
+| `dress` | **unchanged** | formality formal but the room is boots and a drying room |  |
+| `food` | **cooked** | premise: dinner is one pot on a long table |  |
+| `ending` | **clean_stop** | the cards go on until the fire is banked |  |
+| `hour` | **early** | tagline: the first gondola at eight |  |
+| `size` | **one_table** | one pot on a long table |  |
+| `teasing` | **never** | impeccably_polite 0.6 |  |
+
+## BIG SUR, 1971
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | a cabin at the end of a road |  |
+| `schedule` | **none** | premise: a fog that lifts when it lifts |  |
+| `volume` | **quiet** | comfortable_silence 0.7 |  |
+| `dress` | **unchanged** | formality plain |  |
+| `food` | **cooked** | dinner cooked over a fire and eaten off a tailgate |  |
+| `ending` | **clean_stop** | until the fog comes back in and everybody goes inside |  |
+| `hour` | **afternoon** | fog until noon |  |
+| `size` | **few** | a cabin, cars parked facing out |  |
+| `teasing` | **teases** | self_deprecating 0.8 |  |
+
+## TAHITI, 1961
+
+| facet | value | why | ok? |
+|---|---|---|---|
+| `arrival` | **absorbed** | no greeting anywhere in the premise |  |
+| `schedule` | **none** | torches go up long before anybody is hungry |  |
+| `volume` | **quiet** | comfortable_silence 0.6, humour none |  |
+| `dress` | **unchanged** | formality plain |  |
+| `food` | **arrived** | premise: dinner is whatever came in today |  |
+| `ending` | **until_morning** | nothing is cleared until morning |  |
+| `hour` | **late** | eaten late and slowly |  |
+| `size` | **one_table** | a table set on sand |  |
+| `teasing` | **never** | humour mode is none — there is no joke in this writing |  |
+
+## The cells doing the most work
+
+These four hold a failing or near-failing pair on their own. If one flips, the
+pair below it collapses further and the proposed facets stop being optional.
+
+| cell | holds up | if it flips |
+|---|---|---|
+| Havana `teasing = never` | Havana / New Orleans at distance 1 | the pair goes to **0** and only `who cooks` / `telling` can save it |
+| Portofino `size = few` | Côte d'Azur / Portofino at distance 1 | the pair goes to **0** and the Cap Ferrat precedent applies |
+| Vegas `volume = overlapping` | Las Vegas / New York at distance 2 | drops to 1 |
+| Vegas `ending = until_morning` | Las Vegas / New York at distance 2 | drops to 1 |
+
+Nantucket / Big Sur is already at 0 and no single cell rescues it — that pair
+needs `telling`, or it needs one of the two voices to be doing something the
+nine facets cannot see.

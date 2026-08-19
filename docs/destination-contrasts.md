@@ -53,8 +53,7 @@ Ten facets, each answerable as a scene rather than an adjective.
 | facet | levels |
 |---|---|
 | `arrival` | ceremony · absorbed · assigned a role |
-| `schedule` | posted and kept · one fixed anchor · none |
-| `speech` | somebody stands and speaks · nobody ever |
+| `schedule` | posted and kept · none |
 | `volume` | overlapping · one conversation · quiet |
 | `dress` | everyone dressed up · nobody changes |
 | `food` | cooked by us · bought and arranged · whatever arrived |
@@ -105,18 +104,35 @@ has a signal and one story gets told long. What the ten facets miss is
 separates without touching a word of either voice.
 
 **The two destinations really are the same party.** That is the Cap Ferrat case,
-and it was resolved by merging. Côte d'Azur/Portofino needs deciding on those
-terms: at distance 1 they are one Mediterranean afternoon written twice, and
-Amalfi 1953 is about to become a third.
+and it was resolved by merging.
+
+**But nothing merges on this matrix.** These rows were derived from structured
+voice fields rather than from the prose, and that shortcut is the likeliest
+cause of at least one failure. Distance 1 in a thin reading is not distance 1 in
+the voices. The order is: correct the matrix first, then re-run the audit, and
+only then apply the Cap Ferrat precedent to whatever still fails. Merging on an
+uncorrected matrix is deciding the case on a summary of the brief.
+
+The same restraint protects Rio 1947, whose brief looks nearly impossible while
+Havana and New Orleans sit at distance 1 — but if `who cooks` and `telling`
+separate those two, Rio has room to exist.
 
 ## Candidate facets the failures argue for
 
 | facet | levels | rescues |
 |---|---|---|
-| `reach` | easy to get to · a journey · genuinely remote | Nantucket / Big Sur |
+| `reach` | **atmosphere only, see below** | Nantucket / Big Sur |
 | `telling` | one person tells it long · everyone talks over each other · neither | Big Sur / Nantucket, Havana / New Orleans |
 | `who cooks` | a host cooks · everyone brings · nobody cooks | Havana / New Orleans |
 | `spectacle` | something is performed for the room · nothing is | Las Vegas / New York |
+
+**`reach` is dangerous and must be worded as atmosphere, never as geography.**
+Asked naively — "easy to get to, a journey, genuinely remote" — it is the venue
+question wearing a scarf, and it takes the thesis apart through the side door.
+"The world cannot reach you tonight" is a taste. "My apartment is hard to get
+to" is a venue fact. Only the first may be asked. If the wording cannot be made
+to force that reading, the facet does not ship. `telling` has no such problem:
+it is clean, and it rescues both pairs it claims to.
 
 Adding these takes the set to fourteen, which is above the eight-to-twelve band
 that is comfortable. The cut should come from the weakest discriminators —
@@ -132,8 +148,29 @@ Out of 66 pairs:
 47  size                                              20  speech
 ```
 
-`speech` is the weakest and is the likeliest cut. `dress` is weak but earns its
-place because it is the single most legible question to ask a host.
+**`speech` is cut.** Not weak — worthless. It separates 20 pairs and exactly
+zero that `arrival` does not: `speech=speaks` is {Las Vegas, New York} and
+`arrival=ceremony` is the same two, so `arrival` is strictly finer (it also
+isolates Catskills). Its marginal information is zero, not small. Cutting it
+drops no pair below the gate. It earns its place back only if a correction
+breaks the correlation — a room where somebody stands and speaks but arrival is
+absorbed.
+
+`dress` is genuinely weak but earns its place, because it is the single most
+legible question that can be asked of a host.
+
+**`schedule` has a dead level.** The set declares three and uses two: every
+destination is `posted` or `none`, and "one fixed anchor" maps to nothing. A
+three-option question with an option that reaches no destination wastes a third
+of a tap. Either a room really is anchor-shaped — Côte d'Azur, where lunch
+happens and nothing else does, is the candidate — or the level goes.
+
+**Two levels are fingerprint buttons.** `arrival=assigned` is Catskills alone
+and `food=arrived` is Tahiti alone. A host who taps either has chosen a
+destination with one answer. Log-odds scoring softens that but does not remove
+it, and it sits awkwardly beside the rule that one odd tap must never destroy
+the right answer. Not necessarily wrong — a signature question can be
+deliberate — but it should be a decision rather than an accident.
 
 ## The five unwritten rooms
 
