@@ -328,16 +328,21 @@ const ART_BATTLE: Game = {
   slug: "art-battle",
   name: "Art Battle",
   description:
-    "Everyone paints the same thing, nobody signs it, and then everyone " +
-    "lies about somebody else's.",
+    "Everyone paints the same prompt and nobody signs it, so nobody knows " +
+    "whose is whose. Then each of you stands up and invents what somebody " +
+    "else meant by theirs.",
   howItWorks:
     "One prompt, the same for everyone, and twenty minutes to make " +
-    "something. Nothing is signed.\n\n" +
-    "The work goes up anonymously. Each artist gets one minute to explain a " +
-    "piece that is not theirs, and the explanation should be ridiculous.\n\n" +
+    "something. Nothing is signed, so nothing on the wall has an artist " +
+    "attached to it.\n\n" +
+    "The work goes up while the room is out of it. Then everyone draws a " +
+    "number and gets one minute on the piece it belongs to, which is never " +
+    "their own. Nobody is guessing who painted what: the minute is spent " +
+    "inventing what the artist meant by it, in as much confident detail as " +
+    "they can manage, and the artist has to stand there and hear it.\n\n" +
     "Then the room votes: Most Beautiful, Funniest, Most Confusing, I'd Hang " +
-    "This, and Best Story. The Best Story vote is not required to be the true " +
-    "one.\n\n" +
+    "This, and Best Story. Best Story is a vote on the minute somebody spoke, " +
+    "not on the painting they spoke about.\n\n" +
     "The twist, and the reason to run it: the winners do not keep their " +
     "work. Every winning piece goes to a guest drawn at random.",
   materials:
@@ -2051,13 +2056,19 @@ const FISHBOWL: Game = {
     "Everyone writes names into a bowl, and then the same slips get harder " +
     "three times over.",
   howItWorks:
-    "Everybody writes a few names or nouns on slips and folds them into the " +
-    "bowl. Two teams.\n\n" +
+    "Everybody writes six names or nouns on slips and folds them into the " +
+    "bowl. Two teams, counted off round the table.\n\n" +
+    "A turn is one minute. One person draws slips and clues them to their " +
+    "own team, one after another, and the team keeps every slip it gets. " +
+    "When the minute is up the bowl goes to the other team. The round is " +
+    "over when the bowl is empty, and then every slip goes back in for the " +
+    "next one.\n\n" +
     "First round, you may say anything except the word itself. Second round, " +
     "same slips, and you may only act it out. Third round, same slips again, " +
-    "and you get one word.\n\n" +
+    "and you get one word. Most slips across the three wins.\n\n" +
     "The third round is funny because of the first two. That is the whole " +
-    "design and it is why the slips must not be replaced between rounds.",
+    "design, and it is why the bowl is refilled between rounds rather than " +
+    "rewritten.",
   materials: "Paper, a bowl, a pen each, a timer.",
 
   shape: "scheduled",
