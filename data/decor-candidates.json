@@ -1,0 +1,1976 @@
+{
+  "generated": "2026-08-18",
+  "schema_target": "product (db/002-taste-cohorts-and-facets.sql), slot claims via product_slot -> slot_kind(code), facets via product_facet -> facet",
+  "notes": [
+    "NOT A SEED FILE. Nothing here has been written to any database.",
+    "facet_slugs use the 'dimension:code' form that scripts/seed-fixtures.mjs uses; every one was checked against a facet seeded in db/002, db/012, db/016 or db/026.",
+    "destination_affinity, era_tags and facet_slugs are EDITORIAL JUDGEMENT on every row, including rows marked 'sourced'. 'sourced' refers to the name/price/URL/supplier only.",
+    "Casa de Perrin prices are RENTAL rates per piece per event, not purchase prices. price_band is computed from them anyway and will read far too cheap against a purchase catalogue.",
+    "Chairish rows are single one-of-a-kind listings and will 404 when they sell.",
+    "image_url values are REFERENCES to supplier-hosted images. No image was downloaded or copied. Displaying them on a Revelle surface is an unresolved licensing question."
+  ],
+  "price_band_rule": "cents < 2500 under_25; < 7500 from_25_to_75; < 20000 from_75_to_200; < 50000 from_200_to_500; else over_500. Upper bounds treated as exclusive.",
+  "count": 80,
+  "products": [
+    {
+      "slug": "cdp-hudson-emerald-glassware",
+      "name": "Hudson | Emerald",
+      "description": "Mouth-blown rippled glassware in emerald. Goblet, champagne coupe, highball and lowball.",
+      "slot_code": "table_object",
+      "price_cents": 425,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-glassware-collections/hudson-emerald",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Glassware Collections; $4.25 per piece per event (rental, not purchase); observed 2026-08-18; rental rates drift",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur",
+        "havana"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:tropical_maximal",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-hudson-smoke-glassware",
+      "name": "Hudson | Smoke",
+      "description": "Mouth-blown rippled glassware in smoke. Goblet, champagne coupe, highball and lowball.",
+      "slot_code": "table_object",
+      "price_cents": 450,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-glassware-collections/hudson-smoke",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/cf19fe1e-01e4-46e4-8270-fff7b3b8d653/Hudson+Smoke+Collection+-+Casa+de+Perrin.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Glassware Collections; $4.50 per piece per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "las-vegas",
+        "new-york"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:supper_club",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-optique-glassware",
+      "name": "Optique",
+      "description": "Mouth-blown European glassware. Water goblet, wine goblet, champagne flute, tumbler.",
+      "slot_code": "table_object",
+      "price_cents": 425,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-glassware-collections/optique",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/c2011c3f-5092-4625-a4d6-efbb6e589377/Optique+Collection+-+Casa+de+Perrin.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Glassware Collections; $4.25 per piece per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "portofino",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:faded_coastal",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-bella-gold-rimmed-agave-glassware",
+      "name": "Bella Gold Rimmed | Agave",
+      "description": "Agave-coloured glassware banded in 24-karat gold. Six shapes including coupe and flute.",
+      "slot_code": "table_object",
+      "price_cents": 425,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-glassware-collections/bella-gold-rimmed-agave",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/eed8a6f9-62fa-406a-b1cb-d27bd4dae522/Bella+Agave+Collection+-+Casa+de+Perrin.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Glassware Collections, CDP Design Exclusive; $4.25 per piece per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "las-vegas",
+        "havana"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:tropical_maximal",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-vintage-clear-champagne-coupe",
+      "name": "Vintage Clear | Champagne Coupe",
+      "description": "Genuine vintage coupes, 6-8oz, wide rim and shallow bowl. Rims and bowls vary piece to piece.",
+      "slot_code": "table_object",
+      "price_cents": 425,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/glassware-all/vintage-clear-champagne-coupes",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Glassware; $4.25 per piece per event (rental); genuine vintage stock so the set is never uniform; observed 2026-08-18",
+      "era_tags": [
+        "1930s",
+        "1940s",
+        "1950s"
+      ],
+      "destination_affinity": [
+        "new-york",
+        "las-vegas",
+        "westhampton-1976"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:supper_club",
+        "affinity:late",
+        "group_fun:toast"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-rattan-petal-charger-natural",
+      "name": "Rattan Petal | Natural",
+      "description": "Handcrafted rattan charger, 15 inches, petal edge.",
+      "slot_code": "table_object",
+      "price_cents": 1295,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-chargers/rattan-petal-natural",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Chargers; $12.95 per charger per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "tahiti",
+        "havana",
+        "big-sur",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:tropical_maximal",
+        "taste_direction:faded_coastal",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-pleated-charger-natural",
+      "name": "Pleated Charger | Natural",
+      "description": "Natural woven fibre formed into a soft pleat. 12.75 inches.",
+      "slot_code": "table_object",
+      "price_cents": null,
+      "price_band": null,
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-chargers/pleated-charger-natural",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Chargers, CDP Design Exclusive; NO PRICE PUBLISHED on the page; observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket",
+        "big-sur",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "taste_direction:nordic_quiet",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-leather-charger-burgundy",
+      "name": "Leather | Burgundy",
+      "description": "Handcrafted leather charger, 13 inches.",
+      "slot_code": "table_object",
+      "price_cents": null,
+      "price_band": null,
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-chargers/leather-burgundy",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/f0d3a389-f944-4db5-9698-aeb86cb83def/LEATHER+%7C+BURGUNDY.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Chargers, CDP Design Exclusive; page shows $0.00, i.e. no published rate; observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-orleans",
+        "catskills"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "taste_direction:english_country",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-cabana-scalloped-burgundy",
+      "name": "Cabana Scalloped | Burgundy",
+      "description": "Lacquered burgundy with a sculpted scallop, hand painted in Italy. Dinner and salad/dessert plate.",
+      "slot_code": "table_object",
+      "price_cents": null,
+      "price_band": null,
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-dinnerware/cabana-scalloped-burgundy",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/3174e868-3b3b-442d-8682-0aacf9a49e7a/cabanna+burgundy.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Dinnerware, CDP Design Exclusive; page shows $0.00, i.e. no published rate; observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-cabbage-white-dinnerware",
+      "name": "Cabbage | White",
+      "description": "White cabbage-leaf ware. Charger 12in, dinner plate 10.4in, salad/dessert plate 7.5in.",
+      "slot_code": "table_object",
+      "price_cents": 595,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-dinnerware/cabbage-white",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Dinnerware; from $5.95 per piece per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket",
+        "catskills"
+      ],
+      "facet_slugs": [
+        "taste_direction:english_country",
+        "taste_direction:americana_backyard",
+        "season:spring"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-bamboo-flatware-sabre",
+      "name": "Bamboo (flatware by Sabre)",
+      "description": "Genuine bamboo-handled flatware, six pieces per place setting.",
+      "slot_code": "table_object",
+      "price_cents": 225,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-flatware/bamboo",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Flatware, made by Sabre; $2.25 per piece per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "tahiti",
+        "big-sur",
+        "havana"
+      ],
+      "facet_slugs": [
+        "taste_direction:tropical_maximal",
+        "taste_direction:faded_coastal",
+        "affinity:ease"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-gemma-marble-gold-flatware",
+      "name": "Gemma | Marble + Gold",
+      "description": "Marble faceted flatware in gold. Seven pieces including demitasse spoon.",
+      "slot_code": "table_object",
+      "price_cents": 225,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-flatware/gemma-marble-gold",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Flatware; $2.25 per piece per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "las-vegas",
+        "new-york"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "group_fun:dress_up",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-crystal-cobalt-salt-cellar",
+      "name": "Crystal | Cobalt salt cellar",
+      "description": "Two-inch cobalt crystal salt cellar, sawtooth-edge quilted pattern.",
+      "slot_code": "table_object",
+      "price_cents": 195,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/rent-salt-cellars-and-spoons/crystal-cobalt",
+      "image_url": null,
+      "supplier": "Casa de Perrin",
+      "source_note": "Rent Salt Cellars and Spoons; $1.95 per unit per event (rental); observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-york",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:faded_coastal",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-sadie-scalloped-napkin-ivory-olive",
+      "name": "Sadie Scalloped Napkin | Ivory With Olive Trim",
+      "description": "Linen napkin with a scalloped green edge.",
+      "slot_code": "table_object",
+      "price_cents": null,
+      "price_band": null,
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/linens/sadie-scalloped-napkin-ivory-with-olive-trim",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/5dbcb00e-02a5-418d-92ed-e3a170adbe57/Sadie+Scalloped+Napkin-+Ivory+with+Olive+Trim.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Linens; NO PRICE PUBLISHED — Casa de Perrin does not list linen rates on the page; observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "portofino"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "affinity:beauty",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-palm-gold-linen",
+      "name": "Palm Gold",
+      "description": "Palm-patterned cloth in gold. Kings drape, 132in round, napkins, runners and pillows.",
+      "slot_code": "arrival_welcome",
+      "price_cents": null,
+      "price_band": null,
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/linens/palm-gold",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/be27120b-af70-4c75-b933-e513d37f8e11/Palm+Gold.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Linens; NO PRICE PUBLISHED; page itself calls the pattern deco-era; observed 2026-08-18",
+      "era_tags": [
+        "1930s"
+      ],
+      "destination_affinity": [
+        "havana",
+        "las-vegas",
+        "new-york"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:tropical_maximal",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-bamboo-rattan-table-lamp",
+      "name": "Bamboo | Rattan table lamp",
+      "description": "Handwoven rattan lamp in warm bamboo tones.",
+      "slot_code": "table_object",
+      "price_cents": null,
+      "price_band": null,
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/table-lamps/bamboo-rattan",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/fcb1a74b-ca61-4162-a5b1-e008df645b7d/Bamboo+%7C+Rattan.jpeg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Table Lamps (new collections); NO PRICE PUBLISHED; observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "tahiti",
+        "havana",
+        "big-sur"
+      ],
+      "facet_slugs": [
+        "taste_direction:tropical_maximal",
+        "taste_direction:faded_coastal",
+        "affinity:late"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "cdp-tortoise-lowball",
+      "name": "Tortoise | Lowball",
+      "description": "Handcrafted tortoise-shell glass lowball, 12oz.",
+      "slot_code": "arrival_drink",
+      "price_cents": null,
+      "price_band": null,
+      "currency": "USD",
+      "external_url": "https://www.casadeperrin.com/glassware-all/tortoise-lowball",
+      "image_url": "https://images.squarespace-cdn.com/content/v1/566e0077cbced62f3795fe9b/356cbca8-b3f6-45bf-9626-80d08bcef681/Tortoise-Lowball-Casa-de-Perrin.jpg",
+      "supplier": "Casa de Perrin",
+      "source_note": "Glassware, CDP Design Exclusive; NO PRICE PUBLISHED; observed 2026-08-18",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-orleans",
+        "catskills",
+        "las-vegas"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "taste_direction:english_country",
+        "affinity:late"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-murano-three-section-bowl-1960s",
+      "name": "Murano Glass Three-Section Bowl, 1960s",
+      "description": "Biomorphic thick-glass bowl in three sections, Venice, 1960s. 7.48in x 7.48in x 3.54in.",
+      "slot_code": "table_object",
+      "price_cents": 67700,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/25983539/murano-glass-three-section-bowl-1960s",
+      "image_url": "https://chairish-prod.freetls.fastly.net/image/product/sized/596b7df7-1499-4ce8-8260-10791945ac2d/murano-glass-three-section-bowl-1960s-9374?aspect=fit&width=640&height=640",
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass (product page also fetched directly; seller muromant), observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-seguso-sommerso-red-gold-bowl-1960s",
+      "name": "Red and Gold Bowl in Sommerso Murano Glass by Seguso, 1960s",
+      "description": "Sommerso-technique Murano bowl in red and gold by Seguso.",
+      "slot_code": "table_object",
+      "price_cents": 42600,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/5047415/red-and-gold-bowl-in-sommerso-murano-glass-by-seguso-1960s",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-barovier-inverted-swirl-murano-bowl-1957",
+      "name": "1957 Ercole Barovier Inverted Swirl Murano Bowl",
+      "description": "Inverted-swirl Murano bowl by Ercole Barovier, dated 1957.",
+      "slot_code": "table_object",
+      "price_cents": 62500,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/3506745/1957-ercole-barovier-inverted-swirl-murano-bowl",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1950s"
+      ],
+      "destination_affinity": [
+        "dolomites",
+        "portofino"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-murano-aventurine-flecks-midcentury-bowl",
+      "name": "Vintage Murano Pink Yellow Blue White Aventurine Flecks Ribbons Italian Art Glass Mid Century Bowl",
+      "description": "Ribboned Murano art glass with aventurine flecks.",
+      "slot_code": "table_object",
+      "price_cents": 49100,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/3143339/murano-vintage-pink-yellow-blue-white-aventurine-flecks-ribbons-italian-art-glass-midcentury-bowl",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1950s",
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur",
+        "havana"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:tropical_maximal",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-segoso-clam-shell-center-bowl-1960s",
+      "name": "C.1960's Monumental Large Italian Archimede Segoso Hand-Blown Triple Cased Murano Clam-Shell Shaped Center Bowl",
+      "description": "Large hand-blown triple-cased Murano centre bowl in a clam-shell form.",
+      "slot_code": "table_object",
+      "price_cents": 162000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/15540236/c1960s-monumental-large-italian-archimede-segoso-hand-blown-triple-layer-murano-clam-shell-shaped-t",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-fratelli-toso-opalescent-cut-rim-bowl",
+      "name": "Vintage Fratelli Toso Murano Opalescent White Green Aventurine Spots Italian Art Glass Cut Rim Bowl",
+      "description": "Opalescent Murano bowl with green aventurine spots and a cut rim, by Fratelli Toso.",
+      "slot_code": "table_object",
+      "price_cents": 76500,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/35563529/fratelli-toso-murano-vintage-opalescent-white-green-aventurine-spots-italian-art-glass-cut-rim-bowl",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1950s",
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "dolomites"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-barbini-gold-fleck-ashtray-bowl",
+      "name": "Vintage Murano Barbini Green Spots Gold Flecks White Italian Art Glass Folded Rim Ashtray Bowl Dish",
+      "description": "Folded-rim Murano dish with gold flecks and green spots, attributed Barbini.",
+      "slot_code": "table_object",
+      "price_cents": 60000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/29317326/murano-barbini-gold-flecks-green-spots-white-vintage-italian-art-glass-folded-rim-ashtray-bowl-dish",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1950s",
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "havana",
+        "las-vegas"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:supper_club",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-italian-art-glass-bowl-after-murano",
+      "name": "Vintage Italian Art Glass Bowl After Murano",
+      "description": "Italian art glass bowl in the Murano manner.",
+      "slot_code": "table_object",
+      "price_cents": 47500,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/20816066/vintage-italian-art-glass-bowl-after-murano",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/decorative-bowls/murano-glass, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-art-deco-sterling-cut-glass-coaster-set-1920s",
+      "name": "1920s Art Deco Sterling Silver and Cut Glass Coaster Set - Set of 7",
+      "description": "Seven sterling-and-cut-glass coasters, 1920s.",
+      "slot_code": "table_object",
+      "price_cents": 45000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/36707082/art-deco-sterling-silver-and-cut-glass-coaster-set",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/coasters/art-deco, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1920s",
+        "1930s"
+      ],
+      "destination_affinity": [
+        "new-york",
+        "las-vegas"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:supper_club",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-sterling-rimmed-glass-coasters-1920s",
+      "name": "1920s Set of 4 Sterling Silver Rimmed Glass Coasters",
+      "description": "Four glass coasters with sterling rims, 1920s.",
+      "slot_code": "table_object",
+      "price_cents": 15000,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/35928753/1920s-set-of-4-sterling-silver-rimmed-glass-coasters",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/coasters/art-deco, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1920s",
+        "1930s"
+      ],
+      "destination_affinity": [
+        "new-york"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-chase-chrome-canape-plates-lurelle-guild-1933",
+      "name": "Art Deco Chase Shiny Chrome Canape Cup Plates Designed by Lurelle Guild 1933 - Set of 6",
+      "description": "Six chrome canape cup plates by Lurelle Guild for Chase, 1933.",
+      "slot_code": "table_object",
+      "price_cents": 12500,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/32315992/art-deco-chase-shiny-chrome-canape-cup-plates-designed-by-lurelle-guild-1933-set-of-6",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/coasters/art-deco, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1930s"
+      ],
+      "destination_affinity": [
+        "new-york"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "affinity:wit"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-verlys-opalescent-fish-wine-coasters",
+      "name": "Verlys France Art Deco Opalescent Glass Wine Coasters with Fish Decor, 2 pieces",
+      "description": "Two opalescent glass wine coasters with fish decoration, Verlys France.",
+      "slot_code": "table_object",
+      "price_cents": 100000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/35358817/verlys-france-art-deco-opalescent-glass-wine-coasters-with-fish-decor-2-pieces",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/coasters/art-deco, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1930s"
+      ],
+      "destination_affinity": [
+        "new-york",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-leonard-silver-plate-wine-coasters-1960s",
+      "name": "1960s Leonard Silver Manufacturing Attributed Silver Plate & Crystal Wine Glass Coasters - Set of 12",
+      "description": "Twelve silver-plate and crystal wine coasters, 1960s.",
+      "slot_code": "table_object",
+      "price_cents": 72000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/8815602/1960s-leonard-silver-manufacturing-attributed-silver-plate-crystal-wine-glass-coasters-set-of-12",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/coasters/art-deco (marked down from $1,250), observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1960s"
+      ],
+      "destination_affinity": [
+        "las-vegas",
+        "new-orleans"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "taste_direction:deco_hotel"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-gustavsberg-argenta-pottery-coasters",
+      "name": "Mid 20th Century Swedish Gustavsberg Argenta Art Pottery Coasters, Set of 5",
+      "description": "Five turquoise-glazed Argenta art-pottery coasters with silver inlay, Gustavsberg.",
+      "slot_code": "table_object",
+      "price_cents": 25600,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/35946169/mid-20th-century-swedish-gustavsberg-argenta-art-pottery-coasters-set-of-5-turquoise-glazed-with-si",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/coasters/art-deco (marked down from $350), observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1950s",
+        "1960s"
+      ],
+      "destination_affinity": [
+        "dolomites",
+        "big-sur"
+      ],
+      "facet_slugs": [
+        "taste_direction:nordic_quiet",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-pink-depression-glass-coasters-pair",
+      "name": "Early 20th Century Pink Depression Glass Coasters Pair of Two",
+      "description": "Two pink depression-glass coasters with a concentric ring.",
+      "slot_code": "table_object",
+      "price_cents": 3000,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/36698892/pink-depression-glass-coasters-pair-of-two-concentric-ring-small-dishes-4943b",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/coasters/art-deco, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1930s"
+      ],
+      "destination_affinity": [
+        "new-york",
+        "catskills"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "affinity:wit"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-santarelli-majolica-vase-1950s",
+      "name": "Italian Vase Majolica Ceramic, Perugia, 1950s",
+      "description": "Majolica vase from Alfredo Santarelli, Perugia, 1950s. 14.57in x 14.57in x 23.62in.",
+      "slot_code": "table_object",
+      "price_cents": 52100,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/12595367/italian-vase-majolica-ceramic-from-proffessor-alfredo-santarelli-perugia-italy-1950s",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/vessels-and-vases/ceramic, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1950s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "dolomites"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-franco-bucci-black-bottle-vase-1970s",
+      "name": "Black Ceramic Bottle Vase by Franco Bucci, Pesaro, 1970s",
+      "description": "Small black ceramic bottle vase by Franco Bucci, 1970s.",
+      "slot_code": "table_object",
+      "price_cents": 67100,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/3612529/black-ceramic-bottle-vase-by-franco-bucci-pesaro-1970s",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/vessels-and-vases/ceramic, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1970s"
+      ],
+      "destination_affinity": [
+        "big-sur",
+        "westhampton-1976"
+      ],
+      "facet_slugs": [
+        "taste_direction:nordic_quiet",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-bitossi-amphoren-vase-1960s",
+      "name": "Vintage Amphoren Vase from Bitossi, 1960s",
+      "description": "Bitossi amphora-form vase, 1960s.",
+      "slot_code": "table_object",
+      "price_cents": 46200,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/31974352/vintage-amphoren-vase-from-bitossi-1960s",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/vessels-and-vases/ceramic, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1960s"
+      ],
+      "destination_affinity": [
+        "portofino",
+        "big-sur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-gunnar-nylund-ceramic-vase-1960s",
+      "name": "Ceramic Vase by Gunnar Nylund, 1960s",
+      "description": "Gunnar Nylund studio ceramic vase, 1960s.",
+      "slot_code": "table_object",
+      "price_cents": 250000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/3380746/1960s-ceramic-vase-by-gunnar-nylund",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/vessels-and-vases/ceramic, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [
+        "1960s"
+      ],
+      "destination_affinity": [
+        "dolomites",
+        "big-sur"
+      ],
+      "facet_slugs": [
+        "taste_direction:nordic_quiet",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-italian-majolica-blue-white-vase",
+      "name": "Vintage Hand-Painted Italian Majolica Blue and White Neoclassical Vase, Deruta",
+      "description": "Hand-painted blue-and-white majolica vase made in Deruta.",
+      "slot_code": "table_object",
+      "price_cents": 39500,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/13402003/vintage-hand-painted-italian-majolica-blue-white-neoclassical-vase-made-in-deruta-italy-in-the-mann",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/vessels-and-vases/ceramic, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:english_country",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-bamboo-cachepot-green-white-gold",
+      "name": "Bamboo Cachepot, Green/White/Gold, Small",
+      "description": "Small bamboo-motif cachepot in green, white and gold.",
+      "slot_code": "table_object",
+      "price_cents": 7700,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/4874825/bamboo-cachepot-greenwhitegold-small",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/cachepot, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [],
+      "destination_affinity": [
+        "havana",
+        "tahiti",
+        "westhampton-1976"
+      ],
+      "facet_slugs": [
+        "taste_direction:tropical_maximal",
+        "affinity:wit"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-blue-and-white-porcelain-cachepots-pair",
+      "name": "Blue and White Chinese Porcelain Cachepots, A Pair",
+      "description": "A pair of blue-and-white Chinese porcelain cachepots.",
+      "slot_code": "table_object",
+      "price_cents": 55000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/36711465/blue-and-white-chinese-porcelain-cachepots-a-pair",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/cachepot, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket",
+        "new-york"
+      ],
+      "facet_slugs": [
+        "taste_direction:english_country",
+        "taste_direction:faded_coastal",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "chairish-vintage-terracotta-cachepot",
+      "name": "Vintage Terracotta Cachepot",
+      "description": "Plain vintage terracotta cachepot, 8in x 8in x 8.5in.",
+      "slot_code": "table_object",
+      "price_cents": 16900,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://www.chairish.com/product/11892037/vintage-terracotta-cachepot",
+      "image_url": null,
+      "supplier": "Chairish",
+      "source_note": "listing price and URL read off chairish.com/collection/cachepot, observed 2026-08-18; ONE-OF-A-KIND vintage listing — expect it to sell; price drifts and sellers accept offers",
+      "era_tags": [],
+      "destination_affinity": [
+        "big-sur",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "affinity:ease",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-estelle-coupe-amber-smoke-set-of-6",
+      "name": "Champagne Coupe Stemware, Set of 6 Amber Smoke",
+      "description": "Hand-blown coloured-glass coupes in amber smoke, set of six.",
+      "slot_code": "arrival_drink",
+      "price_cents": 21500,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/champagne-coupe-stemware-set-of-6-amber-smoke",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/S_S-369_1_19b478b1-189d-4989-985b-76b5c4e7be1a.jpg?v=1602179321",
+      "supplier": "Over The Moon",
+      "source_note": "brand Estelle Colored Glass; listed in collection tabletop_glassware_champagne-flutes-and-coupes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "westhampton-1976",
+        "las-vegas",
+        "new-orleans"
+      ],
+      "facet_slugs": [
+        "taste_direction:disco_after_dark",
+        "taste_direction:supper_club",
+        "making:made_by_hand",
+        "affinity:late"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-estelle-regal-flute-cobalt-set-of-6",
+      "name": "Estelle Colored Regal Flute in Cobalt Blue, Set of 6",
+      "description": "Hand-blown cobalt flutes, set of six.",
+      "slot_code": "arrival_drink",
+      "price_cents": 23500,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/estelle-colored-regal-flute-in-cobalt-blue-set-of-6",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/blueflutw.png?v=1646860876",
+      "supplier": "Over The Moon",
+      "source_note": "brand Estelle Colored Glass; listed in collection tabletop_glassware_champagne-flutes-and-coupes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "westhampton-1976",
+        "havana"
+      ],
+      "facet_slugs": [
+        "taste_direction:disco_after_dark",
+        "making:made_by_hand",
+        "group_fun:toast"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-vintage-list-gold-rim-champagne-saucers",
+      "name": "Crystal Champagne Saucers with Gold Rim Design",
+      "description": "Gold-rimmed crystal champagne saucers.",
+      "slot_code": "arrival_drink",
+      "price_cents": 4200,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/crystal-champagne-saucers-with-gold-rim-design",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/Saucers_Gold-Rim.jpg?v=1658806811",
+      "supplier": "Over The Moon",
+      "source_note": "brand The Vintage List; listed in collection tabletop_glassware_champagne-flutes-and-coupes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-york",
+        "las-vegas"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:supper_club",
+        "group_fun:toast"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-dascoli-donatello-flute-turquoise-set-of-6",
+      "name": "D'Ascoli Donatello Flute Glasses in Turquoise, Set of 6",
+      "description": "Turquoise Donatello flutes, set of six.",
+      "slot_code": "arrival_drink",
+      "price_cents": 47000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/dascoli-donatello-flute-turquoise-set-of-6",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/Donatello_Flute_3_1.jpg?v=1749154177",
+      "supplier": "Over The Moon",
+      "source_note": "brand Cabana; listed in collection tabletop_glassware_champagne-flutes-and-coupes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-baccarat-massena-coupe-set-of-2",
+      "name": "Massena Coupe, Set of 2",
+      "description": "Baccarat crystal coupes, pair.",
+      "slot_code": "arrival_drink",
+      "price_cents": 69000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/massena-coupe-set-of-2",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/7in_537a7487-e0f0-48ea-a043-2d5749f6dc76.jpg?v=1774042466",
+      "supplier": "Over The Moon",
+      "source_note": "brand Baccarat; listed in collection tabletop_glassware_champagne-flutes-and-coupes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-york",
+        "las-vegas"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "group_fun:dress_up",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-vietri-rainbow-coupe-champagne-glass",
+      "name": "Rainbow Coupe Champagne Glass",
+      "description": "Single coloured coupe.",
+      "slot_code": "arrival_drink",
+      "price_cents": 2200,
+      "price_band": "under_25",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/rainbow-coupe-champagne-glass",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/VBOW-52151-2100-web1_cd784577-c87e-447c-8ee0-f3cb274cb2de.jpg?v=1749750641",
+      "supplier": "Over The Moon",
+      "source_note": "brand VIETRI; listed in collection tabletop_glassware_champagne-flutes-and-coupes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "havana"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:tropical_maximal",
+        "affinity:ease"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-simon-pearce-nantucket-hurricane",
+      "name": "Nantucket Hurricane",
+      "description": "Hand-blown glass hurricane.",
+      "slot_code": "table_object",
+      "price_cents": 20000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/nantucket-hurricane-simon-pearce",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/1110_nantucket_l_3.jpg?v=1754579789",
+      "supplier": "Over The Moon",
+      "source_note": "brand Simon Pearce; listed in collection tabletop_place-settings-linens_candles_hurricanes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket",
+        "big-sur"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "taste_direction:nordic_quiet",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-simon-pearce-nantucket-low-hurricane",
+      "name": "Nantucket Low Hurricane in Gift Box",
+      "description": "Low hand-blown glass hurricane, boxed.",
+      "slot_code": "table_object",
+      "price_cents": 39500,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/nantucket-low-hurricane-gift-box-simon-pearce",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/9786-nantucket-low-hurricane.jpg?v=1754579915",
+      "supplier": "Over The Moon",
+      "source_note": "brand Simon Pearce; listed in collection tabletop_place-settings-linens_candles_hurricanes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-es-imports-hurricane-tortoiseshell",
+      "name": "Hurricane in Tortoiseshell",
+      "description": "Tortoiseshell-finish glass hurricane.",
+      "slot_code": "table_object",
+      "price_cents": 23900,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/hurricane-tortoiseshell",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/HurricaneinTortoiseshell.jpg?v=1765221654",
+      "supplier": "Over The Moon",
+      "source_note": "brand E&S Imports; listed in collection tabletop_place-settings-linens_candles_hurricanes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-orleans",
+        "catskills"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "taste_direction:english_country",
+        "affinity:late"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-es-imports-hurricane-french-blue",
+      "name": "Hurricane in French Blue",
+      "description": "French-blue glass hurricane.",
+      "slot_code": "table_object",
+      "price_cents": 21900,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/hurricane-french-blue",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/HurricaneinFrenchBlue.jpg?v=1765220982",
+      "supplier": "Over The Moon",
+      "source_note": "brand E&S Imports; listed in collection tabletop_place-settings-linens_candles_hurricanes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:faded_coastal"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-aerin-colette-hurricane",
+      "name": "Colette Hurricane",
+      "description": "Glass hurricane.",
+      "slot_code": "table_object",
+      "price_cents": 47500,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/colette-hurricane",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/18120027_1_b1d24d82-7b84-4004-a1c9-186129f51435.jpg?v=1754489759",
+      "supplier": "Over The Moon",
+      "source_note": "brand AERIN; listed in collection tabletop_place-settings-linens_candles_hurricanes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "las-vegas",
+        "new-york"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-caskata-quinn-boothbay-hurricane-ocean",
+      "name": "Quinn Boothbay Hurricane in Ocean",
+      "description": "Ocean-coloured glass hurricane.",
+      "slot_code": "table_object",
+      "price_cents": 15000,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/quinn-boothbay-hurricane-in-ocean",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/Quinn_Ocean_BoothbayHurricane_GL-LGHURR-400.jpg?v=1655309485",
+      "supplier": "Over The Moon",
+      "source_note": "brand Caskata; listed in collection tabletop_place-settings-linens_candles_hurricanes; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket",
+        "tahiti"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "affinity:ease"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-matouk-scallop-edge-napkin-set-of-4",
+      "name": "Scallop Edge Napkin, Set of 4",
+      "description": "Scallop-edged napkins, set of four.",
+      "slot_code": "table_object",
+      "price_cents": 22000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/scallop-edge-napkin",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/ScallopEdge_Napkin_PinkAzalea.png?v=1748009059",
+      "supplier": "Over The Moon",
+      "source_note": "brand Matouk; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "portofino"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-henry-handwork-lemons-napkin",
+      "name": "Lemons Napkin",
+      "description": "White cotton napkin with a lemon motif.",
+      "slot_code": "table_object",
+      "price_cents": 3400,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/lemons-napkin-white-cotton",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/83ca6c4e-b3fd-4009-8c72-d25c0822f50a.png?v=1714494310",
+      "supplier": "Over The Moon",
+      "source_note": "brand Henry Handwork; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "season:high_summer",
+        "affinity:wit"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-caskata-pinstripe-dinner-napkins-green",
+      "name": "Pinstripe Dinner Napkins in Green, Set of 4",
+      "description": "Green pinstriped dinner napkins, set of four.",
+      "slot_code": "table_object",
+      "price_cents": 4500,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/pinstripe-dinner-napkins-in-green-set-4",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/PINSTRIPE_GREEN_NAPKINS_SILO_SQ.jpg?v=1746801132",
+      "supplier": "Over The Moon",
+      "source_note": "brand Caskata; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket",
+        "catskills"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "taste_direction:americana_backyard",
+        "affinity:ease"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-cabana-perusia-napkins-set-of-4",
+      "name": "Perusia Napkins, Set of 4",
+      "description": "Printed napkins, set of four.",
+      "slot_code": "table_object",
+      "price_cents": 11000,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/perusia-napkins-set-of-4",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/OTM_Cabana8_in._Dessert_8a3fd893-8fdc-4d15-a134-0032454905dc.jpg?v=1759799448",
+      "supplier": "Over The Moon",
+      "source_note": "brand Cabana; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-cabana-wisteria-napkins-set-of-four",
+      "name": "Wisteria Napkins, Set of Four",
+      "description": "Wisteria-print napkins, set of four.",
+      "slot_code": "table_object",
+      "price_cents": 13000,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/wisteria-napkins-set-of-four",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/WisteriaNapkins_SetofFour.jpg?v=1742579609",
+      "supplier": "Over The Moon",
+      "source_note": "brand Cabana; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "portofino"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "season:spring",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-cucina-cipoletti-italian-linen-napkins",
+      "name": "Cipoletti x Nadia Co. Fine Italian Linen Napkins, Set of 4",
+      "description": "Italian linen napkins, set of four.",
+      "slot_code": "table_object",
+      "price_cents": 9500,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/cipoletti-x-nadia-co-fine-italian-linen-napkins-set-of-4",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/CucinaxNadia_Co.10.jpg?v=1755882716",
+      "supplier": "Over The Moon",
+      "source_note": "brand Cucina Cipoletti; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "dolomites"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-st-frank-indigo-linen-napkins",
+      "name": "Linen Napkins (indigo)",
+      "description": "Indigo linen napkins.",
+      "slot_code": "table_object",
+      "price_cents": 2600,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/linen-napkins",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/1002_IndigoTableLinens_A_1Shopify_d19f3d55-1fb5-4582-8c58-2ca35addae69.jpg?v=1619710436",
+      "supplier": "Over The Moon",
+      "source_note": "brand St. Frank; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "big-sur",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "making:made_by_hand",
+        "affinity:ease"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-loulou-la-dune-clara-placemat-napkin-set",
+      "name": "Clara Placemat and Napkin Set in Off White",
+      "description": "Off-white placemat and napkin set.",
+      "slot_code": "table_object",
+      "price_cents": 5600,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/clara-placemat-and-napkin-set-in-off-white",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/OTM_LouLouLaDune13_in_Charger_894102ff-39a3-4136-a075-0ea49776c461.jpg?v=1763389027",
+      "supplier": "Over The Moon",
+      "source_note": "brand Loulou La Dune; listed in collection tabletop_place-settings-linens_dinner-napkins; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "big-sur"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "taste_direction:nordic_quiet",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-cabana-ginori-floral-charger-petrol",
+      "name": "Floral Charger Petrol by Ginori 1735",
+      "description": "Petrol floral charger, Ginori 1735 for Cabana.",
+      "slot_code": "table_object",
+      "price_cents": 22000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/floral-charger-petrol-by-ginori-1735-cabana",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/GinoriChargerPetrol_3ee35da8-e76d-463a-9936-9476de625610_2048xBackgroundRemoved.png?v=1762193865",
+      "supplier": "Over The Moon",
+      "source_note": "brand Cabana; listed in collection tabletop_dinnerware_plates_chargers; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-ginori-oriente-italiano-charger-meringa",
+      "name": "Oriente Italiano Antico Doccia Charger Plate in Meringa",
+      "description": "Antico Doccia charger in Meringa.",
+      "slot_code": "table_object",
+      "price_cents": 26000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/oriente-italiano-antico-doccia-charger-plate-in-meringa",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/AnticoDoccciaChargerPlateinMeringa.jpg?v=1739914764",
+      "supplier": "Over The Moon",
+      "source_note": "brand Ginori 1735; listed in collection tabletop_dinnerware_plates_chargers; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "dolomites"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-caravan-amalfi-ceramic-charger",
+      "name": "Amalfi Ceramic Service Charger Plate",
+      "description": "Ceramic service charger.",
+      "slot_code": "table_object",
+      "price_cents": 10700,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/amalfi-ceramic-service-charger-plate",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/AMGCHA__1.jpg?v=1778011642",
+      "supplier": "Over The Moon",
+      "source_note": "brand Caravan; listed in collection tabletop_dinnerware_plates_chargers; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "portofino"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-bordallo-cabbage-charger-pink",
+      "name": "Cabbage Charger Plate in Pink",
+      "description": "Pink cabbage-leaf charger.",
+      "slot_code": "table_object",
+      "price_cents": 9000,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/cabbage-charger-plate-in-pink",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/1_4f7460e8-1bb7-4358-8383-be24129f2d55.png?v=1784312736",
+      "supplier": "Over The Moon",
+      "source_note": "brand Bordallo Pinheiro; listed in collection tabletop_dinnerware_plates_chargers; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "catskills",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:english_country",
+        "affinity:wit"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-themis-z-athenee-peacock-charger",
+      "name": "Athenee Two Tone Blue Peacock Charger Plate",
+      "description": "Two-tone blue peacock charger.",
+      "slot_code": "table_object",
+      "price_cents": 11000,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/athenee-two-tone-blue-peacock-charger-plate",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/72-8596_35f45d02-1cfa-4d16-92da-c7738b4f6b7c.jpg?v=1709240659",
+      "supplier": "Over The Moon",
+      "source_note": "brand Themis Z; listed in collection tabletop_dinnerware_plates_chargers; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "havana"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "taste_direction:moroccan_dusk",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-christofle-vertigo-silver-plated-ice-bucket",
+      "name": "Vertigo Silver-plated Ice Bucket",
+      "description": "Silver-plated ice bucket.",
+      "slot_code": "arrival_drink",
+      "price_cents": 99000,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/vertigo-silverplated-ice-bucket",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/Ice_20bucket_20Vertigo_20_20Silver_20plated_04240520000101_F_1.webp?v=1761937831",
+      "supplier": "Over The Moon",
+      "source_note": "brand Christofle; listed in collection home_bar_ice-buckets; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-york",
+        "las-vegas"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "group_fun:dress_up",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-georg-jensen-manhattan-ice-bucket-tongs",
+      "name": "Manhattan Ice Bucket & Tongs",
+      "description": "Stainless ice bucket with tongs.",
+      "slot_code": "arrival_drink",
+      "price_cents": 26000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/manhattan-ice-bucket-tongs-georgjensen",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/3586086_MANHATTANICE_BUCKET_AND_THONG_SS.jpg?v=1724175477",
+      "supplier": "Over The Moon",
+      "source_note": "brand Georg Jensen; listed in collection home_bar_ice-buckets; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-york",
+        "dolomites"
+      ],
+      "facet_slugs": [
+        "taste_direction:deco_hotel",
+        "taste_direction:nordic_quiet"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-aerin-shagreen-ice-bucket-chocolate",
+      "name": "Shagreen Ice Bucket, Chocolate",
+      "description": "Shagreen-clad ice bucket in chocolate.",
+      "slot_code": "arrival_drink",
+      "price_cents": 77500,
+      "price_band": "over_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/shagreen-ice-bucket-chocolate",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/ShagreenIceBucket_Chocoalte.png?v=1754489612",
+      "supplier": "Over The Moon",
+      "source_note": "brand AERIN; listed in collection home_bar_ice-buckets; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "las-vegas",
+        "new-orleans"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "taste_direction:deco_hotel",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-graphic-image-croc-leather-ice-bucket",
+      "name": "Leather Ice Bucket with Tongs in Crocodile Embossed Leather",
+      "description": "Croc-embossed leather ice bucket with tongs.",
+      "slot_code": "arrival_drink",
+      "price_cents": 18000,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/leather-ice-bucket-with-tongs-crocodile-embossed-leather",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/ICE-CRO-BLK-1.jpg?v=1684416104",
+      "supplier": "Over The Moon",
+      "source_note": "brand Graphic Image; listed in collection home_bar_ice-buckets; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-orleans",
+        "las-vegas"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "affinity:late"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-vintage-list-crystal-ice-bucket-stars",
+      "name": "Crystal Ice Bucket with Stars Design",
+      "description": "Crystal ice bucket, star-cut.",
+      "slot_code": "arrival_drink",
+      "price_cents": 4200,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/a-crystal-ice-bucket-with-stars-design",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/IceStarsLR.jpg?v=1730735045",
+      "supplier": "Over The Moon",
+      "source_note": "brand The Vintage List; listed in collection home_bar_ice-buckets; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "catskills",
+        "westhampton-1976"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "affinity:ease"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-fieldbar-drinks-box-bazaruto-blue",
+      "name": "Drinks Box in Bazaruto Blue",
+      "description": "Portable insulated drinks box.",
+      "slot_code": "arrival_welcome",
+      "price_cents": 24900,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/bazaruto-blue",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/drinks-box-bazaruto-blue-408548.png?v=1730928072",
+      "supplier": "Over The Moon",
+      "source_note": "brand Fieldbar; listed in collection home_bar_ice-buckets; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "big-sur",
+        "tahiti",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "affinity:ease",
+        "environment:beach"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-zafferano-poldina-pro-lamp",
+      "name": "Poldina Pro",
+      "description": "Rechargeable cordless table lamp.",
+      "slot_code": "table_object",
+      "price_cents": 17500,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/zafferano-poldina-pro",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/poldina-blue-2064_2000x_f6820d89-d2f7-4ab0-9783-261403f4e424.jpg?v=1770208265",
+      "supplier": "Over The Moon",
+      "source_note": "brand Zafferano; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "portofino",
+        "tahiti"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "affinity:late",
+        "affinity:ease"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-cabana-speckled-fruit-stand-green",
+      "name": "Speckled Fruit Stand in Green",
+      "description": "Speckled ceramic footed fruit stand.",
+      "slot_code": "table_object",
+      "price_cents": 25000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/speckled-fruit-stand-in-green",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/SpeckledFruitStandinGreen.jpg?v=1742580686",
+      "supplier": "Over The Moon",
+      "source_note": "brand Cabana; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "portofino",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand",
+        "affinity:beauty"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-juliska-puro-vase-tortoiseshell",
+      "name": "Puro Vase 6 in. in Tortoiseshell",
+      "description": "Six-inch tortoiseshell glass vase.",
+      "slot_code": "table_object",
+      "price_cents": 9800,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/puro-vase-6-in-in-tortoiseshell",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/TO117-210img1-1.jpg?v=1742321985",
+      "supplier": "Over The Moon",
+      "source_note": "brand Juliska; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "new-orleans",
+        "catskills"
+      ],
+      "facet_slugs": [
+        "taste_direction:supper_club",
+        "taste_direction:english_country"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-paul-arnhold-orange-spotted-bud-vase",
+      "name": "Orange Transparent Spotted Bud Vase",
+      "description": "Hand-blown spotted bud vase in transparent orange.",
+      "slot_code": "table_object",
+      "price_cents": 22500,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/orange-transparent-spotted-bud-vase",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/Bud_Orange.jpg?v=1667171173",
+      "supplier": "Over The Moon",
+      "source_note": "brand Paul Arnhold Glass; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "westhampton-1976",
+        "big-sur"
+      ],
+      "facet_slugs": [
+        "taste_direction:disco_after_dark",
+        "making:made_by_hand",
+        "affinity:wit"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-juliska-tuileries-mesh-food-cover-natural",
+      "name": "Tuileries Garden Mesh Round Food Cover in Natural, Set of 2",
+      "description": "Two natural mesh food covers for an outdoor table.",
+      "slot_code": "table_object",
+      "price_cents": 16500,
+      "price_band": "from_75_to_200",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/tuileries-garden-mesh-round-food-cover-set-2pc-natural",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/TFC01SET-38img1-1.jpg?v=1742321905",
+      "supplier": "Over The Moon",
+      "source_note": "brand Juliska; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "big-sur",
+        "nantucket"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "affinity:ease",
+        "environment:garden"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-rebecca-udall-daisy-candlestick-leaf-green",
+      "name": "Daisy Candlestick in Leaf Green",
+      "description": "Leaf-green daisy candlestick.",
+      "slot_code": "table_object",
+      "price_cents": 6500,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/daisy-candlestick-leaf-green",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/DaisyCandlestick_Leafgreen_1.png?v=1756981929",
+      "supplier": "Over The Moon",
+      "source_note": "brand Rebecca Udall; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "catskills",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:english_country",
+        "affinity:beauty",
+        "affinity:late"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-bordallo-maria-flor-pitcher",
+      "name": "Maria Flor Pitcher",
+      "description": "Floral ceramic pitcher.",
+      "slot_code": "table_object",
+      "price_cents": 21000,
+      "price_band": "from_200_to_500",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/maria-flor-pitcher",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/F4qFE3o.jpg?v=1742391728",
+      "supplier": "Over The Moon",
+      "source_note": "brand Bordallo Pinheiro; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "cote-dazur",
+        "portofino"
+      ],
+      "facet_slugs": [
+        "taste_direction:old_world_riviera",
+        "making:made_by_hand"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-loulou-baker-palm-beach-playing-cards",
+      "name": "Palm Beach Playing Cards",
+      "description": "Illustrated playing cards left out on the table.",
+      "slot_code": "edit_item",
+      "price_cents": 3200,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/palm-beach-playing-cards",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/products/Palm-Beach-Playing-Cards.jpg?v=1585175441",
+      "supplier": "Over The Moon",
+      "source_note": "brand LouLou Baker; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "havana",
+        "westhampton-1976"
+      ],
+      "facet_slugs": [
+        "taste_direction:tropical_maximal",
+        "affinity:wit",
+        "group_fun:compete"
+      ],
+      "confidence": "sourced"
+    },
+    {
+      "slug": "otm-mariposa-mussel-dip-dish",
+      "name": "Mussel Dip Dish",
+      "description": "Small cast dip dish in a mussel form.",
+      "slot_code": "table_object",
+      "price_cents": 5400,
+      "price_band": "from_25_to_75",
+      "currency": "USD",
+      "external_url": "https://overthemoon.com/products/mussel-dip-dish",
+      "image_url": "https://cdn.shopify.com/s/files/1/0058/8991/7016/files/3528.jpg?v=1773855478",
+      "supplier": "Over The Moon",
+      "source_note": "brand Mariposa; listed in collection tabletop_tabletop-decor; price from the store's public product feed, observed 2026-08-18; retail prices drift and stock sells out",
+      "era_tags": [],
+      "destination_affinity": [
+        "nantucket",
+        "cote-dazur"
+      ],
+      "facet_slugs": [
+        "taste_direction:faded_coastal",
+        "affinity:wit"
+      ],
+      "confidence": "sourced"
+    }
+  ]
+}
