@@ -29,6 +29,20 @@ multiple destination tags at import.
 - Pigs in blankets · H
 - Pickled shrimp · M
 - Chicken liver pâté on toasts · H
+- Oysters casino · H
+- Caviar on toast points · B
+- Steak tartare on rye rounds · M
+- Cold asparagus vinaigrette · M (spring)
+- Salmon mousse with cucumber rounds · M
+- Watercress sandwiches, crusts off · H
+- Swedish meatballs in the chafing dish · H
+- Angels on horseback · H
+- Artichoke bottoms with crab · H
+- Consommé madrilène, jellied · M (summer)
+- Clam dip with potato chips · H
+- Celery victor · M
+- Cheese straws · B
+- Shrimp toast · M
 
 ### Mains
 - Roast duck with orange sauce · M
@@ -51,6 +65,20 @@ multiple destination tags at import.
 - Lobster salad in avocado halves · H (summer)
 - Cold poached salmon, whole, with dill sauce · B (summer)
 - A shrimp and crab platter on ice · B (summer)
+- Rock cornish game hens with wild rice · M
+- Chicken divan · M
+- Sole véronique · M
+- Beef bourguignon · M (fall/winter)
+- Baked striped bass with fennel · M (summer)
+- Rack of lamb persillade · M (spring)
+- Paella for a crowd · M
+- Cold lobster with drawn butter · B (summer)
+- Fried chicken and champagne · H
+- Steamed lobsters from the fish market · B (summer)
+- Cold filet of beef, sliced thin · B
+- Swordfish kebabs · H (summer)
+- Chicken salad with grapes and almonds · H
+- Cold sliced ham and potato salad · B (summer)
 
 ### Desserts
 - Baked alaska · M
@@ -67,6 +95,16 @@ multiple destination tags at import.
 - Ambrosia · H
 - Peach melba · H (summer)
 - Carved watermelon with fruit · H (summer)
+- Chocolate fondue with fruit · H
+- Sherry trifle · H
+- Lemon soufflé · M
+- Meringues with strawberries and cream · H (summer)
+- Angel food cake with macerated berries · H
+- Coupe with cassis · B
+- Brandy alexander pie · H
+- Rum raisin ice cream · B
+- Syllabub · M
+- Coffee granita with cream · H (summer)
 
 ## Nantucket
 
@@ -89,6 +127,18 @@ multiple destination tags at import.
 - Lobster bisque in cups · H
 - Fried oysters · M
 - Marinated mushrooms · H
+- Steamers with broth and drawn butter · M (summer)
+- Portuguese kale soup in cups · M (fall)
+- Bay scallop ceviche · M (fall)
+- Crab salad on cucumber rounds · H
+- Smoked scallops · B
+- Potted crab with toast · M
+- Corn soup in cups · M (summer)
+- Cranberry chutney and cheddar on crackers · H (fall)
+- Egg salad sandwiches, cut small · M
+- Zucchini bread with cream cheese · H (summer)
+- Green salad from the garden · B (summer)
+- Sardines on saltines with mustard · B
 
 ### Mains
 - Boiled lobsters · M (summer)
@@ -111,6 +161,18 @@ multiple destination tags at import.
 - Fish chowder as a main · M
 - Lobsters boiled at the fish market, split and buttered · B (summer)
 - Chowder and lobster rolls brought in from the fish market · B
+- Baked cod with cracker-crumb topping · M
+- Swordfish au poivre · M
+- Lobster newburg · M
+- Steamers and grilled linguiça · M (summer)
+- Baked bluefish with tomatoes · H (summer)
+- Flounder meunière · M
+- Portuguese fish stew · M
+- Roast beef with popovers · M (fall)
+- Chicken pot pie · M (winter)
+- Baked beans and brown bread · H
+- Cold lobster salad plates · H (summer)
+- Swordfish kebabs with lemon · H (summer)
 
 ### Desserts
 - Blueberry pie · M (summer)
@@ -127,6 +189,16 @@ multiple destination tags at import.
 - Lemon buttermilk pie · M
 - Beach plum jam thumbprints · M
 - Sugared doughnuts and cider · B (fall)
+- Cranberry pie · M (fall)
+- Indian pudding with vanilla ice cream · M (winter)
+- Rhubarb crisp · M (spring)
+- Peach pie · M (summer)
+- Grape-nut custard pudding · M
+- Whoopie pies · B
+- Snickerdoodles · M
+- Portuguese sweet bread · B
+- Toll house cookies · M
+- Fudge from the shop in town · B
 
 ## New York
 
@@ -149,6 +221,18 @@ multiple destination tags at import.
 - Escarole salad · H
 - Antipasto platter · B
 - Marinated olives and cheeses · B
+- Celery victor · M
+- Shrimp louis in glasses · H
+- Deviled ham canapés · H
+- Anchovy toasts · H
+- Egg-and-caviar canapés · M
+- Hot cheese puffs · M
+- Waldorf salad · H
+- Lobster cocktail · B
+- Smoked oysters on picks · B
+- Radish roses and olives · B
+- Grapefruit halves with sherry · B
+- Chicken bouillon in cups · M (winter)
 
 ### Mains
 - Chateaubriand with béarnaise · M
@@ -169,6 +253,20 @@ multiple destination tags at import.
 - Deli spread — pastrami, rye, pickles, mustard · B
 - Bagels and lox spread · B
 - Soft scrambled eggs with caviar · H
+- Lobster newburg · M
+- Chicken à la king in pastry shells · H
+- Tournedos rossini · M
+- Filet of sole marguery · M
+- Roast squab on toast · M
+- Chicken divan · M
+- Roast capon with chestnut stuffing · M (winter)
+- Planked shad with roe · M (spring)
+- Lamb chops with mint jelly · H
+- Duck bigarade · M
+- Corned beef hash with poached eggs, late · M
+- Welsh rarebit, late · M
+- Cold chicken and champagne · B
+- Porterhouse for two · M
 
 ### Desserts
 - New York cheesecake · B
@@ -185,6 +283,16 @@ multiple destination tags at import.
 - Rainbow cookies · B
 - Chocolate babka · B
 - Italian ices · B (summer)
+- Nesselrode pie · B
+- Charlotte russe · B
+- Baked alaska · M
+- Lady baltimore cake · M
+- Petit fours · B
+- Floating island · M
+- Chocolate icebox cake · H
+- Brandied peaches with cream · H
+- Coupe st. jacques · B
+- Coffee and candied ginger · B
 
 ## Côte d'Azur
 
@@ -223,6 +331,14 @@ multiple destination tags at import.
 - Fried zucchini blossoms · M (summer)
 - Cold leek and potato soup · M
 - Hard-boiled eggs with herbed mayonnaise · M
+- Soupe au pistou in cups · M (summer)
+- Brandade toasts · H
+- Sea urchins on ice · B (winter)
+- Chilled ratatouille with bread · H (summer)
+- Mesclun salad with walnut oil · B
+- Grilled sardines with lemon · M (summer)
+- Stuffed mussels with breadcrumbs · M
+- Country pâté with cornichons · B
 
 ### Mains
 - Sole in cream sauce with grapes · M
@@ -262,6 +378,12 @@ multiple destination tags at import.
 - Duck with olives · M
 - Rabbit with mustard · M
 - Omelette with fine herbs · M
+- Whole sea bass flambéed with pastis · M
+- Grand aïoli — salt cod, vegetables, garlic mayonnaise · M (summer)
+- Roast guinea hen with herbs · M
+- Socca from the stand, torn and shared · B
+- Grilled quail with grapes · M (fall)
+- Lamb daube with orange peel · M (winter)
 
 ### Desserts
 - Peach melba · H (summer)
@@ -292,6 +414,12 @@ multiple destination tags at import.
 - Melon with lime · B (summer)
 - Honey ice cream · B
 - Nougat and candied fruit plate · B
+- Calissons · B
+- Navettes · B
+- Melon sorbet · B (summer)
+- Meringue glacée · H
+- Candied citrus peel with chocolate · B
+- Roasted apricots with lavender honey · M (summer)
 
 ## Vegas
 
@@ -314,6 +442,18 @@ multiple destination tags at import.
 - Fried zucchini with ranch · M
 - Bacon-wrapped scallops · H
 - Marinated herring · B
+- Crab-stuffed mushrooms · H
+- Shrimp louis · H
+- Caviar with toast points · B
+- Rumaki · H
+- Cocktail franks in bourbon sauce · H
+- Smoked salmon on rye rounds · B
+- Prosciutto-wrapped melon · B
+- Antipasto tray · B
+- Celery with pimento cheese · H
+- Onion rings, stacked tall · M
+- Chilled tomato juice with celery · B
+- Blue cheese-stuffed olives · B
 
 ### Mains
 - New York strip steaks · M
@@ -336,6 +476,18 @@ multiple destination tags at import.
 - Patty melts at midnight · M
 - Steakhouse takeout — strip steaks, creamed spinach, baked potatoes · B
 - A shrimp cocktail tower and cold cracked crab · B
+- Chicken vesuvio · M
+- Veal parmigiana · M
+- Osso buco · M (winter)
+- Rack of lamb bouquetière · M
+- Alaskan king crab legs with butter · B
+- Chicken tetrazzini · M
+- Filet mignon with mushroom caps · M
+- Baked stuffed shrimp · M
+- Frog legs provençale · M
+- Tournedos with béarnaise · M
+- Club sandwiches at three a.m. · H
+- Spaghetti with butter and parmesan, late · M
 
 ### Desserts
 - Cherries jubilee, flamed · H
@@ -352,6 +504,16 @@ multiple destination tags at import.
 - Seven-layer chocolate cake · B
 - Rice pudding with cinnamon · M
 - After-dinner mints and coffee · B
+- Zabaione, whipped at the table · M
+- Pineapple flambé · H
+- Coconut cream pie · M
+- Chocolate éclairs · B
+- Strawberry shortcake · H
+- Sherbet with champagne poured over · B
+- Cannoli · B
+- Petits fours from the pastry cart · B
+- Mints in silver dishes · B
+- Peach melba · H (summer)
 
 ## Catskills
 
@@ -374,6 +536,18 @@ multiple destination tags at import.
 - Smoked trout with horseradish cream · B
 - Stuffed mushrooms · M
 - Cheese and crackers board · B
+- Gefilte fish with beet horseradish · B
+- Schav with sour cream · H (summer)
+- Chopped eggs and onions on rye · M
+- Health salad · M
+- Cucumber salad with dill · M
+- Stuffed derma · H
+- Onion pletzel with butter · B
+- Kasha knishes · B
+- Pickled lox in cream sauce · B
+- Sardines on rye with onion · B
+- Cantaloupe halves · B (summer)
+- Sweet red pepper and eggplant spread · M
 
 ### Mains
 - Brisket with onions · M
@@ -396,6 +570,19 @@ multiple destination tags at import.
 - Cold poached salmon with dill · M (summer)
 - Rotisserie chickens and sides from the good deli · B
 - A deli spread — corned beef, rye, half-sours, mustard · B
+- Boiled flanken with horseradish · M
+- Chicken in the pot · M
+- Chicken fricassee with little meatballs · M
+- Tongue with raisin sauce · M
+- Stuffed peppers with rice and beef · M
+- Veal cutlets, breaded · M
+- Baked whitefish with paprika · M
+- Cheese blintzes as a dairy supper · M
+- Lox, eggs and onions · M
+- Barbecued chicken at the lake · H (summer)
+- Franks and beans · H
+- Salisbury steak with mushroom gravy · M
+- Roast capon with stuffing · M (fall)
 
 ### Desserts
 - Cheese blintzes with berries · M
@@ -412,6 +599,16 @@ multiple destination tags at import.
 - Halvah with chocolate · B
 - Ice cream sandwiches at the lake · B (summer)
 - Black and white cookies · B
+- Sponge cake with strawberries · H (summer)
+- Cheesecake with graham cracker crust · B
+- Mandelbrot · M
+- Chocolate pudding in cups · M
+- Baked apples with cinnamon · M (fall)
+- Poppy seed cookies · M
+- Prune danish · B
+- Napoleon · B
+- Watermelon at the lake · B (summer)
+- Kichel with coffee · B
 
 ## Dolomites
 
@@ -434,6 +631,16 @@ multiple destination tags at import.
 - Apple and cabbage slaw · M
 - Wild mushroom toasts · M (fall)
 - Ham and butter on dark bread · B
+- Goulash soup in cups · M (winter)
+- Bresaola with lemon and oil · B
+- Fonduta with breadsticks · H (winter)
+- Polenta crostini with gorgonzola · H
+- Cabbage salad with crisped speck · H
+- Marinated mountain trout · B
+- Rye crisps with alpine butter · B
+- Nettle soup · M (spring)
+- Egg noodle soup · M
+- Warm potato salad with speck · H
 
 ### Mains
 - Braised beef in red wine over polenta · M
@@ -456,6 +663,17 @@ multiple destination tags at import.
 - Mushroom risotto · M
 - Roast chicken and potatoes from the rotisserie · B
 - Sausages and sauerkraut brought hot from the butcher · B (winter)
+- Casunziei — beet ravioli with poppy seeds and brown butter · M
+- Barley risotto with mushrooms · M (fall)
+- Rabbit braised in white wine · M
+- Cheese fondue for the table · H (winter)
+- Raclette over boiled potatoes · H (winter)
+- Beef braised in dark beer · M (winter)
+- Tagliatelle with venison ragù · M (winter)
+- Roast goose with red cabbage · M (winter)
+- Ham hock with lentils · M (winter)
+- Smoked trout with potato salad · B
+- Pork sausages over polenta · H
 
 ### Desserts
 - Apple strudel with cream · M
@@ -472,6 +690,15 @@ multiple destination tags at import.
 - Spiced pear cake · M (fall)
 - Hot chocolate with whipped cream · H
 - Butter cookies with jam · B
+- Strauben with plum jam · M
+- Sachertorte · B
+- Zelten · B (winter)
+- Vanillekipferl · B (winter)
+- Stewed plums with cream · H (late summer)
+- Meringue with chestnut cream · H (fall)
+- Milk rice with cinnamon and butter · M
+- Ricotta with berries and honey · H (summer)
+- Grappa and butter cookies after · B
 
 ## Tahiti
 
@@ -494,6 +721,16 @@ multiple destination tags at import.
 - Chilled melon soup · M
 - Banana-leaf wrapped fish bites · M
 - Fried plantains · H
+- Crab in coconut cream · M
+- Octopus salad with lime and onions · M
+- Rock lobster medallions with lime mayonnaise · H
+- Ahi tartare with lime · M
+- Green mango with chile and salt · B
+- Grilled bananas with sea salt · H
+- Chilled coconut soup · M
+- Star fruit and shrimp skewers · H
+- Fried breadfruit wedges · H
+- Sesame-lime cucumber salad · H
 
 ### Mains
 - Grilled whole fish with lime · M
@@ -514,6 +751,17 @@ multiple destination tags at import.
 - Garlic butter prawns · M
 - Sweet potato and coconut stew · M
 - Poke bowls, build-your-own · B
+- Whole spiny lobster, split and grilled · M
+- Coconut-braised octopus · M
+- Grilled wahoo with lime butter · H
+- Roast suckling pig for a crowd · M
+- Curried shrimp with coconut rice · M
+- Fish and vegetables steamed in banana leaves · M
+- Fried whole reef fish with chile and lime · M
+- Ginger-glazed tuna · H
+- Pineapple fried rice with shrimp · M
+- Vanilla-butter poached lobster · M
+- Grilled chicken and mango skewers · H
 
 ### Desserts
 - Banana-vanilla pudding · M
@@ -530,6 +778,14 @@ multiple destination tags at import.
 - Banana bread with coconut · M
 - Lime tart with coconut crust · M
 - Fresh young coconuts to drink and scrape · B
+- Baked papaya with vanilla and lime · M
+- Rum-soaked pineapple cake · H
+- Frozen coconut-lime cream · B
+- Banana splits with rum caramel · H
+- Vanilla rice with mango · M
+- Passionfruit granita · H
+- Coconut macaroons · M
+- Candied ginger and fruit skewers · H
 
 ## Havana
 
@@ -552,6 +808,18 @@ multiple destination tags at import.
 - Watercress and orange salad · H
 - Deviled crab croquettes · M
 - Tomato and avocado salad · H
+- Salt cod fritters · M
+- Chicharrones de pollo · M
+- Papas rellenas · M
+- Tostones cups with garlic shrimp · M
+- Chorizo simmered in red wine · H
+- Cuban corn fritters · M
+- Octopus salad with peppers · M
+- Radish and orange salad · H
+- Boniato chips · B
+- Ham bocaditos · B
+- Grilled corn with lime butter · H (summer)
+- Sardines with lime on crackers · B
 
 ### Mains
 - Slow-roast pork with garlic and citrus · M
@@ -574,6 +842,17 @@ multiple destination tags at import.
 - Black beans and rice with all the fixings · M
 - Roast pork, black beans and yellow rice, brought in · B
 - Pressed sandwiches brought in, cut and stacked · B
+- Pollo fricasé with olives and potatoes · M
+- Bistec empanizado · M
+- Masitas de puerco with mojo · M
+- Lobster enchilado · M
+- Ajiaco · M
+- Salt cod a la vizcaína · M
+- Tamal en cazuela · M
+- Picadillo-stuffed plantain boats · M
+- Paella cubana · M
+- Roast turkey with mojo · M (winter)
+- Fried pork chops with lime and onions · M
 
 ### Desserts
 - Flan · M
@@ -590,6 +869,15 @@ multiple destination tags at import.
 - Coconut flan · M
 - Caramelized ripe plantains with cream · H
 - Espresso granita with sweet cream · H
+- Natilla · M
+- Buñuelos in anise syrup · M (winter)
+- Coco quemado · M
+- Guava shells with fresh cheese · B
+- Torrejas in spiced syrup · M
+- Merenguitos · B
+- Brazo gitano · B
+- Dulce de leche cortada · M
+- Mamey ice cream · B
 
 ## Big Sur
 
@@ -612,6 +900,17 @@ multiple destination tags at import.
 - Persimmon and arugula salad · H (fall)
 - Citrus and avocado salad · H (winter)
 - Smoked salmon with rye crisps · B
+- Abalone, pounded and fried · M
+- Grilled whole sardines · M
+- Fried smelt with lemon · M
+- Smoked trout dip with crackers · H
+- Nasturtium and butter sandwiches · H (summer)
+- Miner's lettuce salad · H (spring)
+- Grilled bread rubbed with tomato · H (summer)
+- Warm goat cheese with herbs · H
+- Pickled beets and eggs · M
+- Brown bread with honey butter · B
+- Jack cheese and apples · B (fall)
 
 ### Mains
 - Steaks grilled over fire · M
@@ -634,6 +933,18 @@ multiple destination tags at import.
 - Whole roasted cauliflower with tahini · M
 - Rotisserie chickens, sourdough, and a bag of salad from the market · B
 - Smoked salmon, sourdough and cheese for a cold supper · B
+- Dungeness crab, cracked, with butter · B (winter)
+- Abalone steaks with lemon butter · M
+- Oysters roasted in the shell over coals · H
+- Whole chicken roasted in the coals · M
+- Grilled rockfish with salsa verde · H
+- Skirt steak with chimichurri · H
+- Paella over the fire · M
+- Grilled salmon collars · H
+- Venison chili · M (winter)
+- Lamb stew with white beans · M (winter)
+- Lentil stew with sausage · M (winter)
+- Brown rice and vegetable bowls · M
 
 ### Desserts
 - Blackberry crisp · M (late summer)
@@ -650,6 +961,15 @@ multiple destination tags at import.
 - Strawberries with crème fraîche · B (spring)
 - Brownies from the pan · M
 - Almond cake · M
+- Plum galette · M (late summer)
+- Berry fool · H (summer)
+- Wine-poached pears · M (fall)
+- Date-nut bars · M
+- Zucchini bread · H (summer)
+- Oatmeal cookies · M
+- Chocolate chip cookies warm from the pan · M
+- Honey and yogurt with walnuts · B
+- Baked apples with cinnamon · M (fall)
 
 ## New Orleans
 
@@ -672,6 +992,17 @@ multiple destination tags at import.
 - Crawfish étouffée in cups · M (spring)
 - Fried okra · M (summer)
 - Cheese straws · B
+- Oysters bienville · M
+- Oysters en brochette · M
+- Daube glacé on crackers · M
+- Crab maison · H
+- Corn and crab bisque in cups · M
+- Stuffed artichokes · M
+- Creole tomato salad · B (summer)
+- Natchitoches meat pies · M
+- Andouille bites in creole mustard · H
+- Pickled okra and pepper jelly with cream cheese · B
+- Ham and biscuit bites · H
 
 ### Mains
 - Seafood gumbo over rice · M
@@ -692,6 +1023,17 @@ multiple destination tags at import.
 - Stuffed mirliton · M (fall)
 - Chicken and andouille gumbo · M
 - Roast duck with sweet potatoes · M (winter)
+- Redfish courtbouillon · M
+- Chicken clemenceau · M
+- Shrimp étouffée · M
+- Panéed veal with pasta bordelaise · M
+- Speckled trout meunière · M
+- Creole crab au gratin · M
+- Stuffed bell peppers with shrimp and rice · M
+- Daube with spaghetti · M (winter)
+- Smothered rabbit over rice · M
+- Cochon de lait for a crowd · M
+- Fried oyster loaf · B
 
 ### Desserts
 - Bananas foster · H
@@ -708,6 +1050,14 @@ multiple destination tags at import.
 - Sweet potato pie · M (fall)
 - Chocolate pot de crème · M
 - Café au lait and something from the bakery · B
+- Ponchatoula strawberry pie · M (spring)
+- Blackberry cobbler · M (summer)
+- Caramel cup custard · M
+- Pain perdu with cane syrup · M
+- Russian cake · B
+- Ambrosia · H (winter)
+- Chicory coffee ice cream · B
+- Heavenly hash · B
 
 ## Portofino
 
@@ -730,6 +1080,17 @@ multiple destination tags at import.
 - Fried zucchini blossoms · M (summer)
 - Cold veal with tuna sauce · M
 - Mussels stuffed with breadcrumbs · M
+- Fried dough pillows with soft cheese · M
+- Condiggion · H (summer)
+- Torta pasqualina squares · H (spring)
+- Fresh favas with pecorino · B (spring)
+- Anchovy butter crostini · H
+- White bean and sage crostini · H
+- Beef carpaccio with arugula and parmesan · M
+- Squid salad with celery and olives · M
+- Baked stuffed onions · M
+- Grilled prawns with lemon · H
+- Salame and coppa board · B
 
 ### Mains
 - Trofie with pesto · M
@@ -752,6 +1113,16 @@ multiple destination tags at import.
 - Grilled squid over greens · H
 - Focaccia, cold cuts, cheese and marinated vegetables from the alimentari · B
 - Roast chicken and potatoes from the rosticceria · B
+- Corzetti with marjoram butter · M
+- Tagliatelle with langoustines · M
+- Branzino baked with potatoes and olives · M
+- Octopus braised with olives · M
+- Baked anchovies with potatoes · M
+- Risotto with lemon · M
+- Minestrone with pesto · M
+- Stuffed veal breast, sliced cold · M
+- Roast veal with hazelnuts · M (fall)
+- Whole grilled orata · M
 
 ### Desserts
 - Panna cotta with berries · M
@@ -768,3 +1139,12 @@ multiple destination tags at import.
 - Almond biscotti with sweet wine · B
 - Strawberry and lemon fruit salad · H (spring)
 - Espresso granita with cream · H
+- Pandolce · B (winter)
+- Amaretti · B
+- Canestrelli · B
+- Ricotta with honey and pine nuts · B
+- Chestnut crepes · M (fall)
+- Zabaglione with peaches · M (summer)
+- Torta di riso · M
+- Cherries in syrup over gelato · H (early summer)
+- Hazelnut semifreddo · M
