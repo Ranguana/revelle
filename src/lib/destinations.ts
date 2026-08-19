@@ -34,7 +34,7 @@ import type { ToneWeight } from "./voice";
 
 /* ── THE ALLOCATION ────────────────────────────────────────────────────
  *
- * Thirteen destinations, authored as ONE SET. Read this before adding a
+ * Twelve destinations, authored as ONE SET. Read this before adding a
  * fourteenth or re-tagging an existing one, because the value of the tone
  * question is not in any single destination's list — it is in the SPREAD.
  *
@@ -43,7 +43,7 @@ import type { ToneWeight } from "./voice";
  * A host taps a handful of the fifty-one tones in src/lib/voice.ts. A
  * destination is tagged in the same fifty-one. That join is the entire channel
  * between her and this library, and it is only worth having if her answer
- * CHANGES the answer. Thirteen houses that are all dry and understated make the
+ * CHANGES the answer. Twelve houses that are all dry and understated make the
  * question decorative: she taps, and every destination scores the same.
  *
  * So the set is allocated, not accumulated. Three properties are load-bearing,
@@ -529,7 +529,7 @@ export const WESTHAMPTON_1976_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * HAVANA, THE SMALL HOURS.
+ * HAVANA, 1957.
  *
  * The first destination the CATALOGUE asked for. Its food and its bar were
  * authored before it had a name — menus 28 and 29 in docs/menus.md, drinks 19
@@ -537,25 +537,33 @@ export const WESTHAMPTON_1976_TONES: readonly ToneWeight[] = [
  * those and not the other way round. Read them first; everything here is an
  * answer to something specific in them.
  *
- * ── WHY THERE IS NO YEAR ─────────────────────────────────────────────
+ * ── THE YEAR, AND THE RULE THAT OUTLIVED THE ARGUMENT AGAINST IT ─────
  *
- * WESTHAMPTON is a place and a YEAR. Havana is a place and an HOUR, and the
- * difference is the whole design.
+ * This section was headed WHY THERE IS NO YEAR, and the argument was the
+ * strongest in the file. Give this destination a decade, it said, and there is
+ * only one decade anybody reaches for: 1950s Havana as an American playground —
+ * the casinos, the linen suits, somebody else's country photographed at its
+ * least free. That is kitsch and it is in poor taste. Havana was a place and an
+ * HOUR where WESTHAMPTON is a place and a YEAR, and the hour dated nothing and
+ * excluded nobody.
  *
- * Give this destination a decade and there is only one decade anybody reaches
- * for: 1950s Havana as an American playground — the casinos, the linen suits,
- * somebody else's country photographed at its least free. That is kitsch, it is
- * in poor taste, and it is the same failure WESTHAMPTON's own rule already
- * forbids: the house is not doing an impression of itself. The founder's
- * catalogue names no year either. It names an evening with two halves — a long
- * dinner party (28, 19) and A LATE SUPPER AFTER DANCING (29, 20) — which is a
- * structural fact almost nothing else in the library has, and it is a fact
- * about the clock rather than the calendar.
+ * The catalogue is now pinned to a period per destination, so the name is 1957.
+ * READ THE REST OF THIS BLOCK BEFORE WRITING A WORD FOR IT.
  *
- * So the time is a time of night. It dates nothing, it excludes nobody, and it
- * is the honest reading of the source: coffee at every hour including after
- * midnight, a bar that shakes rather than stirs, and a table that gets carried
- * back against the wall in the middle of the evening.
+ * What was actually being refused was never the date. It was the sales pitch —
+ * the last good year, the linen suits, a country served up as somebody's
+ * playground. A date on a plate is a period the voice is written in. That
+ * sentence is a posture the voice takes toward a place that was not its own,
+ * and it stays forbidden: it is in `rejected`, in the room's own words, and it
+ * is the reason the period rule exists rather than an exception to it.
+ *
+ * The hour survives everything the year did not touch. The founder's catalogue
+ * names an evening with two halves — a long dinner party (28, 19) and A LATE
+ * SUPPER AFTER DANCING (29, 20) — a structural fact almost nothing else in the
+ * library has, and a fact about the clock rather than the calendar. Coffee at
+ * every hour including after midnight, a bar that shakes rather than stirs, and
+ * a table carried back against the wall in the middle of the evening. 1957
+ * dates the register. The hour still runs the night.
  *
  * ── THE SECOND TRAP, AND THE RULE IT PRODUCED ────────────────────────
  *
@@ -615,7 +623,7 @@ const HAVANA_LOOK: Theme = {
 
 export const HAVANA: Destination = {
   key: "havana",
-  name: "HAVANA, THE SMALL HOURS",
+  name: "HAVANA, 1957",
   tagline: "The table is pushed back for the dancing. Supper again at three.",
   premise:
     "A house on Tejadillo with a courtyard, a fan that turns and does not " +
@@ -885,7 +893,7 @@ export const HAVANA: Destination = {
     rejected: [
       {
         text: "Havana, 1957. The casino, the linen suits, the last good year.",
-        why: "Somebody else's country as a playground, photographed at its least free. Kitsch, and the exact failure the period rule exists to stop.",
+        why: "Somebody else's country as a playground, photographed at its least free. Kitsch, and the exact failure the period rule exists to stop. The destination is NAMED for the year and this line is still forbidden — a date the voice is written in is not a nostalgia the voice sells, and the four words this opens with being the name on the plate is what makes it easy to write by accident.",
       },
       {
         text: "Sultry nights, strong rum, and a rhythm you can feel.",
@@ -965,7 +973,7 @@ export const HAVANA_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * LAS VEGAS, 1968.
+ * LAS VEGAS, 1960.
  *
  * The performance pole, and the destination the allocation was built outward
  * from. Menu 19 has a Caesar salad MADE AT THE TABLE and cherries FLAMED over
@@ -978,12 +986,17 @@ export const HAVANA_TONES: readonly ToneWeight[] = [
  *
  * ── THE YEAR, AND WHAT IT IS NOT ─────────────────────────────────────
  *
- * The plate carries 1968 and the year stays, because unlike Havana's this one
- * dates a ROOM rather than somebody's country: a suite, a steakhouse, a table
- * held until midnight. What the year must not become is the impression
- * everybody does. There is no baby, no swingin', no ring-a-ding, no finger
- * snap. The rule is in `never`, in the room's own words, exactly where
- * WESTHAMPTON keeps its ban on darling and groovy.
+ * The year is 1960, and the year stays, because it dates a ROOM rather than
+ * somebody's country: a suite, a steakhouse, a table held until midnight.
+ * It was 1968 until the catalogue was pinned to a period per destination, and
+ * 1960 is the better date for what was already written — the Rat Pack room is
+ * a 1960 room, which is the year the ban below is defending against rather
+ * than reaching for.
+ *
+ * What the year must not become is the impression everybody does. There is no
+ * baby, no swingin', no ring-a-ding, no finger snap. The rule is in `never`,
+ * in the room's own words, exactly where WESTHAMPTON keeps its ban on darling
+ * and groovy.
  *
  * The second trap is the one the catalogue already solved: menu 19's night is
  * ONE table, ONE game, a stake agreed in advance. That is a house that arranges
@@ -1031,9 +1044,9 @@ const LAS_VEGAS_LOOK: Theme = {
   },
 };
 
-export const LAS_VEGAS_1968: Destination = {
+export const LAS_VEGAS_1960: Destination = {
   key: "las-vegas",
-  name: "LAS VEGAS, 1968",
+  name: "LAS VEGAS, 1960",
   tagline: "Everyone dressed up. Nobody in a nightclub queue.",
   premise:
     "A suite on a high floor, everybody ready an hour before anything opens, " +
@@ -1180,11 +1193,11 @@ export const LAS_VEGAS_1968: Destination = {
 
     never: [
       "Never an exclamation point.",
-      "Never do the impression. No baby, no swingin', no ring-a-ding, no finger snap. The room is 1968 and is not doing 1968.",
+      "Never do the impression. No baby, no swingin', no ring-a-ding, no finger snap. The room is 1960 and is not doing 1960.",
       "Never make a joke of money — what a thing costs and what was agreed are written straight, in the fewest words, with no flourish.",
       "Never write gambling as a thrill or a risk worth taking. There is one table, one game and a fixed stake, and that is a kindness rather than a rule.",
       "Never write a woman into the room as scenery. Nobody here is decoration and nobody is described instead of addressed.",
-      "Never mention anything that did not exist in 1968. No apps, no confirming online, no phone photographs.",
+      "Never mention anything that did not exist in 1960. No apps, no confirming online, no phone photographs.",
       "Never explain the joke, and never admit the room knows it is one.",
       "Never name the feeling — no glamour, no magic, no unforgettable, no memories.",
       "Never use italics.",
@@ -1284,7 +1297,7 @@ export const LAS_VEGAS_1968: Destination = {
       },
       {
         text: "Ring-a-ding-ding. Dinner is at midnight.",
-        why: "The impression. The room is 1968 and is not doing an impression of 1968.",
+        why: "The impression. The room is 1960 and is not doing an impression of 1960.",
       },
       {
         text: "Lady luck is at our table tonight.",
@@ -1331,7 +1344,7 @@ export const LAS_VEGAS_1968: Destination = {
  * Formality, address and humour are NOT tagged: formal, second person, absurd
  * are stated outright above and derived by `statedVoiceFacets`.
  */
-export const LAS_VEGAS_1968_TONES: readonly ToneWeight[] = [
+export const LAS_VEGAS_1960_TONES: readonly ToneWeight[] = [
   { code: "makes_an_entrance", weight: 1 },
   { code: "nothing_by_halves", weight: 0.9 },
   { code: "does_the_voice", weight: 0.8 },
@@ -1341,7 +1354,7 @@ export const LAS_VEGAS_1968_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * NEW YORK, NEW YEAR'S.
+ * NEW YORK, 1938.
  *
  * The ceremony pole. Menu 9 is a formal dinner party with MANHATTANS BEFORE;
  * drinks 6 is Manhattans, very dry martinis, sidecars, and brandy after. The
@@ -1350,16 +1363,22 @@ export const LAS_VEGAS_1968_TONES: readonly ToneWeight[] = [
  * house with an order of service, so it is the house that keeps a seating plan,
  * stands when somebody new arrives, and lets one person make one toast.
  *
- * ── WHY NOT A YEAR ───────────────────────────────────────────────────
+ * ── THE YEAR, AND THE ARGUMENT IT OVERTURNED ─────────────────────────
  *
- * The brief that produced this pass called it NEW YORK, 1958. The catalogue
- * does not: docs/menus.md and src/lib/library.ts both say NEW YORK, and the
- * plate says NEW YEAR'S. The catalogue wins, and it is also right. A year here
- * buys nothing that the occasion has not already bought — a place and an hour,
- * exactly Havana's answer — and it costs the same thing 1957 Havana would have
- * cost: somebody's playground, a dinner jacket doing an impression, a paperback
- * New York that has been photographed enough. NEW YEAR'S is the one night of
- * the year that dates itself, so the destination does not need to.
+ * 1938. This section used to be headed WHY NOT A YEAR, and it argued that the
+ * occasion had already bought what a year buys — a place and an hour — and that
+ * naming a year would cost what it costs Havana: somebody's playground, a
+ * dinner jacket doing an impression, a paperback New York photographed enough
+ * already. That argument was good and it lost to a larger one: every
+ * destination in the catalogue is now pinned to a period, because the VOICE is
+ * what a period buys and the voice is the medium of every deliverable. A house
+ * with no date has no register to be written in.
+ *
+ * The old argument survives as a rule rather than as a name. NEW YEAR'S is
+ * still the night — the plate says so, the order of service says so, and menu 9
+ * is still a midnight table. What 1938 must not become is the thing the
+ * rejected list already refuses: a set, a newsreel, a borrowed glamour. The
+ * room is 1938 and is not doing an impression of it.
  *
  * ── THE FOUNDER'S OWN SIGNAL, WHICH IS EASY TO MISS ──────────────────
  *
@@ -1414,7 +1433,7 @@ const NEW_YORK_LOOK: Theme = {
 
 export const NEW_YORK: Destination = {
   key: "new-york",
-  name: "NEW YORK, NEW YEAR'S",
+  name: "NEW YORK, 1938",
   tagline: "A rooftop, briefly. A long table, mostly.",
   premise:
     "An apartment with a table long enough to need a plan, coats piled on the " +
@@ -1712,7 +1731,7 @@ export const NEW_YORK_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * NANTUCKET, AUGUST.
+ * NANTUCKET, 1972.
  *
  * The other end of the ceremony group from NEW YORK, and the destination the
  * founder's own note points straight at: newspaper on the table, paper plates
@@ -1777,7 +1796,7 @@ const NANTUCKET_LOOK: Theme = {
 
 export const NANTUCKET: Destination = {
   key: "nantucket",
-  name: "NANTUCKET, AUGUST",
+  name: "NANTUCKET, 1972",
   tagline: "Newspaper on the table. Butter in a saucepan.",
   premise:
     "A shingled house at the end of a lane, a porch with a bucket of ice on " +
@@ -2071,7 +2090,7 @@ export const NANTUCKET_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * NEW ORLEANS, 3 A.M.
+ * NEW ORLEANS, 1956
  *
  * The pace and volume pole. The plate says it in one line — Sazeracs "made
  * badly and enthusiastically" in the courtyard "before anyone has said hello
@@ -2141,7 +2160,7 @@ const NEW_ORLEANS_LOOK: Theme = {
 
 export const NEW_ORLEANS: Destination = {
   key: "new-orleans",
-  name: "NEW ORLEANS, 3 A.M.",
+  name: "NEW ORLEANS, 1956",
   tagline: "Dinner at nine. Nobody's leaving at eleven.",
   premise:
     "A courtyard behind a corner house, drinks made badly and made again, and " +
@@ -2456,7 +2475,7 @@ export const NEW_ORLEANS_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * CATSKILLS, LAST WEEK OF CAMP.
+ * CATSKILLS, 1963.
  *
  * The familial pole. The plate has bunk assignments on a card "hers included",
  * a swim test "timed, witnessed, and entered in a ledger nobody will ever read
@@ -2524,7 +2543,7 @@ const CATSKILLS_LOOK: Theme = {
 
 export const CATSKILLS: Destination = {
   key: "catskills",
-  name: "CATSKILLS, LAST WEEK OF CAMP",
+  name: "CATSKILLS, 1963",
   tagline: "Everyone swims before breakfast. The tent is decorative.",
   premise:
     "A lake, a row of bunks, and a week that has been run the same way for " +
@@ -3210,17 +3229,21 @@ export const COTE_DAZUR_1962_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * PORTOFINO, OFF-SEASON.
+ * PORTOFINO, 1961.
  *
- * ── THE ONE DESTINATION WITH NO CATALOGUE ────────────────────────────
+ * ── THE DESTINATION THAT HAD NO CATALOGUE WHEN IT WAS WRITTEN ────────
  *
- * Worth stating plainly, because it changed how this one was written: docs/
- * menus.md and docs/drinks.md both say "thirteen destinations" and neither
- * contains PORTOFINO. There is no menu and no bar for it — the other twelve
- * have both. Every other voice in this file is an answer to dishes somebody
- * else authored; this one had to be written from the plate rows alone, and it
- * is the thinnest evidence base in the library. When a menu and a drinks
- * programme are written for it, this voice should be read again beside them.
+ * Worth stating plainly, because it changed how this one was written: when
+ * this voice was authored, docs/menus.md and docs/drinks.md contained no
+ * PORTOFINO at all. Every other voice in this file is an answer to dishes
+ * somebody else authored; this one had to be written from the plate rows
+ * alone, and it was the thinnest evidence base in the library.
+ *
+ * THAT IS NO LONGER TRUE AND THE DEBT HAS NOT BEEN PAID. Portofino now has
+ * three menus and two drinks, written after this voice was. The instruction
+ * this block has always carried — that when a menu and a drinks programme are
+ * written for it, this voice should be read again beside them — is now due.
+ * Nobody has done it. Do that before trusting a tag below.
  *
  * What the plate does give is unusually specific: a walk taken BEFORE the house
  * is unpacked, one drink standing up, the boats counted, a lunch ordered for
@@ -3273,7 +3296,7 @@ const PORTOFINO_LOOK: Theme = {
 
 export const PORTOFINO: Destination = {
   key: "portofino",
-  name: "PORTOFINO, OFF-SEASON",
+  name: "PORTOFINO, 1961",
   tagline: "The harbour to yourselves. Everything shut but the good place.",
   premise:
     "A house above a harbour in the month nobody comes. One restaurant is " +
@@ -3561,7 +3584,7 @@ export const PORTOFINO_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * DOLOMITES, FIRST SNOW.
+ * DOLOMITES, 1956.
  *
  * The far end of the knowing group from WESTHAMPTON. That house explains
  * nothing on principle; this one tells you properly, because on a mountain the
@@ -3625,7 +3648,7 @@ const DOLOMITES_LOOK: Theme = {
 
 export const DOLOMITES: Destination = {
   key: "dolomites",
-  name: "DOLOMITES, FIRST SNOW",
+  name: "DOLOMITES, 1956",
   tagline: "The first gondola at eight. Lunch halfway down.",
   premise:
     "A house at the bottom of the run with a stove, a drying room and the " +
@@ -3936,7 +3959,7 @@ export const DOLOMITES_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * BIG SUR, JUNE.
+ * BIG SUR, 1971.
  *
  * The laconic one, and the destination that owns `absurd` — which looks wrong
  * for a house this quiet until you read the plate: "Someone calls a spout and
@@ -4000,7 +4023,7 @@ const BIG_SUR_LOOK: Theme = {
 
 export const BIG_SUR: Destination = {
   key: "big-sur",
-  name: "BIG SUR, JUNE",
+  name: "BIG SUR, 1971",
   tagline: "Fog until noon. Nobody has a signal.",
   premise:
     "A cabin at the end of a road, cars parked facing out, and a fog that " +
@@ -4270,7 +4293,7 @@ export const BIG_SUR: Destination = {
  * BIG SUR's voice, said in the tones a host is shown.
  *
  * Laconic, and the only house that owns `absurd` — which is the tone a set of
- * thirteen dry-to-warm destinations would otherwise never claim. Every tag
+ * twelve dry-to-warm destinations would otherwise never claim. Every tag
  * points at a line above:
  *
  *   long_way_round   "One story each, told the long way, with the detours."
@@ -4303,7 +4326,7 @@ export const BIG_SUR_TONES: readonly ToneWeight[] = [
 ];
 
 /**
- * TAHITI, THE LONG WAY.
+ * TAHITI, 1961.
  *
  * The plain, generous one, and the only destination in the library whose humour
  * mode is `none` — which is a real authorial position rather than an omission.
@@ -4375,7 +4398,7 @@ const TAHITI_LOOK: Theme = {
 
 export const TAHITI: Destination = {
   key: "tahiti",
-  name: "TAHITI, THE LONG WAY",
+  name: "TAHITI, 1961",
   tagline: "Torches lit before anyone is hungry. The tide comes to the table.",
   premise:
     "A table set on sand, a fire beside it, and torches that go up one at a " +
@@ -4692,7 +4715,7 @@ export const TAHITI_TONES: readonly ToneWeight[] = [
 export const DESTINATIONS = {
   "westhampton-1976": WESTHAMPTON_1976,
   havana: HAVANA,
-  "las-vegas": LAS_VEGAS_1968,
+  "las-vegas": LAS_VEGAS_1960,
   "new-york": NEW_YORK,
   nantucket: NANTUCKET,
   "new-orleans": NEW_ORLEANS,
@@ -4718,7 +4741,7 @@ export type DestinationKey = keyof typeof DESTINATIONS;
 export const DESTINATION_TONES = {
   "westhampton-1976": WESTHAMPTON_1976_TONES,
   havana: HAVANA_TONES,
-  "las-vegas": LAS_VEGAS_1968_TONES,
+  "las-vegas": LAS_VEGAS_1960_TONES,
   "new-york": NEW_YORK_TONES,
   nantucket: NANTUCKET_TONES,
   "new-orleans": NEW_ORLEANS_TONES,

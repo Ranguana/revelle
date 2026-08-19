@@ -244,7 +244,7 @@ test("WESTHAMPTON, 1976 round-trips through the tone vocabulary", () => {
  * So the claim under test is not "Havana is warm". It is that Havana and
  * Westhampton are far apart, and that a host's answers sort them.
  */
-test("HAVANA, THE SMALL HOURS is a different house from Westhampton", () => {
+test("HAVANA, 1957 is a different house from Westhampton", () => {
   const havana = destinationVoiceProfile(
     DESTINATIONS.havana.voice,
     DESTINATION_TONES.havana
@@ -315,7 +315,7 @@ test("HAVANA, THE SMALL HOURS is a different house from Westhampton", () => {
  *
  * Everything above tests a destination. These four test the CATALOGUE, and
  * they are the tests that decide whether the voice question is worth asking at
- * all. A library of thirteen houses that are each individually well written and
+ * all. A library of twelve houses that are each individually well written and
  * collectively identical would pass every assertion above this line.
  *
  * The design they enforce is written out in full at the top of

@@ -12,7 +12,7 @@ Miss any part and it fails in a specific way named below.
 ## 1. The writing, first
 
 Author it in `src/lib/destinations.ts` to the standard of WESTHAMPTON, 1976
-and HAVANA, THE SMALL HOURS. The complete object: key, name, tagline, premise,
+and HAVANA, 1957. The complete object: key, name, tagline, premise,
 look, voiceVersion, and the whole voice — speaker, address, register,
 formality, cadence, punctuation, orthography, humour, lexicon, formulae,
 banned, signOffs, always, never, breaksCharacterFor, exemplars, and `rejected`.
@@ -31,9 +31,11 @@ in `docs/copy.md`.
   impersonation of a nationality. Real nouns are the opposite of caricature: a
   courtyard, a fan, the ice, the last coffee. A real name is a fact; a spelling
   that performs an accent is a costume.
-- **No period kitsch.** Where a year genuinely helps, use it. Where it would be
-  somebody else's country as a playground, use an hour instead — that is why
-  Havana is THE SMALL HOURS and not 1957.
+- **No period kitsch.** Every destination is pinned to a year, because the year
+  is what fixes the register the voice is written in. The year is a period, not
+  a pitch. Havana is named 1957 and is still forbidden to write "the last good
+  year" — where a date would turn somebody else's country into a playground,
+  the ban belongs in that destination's `rejected` list, not in its name.
 
 ## 2. The tones, chosen against the whole library
 

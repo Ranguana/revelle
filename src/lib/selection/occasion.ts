@@ -8,7 +8,7 @@
  *
  * The second collection key, and the counterpart to the destination. The
  * destination decides the REGISTER — what an arrival drink is at WESTHAMPTON,
- * 1976 versus at PORTOFINO, OFF-SEASON. The occasion decides the PARTS — that
+ * 1976 versus at PORTOFINO, 1961. The occasion decides the PARTS — that
  * there is an arrival drink at all, that a birthday has a beat where the person
  * is marked, that a weekend has material for each of its days and a dinner does
  * not.

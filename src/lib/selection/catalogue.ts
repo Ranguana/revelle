@@ -698,7 +698,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
                 '[]'::jsonb) as slots,
               -- native is the CLAIM (db/019) and is what makes this a filter
               -- rather than a weight; wd.name is carried for one sentence,
-              -- "written for HAVANA, THE SMALL HOURS, not for PORT CLYDE", and
+              -- "written for HAVANA, 1957, not for PORT CLYDE", and
               -- the join is against world unfiltered on purpose — an ingredient
               -- may well claim a destination that is still a draft, and the gap
               -- should name it rather than say "another one".

@@ -241,10 +241,10 @@ finished bar as well as a finished table.
 not an option at the Dolomites, and the mulled wine is not an option in Tahiti.
 
 **Every destination now has a bar, and a table.** Menus and drinks cover the
-same thirteen places, so no occasion can be given a table with nothing to
+same twelve places, so no occasion can be given a table with nothing to
 drink at it — or a bar with nothing to eat beside it.
 
-**Havana now has a look, a voice and a plate** — HAVANA, THE SMALL HOURS,
+**Havana now has a look, a voice and a plate** — HAVANA, 1957,
 `havana` — written to these two programmes rather than the other way round. A
 bar that shakes rather than stirs and serves coffee at every hour, including
 after midnight, is most of what the destination knows about itself.

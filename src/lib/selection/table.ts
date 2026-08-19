@@ -74,8 +74,9 @@ const LADDER = ["bought_and_arranged", "half_made", "actually_made"] as const;
  * toward `bought_and_arranged`. From the top rung there is no upward, so it
  * falls straight down — which is the same rule, not an exception to it.
  *
- * This exists because nine of the thirteen destinations have no main course
- * that can be bought (db/021 counts them). Without a fallback, a host who wants
+ * This exists because most destinations have no main course that can be bought
+ * (db/021 counts them). The figure was nine of thirteen when this was written
+ * and has not been re-counted since CAP FERRAT was folded into CÔTE D'AZUR. Without a fallback, a host who wants
  * no work gets a table with no main in it, and a missing main is worse than a
  * main one rung off.
  */

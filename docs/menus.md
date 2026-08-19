@@ -297,5 +297,5 @@ the hotel dining rooms. Do not "fix" menus 21 or 23.
 **Havana was the first destination the catalogue asked for** rather than the
 other way round: these two menus and the two drink programmes beside them were
 authored before it had a name. It now has a look, a voice and a plate —
-HAVANA, THE SMALL HOURS, `havana` — written to them and not the reverse. Menu
+HAVANA, 1957, `havana` — written to them and not the reverse. Menu
 29's "late supper after dancing" is the fact the whole destination is built on.

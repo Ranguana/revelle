@@ -10,7 +10,7 @@
  * A `Destination` (src/lib/tokens.ts) is a LOOK and a VOICE, and both halves
  * are authored by hand before the thing exists — a palette, a lexicon, a page
  * of exemplars, a list of lines that were rejected. WESTHAMPTON, 1976 and
- * HAVANA, THE SMALL HOURS have all of that. The rest have a poster and a
+ * HAVANA, 1957 have all of that. The rest have a poster and a
  * description, which is what a catalogue page needs and nowhere near what a
  * writer needs.
  *
@@ -85,7 +85,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "portofino",
-    name: "PORTOFINO, OFF-SEASON",
+    name: "PORTOFINO, 1961",
     caption: "Portofino",
     number: "No. 05",
     occasion: "The weekend away",
@@ -115,7 +115,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "new-orleans",
-    name: "NEW ORLEANS, 3 A.M.",
+    name: "NEW ORLEANS, 1956",
     caption: "New Orleans",
     number: "No. 03",
     occasion: "The birthday",
@@ -145,7 +145,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "nantucket",
-    name: "NANTUCKET, AUGUST",
+    name: "NANTUCKET, 1972",
     caption: "Nantucket",
     number: "No. 08",
     occasion: "The weekend away",
@@ -175,7 +175,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "las-vegas",
-    name: "LAS VEGAS, 1968",
+    name: "LAS VEGAS, 1960",
     caption: "Las Vegas",
     number: "No. 14",
     occasion: "The birthday",
@@ -205,7 +205,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "new-york",
-    name: "NEW YORK, NEW YEAR'S",
+    name: "NEW YORK, 1938",
     caption: "New York",
     number: "No. 17",
     occasion: "The long dinner",
@@ -247,7 +247,7 @@ export const LIBRARY: readonly Plate[] = [
    */
   {
     slug: "big-sur",
-    name: "BIG SUR, JUNE",
+    name: "BIG SUR, 1971",
     caption: "Big Sur",
     number: "No. 06",
     occasion: "The getaway",
@@ -277,7 +277,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "catskills",
-    name: "CATSKILLS, LAST WEEK OF CAMP",
+    name: "CATSKILLS, 1963",
     caption: "Catskills",
     number: "No. 09",
     occasion: "The weekend away",
@@ -307,7 +307,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "dolomites",
-    name: "DOLOMITES, FIRST SNOW",
+    name: "DOLOMITES, 1956",
     caption: "Dolomites",
     number: "No. 19",
     occasion: "The getaway",
@@ -345,7 +345,7 @@ export const LIBRARY: readonly Plate[] = [
    */
   {
     slug: "havana",
-    name: "HAVANA, THE SMALL HOURS",
+    name: "HAVANA, 1957",
     caption: "Havana",
     number: "No. 15",
     occasion: "The long dinner",
@@ -375,7 +375,7 @@ export const LIBRARY: readonly Plate[] = [
   },
   {
     slug: "tahiti",
-    name: "TAHITI, THE LONG WAY",
+    name: "TAHITI, 1961",
     caption: "Tahiti",
     number: "No. 12",
     occasion: "The long dinner",

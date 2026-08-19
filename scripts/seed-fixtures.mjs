@@ -134,7 +134,7 @@ const DESTINATIONS = [
   },
   {
     slug: "fixture-portofino",
-    name: "PORTOFINO, OFF-SEASON",
+    name: "PORTOFINO, 1961",
     tagline: "The harbour to yourselves. Everything shut but the good place.",
     description:
       "FIXTURE. Catalogue copy from src/lib/library.ts; no authored voice.",
@@ -162,7 +162,7 @@ const DESTINATIONS = [
   },
   {
     slug: "fixture-new-orleans",
-    name: "NEW ORLEANS, 3 A.M.",
+    name: "NEW ORLEANS, 1956",
     tagline: "Dinner at nine. Nobody's leaving at eleven.",
     description:
       "FIXTURE. Catalogue copy from src/lib/library.ts; no authored voice.",
@@ -203,7 +203,7 @@ const DESTINATIONS = [
   },
   {
     slug: "fixture-las-vegas",
-    name: "LAS VEGAS, 1968",
+    name: "LAS VEGAS, 1960",
     tagline: "Everyone dressed up. Nobody in a nightclub queue.",
     description:
       "FIXTURE. Catalogue copy from src/lib/library.ts; no authored voice.",
