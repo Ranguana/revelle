@@ -21,7 +21,7 @@ import { explain } from "./explain.ts";
 import { fillSlots, scopePools } from "./fill.ts";
 import { ensureNovel } from "./novelty.ts";
 import { planSlots } from "./occasion.ts";
-import { mealShape, statedRung } from "./table.ts";
+import { mealShape, statedMeal, statedRung, statedSeason } from "./table.ts";
 import { arbitrarySeed, rng } from "./rng.ts";
 import { buildVector, inheritDestination } from "./vector.ts";
 import {
@@ -99,11 +99,30 @@ export function runSelection(
   // Planned before the impasse check returns, so that "she is not serving
   // food" is on the record even in a run that produced nothing: the curator
   // must be able to see it, and it must never look like something to author.
-  // WHAT KIND OF TABLE THIS EVENING IS — db/023, from the one answer that
-  // already says so. Computed beside the plan because it is the same fact: the
-  // exclusion that removes the main and the dessert is what makes it a cocktail
-  // party rather than a dinner.
-  const meal = mealShape(application.exclusions);
+  // WHAT KIND OF TABLE THIS EVENING IS — db/023, now from her own answer as
+  // well as from the exclusion. Computed beside the plan because it is the same
+  // fact: the exclusion that removes the main and the dessert is what makes it
+  // a cocktail party rather than a dinner, and it still outranks anything she
+  // could have said about a meal she is not having.
+  const meal = mealShape(application.exclusions, statedMeal(application.stated));
+
+  // WHEN IT IS — db/026, as a season band, and null when she has not settled a
+  // month. Read once here and passed to both stages that consume it, because
+  // the calendar is one fact and a stage that re-derived it could disagree with
+  // the other about a host who said nothing.
+  //
+  // It reaches the run in three different registers, and they are three
+  // different rules:
+  //
+  //   a WEIGHT       her month resolved to a season facet in buildVector above,
+  //                  with no code here at all. That is db/026's whole reason for
+  //                  bridging a month onto the dimension the catalogue is
+  //                  already tagged in.
+  //   a FILTER       stage 3, and only over ingredients a curator marked
+  //                  `season_strict`. See scopePools.
+  //   a COMMITMENT   stage 4, seeding what a composed table has to agree with.
+  //                  See fillSlots.
+  const season = statedSeason(application.stated);
 
   const plan = planSlots(
     catalogue.slotRules,
@@ -167,9 +186,12 @@ export function runSelection(
       catalogue.venue ?? null,
       options,
       now,
-      // WHAT KIND OF TABLE THIS EVENING IS — db/023. Derived from her food
-      // plan through the exclusion it already resolves to; see table.ts.
-      meal
+      // WHAT KIND OF TABLE THIS EVENING IS — db/023. Her meal answer, or the
+      // exclusion her food plan already resolves to; see table.ts.
+      meal,
+      // WHEN IT IS — db/026. A gate over the strictly seasonal and nothing
+      // else; null leaves the pool exactly as it was.
+      season
     );
 
     // ── stage 4 ──────────────────────────────────────────────────────
@@ -180,6 +202,10 @@ export function runSelection(
       // wants to make seeds the table's rung; the exemplars are her authored
       // menus for THIS destination, as prose, for the seam in compose.ts.
       rung: statedRung(application.stated),
+      // AND THE CALENDAR THE COURSES HAVE TO AGREE WITH. db/026. The course
+      // agreement rule is unchanged — it is still "these three are one table" —
+      // it simply now opens on her date instead of on the first bound dish.
+      season,
       meal,
       destination: destination.name,
       exemplars: catalogue.ingredients

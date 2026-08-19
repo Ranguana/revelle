@@ -422,6 +422,26 @@ export type Ingredient = {
   season?: string | null;
   making?: string | null;
   /**
+   * IS THAT SEASON A GATE OR A LEAN — `season_strict`, db/012, 017 and 021.
+   *
+   * THE SECOND HALF OF `season`, AND THE HALF THAT MAKES IT A FILTER. db/012
+   * carried both from the start and said why there are two: "some menus are
+   * merely seasonal and some are wrong out of season, and collapsing them would
+   * either make every menu seasonal or none of them." A clambake in February is
+   * the second kind. A menu that merely reads like autumn is the first.
+   *
+   * So it is read HERE, as a column, beside `season` and for the same reason:
+   * the facet projected from `season` is what SCORES, and this is what says
+   * whether the season may also REFUSE. Reading a filter out of a scoring
+   * weight would make the two inseparable.
+   *
+   * Optional, and absent means false — a season that leans and does not gate,
+   * which is both the database's default and the safe one. A hand-built fixture
+   * that omits it is making the weaker claim, which is the one to make when
+   * nobody has decided.
+   */
+  seasonStrict?: boolean;
+  /**
    * WHICH SHAPES OF TABLE THIS CLAIMS — `dish_meal`, db/023. Dishes only.
    *
    * EMPTY MEANS EVERY SHAPE, which is claimEligibility()'s own default and the

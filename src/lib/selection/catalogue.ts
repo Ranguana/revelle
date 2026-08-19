@@ -486,6 +486,13 @@ const POOLS: readonly {
   season: string | null;
   making: string | null;
   /**
+   * WHETHER THAT SEASON GATES — `season_strict`, carried by the same three
+   * pools that carry `season` and by nothing else. Null here means the pool has
+   * no such column, which reads as false: a pool with no season cannot have a
+   * strict one. See db/012 on why the two columns are not one.
+   */
+  seasonStrict: string | null;
+  /**
    * The table of meal-shape claims this pool has — `dish_meal`, db/023. Null in
    * a pool that makes no claim about what kind of table it is for, which is
    * every pool but dishes: a menu and a drink both say what they are for in a
@@ -511,6 +518,7 @@ const POOLS: readonly {
     minGuests: null,
     maxGuests: null,
     season: null,
+    seasonStrict: null,
     making: null,
     meals: null,
     shape: null,
@@ -526,6 +534,7 @@ const POOLS: readonly {
     minGuests: "min_guests",
     maxGuests: "max_guests",
     season: null,
+    seasonStrict: null,
     making: null,
     meals: null,
     shape: "shape",
@@ -541,6 +550,7 @@ const POOLS: readonly {
     minGuests: null,
     maxGuests: null,
     season: null,
+    seasonStrict: null,
     making: null,
     meals: null,
     shape: null,
@@ -566,6 +576,7 @@ const POOLS: readonly {
     minGuests: null,
     maxGuests: null,
     season: "season",
+    seasonStrict: "season_strict",
     // db/012's older name for db/016's axis. Same members, same ladder.
     making: "cooking",
     meals: null,
@@ -593,6 +604,7 @@ const POOLS: readonly {
     minGuests: null,
     maxGuests: null,
     season: "season",
+    seasonStrict: "season_strict",
     making: "making",
     meals: null,
     shape: null,
@@ -635,6 +647,7 @@ const POOLS: readonly {
     minGuests: null,
     maxGuests: null,
     season: "season",
+    seasonStrict: "season_strict",
     making: "making",
     meals: "dish_meal",
     shape: null,
@@ -657,6 +670,9 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
               ${spec.maxGuests ? `t.${spec.maxGuests}` : "null::integer"} as max_guests,
               ${spec.shape ? `t.${spec.shape}::text` : "null::text"} as shape,
               ${spec.season ? `t.${spec.season}::text` : "null::text"} as season,
+              ${
+                spec.seasonStrict ? `t.${spec.seasonStrict}` : "false"
+              } as season_strict,
               ${spec.making ? `t.${spec.making}::text` : "null::text"} as making,
               ${
                 spec.meals
@@ -738,6 +754,11 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
         // CONSTRAIN a set, the facets projected from them SCORE an ingredient,
         // and keeping the two reads apart is what lets either change alone.
         season: nullableStr(row.season),
+        // db/026 made this act. A pool with no season column selects a literal
+        // false, so "this pool has no seasonality" and "this row's season only
+        // leans" arrive as the same value — which is right, because they mean
+        // the same thing to every reader: nothing may be refused on a season.
+        seasonStrict: Boolean(row.season_strict),
         making: nullableStr(row.making),
         // db/023. Empty means every shape — the default an untagged claim has
         // on all four axes in this schema.

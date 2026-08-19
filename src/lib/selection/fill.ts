@@ -115,6 +115,8 @@ import {
 import {
   axesOf,
   groupOf,
+  humanSeason,
+  inSeason,
   mealAgrees,
   narrowSeason,
   rungPreference,
@@ -180,6 +182,27 @@ export type SlotPool = {
 export type TableContext = {
   /** Her `how_made` answer as a rung. Seeds every coherence group. */
   rung?: string | null;
+  /**
+   * HER MONTH'S SEASON — db/026. Seeds every coherence group, exactly as `rung`
+   * does, and for the same reason: a table is set on one date.
+   *
+   * ── AND THIS IS STILL NOT HER ANSWER BECOMING A FILTER ─────────────
+   *
+   * The distinction table.ts draws about the rung holds here word for word.
+   * Every dish is in the pool at every season and is scored by its season facet
+   * exactly as before; what her month seeds is the table's INTERNAL agreement.
+   * The rule is not "she is planning February, so this summer dish is gone" —
+   * it is "a summer dish and a February evening are not one table", and the same
+   * dish is placed happily on the next table that sits in its season.
+   *
+   * The pool-level gate above is a different rule with a different trigger: it
+   * fires only where a curator wrote `season_strict`, which is her way of
+   * saying this one is not a lean.
+   *
+   * Null — she is still deciding — seeds nothing, and every group starts where
+   * it started before db/026: at whatever the first bound dish commits it to.
+   */
+  season?: string | null;
   /** db/023's meal_shape — what kind of table this evening is. */
   meal?: string | null;
   /** The destination's name, for the chooser's request. */
@@ -226,7 +249,16 @@ export function scopePools(
    * mealShape() in table.ts. Null for a caller that does not care, which every
    * fixture written before db/023 is.
    */
-  meal: string | null = null
+  meal: string | null = null,
+  /**
+   * HER MONTH'S SEASON — db/026, from statedSeason() in table.ts.
+   *
+   * Null means the calendar says nothing: she answered "still deciding", she
+   * applied before the question existed, or the snapshot was built by hand.
+   * Nothing is refused on a season in that case, which is what the parameter's
+   * default already gives every caller written before this.
+   */
+  season: string | null = null
 ): Map<string, SlotPool> {
   const groupSize = scale.guestsHigh ?? scale.guestsPlanning ?? null;
   const pools = new Map<string, SlotPool>();
@@ -305,6 +337,40 @@ export function scopePools(
       if (!forVenue.eligible) {
         rejected.push({ rank: 0, text: `${ingredient.name} is ${forVenue.reason}` });
         prunedByVenue.push(ingredient.name);
+        continue;
+      }
+
+      // ── THE CALENDAR, AND ONLY WHERE A CURATOR MADE IT ONE ─────────
+      //
+      // `season_strict` has been on a menu since db/012, on a drink since
+      // db/017 and on a dish since db/021, and until db/026 it did nothing —
+      // there was no answer to filter against, and db/021 said so in the column
+      // comment. This is the line that comment was waiting for.
+      //
+      // A FILTER AND NOT A WEIGHT, for the reason the venue axis is one: a
+      // clambake in February is not a weak match, it is not a thing that can
+      // happen. `season_strict` is the curator's own word for exactly that
+      // distinction — db/012: "some menus are merely seasonal and some are
+      // WRONG out of season" — so the soft ones are untouched here and reach
+      // her as a score, through the season facet her month resolves to.
+      //
+      // Rank 0, beside the other structural impossibilities. A curator reading
+      // a thin pool needs "the clambake needs summer" before she needs the
+      // fourteenth reason.
+      //
+      // Both absences mean yes: a null season here (she is still deciding) and
+      // a `year_round` band on the ingredient. See inSeason().
+      if (
+        season !== null &&
+        ingredient.seasonStrict === true &&
+        !inSeason(season, ingredient.season)
+      ) {
+        rejected.push({
+          rank: 0,
+          text:
+            `${ingredient.name} is written strictly for ${humanSeason(ingredient.season)} ` +
+            `and this is ${humanSeason(season)}`,
+        });
         continue;
       }
 
@@ -479,6 +545,7 @@ export function fillSlots(
   table: TableContext = {}
 ): Fill {
   const tableRung = table.rung ?? null;
+  const tableSeason = table.season ?? null;
   const ceiling = toCents(scale.budgetCeiling);
   const planning = toCents(scale.budgetPlanning);
   const blocks = Math.max(0, shape.scheduledGameMax);
@@ -516,6 +583,32 @@ export function fillSlots(
     if (entry.gap) gaps.push(entry.gap);
   }
 
+  // ── THE TABLE STARTS ON HER DATE ───────────────────────────────────
+  //
+  // Every coherence group in the plan opens already committed to her season,
+  // rather than opening null and being committed by whichever course happened
+  // to be decided first. The difference is not cosmetic and it is not
+  // symmetrical: `narrowSeason` only ever narrows, so a group that opens null
+  // and takes a `shoulder` dish is thereafter a SHOULDER table — wider than the
+  // spring evening she is actually having — and an autumn dessert would then be
+  // agreed with. Seeding it means the calendar is the outer bound and every
+  // course narrows inside it.
+  //
+  // Null seeds null, which is exactly the state this map had before db/026.
+  // Nothing else about the search changes for a host who has not said when.
+  //
+  // The rung is deliberately NOT seeded here. It falls back through
+  // `rungHeld`, because the rung has a preference ORDER (table.ts) and a course
+  // with nothing at her rung must be allowed to reach for the next one — which
+  // is a different rule from a season, where there is nothing to fall back to.
+  const openTable = new Map<string, TableCommitment>();
+  for (const entry of pools.values()) {
+    const group = groupOf(entry.slot);
+    if (group !== null && !openTable.has(group)) {
+      openTable.set(group, { season: tableSeason, making: null });
+    }
+  }
+
   let beam: State[] = [
     {
       picks: [],
@@ -525,7 +618,7 @@ export function fillSlots(
       used: new Set(),
       chosenFacets: [],
       scheduled: 0,
-      table: new Map(),
+      table: openTable,
     },
   ];
 
@@ -667,9 +760,21 @@ export function fillSlots(
           const axes = axesOf(candidate.ingredient);
           if (!seasonAgrees(seasonHeld, axes.season)) {
             if (refusedByTable === null) {
+              // WHERE THE TABLE'S SEASON CAME FROM, because the two are
+              // different work orders. "The other courses are summer" is
+              // something a curator can fix by moving a course; "she is having
+              // this in February" is not something anybody is going to fix, and
+              // what it asks for is a winter dessert at that destination.
+              const fromACourse = state.picks.some(
+                (pick) => groupOf(pick.slot) === group
+              );
               refusedByTable = {
                 name: candidate.ingredient.name,
-                why: `it is written for ${axes.season} and the table is already ${seasonHeld}`,
+                why:
+                  `it is written for ${humanSeason(axes.season)} and ` +
+                  (fromACourse
+                    ? `the table is already ${humanSeason(seasonHeld)}`
+                    : `she is having this in ${humanSeason(seasonHeld)}`),
               };
             }
             continue;

@@ -28,9 +28,10 @@
  *             for how it is PRESENTED. Reported so a drift that was not
  *             intended gets noticed.
  *
- * A fourth case is not a disagreement at all and is listed separately: an
- * ORDINAL question whose options are four points on ONE signed axis. Its words
- * are supposed to differ from the facet's. See the note above `sharesAnAxis`.
+ * A fourth case is not a disagreement at all and is listed separately:
+ * TRANSLATED, where the answer is bridged onto a facet with a different code —
+ * a point on an ordinal axis, or a month landing on a season. Its words are
+ * supposed to differ from the facet's. See the note above `isTranslated`.
  *
  * Exit code is non-zero only for MISSING.
  *
@@ -70,7 +71,7 @@ await client.connect();
 const { rows } = await client.query(`
   select m.quiz_field, m.option_code::text as option_code, m.answer_polarity,
          m.facet_id::text as facet_id, m.answer_weight::float8 as answer_weight,
-         f.label, f.description, f.status
+         f.code::text as facet_code, f.label, f.description, f.status
     from quiz_option_facet m
     join facet f on f.id = m.facet_id
 `);
@@ -102,32 +103,41 @@ await client.end();
 const mapped = new Map(rows.map((r) => [`${r.quiz_field}/${r.option_code}`, r]));
 
 /*
- * AN ORDINAL QUESTION SHARES ONE FACET ACROSS ITS OPTIONS, and the wording
- * check has to know that or it reports drift forever.
+ * SOME ANSWERS ARE THEIR FACET AND SOME ARE TRANSLATED INTO ONE, and the
+ * wording check has to know which or it reports drift forever.
  *
  * Most questions are unordered and their options map one-to-one onto facets —
- * the facet IS the option, so its label and description should be the option's
- * label and hint, and a difference is real drift worth printing.
+ * THE FACET IS THE OPTION, so its label and description should be the option's
+ * label and hint, and a difference is real drift worth printing. That identity
+ * has a spelling: the facet's code and the option's code are the same string,
+ * because both come from the same list. Every generated bridge in db/002, 005,
+ * 006, 007 and 016 is written as `select f.code` for exactly that reason.
  *
- * An ordinal question is not like that. "How much of this do you want to make?"
- * has four answers on ONE signed axis (db/016: four separate terms could not
- * say that bought and arranged is nearer half made than actually made), so the
- * facet's words describe the AXIS and the option's words describe one point on
- * it. They differ on purpose and always will.
+ * Where the codes DIFFER, the bridge is a translation and the two sets of words
+ * are describing different things on purpose:
  *
- * So the comparison is skipped exactly where the mapping is not one-to-one,
- * which is a property of the data rather than a list of exceptions to keep up
- * to date.
+ *   how_made/actually_made -> making/made_by_hand
+ *     An ordinal question. Four answers on ONE signed axis (db/016: four
+ *     separate terms could not say that bought and arranged is nearer half made
+ *     than actually made), so the facet's words describe the AXIS and the
+ *     option's describe one point on it.
+ *   event_month/august -> season/high_summer
+ *     A calendar. db/026 bridges twelve months onto five seasons because the
+ *     catalogue is tagged in seasons; the facet's words are db/012's gloss on a
+ *     season and the option's word is the name of a month. "August" and "High
+ *     summer" are both correct and neither is drift.
+ *
+ * The test is therefore on the codes rather than on a count of options per
+ * facet, which is what it used to be. The count got `august` wrong: high summer
+ * has exactly one month in it, so a bridged answer looked one-to-one and was
+ * reported as drift — inviting somebody to "fix" it by renaming a season after
+ * a month.
  */
-const optionsPerFacet = new Map();
-for (const row of rows) {
-  optionsPerFacet.set(row.facet_id, (optionsPerFacet.get(row.facet_id) ?? 0) + 1);
-}
-const sharesAnAxis = (row) => (optionsPerFacet.get(row.facet_id) ?? 0) > 1;
+const isTranslated = (row, option) => row.facet_code !== option.code;
 
 const missing = [];
 const relabelled = [];
-/** Options that are one point on a shared, ordinal axis. Not drift. */
+/** Options whose facet is a translation of the answer rather than the answer. */
 const shared = [];
 const seen = new Set();
 
@@ -143,8 +153,10 @@ for (const [fieldId, field] of Object.entries(FIELDS)) {
       missing.push(key);
       continue;
     }
-    if (sharesAnAxis(row)) {
-      shared.push(`${key} (weight ${row.answer_weight})`);
+    if (isTranslated(row, option)) {
+      shared.push(
+        `${key} -> ${row.facet_code} (weight ${row.answer_weight})`
+      );
       continue;
     }
     if (row.label !== option.label) {
@@ -203,7 +215,7 @@ for (const line of reweighted) console.log(`[check-facets] voice drift ${line}`)
 
 for (const line of relabelled) console.log(`[check-facets] relabelled  ${line}`);
 for (const line of shared) {
-  console.log(`[check-facets] one axis    ${line}`);
+  console.log(`[check-facets] translated  ${line}`);
 }
 for (const key of orphaned) {
   console.log(`[check-facets] retired     ${key} (kept so old answers resolve)`);
@@ -233,7 +245,7 @@ if (missing.length > 0) {
 
 console.log(
   `[check-facets] ok — ${seen.size} quiz options all resolve to facets ` +
-    `(${relabelled.length} relabelled, ${shared.length} on a shared axis, ` +
+    `(${relabelled.length} relabelled, ${shared.length} translated, ` +
     `${orphaned.length} retired), and ` +
     `every tone resolves to a voice axis (${reweighted.length} reweighted)`
 );

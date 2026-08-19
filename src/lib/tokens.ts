@@ -606,8 +606,10 @@ export function writerPrompt(
     // has not broken. It may not say which weekend she is having.
     "Every date, hour, address and instruction a guest must act on comes from",
     "the facts above and from nowhere else. The destination supplies the place",
-    "and its detail; it does not supply arrangements. Where a fact was not",
-    "given, leave it out rather than furnishing one from the premise.",
+    "and its detail; it does not supply arrangements. Do not name a day, a",
+    "date, a month, a season or a holiday that is not among the facts, even",
+    "when the premise and the house's own lines are full of one. Where a fact",
+    "was not given, leave it out rather than furnishing one.",
     "",
     "Return the finished piece and nothing else. No preamble, no alternatives,",
     "no explanation of the choices, no offer to revise.",

@@ -13,6 +13,7 @@ import {
   QUIZ_VERSION,
   allErrors,
   isEmail,
+  isFieldActive,
   type QuizAnswers,
 } from "@/lib/quiz";
 
@@ -167,7 +168,8 @@ export async function POST(request: Request): Promise<Response> {
            taste_directions, group_fun, anti_preferences, affinities,
            voice_tones,
            secret, guest_count_band, spend_per_person, music_service,
-           food_plan, play_appetite, how_made
+           food_plan, play_appetite, how_made,
+           event_month, meal_time
          ) values (
            $1, $2::jsonb, $3, $4,
            $5::occasion_type, $6, $7::environment_type,
@@ -175,7 +177,8 @@ export async function POST(request: Request): Promise<Response> {
            $12::text[],
            $13, $14::guest_count_band, $15::spend_per_person_band,
            $16::soundtrack_delivery,
-           $17::food_plan, $18::play_appetite, $19::making_level
+           $17::food_plan, $18::play_appetite, $19::making_level,
+           $20::event_month, $21::meal_shape
          )
          returning id`,
         [
@@ -211,6 +214,23 @@ export async function POST(request: Request): Promise<Response> {
           answers.food_plan,
           answers.play_appetite,
           answers.how_made,
+          // db/026. WHEN, as a month — or 'not_decided', which is an answer and
+          // not a hole. The month resolves to a season facet through the same
+          // bridge every other answer uses; nothing about the calendar is
+          // computed here.
+          answers.event_month,
+          // WHICH MEAL, and null unless she was actually asked.
+          //
+          // `stepErrors` SKIPS an inactive conditional field rather than
+          // rejecting a value in it, so a hand-rolled POST can carry a meal
+          // beside a food plan that has no table. Storing it would put a claim
+          // on the record that she was never given the chance to make — the
+          // same failure `occasion_other` is guarded against one line up, where
+          // the guard is spelled `answers.occasion === "other"`. Spelled here as
+          // the field's own condition, so there is one rule and not two.
+          isFieldActive(FIELDS.meal_time, answers)
+            ? trimmed(answers.meal_time)
+            : null,
         ]
       );
 

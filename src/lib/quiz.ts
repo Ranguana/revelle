@@ -53,8 +53,15 @@ import { TONE_GROUPS, TONES } from "./voice.ts";
  * exactly the change this stamp exists for: a response written against
  * 2026-08-d may carry `mostly_made` and is not wrong, it was asked a different
  * question. The code keeps resolving; see db/016 and db/017.
+ *
+ * 2026-08-f asks WHEN — a month, and which meal when there is a table. Adding
+ * questions is additive and would not on its own need a bump; what forces it is
+ * that a response written against 2026-08-e has no `event_month` and is NOT
+ * missing one. It was never asked, and everything downstream treats an
+ * unanswered calendar the way it treats "still deciding": season weights
+ * nothing and excludes nothing. See db/026.
  */
-export const QUIZ_VERSION = "2026-08-e";
+export const QUIZ_VERSION = "2026-08-f";
 
 export type QuizOption = {
   /** Permanent. Stored in the database. */
@@ -78,6 +85,17 @@ type BaseField = {
   id: string;
   /** Rendered above the options when a step has more than one field. */
   label?: string;
+  /**
+   * SHOWN ONLY WHEN ANOTHER ANSWER SAYS SO — conditionality as DATA.
+   *
+   * `{ field: "occasion", is: ["other"] }` means this field appears when she has
+   * chosen "something else" and not otherwise. It is validated, rendered and
+   * cleared off this one declaration, so a question that depends on another is
+   * a property of the question rather than a branch three files know about.
+   *
+   * Absent means always shown, which is what almost every field is.
+   */
+  activeWhen?: { field: string; is: readonly string[] };
 };
 
 export type SingleField = BaseField & {
@@ -254,6 +272,105 @@ const FOOD_PLANS: readonly QuizOption[] = [
   {
     code: "drinks_only",
     label: "Drinks, and nothing that needs a plate",
+  },
+];
+
+/**
+ * WHEN IT IS — a month, and deliberately not a date.
+ *
+ * The engine has carried `season_band` on every menu since db/012, on every
+ * drink since db/017 and on every dish since db/021, and `season_strict` beside
+ * it, and none of it did anything: nothing in the application said when the
+ * evening was, so a dish written for August was as eligible in February as in
+ * August. This is that question.
+ *
+ * ── WHY NOT A CALENDAR ──────────────────────────────────────────────
+ *
+ * The full argument is at the top of db/026; the two that decide it:
+ *
+ *   1. THE EXACT DATE ALREADY EXISTS AND IS SOMEBODY ELSE'S. `event_date` on
+ *      quiz_response is MUTABLE and is filled in by staff from the reply mail.
+ *      It is `guest_count_confirmed` again, and this is `guest_count_band`
+ *      again: her answer is a band, frozen; the exact fact is learned later and
+ *      may move. A second frozen copy of a fact we already know how to learn is
+ *      two representations of one thing, which is what db/002 warns about.
+ *   2. quiz_response IS APPEND-ONLY. A host who means "sometime in June" and is
+ *      made to pick the 13th has been made to lie, permanently — db/006's
+ *      argument about the guest count, unchanged.
+ *
+ * And the plain one: nothing downstream reads a day. The engine reads a season.
+ *
+ * ── WHAT A MONTH RESOLVES TO ────────────────────────────────────────
+ *
+ * A season facet — db/026's bridge — because the catalogue is already tagged in
+ * that dimension. So the calendar becomes a soft weight with no new scoring
+ * code, and the only thing left in TypeScript is the hard gate on the dishes
+ * and menus a curator marked strict.
+ *
+ * The mapping itself is a row and not a line of code. This file does not know
+ * which season August is in, and neither does src/lib/selection/.
+ *
+ * ── AND STILL DECIDING IS AN ANSWER ─────────────────────────────────
+ *
+ * The same grace the room question extends, for the same reason: a host who has
+ * not booked a house has not lied about the month, she has declined to invent
+ * one. It resolves to an inert facet, so she is scored exactly as she was
+ * before this question existed and nothing is excluded on a season. Absence is
+ * a route, not a fault.
+ */
+const EVENT_MONTHS: readonly QuizOption[] = [
+  { code: "january", label: "January" },
+  { code: "february", label: "February" },
+  { code: "march", label: "March" },
+  { code: "april", label: "April" },
+  { code: "may", label: "May" },
+  { code: "june", label: "June" },
+  { code: "july", label: "July" },
+  { code: "august", label: "August" },
+  { code: "september", label: "September" },
+  { code: "october", label: "October" },
+  { code: "november", label: "November" },
+  { code: "december", label: "December" },
+  { code: "not_decided", label: "Still deciding" },
+];
+
+/**
+ * WHICH MEAL — and only where the rest of the application has not already said.
+ *
+ * db/023 gave a table five shapes and could reach two of them. Standing food
+ * makes it a cocktail party, everything else fell through to a long dinner, and
+ * `brunch`, `lunch` and `late_supper` were shapes nothing could produce — so a
+ * dish tagged for brunch was not narrowed to brunch, it was removed from every
+ * table the engine could set.
+ *
+ * ── WHY THE OCCASION CANNOT ANSWER IT ───────────────────────────────
+ *
+ * It was checked first, which is the right order: a second question that
+ * duplicates an answer she already gave is worse than no question. Of the nine
+ * occasions only "a dinner party" names its meal. A birthday can be a brunch, an
+ * anniversary can be a late supper, and db/023 refused to fold the two axes
+ * together for exactly that reason — an occasion is WHY, a meal shape is WHAT.
+ *
+ * ── SO IT IS ASKED ONCE, OF THE HOSTS IT APPLIES TO ─────────────────
+ *
+ * `activeWhen` holds it to a host who has said there is a table. Somebody
+ * throwing a cocktail party is never shown it, because her food answer already
+ * settled it — `standing` carries the `no_seated_meal` exclusion and that IS the
+ * cocktail party. One fact, stated once, by whichever question got there first.
+ *
+ * The codes are the values of `meal_shape` in db/023, so the answer casts
+ * straight into quiz_response.meal_time — the same arrangement `music_service`
+ * has with soundtrack_delivery, and for the same reason: a derivation nobody has
+ * to read is a derivation nobody can get wrong.
+ */
+const MEAL_TIMES: readonly QuizOption[] = [
+  { code: "brunch", label: "Brunch", hint: "The morning after, and it runs long" },
+  { code: "lunch", label: "Lunch", hint: "Midday, and nobody is in a hurry" },
+  { code: "long_dinner", label: "Dinner", hint: "The table, after dark" },
+  {
+    code: "late_supper",
+    label: "A late supper",
+    hint: "After the show, or after dancing",
   },
 ];
 
@@ -487,6 +604,7 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
         maxLength: 120,
         optional: false,
         rows: 2,
+        activeWhen: { field: "occasion", is: ["other"] },
       },
     ],
   },
@@ -506,6 +624,33 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
     eyebrow: "The food",
     title: "What are they eating?",
     fields: [{ id: "food_plan", type: "single", options: FOOD_PLANS }],
+  },
+  // Straight after the food and not before it, because the second field on this
+  // screen is only asked of a host who has said there is a table — and a field
+  // that appears depending on an answer she has not given yet cannot appear at
+  // all. Before anything about taste, with the other facts about the evening:
+  // what she is planning, where it is, what is eaten, when.
+  //
+  // TWO FIELDS ON ONE SCREEN, which only the contrast question does, and it
+  // earns it by being a single question in two halves. So is this one. Which
+  // month and which meal are both "when", and splitting them would make the
+  // shorter of the two a whole screen asking a host who is having brunch to
+  // confirm that she is having brunch.
+  {
+    key: "when",
+    eyebrow: "The calendar",
+    title: "When is it?",
+    help: "The month is enough. If it is not settled, say so.",
+    fields: [
+      { id: "event_month", type: "single", label: "The month", options: EVENT_MONTHS },
+      {
+        id: "meal_time",
+        type: "single",
+        label: "The meal",
+        options: MEAL_TIMES,
+        activeWhen: { field: "food_plan", is: ["sit_down"] },
+      },
+    ],
   },
   {
     key: "taste",
@@ -722,13 +867,43 @@ export function stepErrors(step: QuizStep, answers: QuizAnswers): string[] {
 }
 
 /**
- * A field can be conditional on another answer — today only the "something
- * else" text box, which appears when its parent single-select is on the code
- * named by `revealsTextField`.
+ * A field can be conditional on another answer.
+ *
+ * This used to name `occasion_other` and read `answers.occasion` directly. Two
+ * conditional fields is one too many for that: the second question that depends
+ * on another — which meal, asked only where there is a table — would have been a
+ * second hard-coded branch here, a second one in the renderer that clears a
+ * stale answer, and a third in the bench that does the same. So the condition
+ * moved onto the field, as `activeWhen`, and every reader consults the data.
+ *
+ * A field with no `activeWhen` is always active, which is every field but two.
  */
 export function isFieldActive(field: QuizField, answers: QuizAnswers): boolean {
-  if (field.id !== "occasion_other") return true;
-  return answers.occasion === "other";
+  const gate = field.activeWhen;
+  if (!gate) return true;
+  const value = answers[gate.field];
+  return typeof value === "string" && gate.is.includes(value);
+}
+
+/**
+ * The fields that must be forgotten when `fieldId` changes to `code`.
+ *
+ * Answering a question can un-ask another one, and the answer to a question
+ * that is no longer asked must not be submitted: it would be a claim she was
+ * never given the chance to make. The client clears them as she taps, the
+ * bench clears them when it rolls a host, and `stepErrors` ignores them either
+ * way — three readers, one rule, stated here.
+ */
+export function fieldsInvalidatedBy(
+  fieldId: string,
+  code: string
+): readonly string[] {
+  return Object.values(FIELDS)
+    .filter(
+      (field) =>
+        field.activeWhen?.field === fieldId && !field.activeWhen.is.includes(code)
+    )
+    .map((field) => field.id);
 }
 
 /**

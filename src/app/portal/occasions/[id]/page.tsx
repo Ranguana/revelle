@@ -262,6 +262,38 @@ export default async function OccasionPage({
               </ul>
             </details>
           ) : null}
+
+          {/*
+            THE CORRESPONDENCE — the guest list, and everything she sends them.
+            A section like the others rather than a button in the masthead: it
+            is one of the things that arrived with the destination, and it
+            reads as one.
+          */}
+          <details className={styles.section} open>
+            <summary className={styles.sectionHead}>
+              <span className={styles.sectionName}>The Correspondence</span>
+              <span className={styles.marker} aria-hidden="true" />
+            </summary>
+
+            <div className={styles.pieces}>
+              <article className={styles.piece}>
+                <h3 className={styles.pieceName}>
+                  <Link
+                    className={styles.pieceLink}
+                    href={`/portal/occasions/${id}/correspondence`}
+                  >
+                    The guest list, and what you send them
+                  </Link>
+                </h3>
+                <div className={styles.pieceBody}>
+                  <p>
+                    Invitations, notes, and a line at the top of each morning.
+                    Say what they have to carry; they come back written.
+                  </p>
+                </div>
+              </article>
+            </div>
+          </details>
         </div>
       </main>
     </>

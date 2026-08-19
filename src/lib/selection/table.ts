@@ -158,6 +158,68 @@ export function seasonAgrees(
 }
 
 /**
+ * HER MONTH'S SEASON — or null when the calendar is not settled.
+ *
+ * Read off the resolved answers rather than computed, exactly as `statedRung`
+ * is, and for a stronger version of the same reason: db/026's bridge is the one
+ * place in the system that says which season a month is in. Twelve rows, one
+ * per month, joined to the `season` facets db/012 already authored. Nothing in
+ * this directory knows that August is high summer, and nothing should.
+ *
+ * NULL IS REACHABLE THREE WAYS AND MEANS ONE THING. She answered "still
+ * deciding" (which resolves to an inert `event_timing` facet, not a season);
+ * she applied before the question existed; or a snapshot was built by hand.
+ * All three mean the calendar says nothing, and everything downstream treats
+ * that as today's behaviour — season weights nothing, excludes nothing.
+ */
+export function statedSeason(
+  stated: readonly { field: string; dimension: string; code: string }[]
+): string | null {
+  const answer = stated.find(
+    (entry) => entry.field === "event_month" && entry.dimension === "season"
+  );
+  return answer ? answer.code : null;
+}
+
+/**
+ * IS THIS THING IN SEASON ON HER CALENDAR — and this is NOT `seasonAgrees`.
+ *
+ * The two questions look alike and are not the same, and collapsing them would
+ * be wrong in one direction and invisible:
+ *
+ *   seasonAgrees  CAN THESE TWO SIT AT ONE TABLE. Symmetric, because it is
+ *                 asked of two dishes and neither outranks the other. A summer
+ *                 dish and a high-summer dish are one table either way round.
+ *   inSeason      IS THIS DISH'S BAND OPEN ON HER DATE. DIRECTIONAL, because
+ *                 her month is a point and the dish's band is a set. August is
+ *                 inside summer, so a summer dish is in season in August. June
+ *                 is NOT inside high summer, so a dish written for August only
+ *                 is out of season in June — and the symmetric test would have
+ *                 let it through.
+ *
+ * One ladder underneath both, so "high summer is inside summer" is written once.
+ *
+ * ── THE TWO ABSENCES, AND BOTH MEAN YES ─────────────────────────────
+ *
+ * A candidate with no band, or `year_round`, makes no claim about the calendar
+ * (db/012's own gloss) and is in season always. A HOST with no month has not
+ * made a claim either, and nothing may be refused on a fact nobody stated —
+ * which is what makes "still deciding" a route through this rather than a
+ * degraded version of an answer.
+ */
+export function inSeason(
+  /** Her season, from statedSeason(). Null when the calendar is not settled. */
+  here: string | null,
+  candidate: string | null | undefined
+): boolean {
+  if (!candidate || candidate === "year_round") return true;
+  if (!here) return true;
+  if (candidate === here) return true;
+  // Her season must be INSIDE the candidate's band, never the other way round.
+  return contains(candidate, here);
+}
+
+/**
  * The table's season after this dish joins it — NARROWED, never widened.
  *
  * Summer plus high summer is high summer, so that a third course bound to
@@ -188,24 +250,51 @@ export function groupOf(slot: UnitSlot): string | null {
 }
 
 /**
- * WHAT KIND OF TABLE THIS EVENING IS — db/023's `meal_shape`.
+ * HER `meal_time` ANSWER — or null when she was not asked, or not yet.
  *
- * Derived from the ONE fact the application already resolves that says
- * anything about it: `no_seated_meal`, which db/022 hangs off `food_plan =
- * 'standing'` (and off eating out and drinks only, which remove the table
- * altogether). The very same answer that removes the main and the dessert is
- * the answer that makes it a cocktail party, so reading it here rather than
- * re-deriving from the raw option is one fact in one place.
- *
- * THREE OF THE FIVE SHAPES ARE UNREACHABLE, and the reason is written in db/023
- * rather than hidden: src/lib/quiz.ts never asks the time of day, so nothing
- * can currently produce `brunch`, `lunch` or `late_supper`. A dish tagged only
- * for one of those is therefore invisible to the engine — which is correct, and
- * is a work order rather than a bug. When that question exists, it is one more
- * branch HERE and nowhere else.
+ * Read off the resolved answers, like `statedRung` and `statedSeason`, so that
+ * the option code arrives through db/026's bridge rather than out of a raw
+ * column somebody has to remember to cast.
  */
-export function mealShape(exclusions: readonly string[]): string {
-  return exclusions.includes("no_seated_meal") ? "cocktails" : "long_dinner";
+export function statedMeal(
+  stated: readonly { field: string; dimension: string; code: string }[]
+): string | null {
+  const answer = stated.find(
+    (entry) => entry.field === "meal_time" && entry.dimension === "meal_shape"
+  );
+  return answer ? answer.code : null;
+}
+
+/**
+ * WHAT KIND OF TABLE THIS EVENING IS — db/023's `meal_shape`, in one place.
+ *
+ * db/023 said this would be "one more branch HERE and nowhere else" when the
+ * question existed. It exists (db/026), and this is the branch.
+ *
+ * THE ORDER OF THE THREE IS THE ARGUMENT.
+ *
+ *   1. `no_seated_meal` WINS, and it is not a tie being broken. That exclusion
+ *      is what db/022 hangs off `food_plan = 'standing'` — the very same answer
+ *      that removes the main and the dessert is the answer that makes it a
+ *      cocktail party. A host cannot be shown the meal question at all in that
+ *      case (src/lib/quiz.ts holds it to a seated food plan), so this can only
+ *      ever fire against a stale answer or a hand-rolled one, and it fires
+ *      against them correctly: there is no table, so it is not a lunch.
+ *   2. HER ANSWER, when she gave one. Four of the five shapes are hers, and
+ *      until db/026 three of them were unreachable — which meant a dish tagged
+ *      for brunch was not narrowed to brunch, it was removed from every table
+ *      the engine could set.
+ *   3. `long_dinner`, for a response written before the question existed. It is
+ *      the fallback db/023 already used for everything that was not standing,
+ *      so an old application behaves today exactly as it did yesterday.
+ */
+export function mealShape(
+  exclusions: readonly string[],
+  /** Her answer, from statedMeal(). Null when she was not asked. */
+  chosen: string | null = null
+): string {
+  if (exclusions.includes("no_seated_meal")) return "cocktails";
+  return chosen ?? "long_dinner";
 }
 
 /**
@@ -223,6 +312,21 @@ export function mealAgrees(
 ): boolean {
   if (!meals || meals.length === 0) return true;
   return meals.includes(evening);
+}
+
+/**
+ * A season band as a phrase, for a sentence a curator reads.
+ *
+ * `humanOccasion`'s sibling and in this file rather than beside it, because the
+ * season vocabulary lives here. The only two that need saying are the ones with
+ * an underscore in them; everything else is already a word, and a switch listing
+ * all seven would be five lines that say `return band`.
+ */
+export function humanSeason(band: string | null | undefined): string {
+  if (!band) return "any season";
+  if (band === "high_summer") return "high summer";
+  if (band === "year_round") return "any season";
+  return band;
 }
 
 /** The two axes a table has to agree on, off one ingredient. */

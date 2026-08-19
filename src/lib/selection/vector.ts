@@ -113,6 +113,31 @@ const NON_TASTE_DIMENSIONS = new Set([
    * carries the whole mapping and the argument for it.
    */
   "affinity",
+
+  /*
+   * WHICH MEAL, AND WHETHER SHE HAS PICKED A MONTH — db/026, and both are
+   * facts about the evening rather than opinions about it.
+   *
+   * `meal_shape` is consumed at stage 3 as a claims filter over `dish_meal`,
+   * which is a claims table and not a tag table: nothing in the catalogue is
+   * ever tagged in this dimension, so it would contribute nothing to a score
+   * even if it were left in. It is named here anyway, because a dimension
+   * excluded by accident of not appearing is a dimension somebody will tag
+   * something in.
+   *
+   * `event_timing` has one member — "still deciding" — and its inertness is
+   * load-bearing rather than incidental. It is where an answer about WHEN goes
+   * when it is not a season, and it exists precisely so that a host with no
+   * month is scored as though the question had not been asked.
+   *
+   * THE MONTHS THEMSELVES ARE NOT HERE, and that is the point. They resolve to
+   * `season`, which IS a taste dimension and IS tagged across the menu, drink
+   * and dish pools — so a July host is pulled toward summer food by exactly the
+   * mechanism every other answer uses, and no line in this file had to be
+   * written to make it happen.
+   */
+  "meal_shape",
+  "event_timing",
 ]);
 
 export function buildVector(

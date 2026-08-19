@@ -14,6 +14,7 @@ import {
 import {
   QUIZ_STEPS,
   QUIZ_VERSION,
+  fieldsInvalidatedBy,
   isFieldActive,
   stepErrors,
   type MultiField,
@@ -86,11 +87,12 @@ export default function QuizFlow() {
     setShowErrors(false);
     updateDraft((d) => {
       const answers = { ...d.answers, [field.id]: code };
-      // Clearing the conditional text when its trigger is deselected keeps the
-      // payload honest — and matches the CHECK constraint on the table.
-      if (field.revealsTextField && code !== field.revealsTextField) {
-        delete answers.occasion_other;
-      }
+      // Clearing a conditional answer whose question is no longer asked keeps
+      // the payload honest — and matches the CHECK constraint on the table.
+      // Which fields those are is a property of the fields (`activeWhen`), not
+      // a branch this component holds: there are two of them now, and the next
+      // one must not need an edit here.
+      for (const id of fieldsInvalidatedBy(field.id, code)) delete answers[id];
       return { ...d, answers };
     });
   }, []);

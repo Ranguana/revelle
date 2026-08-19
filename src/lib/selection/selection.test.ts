@@ -24,6 +24,7 @@ import { memberRevelle, type MemberRevelle } from "./member.ts";
 import { assemblageFingerprint, ensureNovel } from "./novelty.ts";
 import { claimEligibility, planSlots } from "./occasion.ts";
 import { dither, rng } from "./rng.ts";
+import { inSeason, mealShape, seasonAgrees, statedSeason } from "./table.ts";
 import {
   facetOverlap,
   issuanceMultiplier,
@@ -2413,7 +2414,9 @@ const COURSE_RULES: SlotRule[] = [
 function tableFor(
   dishes: Ingredient[],
   table: Parameters<typeof fillSlots>[4] = {},
-  meal: string | null = null
+  meal: string | null = null,
+  /** Her month's season — db/026. Null is a host who has not settled one. */
+  season: string | null = null
 ) {
   const vector = buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS);
   const slots = planSlots(COURSE_RULES, SHAPE, SCALE).slots;
@@ -2429,9 +2432,35 @@ function tableFor(
     null,
     OPTIONS,
     OPTIONS.now!,
-    meal
+    meal,
+    season
   );
   return fillSlots(pools, SCALE, SHAPE, OPTIONS, table);
+}
+
+/** The same scoping, stopping at the pool, for asserting on a gap. */
+function coursePoolsFor(
+  dishes: Ingredient[],
+  meal: string | null = null,
+  season: string | null = null
+) {
+  const vector = buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS);
+  const slots = planSlots(COURSE_RULES, SHAPE, SCALE).slots;
+  return scopePools(
+    slots,
+    dishes,
+    destination("d1", "SOMEWHERE", {}),
+    "dinner_party",
+    vector.weights,
+    vector.dealbreakers,
+    (id) => FACETS[id]?.label ?? id,
+    SCALE,
+    null,
+    OPTIONS,
+    OPTIONS.now!,
+    meal,
+    season
+  );
 }
 
 test("the table: the course claim keeps an appetizer out of the main course", () => {
@@ -2611,5 +2640,275 @@ test("what a dish is for: no claim means every shape, any claim is a whitelist",
     "Untagged",
     "650 authored lines carry no fourth field and are eligible everywhere; " +
       "the one dish tagged for brunch is not at a long dinner"
+  );
+});
+
+/* ─────────────────────────────────────────────────────────────────────
+ * WHEN IT IS — db/026
+ *
+ * `season_strict` was stored on every menu, drink and dish from db/012 onward
+ * and read by nothing, because the application never asked when the evening
+ * was. These are the properties that answer buys, and the one it must not.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/** Her month, as the bridge resolves it: field `event_month`, dimension `season`. */
+function monthAnswer(seasonCode: string): StatedFacet {
+  return {
+    facetId: `f-season-${seasonCode}`,
+    dimension: "season",
+    code: seasonCode,
+    label: seasonCode,
+    field: "event_month",
+    polarity: "positive",
+    weight: 1,
+  };
+}
+
+test("when it is: a month resolves to a season, still deciding resolves to none", () => {
+  assert.equal(statedSeason([monthAnswer("winter")]), "winter");
+
+  // "Still deciding" resolves to `event_timing/not_decided`, which is not a
+  // season — so it arrives here as the absence it is, without this function
+  // knowing the code. Absence is a route, not a fault.
+  const undecided: StatedFacet = {
+    facetId: "f-undecided",
+    dimension: "event_timing",
+    code: "not_decided",
+    label: "Still deciding",
+    field: "event_month",
+    polarity: "positive",
+    weight: 1,
+  };
+  assert.equal(
+    statedSeason([undecided]),
+    null,
+    "an answer that is not a season is not a season"
+  );
+
+  assert.equal(statedSeason([]), null, "and an application that predates the question");
+});
+
+test("when it is: in season is DIRECTIONAL, and table agreement is not", () => {
+  // Her season is a point on the calendar; a band is a set of them. The test is
+  // whether the band contains her point, and it does not commute.
+  assert.equal(inSeason("high_summer", "summer"), true, "August is inside summer");
+  assert.equal(
+    inSeason("summer", "high_summer"),
+    false,
+    "June is NOT inside high summer — an August dish is out of season in June, " +
+      "and the symmetric test seasonAgrees() would have let it through"
+  );
+  assert.equal(
+    seasonAgrees("summer", "high_summer"),
+    true,
+    "which it does, correctly, because THAT question is whether two dishes can " +
+      "sit at one table and neither of them outranks the other"
+  );
+
+  assert.equal(inSeason("spring", "shoulder"), true, "spring is inside the shoulder");
+  assert.equal(inSeason("winter", "shoulder"), false, "winter is not");
+  assert.equal(inSeason("winter", "year_round"), true, "a claim about nothing");
+  assert.equal(inSeason("winter", null), true, "and no claim at all");
+  assert.equal(
+    inSeason(null, "summer"),
+    true,
+    "a host with no month refuses nothing: she has not made a claim either"
+  );
+});
+
+test("when it is: strict refuses in February, and a soft season only leans", () => {
+  const clambake = dish("m1", "Boil pot on the beach", "the_main", "actually_made", {
+    season: "summer",
+    seasonStrict: true,
+  });
+  const soft = dish("m2", "Cold poached salmon", "the_main", "half_made", {
+    season: "summer",
+  });
+
+  const winter = coursePoolsFor([clambake, soft], null, "winter");
+  const main = [...winter.values()].find(
+    (entry) => entry.slot.slotCode === "the_main"
+  )!;
+
+  assert.deepEqual(
+    main.candidates.map((c) => c.ingredient.name),
+    ["Cold poached salmon"],
+    "db/012: some menus are merely seasonal and some are WRONG out of season. " +
+      "The clambake is the second kind and leaves the pool; the salmon is the " +
+      "first and stays in it, to be scored"
+  );
+
+  const summer = coursePoolsFor([clambake, soft], null, "high_summer");
+  const inAugust = [...summer.values()].find(
+    (entry) => entry.slot.slotCode === "the_main"
+  )!;
+  assert.equal(
+    inAugust.candidates.length,
+    2,
+    "and in August both are in the pool — summer contains high summer"
+  );
+});
+
+test("when it is: a season that empties a pool is a catalogue gap that says so", () => {
+  // The destination whose only main is written for summer, in February. Not a
+  // silent disappearance: a work order, with the reason first.
+  const pools = coursePoolsFor(
+    [
+      dish("a1", "Something", "the_appetizer", "half_made"),
+      dish("m1", "Boil pot on the beach", "the_main", "actually_made", {
+        season: "summer",
+        seasonStrict: true,
+      }),
+      dish("d1", "A dessert", "the_dessert", "half_made"),
+    ],
+    null,
+    "winter"
+  );
+
+  const main = [...pools.values()].find(
+    (entry) => entry.slot.slotCode === "the_main"
+  )!;
+  assert.equal(main.candidates.length, 0);
+  assert.ok(main.gap, "an empty pool her occasion asked for is a gap");
+  assert.match(
+    main.gap!.detail,
+    /Boil pot on the beach is written strictly for summer and this is winter/,
+    "the reason a curator can act on, first — she authors a winter main, or " +
+      "she decides the tag was wrong"
+  );
+});
+
+test("when it is: still deciding excludes nothing at all", () => {
+  const dishes = [
+    dish("a1", "Something", "the_appetizer", "half_made"),
+    dish("m1", "Boil pot on the beach", "the_main", "actually_made", {
+      season: "summer",
+      seasonStrict: true,
+    }),
+    dish("d1", "A dessert", "the_dessert", "half_made"),
+  ];
+
+  const pools = coursePoolsFor(dishes, null, null);
+  const main = [...pools.values()].find(
+    (entry) => entry.slot.slotCode === "the_main"
+  )!;
+  assert.equal(
+    main.candidates.length,
+    1,
+    "the strictest dish in the library survives a host who has not picked a " +
+      "month, because nothing may be refused on a fact nobody stated"
+  );
+  assert.equal(main.gap, null, "and there is no work order, because there is no hole");
+});
+
+test("when it is: the table opens on her calendar, not on the first dish", () => {
+  // Nothing here is strict, so the pool filter does not fire at all. What
+  // refuses the summer main is the same course-agreement rule db/022 already
+  // had — it simply now opens on February instead of on whatever was decided
+  // first.
+  // The appetizer is the most-constrained slot, so it is decided FIRST and the
+  // table has committed to nothing yet. What refuses the summer one is the
+  // calendar alone.
+  const fill = tableFor(
+    [
+      dish("a1", "Oysters on ice", "the_appetizer", "half_made", { season: "summer" }),
+      dish("a2", "Chestnut soup", "the_appetizer", "half_made", { season: "winter" }),
+      dish("m1", "Braised short ribs", "the_main", "half_made"),
+      dish("m2", "Beef wellington", "the_main", "half_made"),
+      dish("m3", "Coq au vin", "the_main", "half_made"),
+      dish("d1", "A dessert", "the_dessert", "half_made"),
+      dish("d2", "Another dessert", "the_dessert", "half_made"),
+      dish("d3", "A third dessert", "the_dessert", "half_made"),
+    ],
+    { season: "winter" }
+  );
+
+  const first = fill.picks.find((p) => p.slot.slotCode === "the_appetizer")!;
+  assert.equal(first.ingredient.name, "Chestnut soup");
+
+  const refused = fill.dropped.find((d) => d.reason === "table_disagreed");
+  assert.ok(refused, "and the curator is told why the obvious dish is not on it");
+  assert.match(
+    refused!.detail,
+    /she is having this in winter/,
+    "and told which KIND of disagreement it was: a calendar nobody is going " +
+      "to move, rather than two courses that could be swapped. Nothing had " +
+      "been placed yet — the table opened on her date"
+  );
+});
+
+test("when it is: a spring table cannot drift into autumn through the shoulder", () => {
+  // The reason her season SEEDS the commitment rather than being compared
+  // against it. `narrowSeason` only narrows: a group that opened empty and took
+  // the shoulder appetizer would thereafter be a shoulder table, and an autumn
+  // dessert would agree with it — at a party in April.
+  const fill = tableFor(
+    [
+      dish("a1", "Asparagus vinaigrette", "the_appetizer", "half_made", {
+        season: "shoulder",
+      }),
+      dish("m1", "A main", "the_main", "half_made"),
+      dish("d1", "Roast pears in wine", "the_dessert", "half_made", {
+        season: "autumn",
+      }),
+      dish("d2", "Rhubarb fool", "the_dessert", "half_made", { season: "spring" }),
+    ],
+    { season: "spring" }
+  );
+
+  const dessert = fill.picks.find((p) => p.slot.slotCode === "the_dessert")!;
+  assert.equal(dessert.ingredient.name, "Rhubarb fool");
+});
+
+test("when it is: her answer names the meal, and no meal outranks it", () => {
+  assert.equal(
+    mealShape([], "brunch"),
+    "brunch",
+    "three of db/023's five shapes were unreachable, so a dish tagged for " +
+      "brunch was not narrowed to brunch — it was removed from every table"
+  );
+  assert.equal(
+    mealShape([], null),
+    "long_dinner",
+    "an application written before the question was asked behaves as it did"
+  );
+  assert.equal(
+    mealShape(["no_seated_meal"], "brunch"),
+    "cocktails",
+    "and the exclusion still wins: the answer that removes the main and the " +
+      "dessert is the answer that makes it a cocktail party. She cannot be " +
+      "shown the meal question at all in that case, so this can only fire " +
+      "against a stale answer — and it fires against it correctly"
+  );
+});
+
+test("when it is: a brunch dish is finally reachable", () => {
+  const dishes = [
+    dish("a1", "Untagged", "the_appetizer", "half_made"),
+    dish("a2", "Quiche lorraine", "the_appetizer", "half_made", {
+      meals: ["brunch"],
+    }),
+    dish("m1", "A main", "the_main", "half_made"),
+    dish("d1", "A dessert", "the_dessert", "half_made"),
+  ];
+
+  const appetizersAt = (meal: string) =>
+    [...coursePoolsFor(dishes, meal).values()]
+      .find((entry) => entry.slot.slotCode === "the_appetizer")!
+      .candidates.map((c) => c.ingredient.name)
+      .sort();
+
+  assert.deepEqual(
+    appetizersAt("brunch"),
+    ["Quiche lorraine", "Untagged"],
+    "a claim NARROWS where it applies. Before db/026 there was no where: " +
+      "`brunch` was a shape nothing could produce, so the claim only ever " +
+      "removed — tagging a dish for brunch took it off every table the engine " +
+      "could set"
+  );
+  assert.deepEqual(
+    appetizersAt("long_dinner"),
+    ["Untagged"],
+    "and it still removes elsewhere, which is the half that already worked"
   );
 });
