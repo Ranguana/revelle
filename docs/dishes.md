@@ -172,7 +172,6 @@ multiple destination tags at import.
 - Chicken pot pie · M (winter)
 - Baked beans and brown bread · H
 - Cold lobster salad plates · H (summer)
-- Swordfish kebabs with lemon · H (summer)
 
 ### Desserts
 - Blueberry pie · M (summer)
@@ -640,7 +639,6 @@ multiple destination tags at import.
 - Rye crisps with alpine butter · B
 - Nettle soup · M (spring)
 - Egg noodle soup · M
-- Warm potato salad with speck · H
 
 ### Mains
 - Braised beef in red wine over polenta · M
@@ -670,7 +668,6 @@ multiple destination tags at import.
 - Raclette over boiled potatoes · H (winter)
 - Beef braised in dark beer · M (winter)
 - Tagliatelle with venison ragù · M (winter)
-- Roast goose with red cabbage · M (winter)
 - Ham hock with lentils · M (winter)
 - Smoked trout with potato salad · B
 - Pork sausages over polenta · H
@@ -695,7 +692,6 @@ multiple destination tags at import.
 - Zelten · B (winter)
 - Vanillekipferl · B (winter)
 - Stewed plums with cream · H (late summer)
-- Meringue with chestnut cream · H (fall)
 - Milk rice with cinnamon and butter · M
 - Ricotta with berries and honey · H (summer)
 - Grappa and butter cookies after · B
@@ -753,7 +749,6 @@ multiple destination tags at import.
 - Poke bowls, build-your-own · B
 - Whole spiny lobster, split and grilled · M
 - Coconut-braised octopus · M
-- Grilled wahoo with lime butter · H
 - Roast suckling pig for a crowd · M
 - Curried shrimp with coconut rice · M
 - Fish and vegetables steamed in banana leaves · M
@@ -761,7 +756,6 @@ multiple destination tags at import.
 - Ginger-glazed tuna · H
 - Pineapple fried rice with shrimp · M
 - Vanilla-butter poached lobster · M
-- Grilled chicken and mango skewers · H
 
 ### Desserts
 - Banana-vanilla pudding · M
@@ -1088,8 +1082,6 @@ multiple destination tags at import.
 - White bean and sage crostini · H
 - Beef carpaccio with arugula and parmesan · M
 - Squid salad with celery and olives · M
-- Baked stuffed onions · M
-- Grilled prawns with lemon · H
 - Salame and coppa board · B
 
 ### Mains
