@@ -386,3 +386,48 @@ This rule does not live in the matrix and cannot be audited by it. Rows are
 arithmetic; thrown-ness is voice, and the founder audits the second one. A row
 can clear distance 3 against every other room and still describe a postcard.
 Both checks have to pass and neither substitutes for the other.
+
+## The twin rule
+
+A room may sit below the gate against **exactly one** other room — its twin —
+provided all four conditions hold:
+
+1. **Distance >= 1.** Zero is not a twin. It is one room written twice, and the
+   answer is the Cap Ferrat answer.
+2. **Voice affinity < 0.65.** The pair must be separable by the OTHER
+   instrument. A tiebreak needs something to work with, and the ceiling is the
+   one `voice.test.ts` already asserts.
+3. **Declared.** The pair is written into `data/destination-matrix.json` and the
+   audit enforces it. An undeclared sub-gate pair is a failure, not a twin —
+   "we agreed that pair is fine" is exactly the kind of thing that stops being
+   written down.
+4. **One twin per room.** A room sitting below the gate against two others is a
+   crowded corner, not a pair, and may twin with neither.
+
+**HAVANA / NEW ORLEANS is the precedent instance and the reason the rule
+exists.** The same night in shape — crowded, cooked-for, evening, until morning
+— separated by "nobody in the house is the target" against "everybody is fair
+game", and measured at **0.172** in voice space, which is about as far apart as
+this catalogue gets. Forcing a structural facet between them would smuggle a
+guest property back into the matrix. The twin rule says so out loud instead.
+
+**ACAPULCO 1959 is admitted under it**, twinned with St. Moritz 1984 at distance
+2. Condition 2 CANNOT YET BE MEASURED — neither voice is written — so the row is
+admitted and the twin claim is provisional until both exist.
+
+**And the rule blocks OAXACA 1954**, which is the third claim on a corner
+exactly as Rio is. Oaxaca sits below the gate against New Orleans AND Aspen, so
+it may twin with neither — and admitting it would give New Orleans a second
+sub-gate partner and destroy the Havana/New Orleans twin. The precedent instance
+of the rule is the thing that room would cost. Released by a third
+differentiator against either New Orleans or Aspen.
+
+### Two pairs that would qualify and are deliberately NOT declared
+
+`westhampton / nantucket` (2, affinity 0.424) and `portofino / cote-dazur`
+(1, affinity 0.401) both satisfy all four conditions. Neither is declared,
+because a twin declaration would answer a live question by default instead of
+on purpose: the first is a consequence of the schedule reconciliation and of
+Nantucket's two founder-decides cells, and the second IS the open question of
+whether Portofino exists. The rule is for pairs that are genuinely two rooms,
+not a way to retire an argument.

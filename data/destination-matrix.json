@@ -228,17 +228,6 @@
       "crowd",
       "nothing"
     ],
-    "oaxaca-1954": [
-      "absorbed",
-      "anchored",
-      "overlapping",
-      "plain",
-      "cooked",
-      "dissolves",
-      "afternoon",
-      "crowd",
-      "nothing"
-    ],
     "acapulco-1959": [
       "absorbed",
       "anchored",
@@ -270,11 +259,11 @@
     "palm-springs-1965",
     "st-moritz-1984",
     "aspen-1994",
-    "oaxaca-1954",
     "acapulco-1959"
   ],
   "blocked": {
-    "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`."
+    "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`.",
+    "oaxaca-1954": "BLOCKED BY THE TWIN RULE — the third claim on a corner, exactly as Rio was. Oaxaca sits below the gate against TWO rooms (New Orleans at 2, Aspen at 2), so it cannot twin with either. Worse, admitting it COSTS THE HAVANA/NEW ORLEANS TWIN: New Orleans would then have two sub-gate partners and lose its eligibility. The precedent instance of the rule is destroyed by admitting this room. Released by a third differentiator against either New Orleans or Aspen."
   },
   "founderPending": {
     "palm-springs-1965.schedule": "provisional `anchored` — founder decides",
@@ -318,5 +307,55 @@
       "evidence": "`the second wind: coffee and something fried at midnight, taken ON PURPOSE so the night can go on`",
       "status": "stands"
     }
+  },
+  "twinRule": {
+    "statement": "A room may sit below the gate against EXACTLY ONE other room — its twin — provided all four conditions hold.",
+    "conditions": [
+      "distance >= 1. Zero is not a twin, it is one room written twice.",
+      "voice affinity < 0.65. The pair must be separable by the OTHER instrument; the tiebreak has to have something to work with.",
+      "the pair is DECLARED here as a tiebreak pair. An undeclared sub-gate pair is a failure, not a twin.",
+      "ONE TWIN PER ROOM. A room with two sub-gate partners cannot twin with either — that is a crowded corner, not a pair."
+    ],
+    "why": "Havana/New Orleans is the precedent instance and the reason the rule exists: the same night in shape, separated by 'nobody in the house is the target' against 'everybody is fair game', at 0.172 in voice space. Forcing a structural facet between them would smuggle a guest property back into the matrix. The twin rule says so out loud instead.",
+    "declared": [
+      {
+        "pair": [
+          "havana",
+          "new-orleans"
+        ],
+        "distance": 1,
+        "voiceAffinity": 0.172,
+        "status": "verified"
+      },
+      {
+        "pair": [
+          "st-moritz-1984",
+          "acapulco-1959"
+        ],
+        "distance": 2,
+        "voiceAffinity": null,
+        "status": "UNVERIFIED — neither voice is written, so the affinity condition cannot be measured. Admitted on the row; the twin claim is provisional until both voices exist."
+      }
+    ],
+    "candidatesNotDeclared": [
+      {
+        "pair": [
+          "westhampton-1976",
+          "nantucket"
+        ],
+        "distance": 2,
+        "voiceAffinity": 0.424,
+        "note": "Would qualify on all four conditions. NOT declared — this pair is a consequence of the schedule reconciliation and of Nantucket's two founder-decides cells, and it should be resolved by deciding those rather than excused by a twin."
+      },
+      {
+        "pair": [
+          "portofino",
+          "cote-dazur"
+        ],
+        "distance": 1,
+        "voiceAffinity": 0.401,
+        "note": "Would qualify. NOT declared — this is the open question of whether Portofino exists, and a twin declaration would answer it by default instead of on purpose."
+      }
+    ]
   }
 }

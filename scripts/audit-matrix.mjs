@@ -48,14 +48,50 @@ for (let i = 0; i < keys.length; i++)
     pairs.push({ a: keys[i], b: keys[j], d: dist(keys[i], keys[j]) });
 pairs.sort((x, y) => x.d - y.d);
 
-const failing = pairs.filter((p) => p.d < M.gate);
+// THE TWIN RULE. A declared pair may sit below the gate; an undeclared one may
+// not. Enforced here rather than trusted, because "we agreed that pair is fine"
+// is exactly the kind of thing that stops being written down.
+const twinKey = (a, b) => [a, b].sort().join(" / ");
+const declared = new Map((M.twinRule?.declared ?? []).map((t) => [twinKey(...t.pair), t]));
+const twinOf = {};
+for (const t of M.twinRule?.declared ?? []) {
+  const [a, b] = t.pair;
+  if (twinOf[a] || twinOf[b]) console.error(`TWIN VIOLATION: ${twinOf[a] ? a : b} is declared in two twin pairs. One twin per room.`);
+  twinOf[a] = b; twinOf[b] = a;
+}
+
+const belowGate = pairs.filter((p) => p.d < M.gate);
+const excused = belowGate.filter((p) => declared.has(twinKey(p.a, p.b)));
+const failing = belowGate.filter((p) => !declared.has(twinKey(p.a, p.b)));
+
+// A room with two sub-gate partners is a crowded corner, not a pair, and may
+// not twin with either. Check the declarations against that.
+for (const [key, t] of declared) {
+  const [a, b] = t.pair;
+  for (const k of [a, b]) {
+    const partners = keys.filter((o) => o !== k && dist(k, o) < M.gate);
+    if (partners.length > 1)
+      console.error(`TWIN VIOLATION: ${k} sits below the gate against ${partners.length} rooms (${partners.join(", ")}). One twin per room — it may twin with none of them.`);
+  }
+  if (t.d === 0) console.error(`TWIN VIOLATION: ${key} is at distance 0. That is one room written twice, not a twin.`);
+}
 const zero = pairs.filter((p) => p.d === M.gate);
 const mean = pairs.reduce((s, p) => s + p.d, 0) / pairs.length;
 
 console.log(`${keys.length} destinations · ${pairs.length} pairs · gate ${M.gate}`);
 console.log(`${M.authored.length} authored, ${M.proposed.length} proposed\n`);
 
-console.log(`FAILING (below the gate): ${failing.length}`);
+if (excused.length) {
+  console.log(`DECLARED TWINS (below the gate, allowed): ${excused.length}`);
+  for (const p of excused) {
+    const t = declared.get(twinKey(p.a, p.b));
+    const v = t.voiceAffinity == null ? "voice affinity UNMEASURABLE — a voice is unwritten" : `voice affinity ${t.voiceAffinity}`;
+    console.log(`   ${p.d}  ${p.a} / ${p.b}   [${v}]`);
+  }
+  console.log("");
+}
+
+console.log(`FAILING (below the gate, undeclared): ${failing.length}`);
 for (const p of failing) console.log(`   ${p.d}  ${p.a} / ${p.b}   [differ only on: ${differing(p.a, p.b).join(", ")}]`);
 
 console.log(`\nZERO MARGIN (exactly ${M.gate}): ${zero.length}`);

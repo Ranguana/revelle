@@ -38,6 +38,18 @@ space, or to conclude it is an existing room written twice — which is what
 happened to CAP FERRAT, and folding it in was the right outcome rather than a
 defeat.
 
+### 0b-bis. Or claim a twin, under the twin rule
+
+A room may fail 0b against EXACTLY ONE other room, if: distance >= 1, voice
+affinity below 0.65, the pair is declared in data/destination-matrix.json, and
+neither room already has a twin. A room below the gate against two others is a
+crowded corner and may twin with neither.
+
+The full argument, and the precedent instance (Havana / New Orleans at 0.172),
+is in docs/destination-contrasts.md. A twin is for a pair that is genuinely two
+rooms separated by voice rather than by shape — it is not a way to retire an
+argument about whether a room should exist.
+
 ### 0c. Know that there is plenty of room, and place deliberately
 
 The facet space holds **about 131 rooms** at minimum distance 3. Twelve are
