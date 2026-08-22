@@ -17,8 +17,35 @@ import { setApplicationStatus } from "./applications/actions";
 /**
  * THE INBOX.
  *
- * The most valuable screen in the tool, and the reason it exists: applications
- * arrive, nobody is told, and until now nowhere showed them.
+ * ── WHAT THE DESK IS FOR, WHICH CHANGED ─────────────────────────────
+ *
+ *   DECIDING WHAT THE HOUSE MAY OFFER REMAINS OURS.
+ *   DECIDING WHAT ONE MEMBER GETS IS NOW HERS.
+ *
+ * The human left the PER-MEMBER loop, not the CATALOGUE GATE. That is the whole
+ * change and it is a better product than the one with a curator in it.
+ *
+ * So the seeders-create-drafts rule stands untouched — "deciding that something
+ * is offered to a customer is a curator's decision and not a script's" — and
+ * `npm run activate:catalogue -- --yes` is still the one place that yes gets
+ * said. Nothing about removing the curator from selection weakens the gate on
+ * what may reach a member at all.
+ *
+ * What it DOES remove is approval of an individual Revelle. The engine ranks,
+ * the member is shown two or three, she taps one, and her pick is the record.
+ * This screen is therefore an OBSERVATION surface and a spot-check window, not
+ * a queue anybody has to clear: what came in, what the engine proposed, what
+ * she picked, and how far apart those last two were. That divergence is the
+ * calibration data the seam exists to collect (see THE SEAM in
+ * src/lib/destinations.ts) and this is where it is read.
+ *
+ * The approve and reject affordances below are from the previous design and are
+ * due for removal rather than repair.
+ *
+ * ── THE ORIGINAL REASON IT EXISTS, WHICH STILL HOLDS ─────────────────
+ *
+ * The most valuable screen in the tool: applications arrive, nobody is told,
+ * and until this existed nowhere showed them.
  *
  * ── WHAT IS ON A ROW, AND WHY ───────────────────────────────────────
  *

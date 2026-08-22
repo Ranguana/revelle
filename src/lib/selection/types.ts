@@ -945,7 +945,8 @@ export const DEFAULT_OPTIONS: EngineOptions = {
    *   1. IT MUST ACTUALLY CUT. At 0.20 the median host loses six of thirteen —
    *      close to half the library. That is a tier. At 0 nothing is removed and
    *      "voice wins" is a sentence in a comment.
-   *   2. THE SHORTLIST MUST SURVIVE IT. The curator is shown three candidates,
+   *   2. THE SHORTLIST MUST SURVIVE IT. The reveal shows two or three (there
+   *      is no curator; the member picks),
    *      and the dither — the thing that stops two similar customers getting the
    *      same Revelle — is what needs them. With fewer than three survivors
    *      engine.ts reuses one and she is choosing between a thing and itself.

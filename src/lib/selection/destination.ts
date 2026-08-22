@@ -48,12 +48,27 @@
  *
  * ── WHERE THE DITHER IS APPLIED ──────────────────────────────────────
  *
- * On the CURATOR'S SHORTLIST, never on a delivered Revelle. Netflix can afford
- * to explore on a live recommendation because the regret is amortised over a
- * hundred million members; Revelle has few customers and each deliverable is
- * expensive, so exploring on a delivered one is a bad trade. The curator
- * absorbs the exploration risk, and her rejecting a dithered candidate is
- * itself the signal we wanted from the exploration.
+ * ON RANKS 2 TO 5 ONLY. THE TOP-RANKED SURVIVOR ALWAYS APPEARS.
+ *
+ * This paragraph used to read: on the CURATOR'S SHORTLIST, never on a delivered
+ * Revelle, because the curator absorbs the exploration risk and her rejecting a
+ * dithered candidate is itself the signal. THERE IS NO CURATOR. The member sees
+ * the reveal and picks from it, so exploration is now member-absorbed.
+ *
+ * The half of that argument that survives is the reason the bound exists.
+ * Netflix can afford to explore on a live recommendation because the regret is
+ * amortised over a hundred million members; Revelle has few customers and each
+ * deliverable is expensive. Full-shortlist dither with no curator would mean
+ * exploration can cost her THE RIGHT ROOM — she is shown two or three and the
+ * best answer is not among them. That is the bad trade the old comment named,
+ * and removing the curator makes it worse rather than moot.
+ *
+ * So the dither is bounded rather than abandoned: rank 1 is always in the
+ * reveal, and the dither decides only which of ranks 2 to 5 fill the remaining
+ * slots. Exploration is preserved — the engine gets to test near-misses against
+ * a real pick, which is better evidence than a curator's rejection because she
+ * is choosing a party rather than auditing a queue — and the downside is capped
+ * at the slots that were never going to be the answer.
  *
  * AND IT IS APPLIED TO THE SURVIVORS ONLY. Exploration may trade one
  * voice-true destination for another; it may never resurrect an aesthetic

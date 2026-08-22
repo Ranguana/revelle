@@ -186,20 +186,21 @@ import type { ToneWeight } from "./voice";
  *
  * ── The two numbers, and why they are not yet chosen ─────────────────
  *
- * SURVIVOR FLOOR is 3, and it is derived rather than picked: the curator is
- * shown three candidates (src/lib/selection/types.ts), so below three the
- * shortlist is padded by reuse and the dither has nothing to dither. A
- * tap pattern hostile to everything must degrade to "structure decides",
- * never to an empty room.
+ * SURVIVOR FLOOR is 3, and it is derived rather than picked: THE REVEAL SHOWS
+ * TWO OR THREE, so below three survivors there is nothing to show and the
+ * dither has nothing to dither. This used to be derived from "the curator is
+ * shown three candidates" — there is no curator, the member picks, and the
+ * reveal is the better derivation because it is the surface the number
+ * actually serves. A tap pattern hostile to everything must degrade to
+ * "structure decides", never to an empty room.
  *
  * MINIMUM TAPS is 3. The quiz permits one. A one-tap profile is a single
  * tone's facet vector, so a cosine against it measures that tone rather than a
  * voice; two is not much better. Three is the first count at which the
  * question is answering about a GROUP.
  *
- * REVEAL COUNT is 2-3, and 3 is where the engine already lives: the curator is
- * shown three candidates, so the surface and the engine agree without a new
- * number. One is brittle for exactly the reason the tiebreak exists — at a
+ * REVEAL COUNT is 2-3. The curator prop this once leaned on is gone, and the
+ * remaining arguments carry it alone. One is brittle for exactly the reason the tiebreak exists — at a
  * near-tie, a top-1 reveal is a coin-flip presented as a verdict. Larger sets
  * are worse, not better: the recommender literature finds long lists increase
  * choice difficulty and dissatisfaction against short ones, and a long list is
