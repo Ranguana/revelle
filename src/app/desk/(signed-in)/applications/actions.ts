@@ -8,10 +8,7 @@ import { acceptApplicant } from "@/lib/desk/acceptance";
 import { APPLICATION_STATUS } from "@/lib/desk/labels";
 import { clearNotice, setNotice } from "@/lib/desk/notice";
 import {
-  approveProposal,
   deliverRevelle,
-  discardApproval,
-  rejectProposal,
   requestGeneration,
   type Outcome,
 } from "@/lib/desk/proposals";
@@ -31,10 +28,27 @@ import { recordAction, requireStaff } from "@/lib/staff";
  *   guest_count_confirmed   the real number, once there is one. NOT her answer,
  *                           which is guest_count_band and is frozen (db/006).
  *
- * Below those, the five that decide what she actually receives: approving a
- * proposal, rejecting one, asking for another run, discarding an undelivered
- * Revelle, and delivering. And one that decides something else entirely —
- * accepting her as a member. See the note above `acceptApplicantAction`.
+ * Below those, what is left of the five that used to decide what she actually
+ * receives. Three of them are gone: APPROVING a proposal, REJECTING one, and
+ * DISCARDING an undelivered Revelle so it could be chosen again. There is no
+ * curator — the engine ranks, she is shown two or three, she taps one, and her
+ * pick is the record — so an action whose only job was to decide, un-decide or
+ * re-decide one member's Revelle from this side of the screen has nothing left
+ * to do. The argument each of them carried is preserved where it was made:
+ * approve and reject in the header of applications/[id]/Proposals.tsx, discard
+ * beside the panel it lived in on applications/[id]/page.tsx.
+ *
+ * Two survive, because neither decides WHAT she gets:
+ *
+ *   regenerateAction        a repair for a run that produced nothing she could
+ *                           be shown. Hidden once anything of hers exists.
+ *   deliverRevelleAction    WHEN she gets what she chose, and the transition
+ *                           that arms db/003's ratchet.
+ *
+ * And one that decides something else entirely — accepting her as a member.
+ * See the note above `acceptApplicantAction`. That one is the CATALOGUE GATE's
+ * cousin and is untouched by any of this: deciding what the house may offer,
+ * and to whom it opens at all, remains ours.
  *
  * EVERY ACTION RE-CHECKS THE SESSION. A Server Action is its own entry point
  * and is reachable without rendering the page whose form calls it, so the
@@ -129,73 +143,38 @@ export async function setApplicationFacts(form: FormData): Promise<void> {
 /* ── what she actually receives ───────────────────────────────────── */
 
 /**
- * APPROVAL. Before it, a proposal; after it, a Revelle.
+ * REMOVED: `approveProposalAction` and `rejectProposalAction`.
  *
- * Everything that could refuse is in src/lib/revelle/proposals.ts, inside one
- * transaction, on a locked row — the destination with no published voice, the
- * assemblage the engine withheld, the Revelle that already exists and has been
- * delivered. This function's whole job is the session, the ledger row and the
- * sentence.
- */
-export async function approveProposalAction(form: FormData): Promise<void> {
-  const staff = await requireStaff();
-  const id = String(form.get("id") ?? "");
-  const proposalId = String(form.get("proposal_id") ?? "");
-  if (!ID.test(id) || !ID.test(proposalId)) return;
-
-  const outcome = await approveProposal(proposalId, staff.id);
-  if (outcome.ok) {
-    await recordAction(staff, {
-      action: "proposal.approved",
-      entityTable: "quiz_response",
-      entityId: id,
-      summary: outcome.summary,
-      detail: outcome.detail,
-    });
-  }
-  await settle(id, outcome);
-}
-
-/**
- * "Not this one."
+ * Approval was the moment a proposal became a Revelle and rejection was "not
+ * this one", with an optional note that docs/selection-spec.md called the
+ * highest-value observation in the system. Both were a curator deciding one
+ * member's Revelle, and that is the loop the human left. The reasoning, and
+ * what the change cost in prose, is kept in the header of
+ * applications/[id]/Proposals.tsx where the two forms were.
  *
- * The note is the reason this exists at all. docs/selection-spec.md is explicit
- * that a curator's correction is the highest-value observation in the system —
- * "rejecting a dithered candidate is itself signal" — and a rejection with no
- * reason attached teaches nothing. Optional rather than required, because a
- * curator with no words for it should not be blocked from moving on.
+ * `approveProposal` and `rejectProposal` in src/lib/desk/proposals.ts — and
+ * `approve`/`reject` under them in src/lib/revelle/proposals.ts — are NOT
+ * removed with these. They are the write path a member's pick has to travel
+ * too, they carry every refusal that matters (no published voice, a blocked
+ * assemblage, a Revelle that already exists), and they are covered by
+ * src/lib/revelle/proposals.db.test.ts. What is gone is the desk's door to
+ * them, not the machinery behind it.
  */
-export async function rejectProposalAction(form: FormData): Promise<void> {
-  const staff = await requireStaff();
-  const id = String(form.get("id") ?? "");
-  const proposalId = String(form.get("proposal_id") ?? "");
-  if (!ID.test(id) || !ID.test(proposalId)) return;
-
-  const raw = String(form.get("note") ?? "").trim();
-  const outcome = await rejectProposal(
-    proposalId,
-    staff.id,
-    raw.length > 0 ? raw : null
-  );
-  if (outcome.ok) {
-    await recordAction(staff, {
-      action: "proposal.rejected",
-      entityTable: "quiz_response",
-      entityId: id,
-      summary: outcome.summary,
-      detail: outcome.detail,
-    });
-  }
-  await settle(id, outcome);
-}
 
 /**
  * "Show me another set."
  *
  * NOT the only path to a proposal, and it must never become one: generation is
  * automatic and happens in the same transaction as the application (see
- * src/app/api/quiz/route.ts). This is the second half of "approve one, or
- * reject it and ask for another".
+ * src/app/api/quiz/route.ts).
+ *
+ * It used to be the second half of "approve one, or reject it and ask for
+ * another", and that sentence no longer has a first half. What it is for now is
+ * narrower and is enforced by the UI that calls it: a run that left her with
+ * nothing to be shown — failed, impasse, empty. Regenerating supersedes the
+ * whole live set, so offering it once she has been shown candidates would be
+ * taking back an offer, and the form is hidden the moment there is a pick or a
+ * Revelle. `requestGeneration` already refuses outright after delivery.
  */
 export async function regenerateAction(form: FormData): Promise<void> {
   const staff = await requireStaff();
@@ -216,30 +195,21 @@ export async function regenerateAction(form: FormData): Promise<void> {
 }
 
 /**
- * Undo an approval — and THE PLACE THE RATCHET IS FELT.
+ * REMOVED: `discardRevelleAction`.
  *
- * An undelivered Revelle is disposable and db/003 says so at length: drafts and
- * previews may collide with anything, in any number, because nobody has them.
- * A DELIVERED one is not, and this refuses. `first_delivered_at` is the test,
- * so archiving it does not release it either.
+ * "Discard and choose again" — undo an approval so a curator could pick a
+ * different candidate, free until delivery and impossible after it, because
+ * `first_delivered_at` is db/003's ratchet. Every word of that is still true;
+ * what changed is whose choice the button would throw away. Approval is not a
+ * curator's any more, so discarding could only un-decide HER pick and hand the
+ * choice back to the house. The argument is preserved beside the panel it lived
+ * in, in applications/[id]/page.tsx.
+ *
+ * `discardApproval` in src/lib/desk/proposals.ts is left in place. It is the
+ * only correct way to release an undelivered Revelle, it is tested, and a
+ * pick-first flow that has to undo one before delivery will need exactly it.
+ * What it must never grow back is a button on this desk.
  */
-export async function discardRevelleAction(form: FormData): Promise<void> {
-  const staff = await requireStaff();
-  const id = String(form.get("id") ?? "");
-  if (!ID.test(id)) return;
-
-  const outcome = await discardApproval(id, staff.id);
-  if (outcome.ok) {
-    await recordAction(staff, {
-      action: "revelle.discarded",
-      entityTable: "quiz_response",
-      entityId: id,
-      summary: outcome.summary,
-      detail: outcome.detail,
-    });
-  }
-  await settle(id, outcome);
-}
 
 /**
  * DELIVERY. The last thing anyone can undo, and after it nothing.

@@ -22,10 +22,10 @@ import styles from "../../../desk.module.css";
 import Thread from "../../Thread";
 import { Chips, Fact, Head, Status } from "../../bits";
 import Proposals from "./Proposals";
+import { readDecisions } from "../decisions";
 import {
   acceptApplicantAction,
   deliverRevelleAction,
-  discardRevelleAction,
   setApplicationFacts,
   setApplicationStatus,
 } from "../actions";
@@ -36,6 +36,13 @@ import {
  * The inbox is for triage; this is for working. It adds the three things a row
  * cannot carry: what her answers RESOLVE TO in the shared vocabulary, how her
  * people sound on the voice axes, and the verbatim payload she submitted.
+ *
+ * ── AND IT IS NO LONGER WHERE A REVELLE IS CHOSEN ────────────────────
+ *
+ * The engine ranks, she is shown two or three, she taps one. This page reads
+ * that decision back — who decided, which rank was taken, what the engine had
+ * wanted — and it is the spot-check window for it. See the essay at the top of
+ * src/app/desk/(signed-in)/page.tsx for the change and what survived it.
  *
  * ── WHY THE RAW ANSWERS ARE ON THE PAGE ─────────────────────────────
  *
@@ -148,15 +155,18 @@ export default async function ApplicationPage({
     ),
   ]);
 
-  // The three reads that make this page the curator's tool rather than a
-  // viewer: what the engine proposed, where its run got to, and whether an
-  // approval has already turned one of them into a Revelle.
-  const [proposals, run, revelle, member] = await Promise.all([
+  // The reads that make this page a spot-check rather than a viewer: what the
+  // engine proposed, where its run got to, whether one of them is now a
+  // Revelle — and WHO DECIDED THAT, which is the only one of the four that is
+  // still an open question about a person.
+  const [proposals, run, revelle, member, decisions] = await Promise.all([
     applicationProposals(id),
     latestRun(id),
     approvedRevelle(id),
     membership(application.customer_id),
+    readDecisions([id]),
   ]);
+  const divergence = decisions.get(id) ?? null;
 
   const back = `/desk/applications/${id}`;
 
@@ -191,16 +201,18 @@ export default async function ApplicationPage({
           </section>
 
           {/*
-            THE WORKING SURFACE, and the reason this page exists at all. It is
-            directly under her own words because those are what a curator reads
-            the proposal against — docs/selection-spec.md keeps the free-text
-            answer "verbatim and prominent" for exactly this moment.
+            THE READING SURFACE, and the reason this page exists at all. It is
+            directly under her own words because those are what the proposal is
+            read against — docs/selection-spec.md keeps the free-text answer
+            "verbatim and prominent" for exactly this moment, and it is now the
+            first thing to hold beside a pick that went against the engine.
           */}
           <Proposals
             applicationId={id}
             proposals={proposals}
             run={run}
             hasRevelle={revelle !== null}
+            divergence={divergence}
           />
 
           <section className={styles.panel}>
@@ -374,6 +386,14 @@ export default async function ApplicationPage({
         </div>
 
         <div>
+          {/*
+            THE LAST PLACE A STATUS CAN BE SET, and it used to be on every
+            inbox row as well. It is housekeeping — the inbox filters are built
+            on it and something has to be able to archive — but it is a control
+            somebody operates, and a control on a list turns the list back into
+            a queue. So it lives here, one page in, where a person has already
+            decided to look at this application properly.
+          */}
           <section className={styles.panel}>
             <h2 className={styles.panelHead}>
               <span>Workflow</span>
@@ -454,12 +474,23 @@ export default async function ApplicationPage({
           </section>
 
           {/*
-            HER REVELLE, once a curator has approved one.
-            Two buttons and the whole of db/003 behind them: discarding is free
-            until the moment of delivery and impossible after it, because
-            `first_delivered_at` is a ratchet and the assemblage it claims is
-            claimed for good. The panel says which side of that line this
-            Revelle is on before it offers either.
+            HER REVELLE, once there is one — and there is one because SHE
+            PICKED IT.
+
+            WAS: two buttons, "Deliver it" and "Discard and choose again". The
+            second is gone with the curator. Its argument was db/003's, and
+            db/003 is untouched: an undelivered Revelle is disposable, drafts
+            and previews may collide with anything, and until delivery nothing
+            has been claimed. All of that is still true — what changed is whose
+            choice would be thrown away by pressing it. Discarding used to undo
+            a curator's approval so a curator could choose again; there is now
+            nobody on this side of the screen who chose, so the button could
+            only undo HER pick and hand the choice back to the house. That is
+            the loop the design took the human out of.
+
+            Delivery stayed. It decides WHEN she gets what she chose, not WHAT
+            she gets, and db/003's ratchet is armed by it either way — which is
+            why the panel still says which side of that line this Revelle is on.
           */}
           {revelle ? (
             <section className={styles.panel}>
@@ -502,12 +533,10 @@ export default async function ApplicationPage({
                       Deliver it
                     </button>
                   </form>
-                  <form action={discardRevelleAction}>
-                    <input type="hidden" name="id" value={id} />
-                    <button className={styles.buttonDanger} type="submit">
-                      Discard and choose again
-                    </button>
-                  </form>
+                  <span className={styles.hint}>
+                    What is delivered is what she chose. There is nothing here
+                    that re-opens that.
+                  </span>
                 </div>
               )}
             </section>

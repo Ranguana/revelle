@@ -660,10 +660,17 @@ export async function approve(
     );
   }
 
+  // `founder_override` because this path takes a staffId, and under db/027 that
+  // is exactly what a staffed decision now is. THE MEMBER PATH DOES NOT EXIST
+  // YET: when she picks from the reveal it must write kind = 'member' with
+  // decided_by NULL, and a timeout must write 'system_default' — never
+  // 'member', or the divergence measure fills with agreements nobody made.
+  // The check constraint refuses a staff id on either of those.
   await tx.query(
     `update revelle_proposal
         set status = 'approved', revelle_id = $2,
-            decided_at = now(), decided_by = $3
+            decided_at = now(), decided_by = $3,
+            decided_by_kind = 'founder_override'
       where id = $1`,
     [input.proposalId, revelleId, input.staffId]
   );
@@ -698,9 +705,10 @@ export async function reject(
   input: { proposalId: string; staffId: string; note: string | null }
 ): Promise<{ ok: true } | Refusal> {
   const { rows } = await tx.query(
+    // See the note in approve(): a staffId means founder_override under db/027.
     `update revelle_proposal
         set status = 'rejected', decided_at = now(), decided_by = $2,
-            decision_note = $3
+            decided_by_kind = 'founder_override', decision_note = $3
       where id = $1 and status = 'proposed'
      returning id`,
     [input.proposalId, input.staffId, input.note]
@@ -762,7 +770,7 @@ export async function discard(
   await tx.query(
     `update revelle_proposal
         set status = 'proposed', revelle_id = null,
-            decided_at = null, decided_by = null
+            decided_at = null, decided_by = null, decided_by_kind = null
       where revelle_id = $1`,
     [str(revelle.id)]
   );

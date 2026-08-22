@@ -12,7 +12,11 @@ import {
 
 import styles from "../desk.module.css";
 import { Chips, Empty, Fact, Head, Status } from "./bits";
-import { setApplicationStatus } from "./applications/actions";
+import {
+  decisionLine,
+  readDecisions,
+  type Divergence,
+} from "./applications/decisions";
 
 /**
  * THE INBOX.
@@ -39,8 +43,26 @@ import { setApplicationStatus } from "./applications/actions";
  * calibration data the seam exists to collect (see THE SEAM in
  * src/lib/destinations.ts) and this is where it is read.
  *
- * The approve and reject affordances below are from the previous design and are
- * due for removal rather than repair.
+ * ── THE AFFORDANCE THAT WAS ON EVERY ROW, AND WHY IT WENT ────────────
+ *
+ * Each row carried a status dropdown and a Set button, posting to
+ * `setApplicationStatus`. The argument for it was good and it is worth keeping:
+ * somebody working the inbox should be able to move six applications along
+ * without opening six pages, and a queue you cannot clear from the list is a
+ * queue that stays full.
+ *
+ * It lost to the design above. A screen with a per-row decision on it is a
+ * queue whatever the header says, and the one decision that used to justify
+ * working down this list — which Revelle she gets — is no longer anybody's here
+ * to make. What replaced the dropdown is the DECISION LINE: who decided, which
+ * rank was taken, and what the engine had wanted instead. That is a fact to
+ * read, not a control to operate, and it is the thing this screen now exists to
+ * show.
+ *
+ * The status itself is still real — the filters below are built on it, and
+ * archiving is still housekeeping somebody does — so it kept its control on
+ * the application's own page, where a spot-check ends. It is one page further
+ * from the list on purpose.
  *
  * ── THE ORIGINAL REASON IT EXISTS, WHICH STILL HOLDS ─────────────────
  *
@@ -159,6 +181,18 @@ export default async function Inbox({ searchParams }: PageProps<"/desk">) {
     args
   );
 
+  // WHAT SHE DID WITH WHAT THE ENGINE PROPOSED. A second read rather than a
+  // join, so that the list above — which has always worked — cannot be taken
+  // down by a proposal table that is a migration behind. See decisions.ts.
+  const decisions = await readDecisions(rows.map((row) => row.id));
+
+  const settled = [...decisions.values()].filter((d) => d.chosen !== null);
+  const tally = {
+    decided: settled.length,
+    diverged: settled.filter((d) => (d.rankGap ?? 0) > 0).length,
+    timedOut: settled.filter((d) => d.kind === "system_default").length,
+  };
+
   return (
     <>
       <Head eyebrow="Applications" title="The inbox" />
@@ -177,6 +211,18 @@ export default async function Inbox({ searchParams }: PageProps<"/desk">) {
         <span className={styles.hint}>
           {rows.length} shown, newest first
         </span>
+        {/*
+          THE ONLY NUMBER ON THIS SCREEN THAT IS ABOUT THE ENGINE. Over the
+          applications in view: how many were decided, how many of those went
+          against the engine's first choice, and how many were nobody at all.
+          The last is kept separate from the first two forever — see db/027.
+        */}
+        {tally.decided > 0 ? (
+          <span className={styles.hint}>
+            {tally.decided} decided · {tally.diverged} took something other than
+            rank 1 · {tally.timedOut} timed out
+          </span>
+        ) : null}
       </div>
 
       {rows.length === 0 ? (
@@ -286,24 +332,14 @@ export default async function Inbox({ searchParams }: PageProps<"/desk">) {
                     Revelle: {row.revelle_status}
                   </span>
                 ) : null}
-                <form action={setApplicationStatus}>
-                  <input type="hidden" name="id" value={row.id} />
-                  <select
-                    name="status"
-                    defaultValue={row.status}
-                    className={styles.select}
-                    aria-label="Status"
-                  >
-                    {Object.entries(APPLICATION_STATUS).map(([code, label]) => (
-                      <option key={code} value={code}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                  <button className={styles.filter} type="submit">
-                    Set
-                  </button>
-                </form>
+                {/*
+                  WAS: a status dropdown and a Set button, posting to
+                  `setApplicationStatus`. Removed with the curator — see the
+                  essay at the top of this file. The control now lives only on
+                  the application's own page; what stands in its place here is
+                  the decision line, which is read and not operated.
+                */}
+                <Decision divergence={decisions.get(row.id) ?? null} />
                 <Link href={`/desk/applications/${row.id}`} className={styles.filter}>
                   Open
                 </Link>
@@ -326,5 +362,43 @@ export default async function Inbox({ searchParams }: PageProps<"/desk">) {
         </ul>
       )}
     </>
+  );
+}
+
+/**
+ * THE DECISION LINE, and what replaced the dropdown.
+ *
+ * Three states, and the middle one is the reason the column in db/027 exists:
+ *
+ *   nothing here      the engine has not produced candidates for her at all.
+ *                     Silence rather than a reassuring blank — an application
+ *                     with no run is a different problem from an open reveal
+ *                     and the detail page is where that is diagnosed.
+ *   a timeout         `system_default`. It took rank 1 and it looks exactly
+ *                     like agreement in every column except this one, so it is
+ *                     marked, in the row, every time. A screen that renders it
+ *                     as a pick is a screen that will one day be used to argue
+ *                     the model is well calibrated because five hundred people
+ *                     stopped reading.
+ *   unattributed      a decided proposal with no `decided_by_kind`, which is
+ *                     every row written before db/027 and every row written by
+ *                     anything that has not been taught to set it. Said out
+ *                     loud rather than guessed at.
+ */
+function Decision({ divergence }: { divergence: Divergence | null }) {
+  if (divergence === null) return null;
+
+  // A decision that is not hers — a timeout, or one nobody attributed — is set
+  // bold rather than in its own colour: the row is already dense, and `when` is
+  // the type the rest of this column is set in.
+  const suspect =
+    divergence.chosen !== null &&
+    (divergence.kind === "system_default" || divergence.kind === null);
+  const line = decisionLine(divergence);
+
+  return (
+    <span className={styles.when}>
+      {suspect ? <strong>{line}</strong> : line}
+    </span>
   );
 }
