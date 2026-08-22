@@ -2,43 +2,284 @@
   "note": "The structural matrix. One row per destination, one column per facet. Facets describe the EVENING; properties of her PEOPLE belong to the tone tiles and are measured in voice space, never here. Audited by scripts/audit-matrix.mjs — never quote a failure list from anywhere else.",
   "gate": 3,
   "facets": {
-    "arrival":  ["ceremony", "absorbed", "assigned"],
-    "schedule": ["posted", "anchored", "unplanned"],
-    "volume":   ["overlapping", "one_conversation", "quiet"],
-    "dress":    ["dressed", "plain"],
-    "food":     ["bought", "cooked", "arrived"],
-    "ending":   ["clean_stop", "dissolves", "until_morning"],
-    "starts":   ["morning", "afternoon", "evening"],
-    "size":     ["few", "one_table", "crowd"]
+    "arrival": [
+      "ceremony",
+      "absorbed",
+      "assigned"
+    ],
+    "schedule": [
+      "posted",
+      "anchored",
+      "unplanned"
+    ],
+    "volume": [
+      "overlapping",
+      "one_conversation",
+      "quiet"
+    ],
+    "dress": [
+      "dressed",
+      "plain"
+    ],
+    "food": [
+      "bought",
+      "cooked",
+      "arrived"
+    ],
+    "ending": [
+      "clean_stop",
+      "dissolves",
+      "until_morning"
+    ],
+    "starts": [
+      "morning",
+      "afternoon",
+      "evening"
+    ],
+    "size": [
+      "few",
+      "one_table",
+      "crowd"
+    ],
+    "spectacle": [
+      "performed",
+      "nothing"
+    ]
   },
   "facetNotes": {
     "schedule": "posted = the invitation names the hours. anchored = one thing happens at its hour and the rest finds its own. unplanned = nobody decided anything, it became a party. `anchored` absorbs both a named recurring hour (Westhampton's drinks hour, New Orleans' second wind) and a house's standing rhythms (Nantucket, Côte d'Azur's eternal lunch) — a host cannot tell those two apart from her side of the quiz, so they are one level.",
-    "size": "DEFECT: the levels conflate headcount with furniture, and Portofino's prose claims both in one sentence. Unresolved."
+    "size": "Pure headcount. few = 8 or under. table = 8 to 16. crowd = 16 and over. \"One long table\" is EVIDENCE for the middle band, never the definition — the furniture fact stays in the prose.",
+    "spectacle": "performed = A SHOW THE ROOM WATCHES — a floor show, cliff divers, the band that is the point. EXCLUSION, written here because it will otherwise creep: a toast, or a carving at the table, is CEREMONY and not spectacle. The room attending to one person it knows is not an audience."
   },
   "rows": {
-    "westhampton-1976": ["absorbed","anchored","quiet","dressed","bought","dissolves","evening","few"],
-    "new-york":         ["ceremony","posted","one_conversation","dressed","bought","dissolves","evening","one_table"],
-    "new-orleans":      ["absorbed","anchored","overlapping","plain","cooked","until_morning","evening","crowd"],
-    "dolomites":        ["absorbed","posted","quiet","plain","cooked","clean_stop","morning","one_table"],
-    "havana":           ["absorbed","unplanned","overlapping","plain","cooked","until_morning","evening","crowd"],
-    "las-vegas":        ["ceremony","posted","overlapping","dressed","bought","until_morning","evening","one_table"],
-    "portofino":        ["absorbed","anchored","one_conversation","plain","bought","dissolves","afternoon","few"],
-    "tahiti":           ["absorbed","anchored","quiet","plain","arrived","until_morning","evening","one_table"],
-    "cote-dazur":       ["absorbed","anchored","one_conversation","plain","bought","dissolves","afternoon","one_table"],
-    "catskills":        ["assigned","posted","one_conversation","plain","cooked","dissolves","morning","crowd"],
-    "big-sur":          ["absorbed","unplanned","quiet","plain","cooked","clean_stop","afternoon","few"],
-    "nantucket":        ["absorbed","anchored","quiet","plain","cooked","dissolves","evening","few"],
-    "amalfi-1953":      ["absorbed","anchored","overlapping","plain","bought","dissolves","afternoon","crowd"],
-    "palm-springs-1965":["absorbed","anchored","overlapping","dressed","bought","dissolves","afternoon","crowd"],
-    "st-moritz-1984":   ["ceremony","posted","overlapping","dressed","bought","until_morning","afternoon","crowd"],
-    "aspen-1994":       ["absorbed","posted","overlapping","plain","cooked","clean_stop","afternoon","crowd"]
+    "westhampton-1976": [
+      "absorbed",
+      "anchored",
+      "quiet",
+      "dressed",
+      "bought",
+      "dissolves",
+      "evening",
+      "few",
+      "nothing"
+    ],
+    "new-york": [
+      "ceremony",
+      "posted",
+      "one_conversation",
+      "dressed",
+      "bought",
+      "dissolves",
+      "evening",
+      "one_table",
+      "nothing"
+    ],
+    "new-orleans": [
+      "absorbed",
+      "anchored",
+      "overlapping",
+      "plain",
+      "cooked",
+      "until_morning",
+      "evening",
+      "crowd",
+      "nothing"
+    ],
+    "dolomites": [
+      "absorbed",
+      "posted",
+      "quiet",
+      "plain",
+      "cooked",
+      "clean_stop",
+      "morning",
+      "one_table",
+      "nothing"
+    ],
+    "havana": [
+      "absorbed",
+      "unplanned",
+      "overlapping",
+      "plain",
+      "cooked",
+      "until_morning",
+      "evening",
+      "crowd",
+      "nothing"
+    ],
+    "las-vegas": [
+      "ceremony",
+      "posted",
+      "overlapping",
+      "dressed",
+      "bought",
+      "until_morning",
+      "evening",
+      "one_table",
+      "performed"
+    ],
+    "portofino": [
+      "absorbed",
+      "anchored",
+      "one_conversation",
+      "plain",
+      "bought",
+      "dissolves",
+      "afternoon",
+      "few",
+      "nothing"
+    ],
+    "tahiti": [
+      "absorbed",
+      "anchored",
+      "quiet",
+      "plain",
+      "arrived",
+      "until_morning",
+      "evening",
+      "one_table",
+      "nothing"
+    ],
+    "cote-dazur": [
+      "absorbed",
+      "anchored",
+      "one_conversation",
+      "plain",
+      "bought",
+      "dissolves",
+      "afternoon",
+      "one_table",
+      "nothing"
+    ],
+    "catskills": [
+      "assigned",
+      "posted",
+      "one_conversation",
+      "plain",
+      "cooked",
+      "dissolves",
+      "morning",
+      "crowd",
+      "nothing"
+    ],
+    "big-sur": [
+      "absorbed",
+      "unplanned",
+      "quiet",
+      "plain",
+      "cooked",
+      "clean_stop",
+      "afternoon",
+      "few",
+      "nothing"
+    ],
+    "nantucket": [
+      "absorbed",
+      "anchored",
+      "quiet",
+      "plain",
+      "cooked",
+      "dissolves",
+      "evening",
+      "few",
+      "nothing"
+    ],
+    "amalfi-1953": [
+      "ceremony",
+      "unplanned",
+      "overlapping",
+      "plain",
+      "bought",
+      "dissolves",
+      "evening",
+      "crowd",
+      "nothing"
+    ],
+    "palm-springs-1965": [
+      "absorbed",
+      "anchored",
+      "overlapping",
+      "dressed",
+      "bought",
+      "clean_stop",
+      "afternoon",
+      "crowd",
+      "nothing"
+    ],
+    "st-moritz-1984": [
+      "absorbed",
+      "posted",
+      "overlapping",
+      "dressed",
+      "bought",
+      "until_morning",
+      "evening",
+      "crowd",
+      "nothing"
+    ],
+    "aspen-1994": [
+      "absorbed",
+      "posted",
+      "overlapping",
+      "plain",
+      "cooked",
+      "clean_stop",
+      "afternoon",
+      "crowd",
+      "nothing"
+    ],
+    "oaxaca-1954": [
+      "absorbed",
+      "anchored",
+      "overlapping",
+      "plain",
+      "cooked",
+      "dissolves",
+      "afternoon",
+      "crowd",
+      "nothing"
+    ],
+    "acapulco-1959": [
+      "absorbed",
+      "anchored",
+      "overlapping",
+      "dressed",
+      "bought",
+      "until_morning",
+      "evening",
+      "crowd",
+      "performed"
+    ]
   },
-  "authored": ["westhampton-1976","new-york","new-orleans","dolomites","havana","las-vegas","portofino","tahiti","cote-dazur","catskills","big-sur","nantucket"],
-  "proposed": ["amalfi-1953","palm-springs-1965","st-moritz-1984","aspen-1994"],
-  "blocked": { "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`." },
+  "authored": [
+    "westhampton-1976",
+    "new-york",
+    "new-orleans",
+    "dolomites",
+    "havana",
+    "las-vegas",
+    "portofino",
+    "tahiti",
+    "cote-dazur",
+    "catskills",
+    "big-sur",
+    "nantucket"
+  ],
+  "proposed": [
+    "amalfi-1953",
+    "palm-springs-1965",
+    "st-moritz-1984",
+    "aspen-1994",
+    "oaxaca-1954",
+    "acapulco-1959"
+  ],
+  "blocked": {
+    "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`."
+  },
   "founderPending": {
-    "palm-springs-1965.schedule": "provisional `anchored`",
-    "amalfi-1953.schedule": "provisional `anchored`"
+    "palm-springs-1965.schedule": "provisional `anchored` — founder decides",
+    "nantucket.ending": "FOUNDER DECIDES. `dissolves` is CC's pass-1 reading; `clean_stop` was the original. See flipLog.",
+    "nantucket.starts": "FOUNDER DECIDES. `evening` is CC's pass-1 reading; `afternoon` was the original. See flipLog."
   },
   "rejectedFacets": {
     "speech": "Zero marginal information against `arrival` — separated 20 pairs, none that `arrival` did not.",
@@ -46,5 +287,36 @@
     "acquaintance": "Varies per event, so it passes the evening test, but it does not constrain WHICH WORLD FITS. A constraint that governs assembly, not a ranker.",
     "cuisine": "Eleven levels for sixteen rooms, seven of which reach exactly one room. Not a facet — a destination picker, and it memorises an answer key derived from the destinations in the first place.",
     "audience": "Failed re-derivation. The reply convention is the correct evidence class — permeability with no room in it — but only New York is `counted` and six destinations have no reply convention at all. 1-vs-5 is a fingerprint, not an axis. The six gaps are a defect in those voice documents."
+  },
+  "pendingVoice": {
+    "oaxaca-1954": "Row admitted, voice unwritten. The anchor is the comida — one long afternoon meal from about two, mole going since yesterday, dissolving into the courtyard by early evening. Register is DOMESTIC ABUNDANCE, Sunday-afternoon-forever. If the voice drifts toward nightlife, or toward mariachi-as-floor-show, it converges on rooms that already exist.",
+    "acapulco-1959": "Row admitted, voice unwritten. The villa above the bay; the divers go at dusk and dinner follows them; white dinner jackets, the trio, dancing until the fishing boats go out. Admissible ONLY with `spectacle` adopted."
+  },
+  "flipLog": {
+    "note": "The four cells correction pass 1 (c5acce1) changed. ALL FOUR ARE CC'S READINGS. The founder has not run her pass.",
+    "nantucket.ending": {
+      "from": "clean_stop",
+      "to": "dissolves",
+      "evidence": "\"The night ends on the dock, watching nothing happen on the water.\" It relocates and trails rather than stopping.",
+      "status": "FOUNDER DECIDES"
+    },
+    "nantucket.starts": {
+      "from": "afternoon",
+      "to": "evening",
+      "evidence": "\"Sweaters come out at eight whatever the day did.\" `supper`. Hours run six o'clock, half past eight, after dark.",
+      "status": "FOUNDER DECIDES"
+    },
+    "westhampton-1976.schedule": {
+      "from": "none",
+      "to": "anchored",
+      "evidence": "\"Let the hour do the work.\" `drinks: the hour before dinner` is a named recurring hour.",
+      "status": "stands"
+    },
+    "new-orleans.schedule": {
+      "from": "none",
+      "to": "anchored",
+      "evidence": "`the second wind: coffee and something fried at midnight, taken ON PURPOSE so the night can go on`",
+      "status": "stands"
+    }
   }
 }
