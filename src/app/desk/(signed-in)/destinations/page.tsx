@@ -18,6 +18,10 @@ type Row = {
   updated_at: string;
   voice_version: number | null;
   voice_published_at: string | null;
+  // ::int in the query, not just here. count(*) is bigint and node-postgres
+  // hands bigint back as a STRING, so an uncast count typed as `number` lies:
+  // `drafts > 0` survives on coercion but `drafts === 1` is false for "1", and
+  // the plural below silently read "1 drafts" for every destination.
   drafts: number;
   facet_count: number;
   thin: boolean;
@@ -43,13 +47,13 @@ export default async function DestinationsPage() {
     `select w.id, w.slug::text as slug, w.name, w.tagline,
             w.status::text as status, w.updated_at,
             v.version as voice_version, v.published_at as voice_published_at,
-            (select count(*) from world_voice d
+            (select count(*)::int from world_voice d
               where d.world_id = w.id and d.status = 'draft') as drafts,
             coalesce(c.facet_count, 0) as facet_count,
             coalesce(c.thin, true) as thin,
             coalesce(c.lopsided, false) as lopsided,
             coalesce(c.narrow, true) as narrow,
-            (select count(*) from revelle r where r.world_id = w.id) as revelles
+            (select count(*)::int from revelle r where r.world_id = w.id) as revelles
        from world w
        left join world_voice v on v.world_id = w.id and v.status = 'published'
        left join destination_facet_coverage c on c.id = w.id

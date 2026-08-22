@@ -281,7 +281,9 @@ function poolCell(
   noun: string,
   things: readonly Scoped[]
 ): Cell {
-  const href = `/desk/matrix?pool=${poolCode}`;
+  // Games have their own list now; everything else is still best read on the
+  // connections grid, which is where a pool without a screen of its own lives.
+  const href = poolCode === "game" ? "/desk/games" : `/desk/matrix?pool=${poolCode}`;
   if (things.length === 0) {
     return {
       state: "empty",

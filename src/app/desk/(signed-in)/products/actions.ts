@@ -11,10 +11,19 @@ import { recordAction, requireStaff } from "@/lib/staff";
 /**
  * Adding the thing she just found.
  *
- * A CSV importer already exists (scripts/import-products.mjs) and is the right
- * tool for forty rows out of a spreadsheet. This is the common case: one
- * object, seen once, added before the tab is closed. The two write the same
- * table and neither is a wrapper around the other.
+ * THERE IS NO CSV IMPORTER. This comment used to say scripts/import-products.mjs
+ * "already exists" and was the right tool for forty rows out of a spreadsheet.
+ * It does not exist, it is not in package.json, and the empty-pool screen used
+ * to send a curator after it — the one instruction on an empty screen was a
+ * dead end.
+ *
+ * So this is the ONLY way a product enters the pool: one object, seen once,
+ * added before the tab is closed. That is the common case and it is not a
+ * hardship. When bulk import is genuinely needed — data/decor-candidates.json
+ * holds 80 sourced rows waiting for exactly that — it should be built as a desk
+ * screen rather than a script, because the database is unreachable from any
+ * laptop (ipAllowList is empty) and a script nobody can run is worse than no
+ * script at all.
  */
 
 export type ProductState = { error: string | null };

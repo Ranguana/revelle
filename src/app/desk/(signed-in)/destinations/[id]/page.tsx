@@ -51,16 +51,16 @@ export default async function DestinationPage({
     }>(
       `select v.id, v.version, v.status::text as status, v.authored_by, v.note,
               v.published_at,
-              (select count(*) from revelle r where r.voice_id = v.id) as issued
+              (select count(*)::int from revelle r where r.voice_id = v.id) as issued
          from world_voice v
         where v.world_id = $1
         order by v.version desc`,
       [id]
     ),
     queryOne<{ revelles: number; menus: number; sections: number }>(
-      `select (select count(*) from revelle where world_id = $1) as revelles,
-              (select count(*) from menu_world where world_id = $1) as menus,
-              (select count(*) from world_section where world_id = $1) as sections`,
+      `select (select count(*)::int from revelle where world_id = $1) as revelles,
+              (select count(*)::int from menu_world where world_id = $1) as menus,
+              (select count(*)::int from world_section where world_id = $1) as sections`,
       [id]
     ),
   ]);

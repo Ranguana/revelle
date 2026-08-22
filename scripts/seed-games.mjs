@@ -43,6 +43,19 @@
  * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL and is
  * deliberately not wired into a deploy: putting a game in the catalogue is a
  * decision.
+*
+ * ── ONE ASYMMETRY, STATED SO IT IS NOT A SURPRISE ────────────────────
+ *
+ * seed:menus and seed:drinks take `--overwrite`, which lets the file beat the
+ * curator when explicitly asked. THIS SEEDER HAS NO SUCH FLAG and never had
+ * one, and neither do seed:destinations or seed:dishes. So a desk edit here is
+ * not merely default-winning — nothing in the pipeline can revert it, and the
+ * only way back to the authored text is a person retyping it.
+ *
+ * That is defensible for content a curator is meant to own. It is written down
+ * because five scripts describe themselves in near-identical words and only two
+ * of them have the escape hatch.
+
  */
 import pg from "pg";
 

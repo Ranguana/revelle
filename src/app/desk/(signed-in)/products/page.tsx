@@ -73,8 +73,8 @@ export default async function ProductsPage({
 
       {rows.length === 0 ? (
         <Empty>
-          Nothing in the pool yet. Add the thing you just found, or run{" "}
-          <code>npm run import:products</code> for a spreadsheet of them.
+          Nothing in the pool yet. Add the thing you just found — one at a
+          time is the common case, and there is no bulk importer.
         </Empty>
       ) : (
         <table className={styles.table}>
