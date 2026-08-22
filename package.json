@@ -25,7 +25,8 @@
     "selection:demo": "node scripts/selection-demo.mjs",
     "build:tone-marks": "node scripts/build-tone-marks.mjs",
     "check:tone-marks": "node scripts/build-tone-marks.mjs --check",
-    "activate:catalogue": "node scripts/activate-catalogue.mjs"
+    "activate:catalogue": "node scripts/activate-catalogue.mjs",
+    "check:matrix": "node scripts/audit-matrix.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",

@@ -34,6 +34,27 @@ is the thesis — and the thesis is the product:
 Guest count and spend are likewise filters, not taste. They belong to a
 different stage and must not leak into this matrix.
 
+## THE PRINCIPLE
+
+**Facets describe the EVENING. Properties of her PEOPLE belong to the tiles.**
+
+A guest property travels unchanged to every party that group will ever attend,
+so it cannot sort destinations — it can only describe the applicant. Her people
+are measured in VOICE space, by the tone tiles, and the seam already says what
+that layer is for. This is the rule `no_speeches` broke, `teasing` broke, and
+`acquaintance` broke in a subtler way.
+
+The consequence to accept rather than fix: HAVANA and NEW ORLEANS are thin
+structurally BY DESIGN. They are the same night in shape — crowded, cooked-for,
+evening, until morning — and what separates them is "nobody in the house is the
+target" against "everybody is fair game", which is voice. That pair is the
+seam's voice-tiebreak case, and both surface in the two-or-three reveal for a
+warm loud host. A structural facet invented to prise them apart would be a
+guest property smuggled back in.
+
+**The matrix now lives in `data/destination-matrix.json` and is audited by
+`npm run check:matrix`. No failure list may be quoted from anywhere else.**
+
 ## The test a facet has to pass
 
 **One.** *Can a host answer it without knowing the destinations exist, and
