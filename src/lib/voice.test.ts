@@ -336,12 +336,26 @@ test("every tone is claimed by at least one destination", () => {
   for (const key of DESTINATION_KEYS) {
     for (const { code } of DESTINATION_TONES[key]) claimed.add(code);
   }
-  const orphans = ALL.filter((t) => !claimed.has(t.code)).map((t) => t.code);
+  // DRAFT tones are exempt, and only drafts. They are coined for rooms that are
+  // not authored yet — a word waiting for its room rather than an orphan — and
+  // the flag is the whole difference. A draft that is still unclaimed once its
+  // room lands has failed, and clearing the flag is what turns this assertion
+  // back on for it.
+  const orphans = ALL.filter((t) => !t.draft && !claimed.has(t.code)).map((t) => t.code);
   assert.deepEqual(
     orphans,
     [],
     `no destination answers to these tones, so a host who taps one has spent a ` +
       `tap on nothing: ${orphans.join(", ")}`
+  );
+
+  // A draft tone must not be shown to a host. It has no destination to reach.
+  const shown = ALL.filter((t) => t.draft && claimed.has(t.code)).map((t) => t.code);
+  assert.deepEqual(
+    shown,
+    [],
+    `these are still marked draft but a destination now claims them — clear ` +
+      `the flag so the assertion above covers them: ${shown.join(", ")}`
   );
 });
 
@@ -462,55 +476,19 @@ test("no two destinations resolve to nearly the same voice", () => {
  * per destination is the whole point of this test, so the group left with the
  * room. Do not add a fourteenth without adding a destination for it.
  */
-test("different kinds of group land on different destinations", () => {
-  const groups: [string, string[]][] = [
-    ["loud, ceremonious, performing", ["makes_an_entrance", "across_the_room", "dressed_up", "does_the_voice", "no_dead_air"]],
-    ["black tie, seated, one toast", ["toasts", "seating_plan", "rises_to_greet", "exact_word", "impeccably_polite"]],
-    ["quiet, exact, told properly", ["comfortable_silence", "corrects_gently", "spells_it_out", "will_look_it_up", "one_conversation"]],
-    ["warm, sentimental, their own language", ["nicknames", "sentimental", "in_jokes", "says_it_out_loud", "teasing"]],
-    ["fast and irreverent", ["all_at_once", "talks_fast", "swears_fondly", "straight_to_gossip", "interrupts"]],
-    ["dry, quiet, explains nothing", ["deadpan", "understated", "low_voices", "explains_nothing", "never_performs"]],
-    ["knowing, oblique, straight to the gossip", ["means_the_other_thing", "leans_in", "one_tells_it", "straight_to_gossip", "long_way_round"]],
-    ["first names, quiet, no fuss", ["first_names", "comfortable_silence", "warm_not_loud", "good_natured", "self_deprecating"]],
-    ["fond out loud, and loud with it", ["good_natured", "laughs_first", "lingers", "says_it_out_loud", "asks_properly"]],
-    ["private, few, between us", ["between_us", "one_conversation", "low_voices", "exact_word", "warm_not_loud"]],
-    ["plain, generous, no speeches", ["compliments_plainly", "no_speeches", "unhurried", "arrives_late", "asks_properly"]],
-    ["laconic, one long story by a fire", ["long_way_round", "self_deprecating", "absurd", "comfortable_silence", "deadpan"]],
-  ];
-
-  const winners = new Map<string, string>();
-  for (const [label, codes] of groups) {
-    for (const code of codes) {
-      assert.ok(TONE_CODES.has(code), `${label} taps ${code}, which is not a tone`);
-    }
-    const hers = toneProfile(codes);
-    const ranked = DESTINATION_KEYS.map(
-      (key) => [key, voiceAffinity(hers, RESOLVED.get(key)!)] as const
-    ).sort((a, b) => b[1] - a[1]);
-
-    const [winner, top] = ranked[0];
-    const [runnerUp, second] = ranked[1];
-
-    assert.ok(
-      !winners.has(winner),
-      `"${label}" and "${winners.get(winner)}" both land on ${winner}. Two ` +
-        `different rooms are being given the same destination, which is the ` +
-        `allocation failing rather than the arithmetic`
-    );
-    winners.set(winner, label);
-
-    assert.ok(
-      top - second > 0.08,
-      `"${label}" cannot choose between ${winner} (${top.toFixed(3)}) and ` +
-        `${runnerUp} (${second.toFixed(3)})`
-    );
-  }
-
-  assert.equal(
-    winners.size,
-    groups.length,
-    "every kind of group must reach a different house"
-  );
+test("different kinds of group land on different destinations", {
+  todo:
+    "MIGRATED TO THE BENCH. This asserted that N host profiles produce N " +
+    "DISTINCT winners scored on voiceAffinity alone. That was the " +
+    "tiles-as-primary requirement, and THE SEAM supersedes it: voice filters " +
+    "softly, structure ranks the survivors, voice breaks a tie within epsilon, " +
+    "and the member picks from two or three. A group's destination is no longer " +
+    "a function of voice, so a pure-voice bijection tests a machine that does " +
+    "not exist. Groups now route through the full engine via " +
+    "src/lib/desk/bench.ts, which needs a reachable database — so this cannot " +
+    "be a unit test and must not pretend to be one. Its structural sibling is " +
+    "`npm run check:matrix`. Four new host groups are owed there: St. Moritz, " +
+    "Aspen, Acapulco, Oaxaca.",
 });
 
 test("silence is silence: unchosen tones make no claim", () => {

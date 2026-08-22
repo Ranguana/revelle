@@ -371,6 +371,12 @@ export type Tone = {
   group: ToneGroupKey;
   /** At least one. Signed, -1..1, never zero. */
   facets: readonly FacetWeight[];
+  /**
+   * A tone COINED for a room that is not authored yet, and therefore claimed by
+   * nobody. Exempt from the every-tone-is-claimed assertion until its room
+   * lands. A draft tone is a word waiting for its room, not an orphan.
+   */
+  draft?: boolean;
 };
 
 export const TONES = [
@@ -928,6 +934,174 @@ export const TONES = [
       { code: "formality_formal", weight: 0.7 },
       { code: "formality_ceremonial", weight: 0.4 },
       { code: "address_third_person", weight: 0.3 },
+    ],
+  },
+
+  {
+    code: "never_impressed",
+    label: "Nothing impresses them, and that is the fun of it",
+    group: "knowing",
+    draft: true,
+    facets: [
+      { code: "knowingness", weight: 0.9 },
+      { code: "earnestness", weight: -0.8 },
+      { code: "theatricality", weight: -0.6 },
+      { code: "humour_arch", weight: 0.4 },
+    ],
+  },
+  {
+    code: "fluent_in_everyone",
+    label: "They know everybody's story before you finish it",
+    group: "knowing",
+    draft: true,
+    facets: [
+      { code: "knowingness", weight: 0.9 },
+      { code: "warmth", weight: 0.3 },
+      { code: "formality_formal", weight: 0.3 },
+    ],
+  },
+  {
+    code: "closes_the_bar",
+    label: "The night has never once beaten them",
+    group: "pace",
+    draft: true,
+    facets: [
+      { code: "volume", weight: 0.7 },
+      { code: "cadence_unhurried", weight: -0.7 },
+      { code: "irreverence", weight: 0.3 },
+    ],
+  },
+  {
+    code: "finishes_your_sentences",
+    label: "Everybody talks over everybody, and it is affection",
+    group: "volume",
+    draft: true,
+    facets: [
+      { code: "cadence_clipped", weight: 0.8 },
+      { code: "volume", weight: 0.7 },
+      { code: "warmth", weight: 0.6 },
+    ],
+  },
+  {
+    code: "bigger_every_telling",
+    label: "The story gets worse each time and everybody allows it",
+    group: "funny",
+    draft: true,
+    facets: [
+      { code: "irreverence", weight: 0.8 },
+      { code: "humour_warm", weight: 0.4 },
+      { code: "theatricality", weight: 0.35 },
+      { code: "earnestness", weight: -0.6 },
+    ],
+  },
+  {
+    code: "up_early_anyway",
+    label: "However late it went, they are up and out in the morning",
+    group: "precision",
+    draft: true,
+    facets: [
+      { code: "precision", weight: 0.8 },
+      { code: "earnestness", weight: 0.7 },
+      { code: "cadence_unhurried", weight: -0.4 },
+    ],
+  },
+
+  // ── DRAFT TONES, COINED RATHER THAN BORROWED ───────────────────────
+  //
+  // OAXACA 1954 and ACAPULCO 1959 were first tagged with four tones each taken
+  // from CATSKILLS and HAVANA, and breached the voice ceiling at 0.876 and
+  // 0.760. The argument for coining instead of re-tagging is the round-trip
+  // thesis: A ROOM THAT CANNOT BE SAID WITHOUT BORROWING ANOTHER ROOM'S WORDS
+  // MEANS THE LIST IS WRONG.
+  //
+  // Each passes the admission rule — a host could tap it about HER PEOPLE
+  // without knowing the destinations exist.
+
+  {
+    code: "feeds_you_first",
+    label: "A plate reaches you before anybody asks your name",
+    group: "kindness",
+    draft: true,
+    facets: [
+      { code: "warmth", weight: 0.9 },
+      { code: "earnestness", weight: 0.7 },
+      { code: "cadence_unhurried", weight: 0.5 },
+      { code: "formality_plain", weight: 0.3 },
+      { code: "irreverence", weight: -0.5 },
+    ],
+  },
+  {
+    code: "eat_before_you_speak",
+    label: "Eat first. Whatever it is will keep",
+    group: "pace",
+    draft: true,
+    facets: [
+      { code: "cadence_unhurried", weight: 0.9 },
+      { code: "earnestness", weight: 0.6 },
+      { code: "warmth", weight: 0.5 },
+      { code: "irreverence", weight: -0.4 },
+      { code: "volume", weight: -0.2 },
+    ],
+  },
+  {
+    code: "the_same_stories",
+    label: "The same stories, told again, corrected the same way",
+    group: "knowing",
+    draft: true,
+    // knowingness sits at 0.35 where `in_jokes` is 1, and that gap IS the
+    // distance from CATSKILLS. An in-joke is a reference you must already get.
+    // This is a story everybody has heard and wants again.
+    facets: [
+      { code: "cadence_unhurried", weight: 0.8 },
+      { code: "warmth", weight: 0.6 },
+      { code: "earnestness", weight: 0.4 },
+      { code: "knowingness", weight: 0.35 },
+      { code: "theatricality", weight: -0.4 },
+    ],
+  },
+  {
+    code: "marvels_out_loud",
+    label: "Says a thing is beautiful, out loud, and means it",
+    group: "kindness",
+    draft: true,
+    facets: [
+      { code: "earnestness", weight: 1 },
+      { code: "warmth", weight: 0.8 },
+      { code: "theatricality", weight: 0.3 },
+      { code: "knowingness", weight: -0.7 },
+    ],
+  },
+  {
+    code: "shows_you_things",
+    label: "Takes your elbow and turns you toward something",
+    group: "knowing",
+    draft: true,
+    // The far pole from `in_jokes`: that one assumes you already know, this one
+    // is certain you have never seen it. Theatricality is held at 0.3 because
+    // LAS VEGAS runs 0.7 to 1 across its performance tones — this room SHOWS
+    // rather than performs, and the weight is what keeps the two apart.
+    facets: [
+      { code: "knowingness", weight: -0.9 },
+      { code: "warmth", weight: 0.7 },
+      { code: "earnestness", weight: 0.6 },
+      { code: "address_second_person", weight: 0.5 },
+      { code: "theatricality", weight: 0.3 },
+    ],
+  },
+  {
+    code: "all_turn_to_watch",
+    label: "Everybody stops and looks at the same thing at once",
+    group: "performance",
+    draft: true,
+    // CC's, not the founder's — she proposed two for ACAPULCO and asked for
+    // three room-native tones. Strike it if the room does not need it. It is
+    // the terrace watching the dive: communal attention, not a performance
+    // given, which is why volume runs NEGATIVE and theatricality stays low.
+    facets: [
+      { code: "earnestness", weight: 0.7 },
+      { code: "warmth", weight: 0.6 },
+      { code: "theatricality", weight: 0.4 },
+      { code: "volume", weight: -0.3 },
     ],
   },
 ] as const satisfies readonly Tone[];

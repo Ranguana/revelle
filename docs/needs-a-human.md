@@ -117,3 +117,41 @@ hypothetical.
 ### G. The Aspen and Palm Springs prose that exists outside this repo
 Referenced in conversation, not present in `src/lib/destinations.ts` or
 `docs/`. It needs bringing under the same version control as everything else.
+
+### 11. THE HUMOUR-MODE ENUM IS TOO SMALL, and it has now broken something
+
+Deferred as a schema question, and no longer only stylistic. Five mode names
+across the four new rooms have no enum value:
+
+| room | written as | enum home |
+|---|---|---|
+| Acapulco | *delighted* | none — coerced to `warm` |
+| Oaxaca | *fond* | none — coerced to `warm` |
+| Oaxaca | *familial imperative* | none — coerced to `second_person` |
+| Aspen | *self-deprecating bravado* | none — coerced to `warm` |
+| Aspen | *first names, immediately* | none — coerced to `second_person` |
+
+**The consequence is concrete: ASPEN and OAXACA now hold the identical stated
+triple `plain/second_person/warm` — and they are DECLARED TWINS.**
+`voice.test.ts` asserts every triple is distinct, so they cannot both be seeded
+as written. Their TONE affinity is fine (0.288, comfortably inside the strict
+cap); it is the stated axes that collapse, because `warm` is being asked to mean
+delighted, fond, and self-deprecating bravado at once.
+
+`humour = warm` would reach five of sixteen rooms. Either the enum grows, or two
+of these rooms are re-stated onto existing values. Not solved here.
+
+### 12. TILE ART DEBT — twelve marks to cut
+
+Every accepted new tone needs a mark drawn and fitted through
+`scripts/build-tone-marks.mjs`, to the same 46-unit optical box at 1.5-unit
+visual weight as the existing 51. Twelve are coined and marked `draft: true`:
+
+`feeds_you_first` · `eat_before_you_speak` · `the_same_stories` ·
+`marvels_out_loud` · `shows_you_things` · `all_turn_to_watch` ·
+`never_impressed` · `fluent_in_everyone` · `closes_the_bar` ·
+`finishes_your_sentences` · `bigger_every_telling` · `up_early_anyway`
+
+A founder or commission task. Note the silent-failure risk already recorded:
+nothing asserts that the tone codes and the SVG filenames match, so a mark that
+is never cut simply renders nothing.
