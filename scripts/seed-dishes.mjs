@@ -167,7 +167,33 @@ const COURSES = new Map([
 ]);
 
 /** docs/dishes.md, at the top: "Roughly 50 per destination". Exactly 50 today. */
-const PER_DESTINATION = 50;
+// Every destination held exactly fifty until 2026-08-22, when CAP FERRAT was
+// folded into CÔTE D'AZUR and 380 authored dishes were appended. The counts now
+// vary by design, so a single constant cannot express the invariant any more —
+// but the invariant itself is unchanged and still worth having: A COUNT THAT
+// MOVES ON ITS OWN IS EITHER AN EDIT OR A PARSER THAT LOST A LINE, AND
+// AFTERWARDS THOSE LOOK THE SAME.
+//
+// So the expectation becomes a manifest rather than a number. Changing the
+// document means changing this table in the same commit, which is exactly the
+// discipline the old constant enforced — one destination at a time instead of
+// all of them at once.
+//
+// Côte d'Azur is the outlier at 119 because it absorbed Cap Ferrat's pool.
+const PER_DESTINATION = {
+  "Westhampton": 90,
+  "Nantucket": 85,
+  "New York": 86,
+  "Côte d'Azur": 119,
+  "Vegas": 86,
+  "Catskills": 87,
+  "Dolomites": 79,
+  "Tahiti": 77,
+  "Havana": 84,
+  "Big Sur": 84,
+  "New Orleans": 80,
+  "Portofino": 80,
+};
 
 function fail(message) {
   console.error(`\n[seed-dishes] FAILED: ${message}`);
@@ -526,12 +552,20 @@ for (const entry of entries) {
   counts.set(entry.destination, (counts.get(entry.destination) ?? 0) + 1);
 }
 for (const [destination, count] of counts) {
-  if (count !== PER_DESTINATION) {
+  const expected = PER_DESTINATION[destination];
+  if (expected === undefined) {
     fail(
-      `${destination} has ${count} dishes and every destination has ` +
-        `${PER_DESTINATION}. Either the document changed or the parser lost a ` +
-        `line — and after the fact those look the same. If the catalogue ` +
-        `genuinely grew, change PER_DESTINATION here in the same commit.`
+      `${destination} is not in the PER_DESTINATION manifest in this file. A ` +
+        `new destination heading must be added there in the same commit that ` +
+        `adds it to the document, so a count can never appear unwatched.`
+    );
+  }
+  if (count !== expected) {
+    fail(
+      `${destination} has ${count} dishes and the manifest expects ${expected}. ` +
+        `Either the document changed or the parser lost a line — and after the ` +
+        `fact those look the same. If the catalogue genuinely changed, update ` +
+        `PER_DESTINATION in this file in the same commit.`
     );
   }
 }
