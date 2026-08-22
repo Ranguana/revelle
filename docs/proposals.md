@@ -25,6 +25,7 @@ this file did not happen, however clearly it was said somewhere else.
 | — | Aspen and Palm Springs PROSE | referenced, never received | **not in the repo.** Cannot be acted on. |
 | 2026-08-22 | ATMOSPHERE as staging notes — per-destination, voice-derived, draft/published, constraint-tagged, NEVER SCORED, framed by the plannedness register. No floral/lighting/linen slot types; shoppable atmosphere joins via `staging_note_item` to canonical ingredient rows. All-or-nothing at assembly with authored fallbacks. | founder, in-session | specification recorded in `docs/atmosphere.md`. Awaiting sign-off; extraction from voice lexicons begins after. |
 | 2026-08-22 | VOICE LAYER upgraded to per-destination voice packets, packet-prompted from one base model, QA'd against the 26-facet profile, with founder edits logged as preference pairs and per-destination fine-tune evaluation at ~200 accepted outputs. Full specification below. | founder, in-session | recorded. Not built. |
+| 2026-08-22 | DESCENT COURSE — one humble late plate, tagged `descent`, exclusive to till-morn rooms, arriving unannounced as the last-phase turn. And MUSIC SPLIT THREE WAYS — sequenced set (exists), playback equipment as a constraint-class question, and live answers routed to spectacle rooms as a booking instruction. Full specification below. | founder, in-session | recorded. Not built. |
 
 ## Recorded as truth, not as a failure
 
@@ -91,3 +92,66 @@ correction made before the capture exists is a correction lost. Whatever is
 built first, it should be the thing that records the before and after of a
 founder edit, or the 200-output threshold starts counting from whenever that
 lands rather than from now.
+
+
+## 2026-08-22 — The descent course, and music in three parts
+
+**Recorded, not built.**
+
+### The descent course
+
+**One deliberately humble late plate.** Tagged `descent` in the dish pool,
+**exclusive to till-morn rooms**, arriving **unannounced** as the last-phase
+turn.
+
+The six rooms whose `ending` is `until_morning`, computed from the matrix:
+
+`new-orleans` · `havana` · `las-vegas` · `tahiti` · `st-moritz-1984` ·
+`acapulco-1959`
+
+Everything about it is already expressible: a tier tag on the ingredient row, a
+slot in the last phase, and an eligibility rule reading the destination's
+`ending` cell. Unannounced is a property of the RUNBOOK — the plate is not on
+the menu card — which is where a "do not print this" instruction belongs.
+
+### Music, in three parts
+
+**1. The sequenced set.** Per room, and it exists — `tracklist` is a real pool
+in `ingredient_pool`. Unchanged.
+
+**2. Playback equipment — a CONSTRAINT-CLASS quiz question.** Speaker ·
+turntable · hire. It governs which physical kit can be sent, and **records ship
+as goods to turntable members**.
+
+**NEVER SCORED, NEVER REQUIRED.** It cannot influence which destination she is
+given and no room may demand it. Same ruling as venue, `acquaintance` and
+atmosphere: it describes what happens inside a chosen world, so it binds at
+assembly and nowhere else. It is a constraint answer under THE SEAM — it
+survives the pick and governs what can be issued.
+
+**3. "Live" routes to a booking instruction.** A live answer goes to a
+**spectacle room** as a booking instruction carrying an **authored repertoire
+brief**.
+
+The two rooms with `spectacle = performed`: **`las-vegas`** and
+**`acapulco-1959`**.
+
+**AND THIS RESOLVES THE ACAPULCO SPECTACLE-DELIVERABLE GAP.** `spectacle` was
+adopted as a matrix facet today and Acapulco's cell is `performed` — the divers,
+the band — but nothing in the catalogue MADE that true. A room could be tagged
+for a show it had no way to stage. A booking instruction with a repertoire brief
+is the deliverable that closes it, and it is the first thing to give that facet
+a physical consequence.
+
+**Rooms whose voice bans performance LOG AND DECLINE the live answer.** Log,
+not silently drop — a declined live answer is a fact about that host worth
+keeping, and the gap channel already exists for exactly this shape of thing.
+
+**The decline list needs authoring, and an automated pass will not produce it.**
+Only ONE room bans performance unambiguously: `westhampton-1976`, which claims
+the `never_performs` tone and is alone in doing so. Tahiti is a candidate on
+different grounds — humour mode `none`, "there is no joke in this writing." A
+text search for performance refusals returns false positives, because "the room
+is 1960 and is not doing an impression of 1960" is a rule about PERIOD KITSCH
+and appears in Vegas, which plainly does not ban performance. The list is a
+founder judgment per room.
