@@ -1108,19 +1108,34 @@ export const TONES = [
     ],
   },
   {
-    code: "all_turn_to_watch",
-    label: "Everybody stops and looks at the same thing at once",
-    group: "performance",
+    code: "toasts_everything",
+    label: "Any excuse at all, and the glass goes up",
+    group: "ceremony",
     draft: true,
-    // CC's, not the founder's — she proposed two for ACAPULCO and asked for
-    // three room-native tones. Strike it if the room does not need it. It is
-    // the terrace watching the dive: communal attention, not a performance
-    // given, which is why volume runs NEGATIVE and theatricality stays low.
     facets: [
-      { code: "earnestness", weight: 0.7 },
-      { code: "warmth", weight: 0.6 },
-      { code: "theatricality", weight: 0.4 },
-      { code: "volume", weight: -0.3 },
+      { code: "earnestness", weight: 0.9 },
+      { code: "warmth", weight: 0.8 },
+      { code: "theatricality", weight: 0.35 },
+      { code: "irreverence", weight: -0.3 },
+    ],
+  },
+  {
+    code: "always_next_sunday",
+    label: "Nobody says goodbye like it is goodbye, because it isn't",
+    group: "pace",
+    draft: true,
+    // The founder's, proposed as the Oaxaca/Havana fix. Weighted on the
+    // meaning, per the doctrine above: this is a room where leaving is not an
+    // event, which is unhurried and warm and entirely unperformed. It replaces
+    // `lingers` in Oaxaca's seven — lingering is staying late; this is not
+    // marking the end at all, and Havana's night ends at first light whether
+    // anyone decides or not.
+    facets: [
+      { code: "cadence_unhurried", weight: 0.9 },
+      { code: "warmth", weight: 0.8 },
+      { code: "earnestness", weight: 0.6 },
+      { code: "theatricality", weight: -0.5 },
+      { code: "knowingness", weight: -0.4 },
     ],
   },
 ] as const satisfies readonly Tone[];
