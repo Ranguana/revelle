@@ -429,5 +429,9 @@ differentiator against either New Orleans or Aspen.
 because a twin declaration would answer a live question by default instead of
 on purpose: the first is a consequence of the schedule reconciliation and of
 Nantucket's two founder-decides cells, and the second IS the open question of
-whether Portofino exists. The rule is for pairs that are genuinely two rooms,
-not a way to retire an argument.
+whether Portofino exists.
+
+**The rule is for pairs that are genuinely two rooms, not a way to retire an
+argument.** A twin declaration EXCUSES a collision; it does not RESOLVE one. If
+the honest answer to "are these two rooms?" is no, or is not yet known, the pair
+is a failure and stays one until somebody decides.

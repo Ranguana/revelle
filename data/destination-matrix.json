@@ -10,6 +10,7 @@
     "schedule": [
       "posted",
       "anchored",
+      "standing",
       "unplanned"
     ],
     "volume": [
@@ -47,7 +48,7 @@
     ]
   },
   "facetNotes": {
-    "schedule": "posted = the invitation names the hours. anchored = one thing happens at its hour and the rest finds its own. unplanned = nobody decided anything, it became a party. `anchored` absorbs both a named recurring hour (Westhampton's drinks hour, New Orleans' second wind) and a house's standing rhythms (Nantucket, Côte d'Azur's eternal lunch) — a host cannot tell those two apart from her side of the quiz, so they are one level.",
+    "schedule": "posted = the invitation names the hours. anchored = one thing happens AT ITS HOUR and the rest finds its own (Westhampton's drinks hour, New Orleans' second wind at midnight). standing = the house's own unannounced rhythms — nothing is named, but the night has always gone this way (Nantucket, Côte d'Azur's eternal lunch). unplanned = nobody decided anything; it became a party. anchored and standing were briefly ONE level on the argument that a host cannot tell them apart. That was wrong, and the collision proved it: Westhampton/Nantucket failed on [dress, food] with no schedule contribution, which is impossible if those two houses keep time differently — and they do. A named hour and an unnamed habit are different answers to 'does anything happen at a time?'",
     "size": "Pure headcount. few = 8 or under. table = 8 to 16. crowd = 16 and over. \"One long table\" is EVIDENCE for the middle band, never the definition — the furniture fact stays in the prose.",
     "spectacle": "performed = A SHOW THE ROOM WATCHES — a floor show, cliff divers, the band that is the point. EXCLUSION, written here because it will otherwise creep: a toast, or a carving at the table, is CEREMONY and not spectacle. The room attending to one person it knows is not an audience."
   },
@@ -120,7 +121,7 @@
     ],
     "portofino": [
       "absorbed",
-      "anchored",
+      "standing",
       "one_conversation",
       "plain",
       "bought",
@@ -131,7 +132,7 @@
     ],
     "tahiti": [
       "absorbed",
-      "anchored",
+      "standing",
       "quiet",
       "plain",
       "arrived",
@@ -142,7 +143,7 @@
     ],
     "cote-dazur": [
       "absorbed",
-      "anchored",
+      "standing",
       "one_conversation",
       "plain",
       "bought",
@@ -175,7 +176,7 @@
     ],
     "nantucket": [
       "absorbed",
-      "anchored",
+      "standing",
       "quiet",
       "plain",
       "cooked",
@@ -238,6 +239,17 @@
       "evening",
       "crowd",
       "performed"
+    ],
+    "oaxaca-1954": [
+      "absorbed",
+      "standing",
+      "overlapping",
+      "plain",
+      "cooked",
+      "dissolves",
+      "afternoon",
+      "crowd",
+      "nothing"
     ]
   },
   "authored": [
@@ -255,20 +267,22 @@
     "nantucket"
   ],
   "proposed": [
+    "acapulco-1959",
     "amalfi-1953",
-    "palm-springs-1965",
-    "st-moritz-1984",
     "aspen-1994",
-    "acapulco-1959"
+    "oaxaca-1954",
+    "palm-springs-1965",
+    "st-moritz-1984"
   ],
   "blocked": {
-    "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`.",
-    "oaxaca-1954": "BLOCKED BY THE TWIN RULE — the third claim on a corner, exactly as Rio was. Oaxaca sits below the gate against TWO rooms (New Orleans at 2, Aspen at 2), so it cannot twin with either. Worse, admitting it COSTS THE HAVANA/NEW ORLEANS TWIN: New Orleans would then have two sub-gate partners and lose its eligibility. The precedent instance of the rule is destroyed by admitting this room. Released by a third differentiator against either New Orleans or Aspen."
+    "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`."
   },
   "founderPending": {
-    "palm-springs-1965.schedule": "provisional `anchored` — founder decides",
+    "palm-springs-1965.schedule": "provisional `anchored` under the four-level split — founder decides",
     "nantucket.ending": "FOUNDER DECIDES. `dissolves` is CC's pass-1 reading; `clean_stop` was the original. See flipLog.",
-    "nantucket.starts": "FOUNDER DECIDES. `evening` is CC's pass-1 reading; `afternoon` was the original. See flipLog."
+    "nantucket.starts": "FOUNDER DECIDES. `evening` is CC's pass-1 reading; `afternoon` was the original. See flipLog.",
+    "amalfi-1953.schedule": "provisional `unplanned` under the four-level split — founder decides",
+    "acapulco-1959.schedule": "NOT IN THE FOUNDER'S ASSIGNMENT LIST. Left at `anchored` from its own admission brief. Confirm."
   },
   "rejectedFacets": {
     "speech": "Zero marginal information against `arrival` — separated 20 pairs, none that `arrival` did not.",
@@ -335,6 +349,15 @@
         "distance": 2,
         "voiceAffinity": null,
         "status": "UNVERIFIED — neither voice is written, so the affinity condition cannot be measured. Admitted on the row; the twin claim is provisional until both voices exist."
+      },
+      {
+        "pair": [
+          "oaxaca-1954",
+          "aspen-1994"
+        ],
+        "distance": 2,
+        "voiceAffinity": null,
+        "status": "UNVERIFIED — neither voice is written, so the affinity condition cannot be measured. Same handling as St. Moritz/Acapulco: the row is admitted and the twin claim is provisional until both voices exist."
       }
     ],
     "candidatesNotDeclared": [
