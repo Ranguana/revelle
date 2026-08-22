@@ -1,0 +1,36 @@
+{
+  "//": "Editor config for this repo. Your source is 183 files; node_modules and .next are ~24,600. Without these excludes the file watcher and the TypeScript server index all of it, which is what makes the window hang.",
+
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/.git/objects/**": true,
+    "**/pdfs/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/package-lock.json": true
+  },
+  "files.exclude": {
+    "**/.next": true
+  },
+
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsserver.maxTsServerMemory": 6144,
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEventsOnParentDirectory",
+    "watchDirectory": "useFsEvents"
+  },
+  "typescript.disableAutomaticTypeAcquisition": true,
+
+  "editor.formatOnSave": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+
+  "[sql]": { "editor.wordWrap": "off" },
+  "[markdown]": { "editor.wordWrap": "on" },
+
+  "eslint.workingDirectories": [{ "mode": "auto" }]
+}
