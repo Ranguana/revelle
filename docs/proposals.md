@@ -26,6 +26,7 @@ this file did not happen, however clearly it was said somewhere else.
 | 2026-08-22 | ATMOSPHERE as staging notes — per-destination, voice-derived, draft/published, constraint-tagged, NEVER SCORED, framed by the plannedness register. No floral/lighting/linen slot types; shoppable atmosphere joins via `staging_note_item` to canonical ingredient rows. All-or-nothing at assembly with authored fallbacks. | founder, in-session | specification recorded in `docs/atmosphere.md`. Awaiting sign-off; extraction from voice lexicons begins after. |
 | 2026-08-22 | VOICE LAYER upgraded to per-destination voice packets, packet-prompted from one base model, QA'd against the 26-facet profile, with founder edits logged as preference pairs and per-destination fine-tune evaluation at ~200 accepted outputs. Full specification below. | founder, in-session | recorded. Not built. |
 | 2026-08-22 | DESCENT COURSE — one humble late plate, tagged `descent`, exclusive to till-morn rooms, arriving unannounced as the last-phase turn. And MUSIC SPLIT THREE WAYS — sequenced set (exists), playback equipment as a constraint-class question, and live answers routed to spectacle rooms as a booking instruction. Full specification below. | founder, in-session | recorded. Not built. |
+| 2026-08-22 | WESTHAMPTON RE-FOUNDING — Eothen/Capote rather than Locust Valley; possible rename to THE HAMPTONS, 1976. Cells analysed, six clear rows found, nothing applied. Parked. | founder, in-session | **PARKED.** Analysis below so it is not lost. |
 
 ## Recorded as truth, not as a failure
 
@@ -155,3 +156,76 @@ text search for performance refusals returns false positives, because "the room
 is 1960 and is not doing an impression of 1960" is a rule about PERIOD KITSCH
 and appears in Vegas, which plainly does not ban performance. The list is a
 founder judgment per room.
+
+
+## 2026-08-22 — Westhampton re-founding (PARKED)
+
+**Nothing applied. The row and the prose are untouched.**
+
+The proposal: Westhampton stops being Locust Valley dry — drinks-hour, Triscuits
+with champagne, a party that half-exists in three other rooms — and becomes
+**Eothen and Capote's salons**. The house where the famous come to be off-duty.
+Barefoot in designer clothes: the clothes came from the city, the shoes came off
+at the door, and both facts matter.
+
+### What the machinery said, run before any prose
+
+`dress` flips to `plain` — the truthful Eothen answer to "did everyone dress up"
+is no, they arrived perfect. That removes `dress` from the Westhampton/Nantucket
+separating set, and the pair drops below the gate.
+
+`volume` must become `one_conversation` — Capote holding court. **Without it no
+configuration clears at all.** With it, Westhampton stops colliding with
+Nantucket and starts colliding with PORTOFINO instead: both `absorbed ·
+one_conversation · plain · bought · dissolves · few`, separated only by `starts`
+and `schedule`. Eothen becomes Portofino at night.
+
+`ending` is the cell that resolves it, and it carries five of the six clear
+rows. The old room "turns into something else", which is a dinner dissolving;
+this one is indiscreet by ten and legendary by midnight, and goes to first light.
+
+**Six rows clear the gate**, all with `dress = plain` and `volume =
+one_conversation`:
+
+| schedule | size | ending |
+|---|---|---|
+| **standing** | **crowd** | until morning |
+| anchored | few | until morning |
+| anchored | one_table | until morning |
+| anchored | crowd | dissolves |
+| unplanned | few | until morning |
+| unplanned | one_table | until morning |
+
+**`standing` clears in exactly one configuration** — with `crowd`. So the
+founder's `standing` instinct and a small house cannot both hold. CC's
+recommendation was `standing · one_conversation · plain · bought ·
+until_morning · evening · crowd`, on the grounds that it honours the schedule
+instinct and matches the drifting-house scene card.
+
+### The voice-space half, untested
+
+The dry-deadpan tags — `deadpan`, `understated`, `explains_nothing` — were
+Locust Valley. The salon is performative, confessional, indiscreet:
+`straight_to_gossip`, `one_tells_it`, `nothing_sacred`, possibly
+`does_the_voice`. All are real codes, but `does_the_voice` is Las Vegas's alone,
+so Westhampton claiming it wants measuring rather than assuming.
+
+Predicted side effect, unverified: St. Moritz/Westhampton was the monitor-tier
+worry precisely because both were dry-knowing. A warm-indiscreet-performative
+Eothen should separate that pair for free.
+
+### And the rename, which is not a code change
+
+`WESTHAMPTON, 1976` → `THE HAMPTONS, 1976` **cannot ship by editing
+destinations.ts.** `seed-destinations` reports `exists — left as it is` for
+every authored room and has no `--overwrite`, because the rule protects a
+curator's work. Renaming a live destination is a desk action at
+`/desk/destinations/[id]`.
+
+The same discovery applies to work already done: **today's year renames never
+reached production either.** The database still holds NANTUCKET, AUGUST and
+HAVANA, THE SMALL HOURS. The code renamed them; the seeder protected the
+database from the code, by design.
+
+The SLUG stays `westhampton-1976` — it is an identifier, not a name, and
+`cote-dazur` already calls itself 1962.
