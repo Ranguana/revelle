@@ -66,6 +66,64 @@ import type { ToneWeight } from "./voice";
  *   verdicts, plural. Never a browse, never a catalogue, never a filter she
  *   operates.
  *
+ * ── SHE PICKS. THE REVEAL IS THE PICK ────────────────────────────────
+ *
+ * THE MAIN PATH, not a second surface. The engine ranks, two or three come back
+ * as the société's verdicts, she taps one, and that is the assignment. There is
+ * no confirmation step and no litigation of her choice.
+ *
+ * This SUPERSEDES the section headed "Settled — she does not pick the
+ * destination" in docs/selection-spec.md, which is now annotated as such. Its
+ * two arguments are answered rather than ignored, and the answer is that
+ * ANSWERS SPLIT INTO TWO CLASSES that were previously treated as one:
+ *
+ *   TASTE ANSWERS — the tone tiles and the structural facets — are RANKING
+ *   EVIDENCE. They are spent the moment the shortlist exists. A pick against
+ *   the model's first choice is not a contradiction to be resolved: it is
+ *   ground truth beating a posterior, which is the entire job of ground truth.
+ *
+ *   CONSTRAINT ANSWERS — dealbreakers, venue feasibility, platform, guest
+ *   count, spend, and which deliverable she wants more of — SURVIVE the pick
+ *   and govern assembly regardless of which room she chose. A costume
+ *   dealbreaker still binds inside a destination she picked herself.
+ *
+ * So there is no such thing as a pick that "contradicts her answers", and no
+ * mismatch to flag. The two classes never met.
+ *
+ * ── The picked destination is built as authored ──────────────────────
+ *
+ * NEVER BENT TOWARD HER QUIZ ANSWERS. She chose that room; she gets that room.
+ * Bending an authored house toward the taste answers she just overruled would
+ * reintroduce the averaging this block forbids, one layer down and out of
+ * sight — a Dolomites softened toward a warm loud profile is neither house.
+ * Constraints prune what can be issued inside it. Taste does not reshape it.
+ *
+ * ── What the pick is FOR ─────────────────────────────────────────────
+ *
+ * Logged as (application_id, predicted_ranking, picked_destination,
+ * rank_of_pick) into the corrections pipeline. It is the only per-host datum
+ * that will ever say whether the voice layer or the structural layer is
+ * mis-weighted, and its value is entirely in the DIVERGENCE.
+ *
+ * SO IT IS NEVER USED TO RETRO-EDIT HER FACET PROFILE. Feeding the pick back
+ * into the profile that predicted it destroys the measurement — the model would
+ * be scored against a target it had just rewritten, and every calibration
+ * number after that is self-congratulation. Protect the divergence.
+ *
+ * ── The no-pick state, stated so it cannot sneak back in ─────────────
+ *
+ * She may not tap. The state is PICK PENDING: the ranking is preserved
+ * verbatim, nothing is assembled, and on timeout the TOP-RANKED destination
+ * becomes the default.
+ *
+ * This is written down because it is the door "the engine always chooses"
+ * walks back in through. An abandonment path that quietly re-runs anything, or
+ * that loses the ranking and recomputes it later against a changed catalogue,
+ * is the old architecture restored by accident. The default must be the stored
+ * first rank and nothing else. `rank_of_pick` for a timed-out application is
+ * recorded as a DEFAULT rather than as a pick of rank 1, or the calibration
+ * data silently fills with agreements nobody made.
+ *
  * ── Generosity at the reveal is not softness at the engine ───────────
  *
  * These are different surfaces and the distinction is load-bearing.

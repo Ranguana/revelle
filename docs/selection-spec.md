@@ -327,6 +327,16 @@ API in a single announcement and will do it again.
    not a default band in the code.
 ## Settled — she does not pick the destination
 
+> **SUPERSEDED.** She picks. The reveal is two or three verdicts and she taps
+> one, on the main path. See THE SEAM in `src/lib/destinations.ts` for the
+> replacement and for why the two arguments below are answered rather than
+> overruled: answers split into TASTE (ranking evidence, spent once the
+> shortlist exists) and CONSTRAINT (survives the pick, governs assembly). The
+> negative-signal objection is met by logging the divergence between predicted
+> ranking and actual pick, which is a better instrument than the one this
+> section was protecting. The reasoning below is kept because it is the reason
+> the replacement had to be built the way it was.
+
 **Decided for v1, and the reason is measurement, not mystique.**
 
 If she chooses from a shortlist, the profile learns her **self-image** — what

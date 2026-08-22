@@ -560,3 +560,13 @@ test("SEAM: a quiet host gets Nantucket ranked over Portofino, both surviving th
 test("SEAM: a zero-tap host gets a complete structural ranking of the full field", {
   todo: "needs the soft filter — silence must remove nothing",
 });
+
+test("SEAM: an abandoned application defaults to the stored top rank, not a re-run", {
+  todo:
+    "needs the pick-first flow. The abandonment path is where 'the engine " +
+    "always chooses' returns by accident: on timeout the default must be the " +
+    "PRESERVED first rank, never a recomputation against a catalogue that may " +
+    "have changed since. Must also assert the row is recorded as a DEFAULT and " +
+    "not as a pick of rank 1, or the calibration data fills with agreements " +
+    "nobody made.",
+});
