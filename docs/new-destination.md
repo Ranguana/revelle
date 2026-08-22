@@ -9,6 +9,71 @@ Miss any part and it fails in a specific way named below.
 
 ---
 
+
+## 0. THE ADMISSION TEST — before a word is written
+
+The catalogue grows continuously, so a destination is ADMITTED before it is
+authored. Every step below happens in this order and the first failure stops the
+work. This exists because writing a room and then discovering it duplicates an
+existing one wastes the expensive half.
+
+### 0a. Claim a row in the matrix
+
+Fill in all eight facets from `docs/destination-contrasts.md` for the room you
+intend to write. Eight cells, before any prose:
+
+`arrival` · `schedule` · `volume` · `dress` · `food` · `ending` · `starts` · `size`
+
+No blanks. A blank is a destination abdicating from a distinction, and it will
+be the one that never wins or always wins.
+
+### 0b. Clear distance 3 against EVERY existing row
+
+The room must differ from every already-authored destination on at least three
+facets. Three is the coding bound that lets one wrong quiz answer still land the
+host correctly; at distance 1, a single misread tap flips the result.
+
+**Below 3, the room is not admitted.** The options are to re-place it in open
+space, or to conclude it is an existing room written twice — which is what
+happened to CAP FERRAT, and folding it in was the right outcome rather than a
+defeat.
+
+### 0c. Know that there is plenty of room, and place deliberately
+
+The facet space holds **about 131 rooms** at minimum distance 3. Twelve are
+authored. So a collision is never the matrix running out — it is a room written
+into an occupied slot while a hundred sat empty.
+
+Two consequences. A destination that fails 0b should be MOVED rather than
+argued for. And a new room is cheapest to write when its row is chosen first, in
+open space, and the voice is written to the row.
+
+### 0d. Pass the thrown-ness test, which the matrix cannot check
+
+**A premise must read as a party somebody is THROWING, not a scene that
+OCCURS.** Weather, a view, or a place behaving as itself is not a party. A row
+can clear distance 3 against every other room and still describe a postcard.
+
+Rows are arithmetic. Thrown-ness is voice. Both must pass and neither
+substitutes for the other. The founder audits the second.
+
+### 0e. Declare what the deliverable presupposes
+
+If the room cannot be delivered without a feature of the venue — water, snow,
+outdoors — say so now. Venue never touches the DESTINATION CHOICE, which is the
+thesis of the product, but a room whose whole content prunes away in an
+apartment ships hollow and nobody is told.
+
+A room that presupposes many features is probably a location rather than a
+world, and that is worth knowing before it is written.
+
+### 0f. If it fails, record the block and stop
+
+A refused destination gets its proof written down, not a shrug — see RIO DE
+JANEIRO 1947 in `docs/destination-contrasts.md`, which is blocked with the
+distances that block it and the two conditions that would release it. A block
+with a proof is reusable. A block without one gets re-litigated every quarter.
+
 ## 1. The writing, first
 
 Author it in `src/lib/destinations.ts` to the standard of WESTHAMPTON, 1976
