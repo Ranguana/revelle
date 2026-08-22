@@ -227,3 +227,60 @@ pair below it collapses further and the proposed facets stop being optional.
 Nantucket / Big Sur is already at 0 and no single cell rescues it — that pair
 needs `telling`, or it needs one of the two voices to be doing something the
 nine facets cannot see.
+
+## Pass 1 — the eight cells, re-derived from the prose
+
+Done. The first draft read the STRUCTURED voice fields; this pass read the
+authored premise, orthography, `always` list and lexicon for each destination
+involved. Four cells flipped, four were confirmed, and two of the confirmations
+were upgraded from absence-graded to positive evidence.
+
+| cell | was | now | evidence |
+|---|---|---|---|
+| Nantucket `ending` | clean stop | **dissolves** | "The night ends on the dock, watching nothing happen on the water." It relocates and trails; it does not stop |
+| Nantucket `starts` | afternoon | **evening** | "Sweaters come out at eight whatever the day did." `supper`. Hours run six o'clock, half past eight, after dark |
+| Westhampton `schedule` | none | **one anchor** | "Let the hour do the work." `drinks: the hour before dinner` is a named recurring hour, not a timetable and not nothing |
+| New Orleans `schedule` | none | **one anchor** | `the second wind: coffee and something fried at midnight, taken ON PURPOSE so the night can go on` |
+| Tahiti `arrival` | absorbed (absence) | absorbed (positive) | "Nobody here is asked what they would like and nobody is waited on"; shoes left at the edge of the sand |
+| Portofino `size` | few | **few, but see below** | "Keep it to the people who came… a table that has already met" — the prose says BOTH |
+| Vegas `volume` | overlapping | confirmed | `across_the_room`, `no_dead_air`, and `downstairs` as a place with a queue in it |
+| Vegas `ending` | until morning | confirmed | `breakfast at four: the ending. A booth, the good clothes, steak and eggs` |
+
+### The dead level is alive
+
+`schedule` declared three levels and used two. Westhampton and New Orleans are
+both ANCHOR-shaped once the prose is read — a single named hour that holds while
+everything around it floats. All three levels now have destinations.
+
+### Havana / New Orleans separates on a distinction you already wrote
+
+The pair sat at 0 and the fix was not a new facet. New Orleans' midnight is
+"taken ON PURPOSE so the night can go on". Havana's second supper is "nobody
+planned and everybody expects", and its ending is "first light: when it ends,
+which is not a decision anyone makes". One house anchors its night. The other
+refuses to. 0 → 1.
+
+### Result
+
+| pair | before | after |
+|---|---|---|
+| Havana / New Orleans | 0 | 1 |
+| Nantucket / Big Sur | 0 | 2 |
+| Las Vegas / New York | 2 | 2 |
+| Côte d'Azur / Portofino | 1 | **1, unmoved** |
+
+Nothing sits at 0 any more. Four pairs still fail the gate.
+
+### `size` has a level-design defect, and it is the only thing holding Portofino
+
+`few` versus `one table` conflates HOW MANY PEOPLE with WHAT FURNITURE, and
+Portofino's own prose claims both in one sentence: "Keep it to the people who
+came. This is written for a table that has already met."
+
+That matters more than it looks. `size` is the SINGLE facet separating Côte
+d'Azur from Portofino. If the level distinction does not survive scrutiny — and
+a facet whose two levels can be claimed by one sentence is not obviously sound —
+then the pair is at 0 and not 1, and the Cap Ferrat precedent applies.
+
+This is now the highest-value open question in the matrix, and it is a question
+about the FACET rather than about either destination.
