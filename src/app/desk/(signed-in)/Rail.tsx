@@ -21,6 +21,7 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
     { href: "/desk/menus", label: "Menus" },
     { href: "/desk/dishes", label: "Dishes" },
     { href: "/desk/drinks", label: "Drinks" },
+    { href: "/desk/games", label: "Games" },
     { href: "/desk/products", label: "Products" },
   ],
   // The three screens that show what the library DOES rather than what is in

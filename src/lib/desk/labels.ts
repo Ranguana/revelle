@@ -164,6 +164,53 @@ export const COURSES: readonly { code: string; label: string }[] = [
   { code: "dessert", label: "Dessert" },
 ];
 
+/* ── the games ──────────────────────────────────────────────────────── */
+
+/**
+ * `game_shape` in db/010 — what a game does to an EVENING, not what it is like.
+ *
+ * Structural and never a facet, for the reason `course` is not one: nobody
+ * prefers a scheduled game. It is what stops the filler booking two of them for
+ * the same hour, and what makes a duration on an ambient game a contradiction
+ * the database refuses rather than a curiosity.
+ */
+export const GAME_SHAPES: readonly { code: string; label: string }[] = [
+  { code: "scheduled", label: "Scheduled" },
+  { code: "ambient", label: "Ambient" },
+  { code: "finale", label: "The finale" },
+];
+
+/**
+ * `game_sourcing` in db/010 — whether the house may PRINT it or only point.
+ *
+ * A recommended game is somebody else's product: Revelle may name it and may
+ * not reproduce a rule or a card. db/025 enforces that from the other side by
+ * refusing a runbook step that reproduces play.
+ */
+export const GAME_SOURCING: readonly { code: string; label: string }[] = [
+  { code: "provided", label: "Provided" },
+  { code: "recommended", label: "Recommended" },
+];
+
+/** `host_role` in db/025 — is she playing, or is running it her whole job? */
+export const HOST_ROLES: readonly { code: string; label: string }[] = [
+  { code: "plays_too", label: "She plays too" },
+  { code: "runs_it", label: "She runs it" },
+];
+
+/** `supply_source` in db/010 — how a supply arrives. */
+export const SUPPLY_SOURCES: Readonly<Record<string, string>> = {
+  printed: "Printed",
+  host_buys: "She buys it",
+  on_hand: "Already on hand",
+};
+
+/** `dependency_strength` in db/010. A group of `required` rows reads as any-of. */
+export const DEPENDENCY_STRENGTH: Readonly<Record<string, string>> = {
+  required: "Needs",
+  enriched_by: "Better after",
+};
+
 /** occasion_type in db/001, in the order the application offers them. */
 export const OCCASIONS: readonly string[] = [
   "birthday",
@@ -211,6 +258,43 @@ export function dollars(value: number | string | null | undefined): string {
   const n = typeof value === "string" ? Number(value) : value;
   if (!Number.isFinite(n)) return "—";
   return `$${Math.round(n).toLocaleString("en-US")}`;
+}
+
+/**
+ * A duration, from the two columns db/010 stores it in.
+ *
+ * "45–60 min" when there is a range, "45 min" when the two agree or only the
+ * planning figure exists. An ambient game has NEITHER by constraint, and the
+ * honest rendering of that is not "0 min" — it is the em dash every other
+ * absent fact in this tool uses, with the shape column beside it saying why.
+ */
+export function minutes(
+  low: number | null | undefined,
+  high?: number | null
+): string {
+  if (low === null || low === undefined) {
+    return high === null || high === undefined ? "—" : `up to ${high} min`;
+  }
+  if (high === null || high === undefined || high === low) return `${low} min`;
+  return `${low}–${high} min`;
+}
+
+/**
+ * A guest range, from db/009's two nullable bounds.
+ *
+ * Null at an end means NO LIMIT at that end, which is a real claim and not a
+ * missing value — Art Battle's absent ceiling is the founder writing "6-30+"
+ * and meaning the plus. So "6 or more", never "6–null" and never "6".
+ */
+export function guests(
+  min: number | null | undefined,
+  max: number | null | undefined
+): string {
+  if (min === null || min === undefined) {
+    return max === null || max === undefined ? "any number" : `up to ${max}`;
+  }
+  if (max === null || max === undefined) return `${min} or more`;
+  return `${min}–${max}`;
 }
 
 /**
