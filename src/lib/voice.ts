@@ -1014,8 +1014,27 @@ export const TONES = [
   // thesis: A ROOM THAT CANNOT BE SAID WITHOUT BORROWING ANOTHER ROOM'S WORDS
   // MEANS THE LIST IS WRONG.
   //
-  // Each passes the admission rule — a host could tap it about HER PEOPLE
-  // without knowing the destinations exist.
+  // ── THE ADMISSION RULE ─────────────────────────────────────────────
+  //
+  // A host could tap it about HER PEOPLE without knowing the destinations
+  // exist. That is the whole bar for whether a tone may exist.
+  //
+  // ── AND THE WEIGHTING RULE, WITH ITS WORKED EXAMPLE ────────────────
+  //
+  // A COINED TONE IS WEIGHTED AGAINST ITS NEIGHBOURHOOD, ON THE MEANING —
+  // never tuned until a measurement passes. The difference matters: tuning to a
+  // number is how the tag set stops describing the rooms and starts describing
+  // the test, which is the failure this whole vocabulary exists to escape.
+  //
+  // The worked example is `shows_you_things` at theatricality 0.3.
+  //
+  // LAS VEGAS runs 0.7 to 1.0 across its performance tones —
+  // `makes_an_entrance` 1, `does_the_voice` 0.9, `nothing_by_halves` 0.7. That
+  // is a room where somebody is GIVING a performance to an audience. ACAPULCO's
+  // host takes your elbow and turns you toward the divers: theatrical, plainly,
+  // but a fraction of that — she is SHOWING you a thing, not performing one.
+  // 0.3 is the reading of the meaning. It is also, as it happens, what keeps
+  // the two rooms apart, and the order of those two sentences is the rule.
 
   {
     code: "feeds_you_first",

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readdirSync } from "node:fs";
 import { test } from "node:test";
 
 import { DESTINATIONS, DESTINATION_TONES } from "./destinations.ts";
@@ -356,6 +357,62 @@ test("every tone is claimed by at least one destination", () => {
     [],
     `these are still marked draft but a destination now claims them — clear ` +
       `the flag so the assertion above covers them: ${shown.join(", ")}`
+  );
+});
+
+/**
+ * Every shipped tone has a mark cut for it, and no draft does.
+ *
+ * THE CHEAPEST TEST IN THIS FILE AND IT GUARDS A MEMBER SURFACE. The binding
+ * between a tone and its tile art is a FILENAME and nothing else:
+ * scripts/build-tone-marks.mjs reads design/tone-icons/*.svg, strips the
+ * extension, and emits that string as a key into TONE_MARKS. QuizFlow then does
+ * TONE_MARKS[option.code], and a miss renders NOTHING — by design, so that a
+ * tone without a mark is a plainer tile rather than a broken one.
+ *
+ * That graceful failure is correct for one missing mark and terrible as a
+ * silent contract. Rename a tone and its mark is orphaned; coin a tone and its
+ * tile ships blank; and `npm run check:tone-marks` will not notice either,
+ * because it only checks that the GENERATED FILE matches the DIRECTORY. Nothing
+ * anywhere compared the directory to TONES until this test.
+ *
+ * Draft tones are asserted in the OTHER direction: a mark must not exist for a
+ * tone no host can be shown yet, because an unclaimed drawing in that directory
+ * is how a retired tone quietly comes back.
+ */
+test("every shipped tone has a mark, and every mark has a tone", () => {
+  const cut = new Set(
+    readdirSync(new URL("../../design/tone-icons", import.meta.url))
+      .filter((f) => f.endsWith(".svg"))
+      .map((f) => f.slice(0, -4))
+  );
+  const shipped = ALL.filter((t) => !t.draft).map((t) => t.code);
+  const drafts = ALL.filter((t) => t.draft).map((t) => t.code);
+
+  const unmarked = shipped.filter((c) => !cut.has(c));
+  assert.deepEqual(
+    unmarked,
+    [],
+    `these tones ship to a host with no mark cut, so the tile renders blank: ` +
+      `${unmarked.join(", ")}. Cut the SVG into design/tone-icons/ and re-run ` +
+      `npm run build:tone-marks.`
+  );
+
+  const orphaned = [...cut].filter((c) => !shipped.includes(c) && !drafts.includes(c)).sort();
+  assert.deepEqual(
+    orphaned,
+    [],
+    `these marks are drawn but no tone claims them, which is usually a rename ` +
+      `that left its art behind: ${orphaned.join(", ")}`
+  );
+
+  const premature = drafts.filter((c) => cut.has(c)).sort();
+  assert.deepEqual(
+    premature,
+    [],
+    `a mark exists for a DRAFT tone no host can be shown: ${premature.join(", ")}. ` +
+      `Either clear the draft flag or remove the art — an unclaimed drawing is ` +
+      `how a retired tone comes back.`
   );
 });
 
