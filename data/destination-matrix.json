@@ -55,13 +55,13 @@
   "rows": {
     "westhampton-1976": [
       "absorbed",
-      "anchored",
-      "quiet",
-      "dressed",
+      "standing",
+      "one_conversation",
+      "plain",
       "bought",
-      "dissolves",
+      "until_morning",
       "evening",
-      "few",
+      "crowd",
       "nothing"
     ],
     "new-york": [
@@ -380,5 +380,8 @@
         "note": "Would qualify. NOT declared — this is the open question of whether Portofino exists, and a twin declaration would answer it by default instead of on purpose."
       }
     ]
+  },
+  "awaitingVoice": {
+    "westhampton-1976": "ROW RE-FOUNDED, PROSE NOT YET REWRITTEN. The row is Eothen/Capote — the house where the famous come to be off-duty — and src/lib/destinations.ts still holds the Locust Valley voice: deadpan, understated, low_voices, quiet, a card left on the hall table. The two disagree ON PURPOSE and temporarily. Every cell here is carried by a sentence in the founder's scene card: standing = 'people drift out from the city, the weekend has a shape nobody announces'; crowd = 'somebody famous is asleep on the porch'; until_morning = 'indiscreet by ten and legendary by midnight'; one_conversation = 'one person tells it, everyone leans in'; plain = 'the shoes came off at the door'; bought = 'nobody has ever seen this kitchen produce anything but ice'. The voice must be written TO this row. Tone tags also need re-cutting: deadpan/understated/explains_nothing were Locust Valley."
   }
 }
