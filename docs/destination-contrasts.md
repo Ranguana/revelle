@@ -75,6 +75,7 @@ Ten facets, each answerable as a scene rather than an adjective.
 | `ending` | it stops cleanly · it dissolves · it goes until morning |
 | `starts` | morning · afternoon · evening |
 | `size` | few · one table · a crowd |
+| `acquaintance` | known to each other · family · a mix of friends and strangers · not well acquainted |
 
 ## The matrix
 
@@ -251,3 +252,58 @@ to grow, and every new room makes the next one harder to separate.
 - No question has been written. Facets first, then scenes.
 - The matrix is one person's reading of twelve voice documents and should be
   corrected by their author before anything is built on it.
+
+## `acquaintance` — added, and it is the strongest addition so far
+
+*Do the guests already know each other?* Known to each other · family · a mix of
+friends and strangers · not well acquainted.
+
+It passes both acceptance tests, and the second one is the interesting one.
+Unlike `teasing`, acquaintance does NOT travel with the guests unchanged: the
+same host throws a family dinner, a birthday and a work party and answers
+differently each time. It is a property of THIS gathering, which is to say a
+property of the evening.
+
+**What it does to the audit**
+
+| | 8 facets | + acquaintance |
+|---|---|---|
+| failing pairs | 4 | 3 |
+| zero-margin pairs | 7 | 4 |
+| mean distance | 4.85 | 5.55 |
+
+It separates 46 of 66 pairs and rescues one across the gate — Las Vegas/New York
+goes 2 → 3 and clears. Set that against `teasing`, which separated 35 and
+rescued none. Nearly halving the zero-margin count is the more valuable half:
+those are the pairs where one corrected cell could have pushed a passing pair
+into failure.
+
+**The values, read from the prose**
+
+| destination | level | evidence |
+|---|---|---|
+| Portofino | known | "written for a table that has already met" |
+| Nantucket | known | "Use first names. Nobody is introduced twice" |
+| Tahiti | known | `the long way: how everybody got here` |
+| Big Sur | known | a cabin at the end of a road, one story told long |
+| Las Vegas | known | one game, one stake, "agreed upstairs"; the entrance assigned by name |
+| Catskills | family | the bunk list, nicknames, in-jokes, "run the same way for long enough to have its own procedures" |
+| Côte d'Azur | mix | "come up. The road is the answer and nobody is counted" |
+| Havana | mix | "the door is open. Nobody replies and nobody is counted" |
+| New Orleans | mix | "come at nine. Nobody counts"; the walk home, nobody sure who paid |
+| New York | mix | `rises_to_greet` somebody NEW — the seating plan exists to handle strangers |
+| Westhampton | mix | `houseguests: the people staying. Anyone who merely came to dinner is not one` — two tiers |
+| Dolomites | not well acquainted | `impeccably_polite`, `corrects_gently`, and the times posted in a hall |
+
+**And it changes the Portofino question.** Côte d'Azur and Portofino now differ
+on `size` AND on `acquaintance` — "a table that has already met" against "nobody
+is counted". So even if `size` does not survive its level-design defect, the
+pair sits at 1 rather than 0, on a distinction that is written in both houses'
+own words. Portofino has a reason to exist that is not the disputed cell.
+
+**Beyond the matrix.** This facet also has the highest second-order value of
+anything in the set. The games carry a minimum guest count and nothing about
+familiarity, yet Fishbowl needs people who can clue each other, Secret Game
+Cards works BEST among strangers, and Art Battle asks somebody to invent an
+artist statement while the artist listens. Those are three different rooms.
+Ambience follows the same line.
