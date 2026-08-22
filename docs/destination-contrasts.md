@@ -238,9 +238,27 @@ to grow, and every new room makes the next one harder to separate.
   than dressed, a house rather than a hotel.
 - **Palm Springs 1965** — the least contested. Its risk is Westhampton 1976,
   which is also a rented house with questionable guests.
-- **Rio de Janeiro 1947** — the risk is Havana 1957 and New Orleans 1956, which
-  already sit at distance 1 from each other. A third late, loud, crowded,
-  cooked-for room is the same failure a third time.
+- **Rio de Janeiro 1947 — BLOCKED. Do not write it a row.**
+
+  The proof, and it generalises. Pulled STREETWARD it lands at distance 1 from
+  New Orleans. Pulled toward the COPACABANA PALACE it converges on St. Moritz's
+  exact row at distance 0. There is no third position: the until-morning corner
+  is already occupied by Havana, New Orleans and St. Moritz, and the nine facets
+  cannot split a RESORT-night from a HOUSE-night.
+
+  Two release conditions, either of which is sufficient:
+
+  1. Havana and New Orleans separating properly in the correction pass. PARTIAL
+     — pass 1 took them from 0 to 1 on the `schedule` anchor, which is real and
+     evidenced and still below the gate.
+  2. Adoption of `spectacle`. Note what Rio does to that facet rather than what
+     the facet does for Rio: `spectacle` is claimed by Las Vegas alone among the
+     twelve, so it is a fingerprint button. Rio is its second claimant, and a
+     floor show is precisely what splits a resort-night from a house-night.
+     Adopting `spectacle` and unblocking Rio are the same decision.
+
+  On the room rather than the row: Rio does NOT require a beach. It may require
+  outdoors, which `structural_requirement` can already express.
 
 ## What is not done
 
@@ -333,3 +351,17 @@ familiarity, yet Fishbowl needs people who can clue each other, Secret Game
 Cards works BEST among strangers, and Art Battle asks somebody to invent an
 artist statement while the artist listens. Those are three different rooms.
 Ambience follows the same line.
+
+## A standing rule: thrown-ness
+
+**A premise must read as a party somebody is THROWING, not a scene that
+OCCURS.** A destination that describes weather, a view, or a place behaving as
+itself has not been written yet, however well the sentences run.
+
+The Aspen draft failed this and was rewritten. Palm Springs prose is flagged for
+the same check before it is trusted.
+
+This rule does not live in the matrix and cannot be audited by it. Rows are
+arithmetic; thrown-ness is voice, and the founder audits the second one. A row
+can clear distance 3 against every other room and still describe a postcard.
+Both checks have to pass and neither substitutes for the other.
