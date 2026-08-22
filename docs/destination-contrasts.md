@@ -75,7 +75,6 @@ Ten facets, each answerable as a scene rather than an adjective.
 | `ending` | it stops cleanly · it dissolves · it goes until morning |
 | `starts` | morning · afternoon · evening |
 | `size` | few · one table · a crowd |
-| `acquaintance` | known to each other · family · a mix of friends and strangers · not well acquainted |
 
 ## The matrix
 
@@ -253,16 +252,35 @@ to grow, and every new room makes the next one harder to separate.
 - The matrix is one person's reading of twelve voice documents and should be
   corrected by their author before anything is built on it.
 
-## `acquaintance` — added, and it is the strongest addition so far
+## `acquaintance` — NOT a ranking facet. A constraint.
 
 *Do the guests already know each other?* Known to each other · family · a mix of
 friends and strangers · not well acquainted.
 
-It passes both acceptance tests, and the second one is the interesting one.
-Unlike `teasing`, acquaintance does NOT travel with the guests unchanged: the
-same host throws a family dinner, a birthday and a work party and answers
-differently each time. It is a property of THIS gathering, which is to say a
-property of the evening.
+**It was added to the matrix and then removed, and the removal is the correct
+answer.** The reasoning is worth keeping because the facet is worth keeping —
+somewhere else.
+
+It passes the test that killed `teasing`: acquaintance does not travel with the
+guests unchanged, because the same host throws a family dinner, a birthday and a
+work party and answers differently each time. It is a property of THIS
+gathering.
+
+But it fails a test the document did not have, and this is now the THIRD
+acceptance test: DOES IT CONSTRAIN WHICH WORLD FITS? It does not. A group of
+strangers can be given Tahiti or Big Sur or Portofino and none of them is wrong.
+What acquaintance constrains is what should HAPPEN inside the chosen world — the
+games, the seating, whether anybody needs an introduction. That is assembly, not
+ranking.
+
+So it belongs to the CONSTRAINT class defined under THE SEAM in
+src/lib/destinations.ts: answers that survive the pick and govern assembly
+whichever room she chose. It is not spent on the shortlist. It binds afterwards,
+and it binds inside a destination she chose herself.
+
+The measurements below are kept as the record of what it WOULD have done in the
+matrix, and as the argument for why a facet can be strong and still be in the
+wrong layer.
 
 **What it does to the audit**
 
@@ -286,20 +304,28 @@ into failure.
 | Nantucket | known | "Use first names. Nobody is introduced twice" |
 | Tahiti | known | `the long way: how everybody got here` |
 | Big Sur | known | a cabin at the end of a road, one story told long |
-| Las Vegas | known | one game, one stake, "agreed upstairs"; the entrance assigned by name |
+| Las Vegas | mix | corrected — `downstairs` is "the floor, the tables, the queue you are not in", and an assigned entrance is a technology for a room containing people you have not met |
 | Catskills | family | the bunk list, nicknames, in-jokes, "run the same way for long enough to have its own procedures" |
 | Côte d'Azur | mix | "come up. The road is the answer and nobody is counted" |
 | Havana | mix | "the door is open. Nobody replies and nobody is counted" |
 | New Orleans | mix | "come at nine. Nobody counts"; the walk home, nobody sure who paid |
-| New York | mix | `rises_to_greet` somebody NEW — the seating plan exists to handle strangers |
+| New York | mix, leaning strangers | `rises_to_greet` somebody NEW. A seating plan and a coat-pile are both technologies for handling people who have not met |
 | Westhampton | mix | `houseguests: the people staying. Anyone who merely came to dinner is not one` — two tiers |
 | Dolomites | not well acquainted | `impeccably_polite`, `corrects_gently`, and the times posted in a hall |
 
-**And it changes the Portofino question.** Côte d'Azur and Portofino now differ
-on `size` AND on `acquaintance` — "a table that has already met" against "nobody
-is counted". So even if `size` does not survive its level-design defect, the
-pair sits at 1 rather than 0, on a distinction that is written in both houses'
-own words. Portofino has a reason to exist that is not the disputed cell.
+**What removing it costs, stated plainly.** The audit returns to 4 failing pairs
+and 7 zero-margin pairs. Las Vegas/New York drops back below the gate to 2. And
+Côte d'Azur/Portofino returns to 1, separated by `size` alone — the facet with
+the level-design defect. So the Portofino question is once again hostage to a
+single disputed cell, which is exactly where it was.
+
+That cost is worth paying. A facet in the wrong layer does not stop being wrong
+because it improves a number, and improving the audit by ranking on something
+that cannot choose a world is how the matrix becomes decorative — which is the
+failure the whole document exists to prevent.
+
+The right fix for Côte d'Azur/Portofino is a facet that genuinely distinguishes
+two Mediterranean afternoons, or the honest conclusion that there is only one.
 
 **Beyond the matrix.** This facet also has the highest second-order value of
 anything in the set. The games carry a minimum guest count and nothing about
