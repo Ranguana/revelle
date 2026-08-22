@@ -46,15 +46,21 @@
 *
  * ── ONE ASYMMETRY, STATED SO IT IS NOT A SURPRISE ────────────────────
  *
- * seed:menus and seed:drinks take `--overwrite`, which lets the file beat the
- * curator when explicitly asked. THIS SEEDER HAS NO SUCH FLAG and never had
- * one, and neither do seed:destinations or seed:dishes. So a desk edit here is
- * not merely default-winning — nothing in the pipeline can revert it, and the
- * only way back to the authored text is a person retyping it.
+ * `--overwrite` lets the file beat the curator's WORDS when explicitly asked.
+ * seed:menus, seed:drinks and seed:dishes have it; seed:games and
+ * seed:destinations do not.
  *
- * That is defensible for content a curator is meant to own. It is written down
- * because five scripts describe themselves in near-identical words and only two
- * of them have the escape hatch.
+ * BUT THE FLAG HAS NOTHING TO DO WITH STATUS, WHICH IS THE PART THAT MATTERS.
+ * No seeder in this repo writes `status` on a row that already exists — not
+ * one, checked across all five. `--overwrite` rewrites name, contents, season,
+ * notes; `--activate` only touches rows the seeder itself just created. So
+ * PUBLISHING IS ONE-WAY FOR EVERY POOL, and the only way back is a person
+ * withdrawing a row by hand at the desk.
+ *
+ * An earlier version of this note said the asymmetry was about reversibility
+ * and named the wrong scripts. It was wrong twice, and it is corrected here
+ * rather than deleted because the distinction it missed — words are revertible,
+ * offered-ness is not — is the one worth knowing.
 
  */
 import pg from "pg";

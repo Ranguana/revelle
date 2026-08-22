@@ -31,8 +31,10 @@ import {
  *
  * So the seeders-create-drafts rule stands untouched — "deciding that something
  * is offered to a customer is a curator's decision and not a script's" — and
- * `npm run activate:catalogue -- --yes` is still the one place that yes gets
- * said. Nothing about removing the curator from selection weakens the gate on
+ * yes gets said in TWO places now, sharing one implementation: `/desk/publish`
+ * and `npm run activate:catalogue -- --yes`. The screen exists because the
+ * database is unreachable from any laptop, so the script alone meant publishing
+ * required a shell inside Render — a gate nobody could operate is not a gate. Nothing about removing the curator from selection weakens the gate on
  * what may reach a member at all.
  *
  * What it DOES remove is approval of an individual Revelle. The engine ranks,

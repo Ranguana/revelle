@@ -5,6 +5,26 @@
  *   npm run activate:catalogue          say what would change, change nothing
  *   npm run activate:catalogue -- --yes actually do it
  *
+ * ── THERE IS NOW A SCREEN, AND THIS STILL EXISTS ─────────────────────
+ *
+ * /desk/publish does the same thing with the list in front of a curator, and it
+ * is the one a person should reach for: this command can only be typed inside a
+ * Render shell, because the database has an empty ipAllowList and is
+ * unreachable from any laptop by design (render.yaml says why). A gate that can
+ * only be operated from a shell is a gate nobody operates, which is how 372
+ * dishes came to be sitting in draft.
+ *
+ * This is kept because it is the gesture that needs no browser and no session:
+ * the whole catalogue, one command, from inside a deploy shell, when that is
+ * what the situation is. The two must not drift, so the RULES BELOW ARE NOT
+ * IMPLEMENTED HERE ANY MORE — they live in src/lib/desk/publish.ts and both
+ * callers import them. Read that file for the code; read this header for the
+ * argument, which is still the canonical one.
+ *
+ * (Importing a .ts module from a .mjs script is the same thing
+ * scripts/seed-games.mjs and scripts/seed-destinations.mjs already do — Node 22
+ * strips the types. render.yaml pins NODE_VERSION to 22.)
+ *
  * ── WHY THIS IS SEPARATE FROM SEEDING ────────────────────────────────
  *
  * Every seeder creates DRAFTS and says so, because deciding that something is
@@ -12,10 +32,11 @@
  * is right and it is not being weakened here: this is the curator saying yes,
  * in one place, out loud, with a record of what it touched.
  *
- * seed:menus and seed:drinks each take `--activate`. seed:games has no such
- * flag and never had one, and a destination's status is not something any
- * seeder sets at all. So "activate everything" was three different gestures
- * and one impossibility. This is the missing one.
+ * seed:menus, seed:drinks and seed:dishes each take `--activate`, which applies
+ * only to rows THEY create. seed:games has no such flag and never had one, and
+ * a destination's status is not something any seeder sets at all. So "activate
+ * everything" was three different gestures and one impossibility. This is the
+ * missing one.
  *
  * ── THE ONE RULE THAT IS NOT NEGOTIABLE ──────────────────────────────
  *
@@ -36,9 +57,24 @@
  * Re-running reports zero of everything. Nothing here moves a row backwards:
  * a discontinued product stays discontinued, an unpublished destination that a
  * curator archived stays archived. Only `draft` moves.
+ *
+ * ── AND ONE-WAY ──────────────────────────────────────────────────────
+ *
+ * No seeder in this repository can undo what this does. `--activate` only ever
+ * touches rows a seeder creates; `--overwrite` (menus, drinks, dishes) lets the
+ * file beat a curator's edit on the WORDS and writes no status at all. The way
+ * back is by hand, one row at a time, at the desk. See IRREVERSIBLE in
+ * src/lib/desk/publish.ts, where that claim is checked against all four.
  */
 
 import pg from "pg";
+
+import {
+  pools,
+  publish,
+  publishDestinations,
+  worldStanding,
+} from "../src/lib/desk/publish.ts";
 
 const yes = process.argv.includes("--yes");
 
@@ -59,93 +95,48 @@ const pool = new pg.Pool({
 const client = await pool.connect();
 
 /**
- * Which pools exist, and what "offered" MEANS for each, is data — db/002's
- * ingredient_pool carries `active_column` and `active_value` as a column/value
- * pair rather than a predicate string, deliberately, so nothing here has to
- * know that a menu says `status = 'active'` and guess that every other pool
- * agrees. A pool that does not declare a pair has no draft state to leave and
- * is skipped rather than assumed.
+ * The shared module's `Ask`, bound to THIS client.
+ *
+ * Binding it to one client rather than to the pool is what keeps the dry run
+ * honest: every statement below lands inside the single transaction opened here
+ * and is rolled back together when `--yes` is absent.
  */
-const pools = (
-  await client.query(
-    `select entity_table, active_column, active_value
-       from ingredient_pool
-      where active_column is not null
-        -- world IS a pool row (db/002: join_table is null when the reference
-        -- lives on revelle itself). It must NOT go through the generic loop,
-        -- which would publish every draft destination including the ones with
-        -- no voice — the exact thing this script exists to refuse. It is
-        -- handled below, where the voice rule is.
-        --
-        -- db/001's world_published_has_timestamp caught this: the generic
-        -- statement sets a status and no date, and the constraint refused the
-        -- whole transaction. A check written for data integrity happened to
-        -- stop a policy violation, which is the argument for writing them.
-        and entity_table <> 'world'
-      order by entity_table`
-  )
-).rows;
+const ask = async (text, params = []) => (await client.query(text, params)).rows;
 
 let changed = 0;
 
 try {
   await client.query("begin");
 
-  for (const p of pools) {
-    // format(%I) on the identifiers, never interpolation: these come from a
-    // table a curator could in principle write to, and db/002 makes the same
-    // point about why a predicate string was refused here.
-    const { rows } = await client.query(
-      `select format(
-                'update %I set %I = %L where %I = %L returning slug',
-                $1::text, $2::text, $3::text, $2::text, 'draft'
-              ) as sql`,
-      [p.entity_table, p.active_column, p.active_value]
-    );
-    const done = await client.query(rows[0].sql);
-    if (done.rows.length) {
+  // Which pools exist, and what "offered" MEANS for each, is data — see the
+  // registry note in src/lib/desk/publish.ts. `world` is excluded there, not
+  // here, because excluding it is part of the rule and not part of this loop.
+  for (const p of await pools(ask)) {
+    // null: the whole pool, no list. That is this command's gesture — the
+    // screen passes ids because it showed her the rows first.
+    const done = await publish(ask, p, null);
+    if (done.length) {
       console.log(
-        `[activate] ${p.entity_table.padEnd(10)} ${done.rows.length} draft -> ${p.active_value}`
+        `[activate] ${p.code.padEnd(10)} ${done.length} draft -> ${p.activeValue}`
       );
-      changed += done.rows.length;
+      changed += done.length;
     } else {
-      console.log(`[activate] ${p.entity_table.padEnd(10)} nothing in draft`);
+      console.log(`[activate] ${p.code.padEnd(10)} nothing in draft`);
     }
   }
 
   // ── destinations ───────────────────────────────────────────────────
   //
-  // `world_voice` is versioned and superseded; a destination "has a voice"
-  // only if a row of it is currently published. Joining rather than trusting
-  // a flag is the point — see db/004.
-  // `published_at` is not decoration: db/001 constrains status='published' and
-  // published_at to be true together, so setting one without the other is
-  // refused. coalesce so a destination that was published, unpublished and
-  // published again keeps the date it first went out.
-  const voiced = await client.query(
-    `update world w
-        set status = 'published',
-            published_at = coalesce(w.published_at, now())
-      where w.status = 'draft'
-        and exists (
-          select 1 from world_voice v
-           where v.world_id = w.id
-             and v.published_at is not null
-             and v.superseded_at is null
-        )
-      returning w.slug`
-  );
-  for (const r of voiced.rows) console.log(`[activate] world      ${r.slug} -> published`);
-  changed += voiced.rows.length;
+  // The voice rule is inside publishDestinations() and is applied whether or
+  // not a list was given, which is the point: the veto belongs to the
+  // statement, not to whoever assembled the list.
+  const voiced = await publishDestinations(ask, null);
+  for (const r of voiced) console.log(`[activate] world      ${r.slug} -> published`);
+  changed += voiced.length;
 
-  const mute = await client.query(
-    `select w.slug,
-            (select count(*) from menu_world mw where mw.world_id = w.id) as menus,
-            (select count(*) from drink_world dw where dw.world_id = w.id) as drinks
-       from world w
-      where w.status = 'draft'
-      order by w.slug`
-  );
+  // Read AFTER the update, so this is what is still draft once the voiced ones
+  // have gone out.
+  const { mute } = await worldStanding(ask);
 
   if (yes) {
     await client.query("commit");
@@ -157,14 +148,14 @@ try {
     `\n[activate] ${changed} row(s) ${yes ? "changed" : "WOULD change — nothing was written"}`
   );
 
-  if (mute.rows.length) {
+  if (mute.length) {
     console.log(
       `\n[activate] These destinations stay DRAFT because they have no published ` +
         `voice.\n           A destination with a look and no voice cannot be ` +
         `written, so it must not\n           be offered. This list is the ` +
         `authoring queue:\n`
     );
-    for (const r of mute.rows) {
+    for (const r of mute) {
       console.log(
         `             ${r.slug.padEnd(18)} ${String(r.menus).padStart(2)} menus, ` +
           `${String(r.drinks).padStart(2)} drinks written for it`

@@ -1013,6 +1013,42 @@
   color: var(--oxblood);
 }
 
+/* ── the publish board ────────────────────────────────────────────── */
+
+/*
+ * THE LIST SHE IS SAYING YES TO.
+ *
+ * Nothing new is invented here: the items are .facetList / .facetItem, the same
+ * "tick the ones that apply" idiom the facet picker uses, because it is the
+ * same gesture. What this adds is a BOX, because a pool can be 372 rows deep
+ * and a list that pushes its own submit button four screens down is a list
+ * whose button gets pressed without the list being read.
+ *
+ * Scrolled rather than truncated: every row she can publish stays reachable,
+ * and the button stays in sight beneath it.
+ */
+.pickList {
+  border: 1px solid var(--rule);
+  padding: 0.5rem 0.625rem 0.125rem;
+  max-height: 26rem;
+  overflow: auto;
+  margin-bottom: 0.75rem;
+}
+
+/*
+ * The sentence that cannot be skipped. Full ink and its own rule above it: it
+ * is the only irreversible claim on the page, and it must not read as one more
+ * quiet grey option among the ticks above.
+ */
+.pickConfirm {
+  color: var(--ink);
+  align-items: flex-start;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.625rem;
+  margin-bottom: 0.75rem;
+  max-width: 46rem;
+}
+
 /* ── the coverage board ───────────────────────────────────────────── */
 
 .board {

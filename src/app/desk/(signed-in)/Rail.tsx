@@ -23,6 +23,11 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
     { href: "/desk/drinks", label: "Drinks" },
     { href: "/desk/games", label: "Games" },
     { href: "/desk/products", label: "Products" },
+    // LAST IN THE LIBRARY GROUP, not in "What it does", because publishing is
+    // not an instrument for reading the engine — it is the gesture that decides
+    // what the six lists above it are allowed to be. It belongs under them, at
+    // the end, where the work ends.
+    { href: "/desk/publish", label: "Publish" },
   ],
   // The three screens that show what the library DOES rather than what is in
   // it. Their own group, above the messages, because they are the working
