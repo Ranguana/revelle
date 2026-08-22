@@ -54,6 +54,21 @@ between them. "Off-season, few, the harbour to yourselves" is a legitimate
 answer and a distinct party — but it has to be won in the cells, and at present
 it is winning nothing by more than the minimum.
 
+**And the question is NARROWER than it keeps getting stated.** `size` is
+SETTLED: pure headcount, three bands, furniture demoted to evidence. Do not
+reopen the facet definition as part of presenting this choice — that has been
+decided and re-litigating it is how a settled question comes back wearing a new
+hat.
+
+What is live is only this. Portofino's `size` cell is UNEVIDENCED — no
+destination states a headcount except Westhampton's "sleeps six" — and
+evidencing it as `few` leaves the pair at 1 regardless, because `few` is what it
+already holds. So there are exactly two ways out and both are the founder's:
+
+1. **A second distinguishing cell**, found in the correction pass. Any one of
+   the other seven flipping on Portofino or Côte d'Azur clears the pair.
+2. **The Cap Ferrat precedent.** One Mediterranean afternoon, not two.
+
 ## WESTHAMPTON, 1976
 
 | facet | value | why | ok? |
