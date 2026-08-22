@@ -1,3 +1,28 @@
+# ── WHAT THIS FILE IS, AND WHAT IT IS NOT ────────────────────────────
+#
+# THIS BLUEPRINT WAS NEVER APPLIED. The services it describes were created by
+# hand in the dashboard on 2026-08-14, and for eight days this file described a
+# deployment that did not exist:
+#
+#   - it named the web service `revelle`; the real one is `dispatcherie`
+#   - it declared a database `revelle-db`; the real one is `dispatcherie-db`
+#   - and the live service had NO preDeployCommand at all, so `npm run migrate`
+#     and every seeder below had never once run automatically
+#
+# The consequence was invisible and total: code deployed on every push and the
+# DATABASE NEVER MOVED. Schema changes and catalogue content sat in the repo
+# looking shipped.
+#
+# A second service — a static_site also called `revelle`, built from this same
+# repo and branch — served a stale artifact at revelle.onrender.com, which is
+# the URL anybody would guess. It has been deleted.
+#
+# So this file is now reconciled to reality and is DOCUMENTATION OF A RUNNING
+# SYSTEM, not a blueprint waiting to be applied. Applying it as a blueprint
+# would create duplicates of services that already exist. Change the dashboard
+# and change this file in the same commit, or it goes back to being fiction.
+# ─────────────────────────────────────────────────────────────────────
+
 # Revelle Société — Render Blueprint
 #
 # One web service (Render's native Node runtime) + one Render Postgres.
@@ -13,7 +38,7 @@
 # ─────────────────────────────────────────────────────────────────────
 
 databases:
-  - name: revelle-db
+  - name: dispatcherie-db
     databaseName: revelle
     user: revelle
     # basic-256mb is the cheapest non-expiring plan. `free` also works but is
@@ -27,7 +52,7 @@ databases:
 
 services:
   - type: web
-    name: revelle
+    name: dispatcherie
     runtime: node
     plan: starter
     # Must match the database's region, or DATABASE_URL's internal hostname
@@ -102,11 +127,12 @@ services:
       # already honours that as its escape hatch.
       - key: DATABASE_URL
         fromDatabase:
-          name: revelle-db
+          name: dispatcherie-db
           property: connectionString
 
       # The real public origin, no trailing slash. Set after the first deploy to
-      # https://<service>.onrender.com or the custom domain.
+      # Set to https://revellery.com — the service carries four verified
+      # domains: revellery.com, www.revellery.com, dispatcherie.com, www.dispatcherie.com.
       - key: APP_URL
         sync: false
 
