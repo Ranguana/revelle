@@ -91,7 +91,25 @@ flickered through three reports before anyone traced it. `src/lib/deploy.test.ts
 now fails if a `seed:*` script is neither in the chain nor listed as manual with
 a reason.
 
-**13. Superseded reasoning is PRESERVED, never deleted.**
+**13. POOL CONTENT STOCKS ITSELF. GOVERNED CLASSES DO NOT.**
+Dishes, drinks, bank items, menus, products and tracklists go live on deploy;
+the desk is an audit feed and the founder VETOES rather than consents. An item
+carrying a founder-pending question stays draft, and it knows who it is because
+the seeder wrote the question into it.
+
+Destinations, gestures, voices, matrix cells and member-facing copy stay
+founder-signed. Each is a claim about a WORLD or about how the house SPEAKS,
+and one of those reaching a member unread is a different kind of wrong from a
+dish doing it. `src/lib/governed.test.ts` fails the build if a seeder gives
+`world` or `world_voice` a live status — rule 12's sibling: that one catches a
+seeder that never runs, this one catches a seeder that runs and signs something
+it may not.
+
+The older rule — "deciding that something is offered to a customer is a
+curator's decision and not a script's" — was right about what it protected and
+wrong about its scope. It was written when the only content was destinations.
+
+**14. Superseded reasoning is PRESERVED, never deleted.**
 When a decision reverses, keep the old argument and say what beat it. See the
 year decisions in `src/lib/destinations.ts` and the "she does not pick" section
 in `docs/selection-spec.md`. In six months the reasoning is the part that gets
