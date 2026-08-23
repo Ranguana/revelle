@@ -87,6 +87,29 @@ a fine-tune is **adopted only on a blind comparison win** against the
 packet-prompted base. Not on a metric, not on the author's impression of it, and
 not because the tuning ran.
 
+### The banned layer is BUILT, and the anti-exemplars are the refusals
+
+`npm run check:voice-output -- <slug> "<line>"` — `scripts/check-voice-output.mjs`.
+
+It is the third of the three QA checks, built first because it needs no model
+and no training data: the material already exists, authored, in every
+destination's `rejected` list.
+
+**The refusals ARE the anti-exemplars.** A banned WORD list catches "authentic"
+and misses "a night of old New York glamour", which uses no banned word and is
+the exact failure the house refuses. A rejected example is a banned SHAPE with
+the reason attached, and it is the only place in the catalogue where the failure
+mode is stated positively. Every packet should carry its room's `rejected` list
+for this reason — an exemplar of what not to write is worth more than another
+instruction not to write it.
+
+Three checks, none of them clever: DISPLACED TERMS (every `insteadOf` word in
+the lexicon, hard bans), NEVER-RULE TERMS, and SHAPE PROXIMITY against each
+refusal. The third reports and does not judge — a high score prints the refusal
+and its `why` beside the candidate and says "not a verdict". A model will judge
+shape better than this eventually; until then a lexical check that never lies
+about its confidence beats a clever one that does.
+
 ### What this requires that does not exist yet
 
 **Edit capture.** Preference pairs cannot accumulate retroactively — a

@@ -17,43 +17,43 @@ strongest candidates for a line that has to carry the whole idea.
 
 > Venue never touches the destination — that's the thesis of the product. The destination is where she's transported to; the venue is where she physically is; the engine's whole job is mapping one onto the other. Havana in a Brooklyn apartment isn't a compromise, it's the pitch.
 
-*selection/venue.ts · enforced in three places*
+*selection/venue.ts · enforced in three places* — quotable.
 
 > If she chooses from a shortlist, the profile learns her self-image — what she would like to be seen wanting. If the curator chooses and she reacts, it learns her taste. Those diverge, and the second is the product.
 
-*selection-spec.md · superseded by pick-first, kept for the reasoning*
+*selection-spec.md · superseded by pick-first, kept for the reasoning* — **NO QUOTE. House only.**
 
 > Not a bigger weight — a TIER. A weight averages. Averaging two axes produces the destination that is middling on both, which is the compromise that is nobody's.
 
-*selection/tone.ts*
+*selection/tone.ts* — **NO QUOTE. House only.**
 
 > Deciding what the house may offer remains ours. Deciding what one member gets is now hers.
 
-*desk/page.tsx*
+*desk/page.tsx* — **NO QUOTE. House only.**
 
 > Facets describe the evening. Properties of her people belong to the tiles.
 
-*destination-contrasts.md*
+*destination-contrasts.md* — **NO QUOTE. House only.**
 
 > A room that cannot be said without borrowing another room's words means the list is wrong.
 
-*voice.ts, the coined tones*
+*voice.ts, the coined tones* — **NO QUOTE. House only.**
 
 > Rows are arithmetic. Thrown-ness is voice.
 
-*destination-contrasts.md*
+*destination-contrasts.md* — **NO QUOTE. House only.**
 
 > A premise must read as a party somebody is throwing, not a scene that occurs.
 
-*new-destination.md, step 0d*
+*new-destination.md, step 0d* — **NO QUOTE. House only.**
 
 > The conflict exists only because your catalog lacks that destination.
 
-*selection/destination.ts*
+*selection/destination.ts* — **NO QUOTE. House only.**
 
 > Every sentence in this file is for the house.
 
-*selection/engine.ts*
+*selection/engine.ts* — **NO QUOTE. House only.**
 
 ---
 
@@ -116,6 +116,22 @@ catalogue, because each one is a whole scene in a sentence.
 
 **TAHITI, 1961**
 > A note left face up on the table under a stone, written before anybody else was awake.
+
+---
+
+## 3a. The rule that governs every refusal
+
+Promoted out of Havana's list because it is not Havana's. It is the
+catalogue-wide test for whether a period is a REGISTER or a PITCH, and every
+dated room is subject to it:
+
+> ~~"Havana, 1957. The casino, the linen suits, the last good year."~~
+
+> Somebody else's country as a playground, photographed at its least free. Kitsch, and the exact failure the period rule exists to stop. The destination is NAMED for the year and this line is still forbidden — a date the voice is written in is not a nostalgia the voice sells, and the four words this opens with being the name on the plate is what makes it easy to write by accident.
+
+The general form: **a date the voice is written IN is not a nostalgia the voice
+SELLS.** Twelve rooms carry a year. Any line that sells the year rather than
+writing from inside it fails this, whichever room it is for.
 
 ---
 
@@ -208,4 +224,31 @@ to say what Revelle is NOT — because it does it by demonstration.
   — A Hawaiian word on a Polynesian island four thousand miles away, and then the feeling named outright. Two costumes in five words.
 - ~~"Island time. Nobody is watching the clock."~~
   — A joke about lateness at the expense of the place. There is no clock on the page at all, which is the honest version of the same fact.
+
+---
+
+## 5. What this sheet cannot give you yet
+
+**SIX ROOMS HAVE NO REPLY CONVENTION.** Every other destination carries one in
+its lexicon — `regrets only`, `the door is open`, `come up`, `come when you
+come`, `come at nine`, `kindly reply` — and they are the best short copy in the
+catalogue, because each states a whole social contract in three words. These six
+have none, so there is nothing to pull:
+
+- LAS VEGAS, 1960
+- CATSKILLS, 1963
+- PORTOFINO, 1961
+- DOLOMITES, 1956
+- BIG SUR, 1971
+- TAHITI, 1961
+
+That is a gap in those voice documents rather than in this sheet, and it is the
+same gap that made `audience` fail as a facet.
+
+**WESTHAMPTON IS PROVISIONAL.** Its matrix row was re-founded to Eothen/Capote —
+the house where the famous come to be off-duty — and its VOICE has not been
+rewritten. Everything quoted above under WESTHAMPTON, 1976 is the superseded
+Locust Valley register: dry, quiet, a card left on the hall table. **Do not use
+it for copy.** The mismatch is recorded under `awaitingVoice` in
+`data/destination-matrix.json`.
 
