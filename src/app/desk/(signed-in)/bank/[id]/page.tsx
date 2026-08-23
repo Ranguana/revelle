@@ -3,12 +3,21 @@ import { notFound } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
 import { POOL_STATUS, money } from "@/lib/desk/labels";
+import {
+  requirementVocabulary,
+  requirementsFor,
+} from "@/lib/desk/requirements";
 
 import styles from "../../../desk.module.css";
 import Thread from "../../Thread";
-import { Empty, Head, Seam, Status } from "../../bits";
+import { Chips, Empty, Head, Seam, Status } from "../../bits";
 import BankForm, { type BankValues } from "../BankForm";
-import { attachIngredient, detachIngredient } from "../actions";
+import {
+  attachIngredient,
+  clearBankRequirement,
+  declareBankRequirement,
+  detachIngredient,
+} from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +28,13 @@ type Item = BankValues & {
   world_name: string;
   gesture: string | null;
   gesture_note: string | null;
+  /**
+   * db/033's `world.venue_requirement` — what this DESTINATION's deliverable
+   * presupposes, joined for its words. Read-only here and never scored.
+   */
+  world_requirement: string | null;
+  world_requirement_label: string | null;
+  world_requirement_demand: string | null;
 };
 
 export default async function BankItemPage({
@@ -32,18 +48,29 @@ export default async function BankItemPage({
   const item = await queryOne<Item>(
     `select b.id, b.slug::text as slug, b.world_id, b.kind::text as kind,
             b.name, b.description, b.phase::text as phase,
-            b.venue::text as venue, b.min_lead_days, b.ships,
+            b.min_lead_days, b.ships,
             b.technique_card_id, b.weight::text as weight,
             b.status::text as status, b.source_citation,
-            w.name as world_name, w.gesture, w.gesture_note
+            w.name as world_name, w.gesture, w.gesture_note,
+            w.venue_requirement as world_requirement,
+            k.label as world_requirement_label,
+            k.demand as world_requirement_demand
        from bank_item b
        join world w on w.id = b.world_id
+       left join structural_requirement k on k.code = w.venue_requirement
       where b.id = $1`,
     [id]
   );
   if (!item) notFound();
 
-  const [destinations, cards, ingredients, products] = await Promise.all([
+  const [
+    destinations,
+    cards,
+    ingredients,
+    products,
+    requirements,
+    vocabulary,
+  ] = await Promise.all([
     query<{ id: string; name: string }>(
       `select id, name from world where status <> 'retired' order by name`
     ),
@@ -86,7 +113,16 @@ export default async function BankItemPage({
         limit 500`,
       [id]
     ),
+    requirementsFor("bank_item", id),
+    requirementVocabulary(),
   ]);
+
+  // What is left to declare. The vocabulary arrives in db/020's `position`
+  // order and stays in it, which is what puts `outdoor_access` directly under
+  // `requires_outdoors` in the select — the lesser grade under the greater,
+  // rather than four rows away under an alphabetical sort.
+  const declared = new Set(requirements.map((row) => row.code));
+  const undeclared = vocabulary.filter((kind) => !declared.has(kind.code));
 
   return (
     <>
@@ -104,6 +140,156 @@ export default async function BankItemPage({
           <BankForm values={item} destinations={destinations} cards={cards} />
         </div>
         <div>
+          {/*
+            WHAT IT NEEDS OF THE ROOM — `ingredient_requirement`, db/020 and
+            db/033, and the panel that replaces the venue select db/033 took
+            off the form beside it.
+
+            It is built as the ingredient panel below it is built, deliberately
+            and not for want of an idea: a table of what is declared with a
+            clear button per row, then a select, a note and a button to declare
+            one more. Same reasons, and neither is layout — a nested <form> is
+            not legal HTML, and a save that owns a relationship it cannot fully
+            see will eventually destroy one.
+
+            ── THE TWO GRADES ARE NEVER ONE CONTROL ──
+
+            The distinction the dropped `bank_venue` was built to protect
+            survives the move intact. A requirement some room REFUSES is drawn
+            with the veto mark the rest of the desk gives a thing that rules an
+            evening out; a requirement no room refuses is plain text. That is
+            not a list kept here — it is `venue_affordance`, the same table
+            venueEligibility() prunes with, so the mark means exactly "this can
+            delete a deliverable" and cannot drift from what actually does.
+
+            `outdoor_access` comes out plain by that test rather than by being
+            named: db/033 adds the code and no affordance rows, so no room
+            declines it. It is a GRADE and not a sibling — anything satisfying
+            `requires_outdoors` satisfies it — and the position ordering keeps
+            the two adjacent wherever the vocabulary prints.
+          */}
+          <section className={styles.panel}>
+            <h2 className={styles.panelHead}>What it needs of the room</h2>
+
+            {requirements.length === 0 ? (
+              <Empty>
+                Nothing declared, and that is a complete answer rather than an
+                empty one: no requirement means it works anywhere. db/020 calls
+                that the safe default and the founder&rsquo;s instruction where
+                it is a judgement call — a wrong tag deletes this line silently
+                and forever, a missing one costs a curator a second look.
+              </Empty>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>It needs</th>
+                    <th>Which reads</th>
+                    <th>Note</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {requirements.map((row) => (
+                    <tr key={row.code}>
+                      <td>
+                        {row.vetoes ? (
+                          <Chips items={[row.label]} tone="no" />
+                        ) : (
+                          row.label
+                        )}
+                      </td>
+                      <td>
+                        {/*
+                          db/020 shaped `demand` to complete "it …" in a
+                          rejection sentence, so this column is the sentence a
+                          host would be given if the room could not do it.
+                        */}
+                        it {row.demand}
+                        {row.vetoes ? null : (
+                          <div className={styles.when}>
+                            no room in the library refuses this, so it prunes
+                            nothing on its own
+                          </div>
+                        )}
+                      </td>
+                      <td>{row.note || "—"}</td>
+                      <td>
+                        <form action={clearBankRequirement}>
+                          <input type="hidden" name="id" value={item.id} />
+                          <input
+                            type="hidden"
+                            name="requirement"
+                            value={row.code}
+                          />
+                          <button className={styles.filter}>Clear it</button>
+                        </form>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            {undeclared.length === 0 ? (
+              <p className={styles.hint}>
+                It already carries every requirement there is, which is almost
+                certainly more than one line can mean. Clear the ones that are
+                not true of it.
+              </p>
+            ) : (
+              <form action={declareBankRequirement} className={styles.buttonRow}>
+                <input type="hidden" name="id" value={item.id} />
+                <select
+                  name="requirement"
+                  aria-label="What it needs of the room"
+                  className={styles.select}
+                  defaultValue=""
+                >
+                  <option value="">Pick what the room must do</option>
+                  {undeclared.map((kind) => (
+                    <option key={kind.code} value={kind.code}>
+                      {/*
+                        The mark is the truth about consequence, not a
+                        decoration: a requirement some room refuses can delete
+                        this line from a package, and one nothing refuses
+                        cannot. Said in words here because a select cannot
+                        carry a chip.
+                      */}
+                      {kind.label}
+                      {kind.vetoes ? "" : " — no room refuses this one"}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  name="note"
+                  placeholder="Why this one"
+                  aria-label="Why this one"
+                  className={styles.input}
+                />
+                <button className={styles.button}>Declare it</button>
+              </form>
+            )}
+
+            <p className={styles.hint}>
+              <strong>
+                &ldquo;Needs a door to somewhere&rdquo; is a grade of
+                &ldquo;Needs outdoors&rdquo;, not a sibling of it.
+              </strong>{" "}
+              A terrace, a stoop, a balcony, a yard — and anything that
+              satisfies the harder one satisfies this. Declare the harder one
+              only when the line genuinely cannot happen inside: it is the one
+              a room can refuse, and a host with no outside then never sees the
+              line at all.
+            </p>
+            <p className={styles.hint}>
+              These are the same words a menu, a drink, a dish, a game and a
+              product use. db/033 unified the vocabulary rather than bridging
+              two of them, so what a bank item asks of a room is legible to the
+              filter that already reads every other pool.
+            </p>
+          </section>
+
           {/*
             SHOPPABLE ATMOSPHERE — db/031's `bank_item_ingredient`, and its own
             panel rather than a field inside the form above. Two reasons, and
@@ -213,6 +399,43 @@ export default async function BankItemPage({
           />
         </div>
       </div>
+
+      {/*
+        WHAT THE DESTINATION PRESUPPOSES — db/033's `world.venue_requirement`.
+
+        Here because a bank item in a room that presupposes outdoors INHERITS a
+        constraint it never declared, and a curator reading this line has no
+        other way to know. Tahiti and Palm Springs carried `requires_outdoors`
+        in a markdown heading for months, which is not data and cannot be read
+        by anything; it is a column now, and this is where it reaches the person
+        deciding whether the line is worth writing.
+
+        READ-ONLY, and it will not become editable from this screen. It belongs
+        to the destination — and db/033 is emphatic that it is read at the
+        reveal and SURFACED, never scored: venue must never touch which
+        destination a party is in. Standing rule 2, enforced in vector.ts,
+        db/020 and selection.test.ts.
+      */}
+      {item.world_requirement ? (
+        <Seam title={`${item.world_name} already presupposes a room`}>
+          Its deliverable{" "}
+          <strong>
+            {item.world_requirement_demand
+              ? `${item.world_requirement_demand}`
+              : item.world_requirement}
+          </strong>
+          {item.world_requirement_label
+            ? ` — “${item.world_requirement_label}”`
+            : ""}
+          . This line inherits that whether or not it declares anything of its
+          own, so a host whose room cannot do it was never going to receive this
+          room at all. Declaring the same requirement here is not wrong and is
+          usually redundant; declaring it is only worth doing if the line needs
+          it and the rest of the room does not. It is read at the reveal and
+          surfaced, never scored — venue never touches which destination she
+          gets — and it is edited on the destination record.
+        </Seam>
+      ) : null}
 
       <Seam title={`The gesture at ${item.world_name} is not a bank row`}>
         {item.gesture ? (

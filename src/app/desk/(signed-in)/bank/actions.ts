@@ -4,12 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
+import { BANK_KINDS, BANK_PHASES, slugify } from "@/lib/desk/labels";
 import {
-  BANK_KINDS,
-  BANK_PHASES,
-  BANK_VENUES,
-  slugify,
-} from "@/lib/desk/labels";
+  clearRequirement,
+  declareRequirement,
+  requirementNamed,
+} from "@/lib/desk/requirements";
 import { recordAction, requireStaff } from "@/lib/staff";
 
 /**
@@ -35,13 +35,28 @@ import { recordAction, requireStaff } from "@/lib/staff";
  * content — db/031 is explicit that an invariant in a pool of variables
  * eventually gets left out of a package. The desk shows it beside this pool,
  * read-only, and it is edited where it lives, on the destination record.
+ *
+ * `world.venue_requirement`, db/033, for the same reason and a sharper one. It
+ * is what a DESTINATION's deliverable presupposes, so it belongs to the
+ * destination record; and it is read at the reveal and surfaced, NEVER scored,
+ * so nothing about it may become a thing a curator adjusts from a pool screen
+ * until she has understood which of the two questions she is answering.
+ *
+ * ── AND THE COLUMN THAT IS NOT WRITTEN BECAUSE IT IS GONE ───────────
+ *
+ * `bank_item.venue`. db/033 dropped it and dropped the `bank_venue` type with
+ * it: a bank item's venue requirement now lives in `ingredient_requirement`,
+ * where every other pool's does, and it is written by the two actions at the
+ * foot of this file rather than by the item's own save. That is not only
+ * because it moved tables — it is the `bank_item_ingredient` rule again, argued
+ * at length below: a save that owns a relationship it cannot fully see will
+ * eventually destroy one.
  */
 
 export type BankState = { error: string | null };
 
 const KIND_CODES = BANK_KINDS.map((entry) => entry.code);
 const PHASE_CODES = BANK_PHASES.map((entry) => entry.code);
-const VENUE_CODES = BANK_VENUES.map((entry) => entry.code);
 const STATUSES = ["draft", "active", "discontinued"];
 
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -87,11 +102,9 @@ export async function saveBankItem(
 
   const kind = trimmed(form, "kind");
   const phase = trimmed(form, "phase");
-  const venue = trimmed(form, "venue");
   const status = trimmed(form, "status");
   if (!KIND_CODES.includes(kind)) return { error: "Pick what it is." };
   if (!PHASE_CODES.includes(phase)) return { error: "Pick a time of day." };
-  if (!VENUE_CODES.includes(venue)) return { error: "Pick where it can happen." };
   if (!STATUSES.includes(status)) return { error: "Unknown status." };
 
   // BLANK IS A CLAIM, NOT A GAP: db/031 says a null lead time means "no lead
@@ -135,7 +148,6 @@ export async function saveBankItem(
     name,
     trimmed(form, "description"),
     phase,
-    venue,
     lead,
     ships,
     card,
@@ -153,20 +165,20 @@ export async function saveBankItem(
         `update bank_item
             set slug = $1, world_id = $2, kind = $3::bank_kind, name = $4,
                 description = $5, phase = $6::bank_phase,
-                venue = $7::bank_venue, min_lead_days = $8, ships = $9,
-                technique_card_id = $10, weight = $11::numeric,
-                status = $12::product_status, source_citation = $13
-          where id = $14`,
+                min_lead_days = $7, ships = $8,
+                technique_card_id = $9, weight = $10::numeric,
+                status = $11::product_status, source_citation = $12
+          where id = $13`,
         [...values, id]
       );
     } else {
       const rows = await query<{ id: string }>(
         `insert into bank_item
-           (slug, world_id, kind, name, description, phase, venue,
+           (slug, world_id, kind, name, description, phase,
             min_lead_days, ships, technique_card_id, weight, status,
             source_citation)
-         values ($1,$2,$3::bank_kind,$4,$5,$6::bank_phase,$7::bank_venue,
-                 $8,$9,$10,$11::numeric,$12::product_status,$13)
+         values ($1,$2,$3::bank_kind,$4,$5,$6::bank_phase,
+                 $7,$8,$9,$10::numeric,$11::product_status,$12)
          returning id`,
         values
       );
@@ -181,7 +193,7 @@ export async function saveBankItem(
     entityTable: "bank_item",
     entityId: itemId,
     summary: `${name} (${kind}, ${status})`,
-    detail: { slug, kind, phase, venue, ships, lead, weight: weight.toFixed(3) },
+    detail: { slug, kind, phase, ships, lead, weight: weight.toFixed(3) },
   });
 
   revalidatePath("/desk/bank");
@@ -274,5 +286,72 @@ export async function detachIngredient(form: FormData): Promise<void> {
     detail: { productId },
   });
 
+  revalidatePath(`/desk/bank/${id}`);
+}
+
+/**
+ * WHAT IT NEEDS OF THE ROOM — `ingredient_requirement`, db/020 and db/033.
+ *
+ * The pair sits here rather than inside the item form for the reason the
+ * ingredient pair does, and it is not layout: a save that owns a relationship
+ * it cannot fully see will eventually destroy one. The old `bank_item.venue`
+ * was a single column and could be saved with the row; a set of requirements
+ * cannot, because a form that posts an empty set is indistinguishable from a
+ * form that was rendered before somebody else declared one.
+ *
+ * DECLARING AND CLEARING ARE THE SAME GESTURE, in the same place, and neither
+ * can be undone by saving an unrelated field. There is no "none" to choose:
+ * clearing the last row is the claim that it works anywhere, which is db/020's
+ * default and the founder's instruction where it is a judgement call.
+ */
+export async function declareBankRequirement(form: FormData): Promise<void> {
+  const staff = await requireStaff();
+  const id = String(form.get("id") ?? "");
+  const requirement = String(form.get("requirement") ?? "").trim();
+  if (!UUID.test(id)) return;
+
+  // Checked against the table, not a list here — db/020 says the vocabulary is
+  // closed only in the sense that adding to it is an INSERT. An unknown code is
+  // nothing happening, quietly, rather than a foreign key raised as a 500.
+  const kind = await requirementNamed(requirement);
+  if (!kind) return;
+
+  const note = String(form.get("note") ?? "").trim();
+
+  await declareRequirement("bank_item", id, requirement, note);
+
+  await recordAction(staff, {
+    action: "bank_item.requirement_declared",
+    entityTable: "bank_item",
+    entityId: id,
+    // db/020's `demand` completes "it …", which is what makes an audit line a
+    // sentence a person can check rather than a code they have to look up.
+    summary: `it ${kind.demand}`,
+    detail: { requirement, note },
+  });
+
+  revalidatePath("/desk/bank");
+  revalidatePath(`/desk/bank/${id}`);
+}
+
+export async function clearBankRequirement(form: FormData): Promise<void> {
+  const staff = await requireStaff();
+  const id = String(form.get("id") ?? "");
+  const requirement = String(form.get("requirement") ?? "").trim();
+  if (!UUID.test(id)) return;
+  const kind = await requirementNamed(requirement);
+  if (!kind) return;
+
+  await clearRequirement("bank_item", id, requirement);
+
+  await recordAction(staff, {
+    action: "bank_item.requirement_cleared",
+    entityTable: "bank_item",
+    entityId: id,
+    summary: `it no longer ${kind.demand}`,
+    detail: { requirement },
+  });
+
+  revalidatePath("/desk/bank");
   revalidatePath(`/desk/bank/${id}`);
 }

@@ -6,7 +6,6 @@ import {
   BANK_KINDS,
   BANK_PHASES,
   BANK_SHIPS,
-  BANK_VENUES,
   POOL_STATUS,
 } from "@/lib/desk/labels";
 
@@ -14,23 +13,31 @@ import styles from "../../desk.module.css";
 import { saveBankItem, type BankState } from "./actions";
 
 /**
- * One bank item, in the fields db/031 gives it.
+ * One bank item, in the fields db/031 gives it and db/033 left it.
  *
- * ── THE THREE FIELDS THAT ARE READ WRONG IF THEY ARE LABELLED RIGHT ──
+ * ── THE TWO FIELDS THAT ARE READ WRONG IF THEY ARE LABELLED RIGHT ────
  *
- * Three of these columns have a value whose NAME is the opposite of its
- * meaning, and each is worded here rather than glossed in a tooltip nobody
- * opens:
+ * Two of these columns have a value whose NAME is the opposite of its meaning,
+ * and each is worded here rather than glossed in a tooltip nobody opens:
  *
  *   phase = all     is NO OPINION. Not "every phase" and not "always". Shown as
- *                   "No opinion", never as "All".
+ *                   "No opinion", never as "All". Four real times of day sit
+ *                   above it, in the order the day runs.
  *   ships = false   is OWNED-IF-PRESENT. Not "out of stock". Shown as a
  *                   sentence, never as an unticked box, because an unticked box
  *                   is an absence and this is a claim.
- *   venue           has two positive grades, not a boolean. "Needs a door to
- *                   somewhere" is the soft one most apartments meet; "Cannot
- *                   happen inside" is a hard constraint. They are never one
- *                   control with an on and an off.
+ *
+ * ── AND THE THIRD, WHICH IS NO LONGER A FIELD ───────────────────────
+ *
+ * WHERE IT CAN HAPPEN. It was `bank_item.venue`, a select on this form, and
+ * db/033 dropped the column: a bank item's venue requirement now lives in
+ * `ingredient_requirement` beside every other pool's. Its grades survive the
+ * move and are still never one control with an on and an off — the hard one is
+ * a veto, the soft one is not — but they are declared in their own panel on the
+ * item's own screen, not saved with the row. actions.ts argues that cut.
+ *
+ * The hint in this form's place says so, and says the thing a curator most
+ * needs to hear: DECLARING NOTHING IS A COMPLETE ANSWER.
  *
  * There is no tag picker on this form: db/031 registers the pool for publishing
  * and issuance but does not call `install_facet_tags`, so `bank_item_facet`
@@ -47,7 +54,6 @@ export type BankValues = {
   name?: string;
   description?: string;
   phase?: string;
-  venue?: string;
   min_lead_days?: number | string | null;
   ships?: boolean;
   technique_card_id?: string | null;
@@ -202,31 +208,32 @@ export default function BankForm({
             <strong>No opinion is the default and means exactly that:</strong>{" "}
             this line makes no claim about when it belongs. It does{" "}
             <em>not</em> mean every phase and it does <em>not</em> mean always.
-            Pick one of the other three only when the wrong hour would be wrong.
+            Pick one of the other four only when the wrong hour would be wrong.
+            Dawn is not dark — it is the windows going blue, which is the
+            opposite of deep night.
           </span>
         </div>
+        {/*
+          NOT A FIELD, AND SAYING SO IS THE POINT. A curator who edited this
+          form last month will look here for the venue select. It is gone with
+          the column db/033 dropped, and the sentence below is where she is
+          told what replaced it and where — the alternative is her concluding
+          the constraint stopped mattering.
+        */}
         <div className={styles.field}>
-          <label className={styles.label} htmlFor="venue">
-            Where it can happen
-          </label>
-          <select
-            id="venue"
-            name="venue"
-            defaultValue={values.venue ?? "none"}
-            className={styles.select}
-          >
-            {BANK_VENUES.map((entry) => (
-              <option key={entry.code} value={entry.code}>
-                {entry.label} — {entry.gloss}
-              </option>
-            ))}
-          </select>
+          <span className={styles.label}>What it needs of the room</span>
+          <p className={styles.hint}>
+            <strong>Declared on this item&rsquo;s own screen</strong>, in its
+            own panel, the way the products it buys are — not saved with this
+            form. It is the one vocabulary the whole catalogue uses for the
+            room, so a bank item asks for outdoors, live fire or a real kitchen
+            in the same words a menu does.
+          </p>
           <span className={styles.hint}>
-            Two different constraints, not one with a strength. &ldquo;Needs a
-            door to somewhere&rdquo; is the soft grade the sparklers wanted — a
-            balcony or a stoop will do, which most apartments have.
-            &ldquo;Cannot happen inside&rdquo; is hard: a host with no outside
-            never sees the line at all.
+            <strong>Declaring nothing is a complete answer.</strong> No
+            requirement means it works anywhere, which is the default and
+            usually right — a wrong tag deletes a line silently and forever, a
+            missing one costs a second look.
           </span>
         </div>
       </div>

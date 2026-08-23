@@ -1290,7 +1290,6 @@ function report() {
     for (const row of mine) {
       const flags = [
         `phase=${row.phase}`,
-        `venue=${row.venue}`,
         `ships=${row.ships}`,
         row.minLeadDays === null ? null : `lead=${row.minLeadDays}d`,
         row.weight === 1 ? null : `weight=${row.weight.toFixed(3)}`,
@@ -1419,10 +1418,13 @@ function report() {
   );
   console.log(`\n'outdoor_access' IS NOT A structural_requirement`);
   console.log(
-    `   db/031's bank_venue adds it as the softer grade; db/020's\n` +
+    `   RESOLVED BY db/033 — outdoor_access is now a structural_requirement\n` +
       `   structural_requirement table has only 'requires_outdoors'. The two\n` +
-      `   vocabularies do not line up, so venueEligibility() cannot read a\n` +
-      `   bank item's venue the way it reads a menu's requirement.`
+      `   in its own right at position 15, a GRADE below requires_outdoors.\n` +
+      `   bank_item.venue is dropped; a bank item carries its requirement\n` +
+      `   through ingredient_requirement, the same table a menu uses, so\n` +
+      `   venueEligibility() reads both the same way. This seeder writes no\n` +
+      `   venue at all — declare one at /desk/bank once the rows exist.`
   );
 
   section("COUNTS");
@@ -1525,7 +1527,7 @@ try {
     const description = row.description.join("\n\n");
 
     const { rows: existing } = await client.query(
-      `select id, name, description, kind::text, phase::text, venue::text,
+      `select id, name, description, kind::text, phase::text,
               min_lead_days, ships, weight::text, source_citation
          from bank_item where slug = $1`,
       [row.slug]
@@ -1534,9 +1536,9 @@ try {
     if (existing.length === 0) {
       const { rows: inserted } = await client.query(
         `insert into bank_item
-           (slug, world_id, kind, name, description, phase, venue,
+           (slug, world_id, kind, name, description, phase,
             min_lead_days, ships, weight, status, source_citation)
-         values ($1, $2, $3::bank_kind, $4, $5, $6::bank_phase, $7::bank_venue,
+         values ($1, $2, $3::bank_kind, $4, $5, $6::bank_phase,
                  $8, $9, $10, 'draft'::product_status, $11)
          returning id`,
         [
@@ -1546,7 +1548,6 @@ try {
           row.name,
           description,
           row.phase,
-          row.venue,
           row.minLeadDays,
           row.ships,
           row.weight,
@@ -1562,7 +1563,6 @@ try {
         existing[0].description !== description ||
         existing[0].kind !== row.kind ||
         existing[0].phase !== row.phase ||
-        existing[0].venue !== row.venue ||
         (existing[0].min_lead_days ?? null) !== row.minLeadDays ||
         existing[0].ships !== row.ships ||
         Number(existing[0].weight) !== row.weight ||
@@ -1577,7 +1577,7 @@ try {
       } else if (differs) {
         await client.query(
           `update bank_item set name = $2, description = $3, kind = $4::bank_kind,
-                  phase = $5::bank_phase, venue = $6::bank_venue,
+                  phase = $5::bank_phase,
                   min_lead_days = $7, ships = $8, weight = $9,
                   source_citation = $10
              where id = $1`,
@@ -1587,7 +1587,6 @@ try {
             description,
             row.kind,
             row.phase,
-            row.venue,
             row.minLeadDays,
             row.ships,
             row.weight,

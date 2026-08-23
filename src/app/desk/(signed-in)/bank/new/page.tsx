@@ -15,6 +15,12 @@ export const dynamic = "force-dynamic";
  *
  * There is no ingredient block here. A product link needs a row to hang off,
  * and it appears on the item's own screen the moment it is saved.
+ *
+ * There is no requirement block either, for exactly that reason —
+ * `ingredient_requirement` is keyed by (entity_table, entity_id) and there is
+ * no id yet. It costs nothing: db/020's default is that an untagged thing works
+ * anywhere, so an item saved from this page is COMPLETE rather than pending,
+ * and the form says so where the venue select used to be.
  */
 export default async function NewBankItemPage() {
   const [destinations, cards] = await Promise.all([
@@ -45,7 +51,7 @@ export default async function NewBankItemPage() {
         </Empty>
       ) : (
         <BankForm
-          values={{ status: "draft", phase: "all", venue: "none", ships: true }}
+          values={{ status: "draft", phase: "all", ships: true }}
           destinations={destinations}
           cards={cards}
         />

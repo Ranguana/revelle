@@ -4,11 +4,15 @@ import { query } from "@/lib/db";
 import {
   BANK_KINDS,
   BANK_PHASES,
-  BANK_VENUES,
   POOL_STATUS,
   leadDays,
   shipsWord,
 } from "@/lib/desk/labels";
+import {
+  requirementVocabulary,
+  requirementsForMany,
+  type CarriedRequirement,
+} from "@/lib/desk/requirements";
 
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Seam, Status, StatusLegend, TableRow } from "../bits";
@@ -25,30 +29,48 @@ import { setBankStatus } from "./actions";
  *
  * ── HOW TO READ THE COLUMNS, WHICH IS THE WHOLE DESIGN PROBLEM ───────
  *
- * Three of db/031's values are named the opposite of what they mean, and a
+ * Three of this pool's values are named the opposite of what they mean, and a
  * curator who reads them wrongly will TAG ROWS to match the wrong reading. So
- * the table never prints the enum's own word for them:
+ * the table never prints the stored word for them:
  *
  *   phase `all`      printed "no opinion", lower case. It is not "All" and not
  *                    "always" — it is the absence of a claim about the hour.
+ *                    Four real times of day sit above it and run as the day
+ *                    runs: daylight, dusk, dark, dawn. Dawn is db/033's, and it
+ *                    is NOT dark — it is the windows going blue.
  *   ships `false`    printed "Owned if present", a sentence, never a blank cell
  *                    or an unticked box. Both of those read as "out of stock",
  *                    which is the one thing it does not mean.
- *   venue            two positive grades, never collapsed. "Needs a door to
- *                    somewhere" is soft and most apartments meet it. "Cannot
- *                    happen inside" is a hard constraint and is drawn as a veto
- *                    chip, the same mark the rest of the desk gives a thing
- *                    that rules an evening out.
+ *   no requirement   printed "works anywhere", lower case, never left blank. An
+ *                    empty cell is the one place a curator reads a gap, and
+ *                    db/020 is explicit that this is a complete answer: "UNTAGGED
+ *                    MEANS WORKS ANYWHERE, and that is the founder's instruction
+ *                    as well as the safe default."
  *
  * The typographic rule that follows from those three, and is stated in the note
  * on the screen: A CAPITAL IS A CLAIM, lower case is the absence of one.
  *
- * ── GESTURES ARE NOT HERE ────────────────────────────────────────────
+ * ── WHERE IT CAN HAPPEN, AFTER db/033 ───────────────────────────────
  *
- * db/031 kept them off this table on purpose — a gesture is INVARIANT per
+ * The column used to read `bank_item.venue`. That column is gone and so is the
+ * `bank_venue` type: a bank item's venue requirement now lives in
+ * `ingredient_requirement` beside every other pool's, in the one vocabulary
+ * `structural_requirement` holds. The grades survive the move and are still
+ * never collapsed into one control with an on and an off — a requirement some
+ * room REFUSES is drawn as a veto chip, the mark the rest of the desk gives a
+ * thing that rules an evening out; a requirement no room refuses is plain text.
+ * The mark is derived from `venue_affordance` rather than from a list here, so
+ * it means exactly "this can delete a deliverable".
+ *
+ * ── GESTURES ARE NOT HERE. NEITHER IS THE DESTINATION'S OWN ──────────
+ *
+ * db/031 kept the gesture off this table on purpose — it is INVARIANT per
  * destination and the bank is only what selection chooses among. Filter to one
- * destination and the gesture is shown at the foot of this screen, read-only,
- * with where it is edited.
+ * destination and it is shown at the foot of this screen, read-only, with where
+ * it is edited. db/033's `world.venue_requirement` is shown the same way and for
+ * a sharper reason: every line in a room that presupposes outdoors inherits a
+ * constraint none of them declared, and a per-row column would say it a hundred
+ * times and imply it was theirs.
  */
 
 export const dynamic = "force-dynamic";
@@ -60,7 +82,6 @@ type Row = {
   description: string;
   kind: string;
   phase: string;
-  venue: string;
   min_lead_days: number | string | null;
   ships: boolean;
   /** numeric(4,3) — a STRING out of node-postgres. Never compared as a number. */
@@ -79,11 +100,29 @@ type Destination = {
   name: string;
   gesture: string | null;
   gesture_note: string | null;
+  /** db/033 — what this destination's deliverable presupposes. Never scored. */
+  venue_requirement: string | null;
+  venue_requirement_label: string | null;
+  venue_requirement_demand: string | null;
 };
 
 const PER_PAGE = 100;
 
 const STATUSES = ["draft", "active", "discontinued"];
+
+/**
+ * The requirement filter's one value that is not a requirement code.
+ *
+ * "Only the ones that need nothing" is a real question — it is how a curator
+ * finds the lines that survive any room — and it cannot be asked with a code,
+ * because the answer is the ABSENCE of a row. It is a sentinel rather than a
+ * code for the same reason `bank_venue`'s `none` had to go: there is no row
+ * that says "works anywhere", only no row at all.
+ *
+ * A code from `structural_requirement` can never collide with it: db/020's
+ * codes are lower-case identifiers and this is not one.
+ */
+const NEEDS_NOTHING = "-none";
 
 /** The two answers the `ships` filter can give, as words rather than a boolean. */
 const SHIPPING = [
@@ -95,6 +134,37 @@ const label = (
   list: readonly { code: string; label: string }[],
   code: string
 ) => list.find((entry) => entry.code === code)?.label ?? code;
+
+/**
+ * WHAT ONE LINE NEEDS OF THE ROOM, and the cell where db/033's grades survive.
+ *
+ * A requirement some room REFUSES is drawn with the mark the rest of the desk
+ * gives a veto, because carrying it can remove this line from a package. One no
+ * room refuses is plain text beside it, and the two are NEVER one control with
+ * an on and an off — that distinction was the whole reason the dropped
+ * `bank_venue` was not a boolean, and it does not depend on the column that
+ * held it. Which is which comes from `venue_affordance`, the same table the
+ * pruning reads, rather than from a list kept here.
+ *
+ * NO ROW PRINTS WORDS, never a blank cell: "works anywhere", lower case, under
+ * the rule stated in the note on the screen — a capital is a claim, lower case
+ * is the absence of one. db/020 is explicit that the absence is a complete
+ * answer, and an empty cell is the one place a curator reads a gap.
+ */
+function Needs({ needs }: { needs?: readonly CarriedRequirement[] }) {
+  const list = needs ?? [];
+  if (list.length === 0) return <>works anywhere</>;
+  const vetoes = list.filter((one) => one.vetoes);
+  const soft = list.filter((one) => !one.vetoes);
+  return (
+    <>
+      {vetoes.length > 0 ? (
+        <Chips items={vetoes.map((one) => one.label)} tone="no" />
+      ) : null}
+      {soft.length > 0 ? <div>{soft.map((one) => one.label).join(" · ")}</div> : null}
+    </>
+  );
+}
 
 /** One value out of the query string, or "" — never a decision, only a read. */
 function one(value: string | string[] | undefined): string {
@@ -115,12 +185,22 @@ export default async function BankPage({
 }: PageProps<"/desk/bank">) {
   const params = await searchParams;
 
-  const destinations = await query<Destination>(
-    `select id, slug::text as slug, name, gesture, gesture_note
-       from world
-      where status <> 'retired'
-      order by name`
-  );
+  const [destinations, vocabulary] = await Promise.all([
+    query<Destination>(
+      `select w.id, w.slug::text as slug, w.name, w.gesture, w.gesture_note,
+              w.venue_requirement,
+              k.label  as venue_requirement_label,
+              k.demand as venue_requirement_demand
+         from world w
+         left join structural_requirement k on k.code = w.venue_requirement
+        where w.status <> 'retired'
+        order by w.name`
+    ),
+    // The filter's vocabulary, read rather than declared, in db/020's own
+    // `position` order — which is what sits `outdoor_access` directly under
+    // `requires_outdoors` in the select instead of four rows away.
+    requirementVocabulary(),
+  ]);
 
   const q = one(params.q).slice(0, 80);
   const destination = oneOf(
@@ -129,7 +209,10 @@ export default async function BankPage({
   );
   const kind = oneOf(params.kind, BANK_KINDS.map((entry) => entry.code));
   const phase = oneOf(params.phase, BANK_PHASES.map((entry) => entry.code));
-  const venue = oneOf(params.venue, BANK_VENUES.map((entry) => entry.code));
+  const needs = oneOf(params.needs, [
+    NEEDS_NOTHING,
+    ...vocabulary.map((entry) => entry.code),
+  ]);
   const shipping = oneOf(params.ships, SHIPPING.map((entry) => entry.code));
   const status = oneOf(params.status, STATUSES);
   const page = Math.max(1, Number(one(params.page)) || 1);
@@ -139,9 +222,11 @@ export default async function BankPage({
   // eventually has. Lifted from /desk/dishes deliberately.
   const clauses: string[] = [];
   const values: unknown[] = [];
+  /** A clause with no value of its own. Only "needs nothing" is one. */
+  const clause = (sql: string) => clauses.push(sql);
   const where = (sql: string, value: unknown) => {
     values.push(value);
-    clauses.push(sql.replace("$?", `$${values.length}`));
+    clause(sql.replace("$?", `$${values.length}`));
   };
 
   if (q) where("b.name ilike '%' || $? || '%'", q);
@@ -151,7 +236,31 @@ export default async function BankPage({
   // is a real question and not the same as "any phase" — that is the empty
   // filter above it in the select.
   if (phase) where("b.phase::text = $?", phase);
-  if (venue) where("b.venue::text = $?", venue);
+  // WHAT IT NEEDS OF THE ROOM — an EXISTS over db/020's polymorphic side table
+  // rather than a column comparison, because that is where the answer lives
+  // after db/033. The sentinel is the mirror question: the rows that carry no
+  // requirement at all, which is the pool that survives any room.
+  //
+  // The filter matches the tag a row actually carries and does not widen a
+  // grade into its lesser one. Asking for `outdoor_access` therefore does NOT
+  // return the rows tagged `requires_outdoors`, even though anything that
+  // satisfies the harder one satisfies the softer. That is deliberate: this
+  // screen is for finding what a curator TAGGED, and a filter that silently
+  // returned rows she did not tag would be the bridge db/033 removed, rebuilt
+  // in the desk. The note on the screen says so.
+  if (needs === NEEDS_NOTHING) {
+    clause(`not exists (select 1 from ingredient_requirement r
+                         where r.entity_table = 'bank_item'
+                           and r.entity_id = b.id)`);
+  } else if (needs) {
+    where(
+      `exists (select 1 from ingredient_requirement r
+                where r.entity_table = 'bank_item'
+                  and r.entity_id = b.id
+                  and r.requirement = $?)`,
+      needs
+    );
+  }
   if (shipping) {
     where(
       "b.ships = $?",
@@ -180,7 +289,7 @@ export default async function BankPage({
   const rows = await query<Row>(
     `select b.id, b.slug::text as slug, b.name, b.description,
             b.kind::text as kind, b.phase::text as phase,
-            b.venue::text as venue, b.min_lead_days, b.ships,
+            b.min_lead_days, b.ships,
             b.weight::text as weight, b.status::text as status,
             w.name as world_name,
             c.id as card_id, c.name as card_name,
@@ -195,6 +304,15 @@ export default async function BankPage({
     values
   );
 
+  // One query for the whole page rather than one per row. A row that is ABSENT
+  // from this map carries no requirement, which is the claim that it works
+  // anywhere — the cell below prints those words rather than leaving a blank,
+  // because a blank is the one place a curator reads a gap.
+  const carried = await requirementsForMany(
+    "bank_item",
+    rows.map((row) => row.id)
+  );
+
   /** This view's URL with one thing changed. Paging must not drop the filters. */
   const href = (changes: Record<string, string>) => {
     const next = new URLSearchParams();
@@ -203,7 +321,7 @@ export default async function BankPage({
       destination,
       kind,
       phase,
-      venue,
+      needs,
       ships: shipping,
       status,
       page: String(current),
@@ -239,7 +357,25 @@ export default async function BankPage({
         &ldquo;no opinion&rdquo; under Time of day means this line says nothing
         about the hour — not that it suits every hour. &ldquo;Owned if
         present&rdquo; under What arrives means the house sends nothing and the
-        scene card only glances at it — it is not out of stock.
+        scene card only glances at it — it is not out of stock. &ldquo;works
+        anywhere&rdquo; under What it needs of the room means no requirement is
+        declared, which is a complete answer and the safe one.
+      </p>
+
+      <p className={styles.note}>
+        What a line needs of the room is the same vocabulary a menu, a drink, a
+        dish, a game and a product use — db/033 unified it rather than bridging
+        two of them. A requirement drawn as a{" "}
+        <strong>veto</strong> is one some room actually refuses, so carrying it
+        can remove the line from a package; one drawn as plain text is not
+        refused anywhere and prunes nothing on its own.{" "}
+        <strong>
+          &ldquo;Needs a door to somewhere&rdquo; is a grade of &ldquo;Needs
+          outdoors&rdquo;, not a sibling
+        </strong>{" "}
+        — a terrace, a stoop, a balcony, a yard, and anything that satisfies the
+        harder one satisfies it. The filter matches the tag a line actually
+        carries and does not widen one grade into the other.
       </p>
 
       <form method="get" action="/desk/bank" className={styles.buttonRow}>
@@ -298,13 +434,22 @@ export default async function BankPage({
           ))}
         </select>
         <select
-          name="venue"
-          defaultValue={venue}
-          aria-label="Where it can happen"
+          name="needs"
+          defaultValue={needs}
+          aria-label="What it needs of the room"
           className={styles.select}
         >
-          <option value="">Anywhere it can happen</option>
-          {BANK_VENUES.map((entry) => (
+          {/*
+            "Whatever it needs" is NO FILTER. "Only the ones that need nothing"
+            is a filter, over the absence of a row — the same distinction the
+            phase select draws above, and the reason the default here is ""
+            rather than the sentinel.
+          */}
+          <option value="">Whatever it needs</option>
+          <option value={NEEDS_NOTHING}>
+            Only the ones that need nothing
+          </option>
+          {vocabulary.map((entry) => (
             <option key={entry.code} value={entry.code}>
               {entry.label}
             </option>
@@ -409,7 +554,7 @@ export default async function BankPage({
               <th>The line</th>
               <th>What it is</th>
               <th>Time of day</th>
-              <th>Where it can happen</th>
+              <th>What it needs of the room</th>
               <th>What arrives</th>
               <th>Lead time</th>
               <th>Card</th>
@@ -444,16 +589,7 @@ export default async function BankPage({
                     : label(BANK_PHASES, row.phase)}
                 </td>
                 <td>
-                  {row.venue === "requires_outdoors" ? (
-                    // A hard constraint, drawn with the mark the rest of the
-                    // desk gives a veto. The soft grade beside it is plain text
-                    // on purpose: the two must not look like one control.
-                    <Chips items={["Cannot happen inside"]} tone="no" />
-                  ) : row.venue === "outdoor_access" ? (
-                    "Needs a door to somewhere"
-                  ) : (
-                    "indoors is fine"
-                  )}
+                  <Needs needs={carried.get(row.id)} />
                 </td>
                 {/*
                   BOTH STATES ARE A SENTENCE. An unticked box or a blank cell
@@ -496,6 +632,43 @@ export default async function BankPage({
           </tbody>
         </table>
       )}
+
+      {/*
+        WHAT THIS DESTINATION PRESUPPOSES — db/033's `world.venue_requirement`,
+        and only when the screen is filtered to one destination, because outside
+        that it is not one fact.
+
+        It belongs here rather than in a column for the reason the gesture does:
+        every line in a room that presupposes outdoors inherits the constraint,
+        none of them declared it, and printing it per row would say it a hundred
+        times and imply it was theirs. A curator should be able to see, without
+        leaving this screen, that the whole room is already outdoors — otherwise
+        she declares `requires_outdoors` on line after line that never needed to
+        carry it.
+
+        READ-ONLY. It is the destination's, and db/033 is emphatic about what it
+        is not: read at the reveal and SURFACED, never scored. Venue must never
+        touch which destination a party is in — standing rule 2, enforced in
+        vector.ts, db/020 and selection.test.ts.
+      */}
+      {house?.venue_requirement ? (
+        <Seam title={`${house.name} already presupposes a room`}>
+          Its deliverable{" "}
+          <strong>
+            {house.venue_requirement_demand ?? house.venue_requirement}
+          </strong>
+          {house.venue_requirement_label
+            ? ` — “${house.venue_requirement_label}”`
+            : ""}
+          . Every line above inherits that whether or not it declares anything
+          of its own: a host whose room cannot do it was never going to receive
+          this room at all. So declaring the same requirement on a line here is
+          usually redundant, and worth doing only where the line needs it and
+          the rest of the room does not. It is read at the reveal and surfaced,
+          never scored — venue never touches which destination she gets — and it
+          is edited on the destination record.
+        </Seam>
+      ) : null}
 
       {house ? (
         <Seam title={`The gesture at ${house.name} is not in this pool`}>

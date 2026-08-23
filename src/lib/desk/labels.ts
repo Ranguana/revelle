@@ -248,9 +248,9 @@ export function sectionLabel(code: string): string {
  * `bank_kind` in db/031 — WHAT A CURATOR CALLS IT, and nothing else.
  *
  * The four kinds share one table because their mechanics are identical: per
- * destination, draft/active, a phase, a venue grade, a lead time, a technique
- * card. The kind is the word, not the behaviour, which is why it is a filter
- * and a column and never a fifth table.
+ * destination, draft/active, a phase, what it needs of the room, a lead time, a
+ * technique card. The kind is the word, not the behaviour, which is why it is a
+ * filter and a column and never a fifth table.
  *
  * `game` here is a game a HOUSE HAS OUT — backgammon, the good chess set — and
  * is not the authored `game` pool at /desk/games. Two pools may hold the word
@@ -274,8 +274,24 @@ export const BANK_KINDS: readonly { code: string; label: string }[] = [
  * rows to match it, so the word is never shown: the label is "No opinion" on
  * every screen, and the gloss below is shown wherever there is room for it.
  *
- * Ordered with the three real claims first and the default last, the way
- * SEASONS puts `year_round` last for the same reason.
+ * ── `dawn`, ADDED BY db/033 ──────────────────────────────────────────
+ *
+ * DAWN IS NOT DARK, and the migration is blunt about why the value had to
+ * exist: "Havana's first-light register is the windows going blue, which is the
+ * opposite of deep night, and St. Moritz's breakfast is the same hour. `dark`
+ * was the nearest available value and it was false, so both were left at `all`
+ * — a content type refusing to lie, which is the right failure and still a
+ * loss."
+ *
+ * ── THE ORDER IS THE DAY, AND THEN THE ABSENCE OF A CLAIM ────────────
+ *
+ * The four real claims run as the day runs — daylight, dusk, dark, dawn — which
+ * is where `dawn` genuinely falls: after the dark it ends, not between `dark`
+ * and `all` alphabetically and not first because the word means morning. The
+ * default comes last, the way SEASONS puts `year_round` last for the same
+ * reason: it is not a fifth time of day, it is the absence of a claim about
+ * which one, and a list that mixes it in among the four invites a curator to
+ * pick it as though it were one.
  */
 export const BANK_PHASES: readonly {
   code: string;
@@ -285,6 +301,7 @@ export const BANK_PHASES: readonly {
   { code: "daylight", label: "Daylight", gloss: "it belongs in the light" },
   { code: "dusk", label: "Dusk", gloss: "it belongs as the light goes" },
   { code: "dark", label: "Dark", gloss: "it belongs after dark" },
+  { code: "dawn", label: "Dawn", gloss: "it belongs as the windows go blue" },
   {
     code: "all",
     label: "No opinion",
@@ -294,39 +311,47 @@ export const BANK_PHASES: readonly {
 ];
 
 /**
- * `bank_venue` in db/031 — THREE GRADES, and they must not be collapsed.
+ * `BANK_VENUES` WAS HERE, AND db/033 BEAT IT. Standing rule 12: the argument is
+ * kept and what beat it is named, because in six months the reasoning is the
+ * part that gets lost and a deleted argument gets re-made.
  *
- * db/031: "`requires_outdoors` means it CANNOT happen inside. `outdoor_access`
- * is the softer grade the sparklers wanted: it needs a door to somewhere, which
- * most apartments have. The distinction is the whole reason this is not a
- * boolean." So neither label contains the word "outdoors" on its own: one says
- * what it needs, the other says what it cannot do.
+ * ── WHAT IT SAID ─────────────────────────────────────────────────────
  *
- * This is the pool-pruning venue of standing rule 2 — it never touches which
- * destination a party is in.
+ * It was the desk's map for `bank_venue` in db/031, three grades — "Indoors is
+ * fine" for `none`, "Needs a door to somewhere" for `outdoor_access`, "Cannot
+ * happen inside" for `requires_outdoors` — and its comment argued, correctly,
+ * that they must never be collapsed: "`requires_outdoors` means it CANNOT
+ * happen inside. `outdoor_access` is the softer grade the sparklers wanted: it
+ * needs a door to somewhere, which most apartments have. The distinction is the
+ * whole reason this is not a boolean." Neither label carried the bare word
+ * "outdoors": one said what it needs, the other what it cannot do.
+ *
+ * ── WHAT BEAT IT ─────────────────────────────────────────────────────
+ *
+ * Not the grades — those survive, and the screens still draw the hard one as a
+ * veto and the soft one as plain text. What lost was the SECOND VOCABULARY.
+ * `bank_venue` said in its own words what `structural_requirement` had said
+ * since db/020, which is why `venueEligibility()` could read a menu's venue and
+ * not a bank item's. db/033 moved the two tagged rows into
+ * `ingredient_requirement`, dropped the column and dropped the type, and added
+ * `outdoor_access` to the real vocabulary as the soft grade it always was. The
+ * founder's instruction was "unify the venue vocabulary, don't bridge it", and
+ * a hand-written list here beside a table holding the same codes is a bridge.
+ *
+ * ── WHERE IT WENT ────────────────────────────────────────────────────
+ *
+ * src/lib/desk/requirements.ts, which reads the vocabulary rather than
+ * declaring it. Two consequences worth carrying across:
+ *
+ *   `none` HAS NO CODE ANY MORE. There is no row that says "indoors is fine";
+ *   there is the ABSENCE of a row, and db/020 is explicit that it means "works
+ *   anywhere" — not merely indoors, and not a gap. Every screen prints those
+ *   words, lower case, under the rule that a capital is a claim.
+ *
+ *   THE LADDER IS ORDERING, not a pair. `requires_outdoors` sits at position 10
+ *   and `outdoor_access` at 15, so printing the vocabulary in `position` order
+ *   puts the lesser grade directly under the greater wherever it appears.
  */
-export const BANK_VENUES: readonly {
-  code: string;
-  label: string;
-  gloss: string;
-}[] = [
-  {
-    code: "none",
-    label: "Indoors is fine",
-    gloss: "it says nothing about where it happens",
-  },
-  {
-    code: "outdoor_access",
-    label: "Needs a door to somewhere",
-    gloss:
-      "a balcony, a stoop, a fire escape, a yard — the soft grade, which most apartments can meet",
-  },
-  {
-    code: "requires_outdoors",
-    label: "Cannot happen inside",
-    gloss: "a hard constraint: no outside, no line",
-  },
-];
 
 /**
  * `bank_item.ships` in db/031, in words, because the boolean is a trap.
