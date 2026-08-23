@@ -1,0 +1,129 @@
+/*
+ * THE PREVIEW FRAME.
+ *
+ * Everything in this file exists to make one claim impossible to miss: what is
+ * below the banner is somebody else's private screen, drawn from her data, and
+ * nothing on it does anything. It is deliberately LOUD. A subtle badge on a
+ * screen that is pixel-for-pixel her portal is how somebody ends up believing
+ * she pressed a button, and the whole point of the read-only preview is that
+ * nobody can ever believe that.
+ *
+ * House tokens only (src/lib/tokens.ts) — there is one palette in this
+ * codebase and dark mode comes free with it. The banner sits OUTSIDE the
+ * destination's own scoped token block on purpose: her occasion is painted in
+ * the destination's palette, and a warning painted in the same palette reads
+ * as part of the thing it is warning about.
+ */
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.9rem 1.1rem;
+
+  background: var(--ground2);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+
+  /* Two edges rather than one. The heavy left bar is the mark the eye keeps
+     when the page is scrolled and only a slice of the banner is showing. */
+  border: 1px solid var(--rule);
+  border-left: 0.375rem solid var(--oxblood);
+  border-radius: 2px;
+}
+
+.mark {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.who {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.125rem;
+  line-height: 1.25;
+}
+
+.address {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+.said {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--ink-soft);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+.back {
+  color: var(--aqua);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.back:hover {
+  border-bottom-color: currentColor;
+}
+
+/*
+ * THE SECOND LOCK.
+ *
+ * A <fieldset disabled> around the previewed portal. The markup below it is
+ * written not to contain a single form, so this should never have anything to
+ * do — which is exactly why it is here: it is the guard against a future edit
+ * that pastes a control in from the portal and forgets. `disabled` on a
+ * fieldset is a native, no-JavaScript rule that no descendant control can opt
+ * out of, and it survives having the stylesheet fail to load.
+ *
+ * `display: contents` because the fieldset must not exist as far as layout is
+ * concerned — the portal's own <main> owns the page inside it. Disabling is
+ * not a visual effect and is unaffected by the display value.
+ */
+.inert {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+/*
+ * A control of hers that has been taken out.
+ *
+ * Where the portal has a link she can follow into a screen the preview does
+ * not render, the preview prints the name and this line. Said in words rather
+ * than left as a dead-looking link, because a link that does nothing is a bug
+ * and a sentence is a decision.
+ */
+.stopped {
+  margin: 0.5rem 0 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}

@@ -15,7 +15,10 @@ import styles from "../desk.module.css";
  */
 
 const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = [
-  [{ href: "/desk", label: "The inbox", exact: true }],
+  [
+    { href: "/desk", label: "The inbox", exact: true },
+    { href: "/desk/members", label: "Members" },
+  ],
   [
     { href: "/desk/destinations", label: "Destinations" },
     { href: "/desk/menus", label: "Menus" },
