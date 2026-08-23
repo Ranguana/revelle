@@ -22,10 +22,11 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
     { href: "/desk/dishes", label: "Dishes" },
     { href: "/desk/drinks", label: "Drinks" },
     { href: "/desk/games", label: "Games" },
+    { href: "/desk/bank", label: "Atmosphere" },
     { href: "/desk/products", label: "Products" },
     // LAST IN THE LIBRARY GROUP, not in "What it does", because publishing is
     // not an instrument for reading the engine — it is the gesture that decides
-    // what the six lists above it are allowed to be. It belongs under them, at
+    // what the seven lists above it are allowed to be. It belongs under them, at
     // the end, where the work ends.
     { href: "/desk/publish", label: "Publish" },
   ],

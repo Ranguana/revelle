@@ -73,6 +73,11 @@ const ask: Ask = query;
  * the seam at the bottom names it for exactly that reason.
  */
 const SCREENS: Readonly<Record<string, string>> = {
+  // Added with /desk/bank. Without it the confirmation text tells a curator
+  // "there is no desk screen for this pool, so there is no way back from here
+  // at all" — in the warning for an IRREVERSIBLE bulk publish, which was false
+  // the moment the section shipped.
+  bank_item: "/desk/bank",
   menu: "/desk/menus",
   drink: "/desk/drinks",
   dish: "/desk/dishes",

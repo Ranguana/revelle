@@ -242,6 +242,142 @@ export function sectionLabel(code: string): string {
   return SECTION_KINDS.find((s) => s.code === code)?.label ?? code;
 }
 
+/* ── the bank ───────────────────────────────────────────────────────── */
+
+/**
+ * `bank_kind` in db/031 — WHAT A CURATOR CALLS IT, and nothing else.
+ *
+ * The four kinds share one table because their mechanics are identical: per
+ * destination, draft/active, a phase, a venue grade, a lead time, a technique
+ * card. The kind is the word, not the behaviour, which is why it is a filter
+ * and a column and never a fifth table.
+ *
+ * `game` here is a game a HOUSE HAS OUT — backgammon, the good chess set — and
+ * is not the authored `game` pool at /desk/games. Two pools may hold the word
+ * without holding the same thing, and the hint on the form says so where a
+ * curator is choosing.
+ */
+export const BANK_KINDS: readonly { code: string; label: string }[] = [
+  { code: "good", label: "A good" },
+  { code: "host_act", label: "A host act" },
+  { code: "game", label: "A game in the room" },
+  { code: "printed_card", label: "A printed card" },
+];
+
+/**
+ * `bank_phase` in db/031 — and the whole reason this map exists is `all`.
+ *
+ * `all` IS THE DEFAULT AND MEANS NO OPINION. It is not "every phase" and it is
+ * not "always". Most atmosphere has no time of day, and db/031 chose that
+ * default precisely because a tag that must be filled in for every row gets
+ * filled in wrongly. A curator who reads the word "All" in a column will tag
+ * rows to match it, so the word is never shown: the label is "No opinion" on
+ * every screen, and the gloss below is shown wherever there is room for it.
+ *
+ * Ordered with the three real claims first and the default last, the way
+ * SEASONS puts `year_round` last for the same reason.
+ */
+export const BANK_PHASES: readonly {
+  code: string;
+  label: string;
+  gloss: string;
+}[] = [
+  { code: "daylight", label: "Daylight", gloss: "it belongs in the light" },
+  { code: "dusk", label: "Dusk", gloss: "it belongs as the light goes" },
+  { code: "dark", label: "Dark", gloss: "it belongs after dark" },
+  {
+    code: "all",
+    label: "No opinion",
+    gloss:
+      "no claim about the time of day — not “every phase”, not “always”",
+  },
+];
+
+/**
+ * `bank_venue` in db/031 — THREE GRADES, and they must not be collapsed.
+ *
+ * db/031: "`requires_outdoors` means it CANNOT happen inside. `outdoor_access`
+ * is the softer grade the sparklers wanted: it needs a door to somewhere, which
+ * most apartments have. The distinction is the whole reason this is not a
+ * boolean." So neither label contains the word "outdoors" on its own: one says
+ * what it needs, the other says what it cannot do.
+ *
+ * This is the pool-pruning venue of standing rule 2 — it never touches which
+ * destination a party is in.
+ */
+export const BANK_VENUES: readonly {
+  code: string;
+  label: string;
+  gloss: string;
+}[] = [
+  {
+    code: "none",
+    label: "Indoors is fine",
+    gloss: "it says nothing about where it happens",
+  },
+  {
+    code: "outdoor_access",
+    label: "Needs a door to somewhere",
+    gloss:
+      "a balcony, a stoop, a fire escape, a yard — the soft grade, which most apartments can meet",
+  },
+  {
+    code: "requires_outdoors",
+    label: "Cannot happen inside",
+    gloss: "a hard constraint: no outside, no line",
+  },
+];
+
+/**
+ * `bank_item.ships` in db/031, in words, because the boolean is a trap.
+ *
+ * FALSE IS OWNED-IF-PRESENT: the scene card may GLANCE at it and nothing ships.
+ * Turntables, fireplaces, backgammon, the good chess set — a house either has
+ * one or the line is not written. It is NOT "out of stock", not "unavailable"
+ * and not "we forgot to source it", and a blank cell or an unticked box would
+ * read as all three. So it is never drawn as an absence: both states are a
+ * sentence, on the form and in the table.
+ */
+export const BANK_SHIPS: readonly {
+  value: boolean;
+  label: string;
+  short: string;
+  gloss: string;
+}[] = [
+  {
+    value: true,
+    label: "It ships",
+    short: "Ships",
+    gloss: "the house sends it, or sends her to buy it",
+  },
+  {
+    value: false,
+    label: "Owned if present — nothing ships",
+    short: "Owned if present",
+    gloss:
+      "the scene card may glance at it and nothing is sent: a house either has one or the line is not written",
+  },
+];
+
+export function shipsWord(ships: boolean | null | undefined): string {
+  const entry = BANK_SHIPS.find((row) => row.value === (ships === true));
+  return entry ? entry.short : BANK_SHIPS[0].short;
+}
+
+/**
+ * `bank_item.min_lead_days`, where NULL IS A CLAIM.
+ *
+ * db/031: "Nulls mean 'no lead time', not 'unknown'." Everywhere else in this
+ * tool an em dash means a fact nobody has supplied, so an em dash here would
+ * say the opposite of what the null says. Hence a word.
+ */
+export function leadDays(value: number | string | null | undefined): string {
+  if (value === null || value === undefined || value === "") return "none needed";
+  const days = Number(value);
+  if (!Number.isFinite(days)) return "none needed";
+  return days === 1 ? "1 day ahead" : `${days} days ahead`;
+}
+
 /* ── numbers and dates ──────────────────────────────────────────────── */
 
 export function money(cents: number | null | undefined): string {
