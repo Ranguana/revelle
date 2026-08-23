@@ -194,7 +194,9 @@ Move them up. Show them as objects, not a list of file names.
   through it. Approved after several iterations. It may evolve (masked over
   photography, gradient, motion) but it stays.
 - **CTA:** *Start your Revelle* — everywhere, with no duration or count.
-- **"No clipboards. No costume rule."**
+- **"Every party is a destination."** — under Apply for membership, both pages.
+  Approved 2026-08-23, replacing "No clipboards. No costume rule." See THE
+  THREE ANNOTATIONS below; the string alone is not the approval.
 - The occasion cards above.
 - **WESTHAMPTON, 1976 — Vintage summer glamour. Very questionable houseguests.**
   This is the tone target: confident, specific, funny without performing.
@@ -220,3 +222,61 @@ Then ask: **who is the hero of this sentence?** If it is Revelle, rewrite it.
 
 Then ask: **could a smart friend with great taste say this out loud without
 cringing?** If no, cut it.
+
+---
+
+## "Every party is a destination." — the three annotations
+
+**Approved 2026-08-23.** The string is not the whole approval. A line approved
+without its slot, its register and its sourcing is a line that gets pasted
+somewhere it does not belong by somebody who was not in the conversation.
+
+### 1. The slot it is approved for
+
+**The pre-commitment CTA**, directly under *Apply for membership*, on the
+homepage and the pricing page. Nowhere else.
+
+**Other slots get their own approvals.** They are different jobs: the line under
+a CTA answers *what am I getting into*, and a line at the reveal answers
+something the reader has already earned the context for.
+
+Specifically: **"You choose the room. Everything else is written." is
+RE-SLOTTED, not killed** — it moves to the reveal or how-it-works, where the
+room concept has been earned. At the CTA it explains a mechanic nobody has met
+yet. (It also fails the register below, on its second clause. Fix that before
+using it.)
+
+### 2. The register decision, which governs ALL future copy
+
+**HOST-AS-AUTHOR. PRODUCT-AS-INSTRUMENT.**
+
+The party is hers. Revelle is the instrument that makes her taste real. The
+product never authors *at* her.
+
+So these fail, even when short and true:
+
+- ~~"It arrives written."~~ — the product wrote it. She did not.
+- ~~"We've done everything."~~ — then whose party is it.
+- ~~"Everything else is written."~~ — same failure, one clause deep.
+
+The test: **does the line credit her, or credit us?** A line that describes how
+much work the product did has told her she is a customer of a service rather
+than the author of an evening. "Every party is a destination" passes because it
+makes a claim about HER party, and the product does not appear in it at all.
+
+This is the register decision, not a preference about these four words. Every
+future line is subject to it.
+
+### 3. The sourcing rule
+
+**Mine the doctrine before generating anything.**
+
+Before writing copy for any slot, read `src/lib/destinations.ts`, THE
+ALLOCATION, and `docs/destination-contrasts.md` for thesis-grade sentences.
+They were written under truth-pressure — each one had to survive being wrong in
+front of an engine that would expose it — and **they have beaten generated
+options twice now.**
+
+`docs/copy-source.md` is that extraction, regenerable with
+`npm run copy:source`. Sections are marked for what may face a member and what
+is house-only. Start there; generate only for what it cannot supply.

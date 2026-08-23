@@ -17,7 +17,7 @@ Draft. Not committed.
 > A société for people who host.
 >
 > **[ Apply for membership ]**
-> No clipboards. No costume rule.
+> Every party is a destination.
 
 The hero *is* a destination, set like a plate, with the photography behind it.
 No headline explaining the service, no promise of escape — just escape. It shows

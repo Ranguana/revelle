@@ -138,7 +138,7 @@ export default function PricingPage() {
           <Link className="cta" href="/apply">
             Apply for membership
           </Link>
-          <p className={styles.fine}>No clipboards. No costume rule.</p>
+          <p className={styles.fine}>Every party is a destination.</p>
         </div>
       </div>
     </main>

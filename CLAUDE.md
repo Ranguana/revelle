@@ -68,7 +68,22 @@ The database is unreachable from any laptop (`ipAllowList: []`), so a script
 nobody can run is worse than no script. An empty screen once told a curator to
 run `npm run import:products`, which has never existed.
 
-**10. Superseded reasoning is PRESERVED, never deleted.**
+**10. HOST-AS-AUTHOR. PRODUCT-AS-INSTRUMENT.**
+The party is hers. Revelle is the instrument that makes her taste real, and it
+never authors AT her. "It arrives written", "we've done everything",
+"everything else is written" all FAIL — even short and true. The test: does the
+line credit her, or credit us? A line describing how much work the product did
+has told her she is a customer of a service rather than the author of an
+evening. Governs all copy. Full argument in `docs/copy-brief.md`.
+
+**11. Mine the doctrine before generating copy.**
+`destinations.ts`, THE ALLOCATION and the audit doc are written under
+truth-pressure, and thesis-grade sentences from them have beaten generated
+options twice. `docs/copy-source.md` is that extraction —
+`npm run copy:source` — marked for what may face a member and what is house
+only. Start there; generate only for what it cannot supply.
+
+**12. Superseded reasoning is PRESERVED, never deleted.**
 When a decision reverses, keep the old argument and say what beat it. See the
 year decisions in `src/lib/destinations.ts` and the "she does not pick" section
 in `docs/selection-spec.md`. In six months the reasoning is the part that gets

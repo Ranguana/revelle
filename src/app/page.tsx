@@ -156,7 +156,7 @@ export default function Home() {
                 <Link className={`cta ${styles.ctaHero}`} href="/apply">
                   Apply for membership
                 </Link>
-                <p className={styles.fine}>No clipboards. No costume rule.</p>
+                <p className={styles.fine}>Every party is a destination.</p>
               </div>
               {/*
                 The founding offer. It is a count, and the brief bans counting —
