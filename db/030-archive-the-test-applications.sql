@@ -50,34 +50,34 @@ update quiz_response q
      or c.email like 'throttle-probe@%'
    );
 
--- Their Revelles go with them. `revelle_status` already carries 'archived', and
--- leaving a delivered Revelle attached to an archived application would leave
--- the more visible half of the pair still reading as real work.
-update revelle r
-   set status = 'archived'
-  from quiz_response q
-  join customer c on c.id = q.customer_id
- where r.quiz_response_id = q.id
-   and q.status = 'archived'
-   and r.status <> 'archived'
-   and (
-        c.email like '%@example.invalid'
-     or c.email like '%@example.com'
-     or c.email like 'throttle-probe@%'
-   );
+-- ── THEIR REVELLES STAY DELIVERED ────────────────────────────────────
+--
+-- An earlier version of this file also archived the Revelles these
+-- applications produced, so the more visible half of the pair would stop
+-- reading as real work. THE DATABASE REFUSED IT:
+--
+--   new row for relation "revelle" violates check constraint
+--   "revelle_delivered_has_timestamp"
+--
+-- The constraint is `(status = 'delivered') = (delivered_at is not null)`, and
+-- it was right. A Revelle that was delivered HAS a delivery timestamp, and
+-- moving it to 'archived' while the timestamp stands would have made the row
+-- lie about itself.
+--
+-- It also caught this file contradicting its own argument two paragraphs up.
+-- The applications are archived rather than deleted because a system that can
+-- silently unask cannot be trusted — and then it tried to un-deliver two
+-- Revelles for tidiness. They were delivered. That is the only record of what
+-- the engine has ever actually produced, and it stays.
+--
+-- The applications leave the inbox; their Revelles remain true.
 
 do $$
-declare v_q int; v_r int;
+declare v_q int;
 begin
   select count(*) into v_q from quiz_response q join customer c on c.id = q.customer_id
    where q.status = 'archived'
      and (c.email like '%@example.invalid' or c.email like '%@example.com'
           or c.email like 'throttle-probe@%');
-  select count(*) into v_r from revelle r
-     join quiz_response q on q.id = r.quiz_response_id
-     join customer c on c.id = q.customer_id
-   where r.status = 'archived'
-     and (c.email like '%@example.invalid' or c.email like '%@example.com'
-          or c.email like 'throttle-probe@%');
-  raise notice '[030] % test application(s) archived, % revelle(s) with them', v_q, v_r;
+  raise notice '[030] % test application(s) archived', v_q;
 end $$;
