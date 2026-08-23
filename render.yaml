@@ -102,6 +102,19 @@ services:
     # writes it. First pass publishes what is authored, the seeders attach the
     # content, second pass adopts anything new.
     #
+    # seed:bank added 2026-08-23. It creates six DRAFT world stubs — Oaxaca,
+    # Acapulco, St. Moritz, Aspen, Palm Springs, Amalfi — for admitted rooms
+    # whose voices are drafted or whose schedule cells are founder-pending.
+    # That is the system working rather than a decision being made: a draft
+    # world is invisible to selection and to members, and the desk is exactly
+    # where a proposed room belongs so it can be SEEN. The rule was never
+    # "nothing new reaches the desk"; it is "nothing reaches a member".
+    #
+    # Rio and Cap Ferrat are NOT among them and must never be. Rio is blocked
+    # with a proof; Cap Ferrat is retired and reserved for a duration tier. A
+    # draft row is an invitation to finish something, and those two are
+    # deliberately unfinished.
+    #
     # Fixtures and demo occasions are deliberately absent: those invent test
     # customers and they refuse a non-local database anyway.
     #
@@ -113,6 +126,7 @@ services:
       npm run seed:drinks &&
       npm run seed:dishes &&
       npm run seed:games &&
+      npm run seed:bank &&
       npm run seed:destinations
 
     envVars:

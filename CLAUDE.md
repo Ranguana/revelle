@@ -83,7 +83,15 @@ options twice. `docs/copy-source.md` is that extraction —
 `npm run copy:source` — marked for what may face a member and what is house
 only. Start there; generate only for what it cannot supply.
 
-**12. Superseded reasoning is PRESERVED, never deleted.**
+**12. A seeder not in `preDeployCommand` is a seeder that silently did not
+happen.** It raises nothing and logs nothing; the catalogue is just smaller
+than the repo says. `seed:bank` sat out every deploy and surfaced only as
+eighteen destinations in the file against thirteen on the dashboard, which
+flickered through three reports before anyone traced it. `src/lib/deploy.test.ts`
+now fails if a `seed:*` script is neither in the chain nor listed as manual with
+a reason.
+
+**13. Superseded reasoning is PRESERVED, never deleted.**
 When a decision reverses, keep the old argument and say what beat it. See the
 year decisions in `src/lib/destinations.ts` and the "she does not pick" section
 in `docs/selection-spec.md`. In six months the reasoning is the part that gets
