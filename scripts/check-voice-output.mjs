@@ -84,13 +84,22 @@ for (const rule of dest.voice.never || []) {
 // somebody already wrote. Adding one means finding the rejected entry that
 // argues for it — this list may not grow on taste alone.
 const HOUSE_WIDE = [
-  { term: "experience", why: 'NANTUCKET: "A clambake is a dinner, not an experience, and calling it authentic is the surest sign it is not."' },
+  // NARROWED 2026-08-23. The ban is on the NOUN — "a ___ experience" — which is
+  // what Nantucket refuses: an event sold as a category rather than named. It
+  // is NOT a ban on the verb. The founder's Catskills tagline, "It's never too
+  // late to experience sleepaway camp", uses it as a verb and is correct, and a
+  // rule the catalogue itself violates is a wrong rule rather than an exception
+  // to make. Matches "an experience", "the experience", "X experience".
+  { pattern: /\b(?:an?|the)\s+\w*\s*experience\b|\bexperiences?\b(?=\s*[.,])/i,
+    term: "experience (as a noun)",
+    why: 'NANTUCKET: "A clambake is a dinner, not an experience, and calling it authentic is the surest sign it is not."' },
   { term: "authentic",  why: 'NANTUCKET: "Three words the house bans in one line."' },
   { term: "curated",    why: "The house names the thing. A curated anything is a shop describing itself." },
   { term: "elevated",   why: "Nothing here is elevated. It is a dinner, a lunch, or a night." },
   { term: "unforgettable", why: "Promises the reader's memory back to her. The evening either is or is not." },
 ];
-const houseWide = HOUSE_WIDE.filter((h) => new RegExp(`\\b${h.term}`, "i").test(text));
+const houseWide = HOUSE_WIDE.filter((h) =>
+  h.pattern ? h.pattern.test(text) : new RegExp(`\\b${h.term}`, "i").test(text));
 
 // 3 · shape proximity against every rejected example
 const cand = new Set(words(text).filter((w) => !STOP.has(w)));

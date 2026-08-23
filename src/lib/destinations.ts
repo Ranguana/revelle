@@ -2728,12 +2728,25 @@ const CATSKILLS_LOOK: Theme = {
 export const CATSKILLS: Destination = {
   key: "catskills",
   name: "CATSKILLS, 1963",
-  tagline: "Everyone swims before breakfast. The tent is decorative.",
+  tagline: "It's never too late to experience sleepaway camp.",
+  // Rewritten at the desk and moved here on 2026-08-23, in the founder's words.
+  // It walks the whole day — eleven in the morning, the afternoon spreading
+  // out, dusk and the string lights, down to the people who always stay — which
+  // is the daylight/dusk/dark arc the phase tag was specified to select on. The
+  // room had it before the schema did.
   premise:
-    "A lake, a row of bunks, and a week that has been run the same way for " +
-    "long enough to have its own procedures. Everybody gets a bunk and a name " +
-    "in the first hour, including whoever organised it. The last night is on " +
-    "the dock, and whoever is last up turns off the string lights.",
+    "Eleven in the morning and the bell's already been rung once, just to " +
+    "test it. The first tray of food is out before anyone's hungry, and the " +
+    "trays don't really stop after that.\n\n" +
+    "The afternoon spreads out on its own — there's a lake if there's a lake, " +
+    "and if there is, someone's in it before they meant to be. Someone's " +
+    "asleep in the sun. Someone's been teasing the same person since noon, " +
+    "which is how you know they're friends now.\n\n" +
+    "At dusk the string lights come on between the trees and the whole day " +
+    "changes gears without anyone saying so. Dinner is long and loud and too " +
+    "much.\n\n" +
+    "By dark it's down to the people who always stay. Whoever's up last turns " +
+    "off the lights.",
   look: CATSKILLS_LOOK,
   voiceVersion: 1,
   voice: {
