@@ -31,14 +31,23 @@
 -- If this recurs, the fix is not a broader pattern here — it is that test
 -- traffic should not reach the production database, which is a question about
 -- how the probes were run rather than about this table.
+--
+-- THE EMAIL IS ON `customer`, NOT ON `quiz_response`. The first version of this
+-- file assumed otherwise and failed the deploy with `column "email" does not
+-- exist`, which is the pre-deploy doing its job: a bad migration took the whole
+-- chain down and the old instance kept serving. db/001 is explicit about why
+-- the column lives there — "Name is not asked at quiz time (the email is the
+-- whole ask)" — so an application reaches its address through customer_id.
 
-update quiz_response
+update quiz_response q
    set status = 'archived'
- where status <> 'archived'
+  from customer c
+ where c.id = q.customer_id
+   and q.status <> 'archived'
    and (
-        email like '%@example.invalid'
-     or email like '%@example.com'
-     or email like 'throttle-probe@%'
+        c.email like '%@example.invalid'
+     or c.email like '%@example.com'
+     or c.email like 'throttle-probe@%'
    );
 
 -- Their Revelles go with them. `revelle_status` already carries 'archived', and
@@ -47,25 +56,28 @@ update quiz_response
 update revelle r
    set status = 'archived'
   from quiz_response q
+  join customer c on c.id = q.customer_id
  where r.quiz_response_id = q.id
    and q.status = 'archived'
    and r.status <> 'archived'
    and (
-        q.email like '%@example.invalid'
-     or q.email like '%@example.com'
-     or q.email like 'throttle-probe@%'
+        c.email like '%@example.invalid'
+     or c.email like '%@example.com'
+     or c.email like 'throttle-probe@%'
    );
 
 do $$
 declare v_q int; v_r int;
 begin
-  select count(*) into v_q from quiz_response
-   where status = 'archived'
-     and (email like '%@example.invalid' or email like '%@example.com'
-          or email like 'throttle-probe@%');
-  select count(*) into v_r from revelle r join quiz_response q on q.id = r.quiz_response_id
+  select count(*) into v_q from quiz_response q join customer c on c.id = q.customer_id
+   where q.status = 'archived'
+     and (c.email like '%@example.invalid' or c.email like '%@example.com'
+          or c.email like 'throttle-probe@%');
+  select count(*) into v_r from revelle r
+     join quiz_response q on q.id = r.quiz_response_id
+     join customer c on c.id = q.customer_id
    where r.status = 'archived'
-     and (q.email like '%@example.invalid' or q.email like '%@example.com'
-          or q.email like 'throttle-probe@%');
+     and (c.email like '%@example.invalid' or c.email like '%@example.com'
+          or c.email like 'throttle-probe@%');
   raise notice '[030] % test application(s) archived, % revelle(s) with them', v_q, v_r;
 end $$;
