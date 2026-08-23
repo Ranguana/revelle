@@ -66,3 +66,45 @@ discipline as everything else in the catalogue.
 
 **Recorded in `docs/proposals.md` per the ledger rule: nothing is admitted that
 is not in that file.**
+
+---
+
+## Phase — time of day (2026-08-23)
+
+Bank items — **goods, acts and games** — carry a **phase tag**:
+
+`daylight` · `dusk` · `dark` · `all`
+
+**Defaulting to `all`.** Assembly filters by the member's hours within the
+room's authored arc. **Phase-lock and turns are unchanged** — this selects what
+is eligible; it does not reorder the evening.
+
+That is the whole change.
+
+### The three axes, and what actually exists
+
+With phase, the bank is selectable on every axis a party has:
+
+| axis | what it answers | state |
+|---|---|---|
+| **season** | time of year | **BUILT** — `season_band`, `season_note`, and a seeded `season` facet dimension |
+| **phase** | time of day | proposed here |
+| **tier** | place — signature / regional / repertoire | proposed, not built |
+
+**One correction worth making before anyone starts.** The `descent` tag was
+cited as the existing precedent, and it is a precedent in DESIGN — a
+phase-shaped eligibility tag on an ingredient row, gated on the destination's
+`ending` cell — but it does not exist in code. Neither does the tier system.
+Both were specified yesterday and neither is in the schema, the seeders or
+`docs/dishes.md`.
+
+So a phase tag is not copying a working pattern; it is the SECOND instance of a
+pattern nobody has built once. That argues for building `descent` and `phase`
+together, since they are the same mechanism twice — an enum on an ingredient
+row, a default that means "no opinion", and one clause in the assembly candidate
+query — and the second is nearly free once the first exists.
+
+Season is the only one of the three that is real today, and it is worth reading
+its implementation first: it already distinguishes a HARD filter from a SOFT
+weight, and phase will need the same distinction. A candle at dusk is a
+preference; a game that only works in the dark is a constraint.
