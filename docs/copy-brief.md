@@ -280,3 +280,31 @@ options twice now.**
 `docs/copy-source.md` is that extraction, regenerable with
 `npm run copy:source`. Sections are marked for what may face a member and what
 is house-only. Start there; generate only for what it cannot supply.
+
+## The explainer — founder's original, verbatim
+
+Approved 2026-08-23 for the homepage, under the société line. Recorded before
+edit so the original is never lost:
+
+> Revelle Société is essentially a creative director for your social life. A
+> customer comes to us with a moment—a birthday, girls' weekend, dinner,
+> holiday, getaway, etc.—and Revelle turns it into a personalized, elevated
+> experience she can actually execute herself.
+
+**Shipped as**, with three changes and the reason for each:
+
+> Revelle Société is a creative director for your social life. You come to us
+> with a moment — a birthday, a girls' weekend, a dinner, a holiday, a getaway —
+> and you throw the night you meant to, made yours and made real.
+
+- `elevated experience` — struck. Both words are house-wide refusals, carried by
+  authored rejections: "nothing here is elevated, it is a dinner, a lunch, or a
+  night", and Nantucket's "a clambake is a dinner, not an experience".
+  `npm run check:voice-output` fails the original on `elevated`.
+- `Revelle turns it into` → `you throw` — rule 10, HOST-AS-AUTHOR. The original
+  credits the product with her party, which is the failure "we've done
+  everything" fails on.
+- `a customer comes to us` → `you come to us` — she is the reader, and being
+  called a customer in the third person is colder than the rest of the page.
+
+Revert any of the three by editing `EXPLAINER` in `src/app/page.tsx`.

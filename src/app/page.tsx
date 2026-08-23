@@ -78,6 +78,30 @@ const WESTHAMPTON = WESTHAMPTON_1976;
  * The forms are deliberately unlike each other — a year, a season, a weekday —
  * so the three land as a range rather than a list.
  */
+/**
+ * The plain-English explainer, for the reader who wants the service named
+ * before she reads a plate. The founder's words, with two fixes she can revert:
+ *
+ *   "elevated experience"  -> struck. `elevated` is a house-wide refusal
+ *                             ("nothing here is elevated — it is a dinner, a
+ *                             lunch, or a night") and `experience` as a noun is
+ *                             Nantucket's ("a clambake is a dinner, not an
+ *                             experience"). npm run check:voice-output catches
+ *                             both.
+ *   "Revelle turns it into" -> "you throw". Rule 10: HOST-AS-AUTHOR,
+ *                             PRODUCT-AS-INSTRUMENT. The original credits the
+ *                             product with her party, which is the same failure
+ *                             as "we've done everything".
+ *
+ * "a customer comes to us" also became "you come to us" — she is reading this,
+ * and being called a customer in the third person is colder than the rest of
+ * the page. The original is recorded verbatim in docs/copy-brief.md.
+ */
+const EXPLAINER =
+  "Revelle Société is a creative director for your social life. You come to " +
+  "us with a moment — a birthday, a girls' weekend, a dinner, a holiday, a " +
+  "getaway — and you throw the night you meant to, made yours and made real.";
+
 const HERO_LINE =
   "Westhampton, 1976. Portofino, off-season. Your dining room, Saturday.";
 
@@ -151,6 +175,7 @@ export default function Home() {
                   ornament belongs to the worked plate further down. */}
               <p className={styles.heroTagline}>{HERO_LINE}</p>
               <p className={styles.heroSociete}>A société for people who host.</p>
+              <p className={styles.heroExplainer}>{EXPLAINER}</p>
 
               <div className={styles.heroActions}>
                 <Link className={`cta ${styles.ctaHero}`} href="/apply">
