@@ -71,6 +71,27 @@ for (const rule of dest.voice.never || []) {
   }
 }
 
+// 2b · CATALOGUE-WIDE refusals
+//
+// Found by using this tool on real copy: a Catskills tagline reading "never too
+// late to EXPERIENCE sleepaway camp" passed, because the word is refused in
+// NANTUCKET's list — "a clambake is a dinner, not an experience" — and the
+// check was scoped per room. But that is not a Nantucket quirk. It is a rule
+// about the whole house's relationship to the word, and a per-room check reads
+// a catalogue-wide refusal as somebody else's business.
+//
+// So a small set of terms is refused EVERYWHERE, each carried by a refusal
+// somebody already wrote. Adding one means finding the rejected entry that
+// argues for it — this list may not grow on taste alone.
+const HOUSE_WIDE = [
+  { term: "experience", why: 'NANTUCKET: "A clambake is a dinner, not an experience, and calling it authentic is the surest sign it is not."' },
+  { term: "authentic",  why: 'NANTUCKET: "Three words the house bans in one line."' },
+  { term: "curated",    why: "The house names the thing. A curated anything is a shop describing itself." },
+  { term: "elevated",   why: "Nothing here is elevated. It is a dinner, a lunch, or a night." },
+  { term: "unforgettable", why: "Promises the reader's memory back to her. The evening either is or is not." },
+];
+const houseWide = HOUSE_WIDE.filter((h) => new RegExp(`\\b${h.term}`, "i").test(text));
+
 // 3 · shape proximity against every rejected example
 const cand = new Set(words(text).filter((w) => !STOP.has(w)));
 const near = (dest.voice.rejected || []).map((r) => {
@@ -95,6 +116,13 @@ if (neverTerms.length) {
   for (const n of neverTerms) console.log(`   "${n.term}"  — ${n.rule}…`);
   console.log("");
 }
+if (houseWide.length) {
+  bad += houseWide.length;
+  console.log("HOUSE-WIDE REFUSALS — banned in every room, not just this one:");
+  for (const h of houseWide) console.log(`   "${h.term}"  — ${h.why}`);
+  console.log("");
+}
+
 const top = near[0];
 if (top && top.score >= 0.34) {
   console.log(`SHAPE PROXIMITY — closest refusal (${(top.score * 100) | 0}% of the shorter line's distinctive words):`);
