@@ -1,4 +1,4 @@
-# Atmosphere — staging notes
+ n# Atmosphere — staging notes
 
 **Status: founder specification, recorded. Not built. Extraction from voice
 lexicons begins after founder sign-off.**

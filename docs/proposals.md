@@ -27,6 +27,7 @@ this file did not happen, however clearly it was said somewhere else.
 | 2026-08-22 | VOICE LAYER upgraded to per-destination voice packets, packet-prompted from one base model, QA'd against the 26-facet profile, with founder edits logged as preference pairs and per-destination fine-tune evaluation at ~200 accepted outputs. Full specification below. | founder, in-session | recorded. Not built. |
 | 2026-08-22 | DESCENT COURSE — one humble late plate, tagged `descent`, exclusive to till-morn rooms, arriving unannounced as the last-phase turn. And MUSIC SPLIT THREE WAYS — sequenced set (exists), playback equipment as a constraint-class question, and live answers routed to spectacle rooms as a booking instruction. Full specification below. | founder, in-session | recorded. Not built. |
 | 2026-08-22 | WESTHAMPTON RE-FOUNDING — Eothen/Capote rather than Locust Valley; possible rename to THE HAMPTONS, 1976. Cells analysed, six clear rows found, nothing applied. Parked. | founder, in-session | **PARKED.** Analysis below so it is not lost. |
+| 2026-08-23 | ATMOSPHERE IDEA BANK v1 — all eighteen rooms, founder-blessed. Routing rules, nine new content classes, per-room goods/acts/games/cards, and a ten-item founder-pending ledger. Copied to `docs/atmosphere-idea-bank-v1.md`. | founder | **in the repo.** Two schema gaps and one resolved pending item, below. |
 
 ## Recorded as truth, not as a failure
 
@@ -229,3 +230,63 @@ database from the code, by design.
 
 The SLUG stays `westhampton-1976` — it is an identifier, not a name, and
 `cote-dazur` already calls itself 1962.
+
+
+## 2026-08-23 — Atmosphere idea bank v1: what it needs that does not exist
+
+The bank is `docs/atmosphere-idea-bank-v1.md`, copied in from the project folder
+so there is one copy under version control. Its own header says any copy without
+the v1 header is stale, which is an argument for it living here rather than in
+three folders.
+
+### Pending item 1 is ANSWERED
+
+> *"Westhampton bench provisional until the Eothen row re-runs."*
+
+**The row re-ran last night and cleared.** Westhampton is now
+`absorbed · standing · one_conversation · plain · bought · until_morning ·
+evening · crowd`, and every cell is carried by a sentence in the founder's own
+scene card. The audit was unchanged by it: one undeclared failure catalogue-wide,
+`portofino / cote-dazur` at 1 on `size`. The bench is no longer provisional on
+that ground.
+
+The row is in `data/destination-matrix.json` and the VOICE is not yet rewritten —
+`destinations.ts` still holds Locust Valley. That mismatch is recorded under
+`awaitingVoice` in the matrix.
+
+### GAP 1 — a destination cannot carry a structural requirement
+
+The bank states: *"Tahiti and Palm Springs carry destination-level
+requires_outdoors."*
+
+They cannot. `db/020`:
+
+```sql
+constraint ingredient_requirement_known_pool
+  check (entity_table in ('product', 'game', 'tracklist', 'menu', 'drink'))
+```
+
+`world` is excluded deliberately — the same migration refuses to let an
+environment facet be tagged onto a destination at all, because venue must never
+touch the destination CHOICE. Destination-level presupposition is a different
+thing from venue scoring and needs its own expression: a migration allowing
+`world`, checked at ASSEMBLY, surfaced as a warning, never a ranking input. That
+was scoped when the founder asked "you can't do Palm Springs 1965 without a
+pool" and the bank now requires it.
+
+### GAP 2 — `outdoor_access` does not exist
+
+The bank wants a *"softer grade"* for sparklers. `structural_requirement` holds
+exactly three codes: `requires_outdoors`, `requires_open_flame`,
+`requires_full_kitchen`. A softer grade is a new row, and it is worth naming the
+distinction on the way in: `requires_outdoors` means the thing CANNOT happen
+inside; `outdoor_access` means it needs a door to somewhere, which most
+apartments have.
+
+### NOT A GAP — costume briefs are already dead
+
+*"Costume briefs are killed catalog-wide"* confirms the existing position rather
+than asking for a deletion. All seven mentions in the repo are the ANTI-costume
+rule: "No clipboards. No costume rule." on the homepage, the dealbreaker filter
+in the selection spec, and "a spelling that performs an accent is a costume" in
+the authoring guide. Nothing to remove.
