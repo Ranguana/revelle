@@ -10,6 +10,7 @@ import {
   publishDestinations,
   type Ask,
 } from "@/lib/desk/publish";
+import { POOL_SCREEN } from "@/lib/desk/stocked";
 import { recordAction, requireStaff } from "@/lib/staff";
 
 /**
@@ -110,7 +111,7 @@ export async function publishSelected(form: FormData): Promise<void> {
   revalidatePath("/desk/publish");
   revalidatePath("/desk/matrix");
   revalidatePath("/desk/coverage");
-  for (const path of POOL_SCREENS[poolCode] ?? []) revalidatePath(path);
+  if (POOL_SCREEN[poolCode]) revalidatePath(POOL_SCREEN[poolCode]);
 
   redirect(`${back}&published=${done.names.length}&asked=${ids.length}`);
 }
@@ -175,19 +176,11 @@ const NOTHING_TICKED =
   "Nothing was published, because nothing was ticked. Untick what should stay " +
   "in draft, not everything.";
 
-/**
- * Which desk screens show a status for each pool, so they can be revalidated.
- *
- * Hardcoded rather than derived: this is a fact about the DESK's routes, not
- * about the database, and the registry has no column for it. A pool missing
- * from this map still publishes correctly — it just has no list screen to
- * refresh, which is itself worth seeing on /desk/publish.
+/*
+ * The map of pool -> desk screen used to be a second copy right here, and it
+ * had already drifted from the one on the screen: this one had no `bank_item`,
+ * so offering a bank item left /desk/bank showing drafts that were not. It now
+ * lives in src/lib/desk/stocked.ts, which is a plain module and can therefore
+ * be imported by both — a `"use server"` file may only export async functions,
+ * which is why neither action file could own it.
  */
-const POOL_SCREENS: Readonly<Record<string, readonly string[]>> = {
-  menu: ["/desk/menus"],
-  drink: ["/desk/drinks"],
-  dish: ["/desk/dishes"],
-  game: ["/desk/games"],
-  product: ["/desk/products"],
-  world: ["/desk/destinations"],
-};

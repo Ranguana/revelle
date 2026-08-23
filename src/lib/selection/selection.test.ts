@@ -56,8 +56,32 @@ function facet(id: string, dimension: string, code: string): Facet {
   return f;
 }
 
-const COASTAL = facet("f-coastal", "taste_direction", "faded_coastal");
-const DISCO = facet("f-disco", "taste_direction", "disco_after_dark");
+/*
+ * HER GENERIC TASTE ANSWER, AND IT IS NOT `taste_direction` ANY MORE.
+ *
+ * These two are the stand-in "she said she likes this" facet in most of the
+ * tests below, and what those tests are about is vector arithmetic — a soft
+ * negative is a fifth of a positive, a dealbreaker comes from this application
+ * only, an aesthetic ranks within the survivors. None of them is about which
+ * dimension the answer came from.
+ *
+ * They were `taste_direction` until that dimension joined NON_TASTE_DIMENSIONS
+ * (src/lib/selection/vector.ts, and the whole argument is there: nothing in the
+ * catalogue is tagged in it, so her two or three terms sat in facetOverlap's
+ * denominator and damped every term that DID match). A fixture on an excluded
+ * dimension would have made seven tests assert the mechanics of a term that no
+ * longer exists, so they moved to `mood`, which the catalogue really is tagged
+ * in — one menu tag today, `cooking_smell`, and it is a scored dimension.
+ *
+ * MOVE THEM BACK the day the catalogue carries taste directions and that line
+ * comes out of vector.ts. Until then the one test that is genuinely ABOUT the
+ * dimension — the catalogue-gap keyed on the look she asked for — uses
+ * DISCO_DIRECTION below, which is the real thing.
+ */
+const COASTAL = facet("f-coastal", "mood", "faded_coastal");
+const DISCO = facet("f-disco", "mood", "disco_after_dark");
+/** The real `taste_direction` answer, for the one test about the gap it files. */
+const DISCO_DIRECTION = facet("f-disco-direction", "taste_direction", "disco_after_dark");
 const NOVELTY = facet("f-novelty", "anti_preference", "novelty");
 const EASE = facet("f-ease", "affinity", "ease");
 const GUESTS = facet("f-guests", "guest_count", "from_9_to_12");
@@ -1883,8 +1907,13 @@ test("an untagged ingredient works anywhere, which is the safe default", () => {
       requires_outdoors: false,
       requires_open_flame: false,
       requires_full_kitchen: false,
-      noise_ceiling: false,
-      deposit_safe: false,
+      // `noise_ceiling` and `deposit_safe` were here and are cut by db/039:
+      // every room had an affordance row for both and nothing in the catalogue
+      // ever claimed either, so they pruned nothing for their whole life. The
+      // fixture is "a room that affords NOTHING", so it has to be the real list
+      // of requirements — a stale extra key would make it look like the venue
+      // system still refuses on loudness.
+      outdoor_access: false,
     },
     notes: {},
   };
@@ -2249,7 +2278,12 @@ test("a hard clash is a catalogue gap BEFORE it is an engine decision", () => {
     [LOW_VOICES.id]: 1,
   });
   const vector = buildVector(
-    [stated(COASTAL), stated(DISCO), ...HER_TONES],
+    // DISCO_DIRECTION is the answer the gap is keyed on and is deliberately NOT
+    // scored — `taste_direction` is out of the vector until the catalogue is
+    // tagged in it. It reaches this report through `vector.unscored`, which is
+    // the whole reason that field exists: an answer that stops scoring must not
+    // also stop being reported as the thing the library is missing.
+    [stated(COASTAL), stated(DISCO), stated(DISCO_DIRECTION), ...HER_TONES],
     [],
     [],
     FACETS,

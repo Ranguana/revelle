@@ -13,6 +13,14 @@ import { Head } from "../bits";
  * The activity list is `staff_recent_activity` (db/011) — the attribution
  * ledger with a name attached. It is the answer to "who changed this", and it
  * only means anything because the two of them sign in as themselves.
+ *
+ * THAT VIEW IS THE HUMAN HALF OF THE LEDGER AND NOT ALL OF IT. Since db/036 a
+ * seeder can act too, with `staff_id` null and `actor` naming the machine, and
+ * db/038 made the exclusion explicit: `staff_recent_activity` is
+ * `desk_activity` filtered to `actor = 'staff'`. That is the right half HERE —
+ * this panel is "what have the two of them been doing", and a row with nobody
+ * to name in the Who column would be answering a different question. What the
+ * catalogue did to itself is /desk/stocked.
  */
 
 export const dynamic = "force-dynamic";

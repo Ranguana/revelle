@@ -10,7 +10,10 @@ import {
   POOL_STATUS,
 } from "@/lib/desk/labels";
 
+import type { Carried } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
+import { ReviewFields } from "../bits";
 import FacetPicker from "../FacetPicker";
 import { saveGame, type GameState } from "./actions";
 
@@ -79,17 +82,22 @@ export default function GameForm({
   groups,
   selected,
   weights,
+  carried,
 }: {
   values: GameValues;
   groups: readonly FacetGroup[];
   selected: readonly string[];
   weights?: readonly (readonly [string, string])[];
+  /** the review this save must land back inside, if one is running */
+  carried?: Carried | null;
 }) {
   const [state, action, pending] = useActionState(saveGame, INITIAL);
 
   return (
     <form action={action} className={`${styles.form} ${styles.formWide}`}>
       {values.id ? <input type="hidden" name="id" value={values.id} /> : null}
+      {/* So that saving mid-review does not end the review. See review.ts. */}
+      <ReviewFields carried={carried ?? null} />
 
       {state.error ? (
         <p className={styles.error}>

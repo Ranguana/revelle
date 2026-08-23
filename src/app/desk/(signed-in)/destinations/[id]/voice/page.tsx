@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
 import { stamp } from "@/lib/desk/labels";
+import { destinationSequence } from "@/lib/desk/lists";
+import { readReview, reviewPass } from "@/lib/desk/review";
 import { voiceToForm } from "@/lib/desk/voice-form";
 import { voicePrompt, type Voice } from "@/lib/tokens";
 
 import styles from "../../../../desk.module.css";
 import Thread from "../../../Thread";
-import { Head, Status } from "../../../bits";
+import { Head, Review, ReviewFields, Status } from "../../../bits";
 import { discardVoiceDraft, startVoiceDraft } from "../../actions";
 import VoiceForm from "./VoiceForm";
 
@@ -53,9 +55,16 @@ type VoiceRow = {
 
 export default async function VoicePage({
   params,
+  searchParams,
 }: PageProps<"/desk/destinations/[id]/voice">) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
+  // READING EVERY ROOM'S VOICE IN TURN is a real pass and this screen says so
+  // itself: the assembled prompt is on the page because reading it is the
+  // review step. So it walks the library's sequence, staying on the voice
+  // screen rather than handing her back to the destination — that is what
+  // `rowPath` is for in src/lib/desk/review.ts.
+  const carried = readReview(await searchParams);
 
   const world = await queryOne<{ id: string; name: string; slug: string }>(
     `select id, name, slug::text as slug from world where id = $1`,
@@ -73,6 +82,17 @@ export default async function VoicePage({
     [id]
   );
 
+  const sequence = carried ? await destinationSequence(carried.search) : [];
+  const pass = carried
+    ? reviewPass({
+        path: "/desk/destinations",
+        ids: sequence,
+        id,
+        carried,
+        rowPath: (world) => `/desk/destinations/${world}/voice`,
+      })
+    : null;
+
   const draft = voices.find((voice) => voice.status === "draft") ?? null;
   const published = voices.find((voice) => voice.status === "published") ?? null;
   const older = voices.filter((voice) => voice.status === "superseded");
@@ -88,6 +108,8 @@ export default async function VoicePage({
           Back to the destination
         </Link>
       </Head>
+
+      {pass ? <Review pass={pass} noun="destinations" /> : null}
 
       <div className={styles.panels}>
         <div>
@@ -110,6 +132,7 @@ export default async function VoicePage({
               {!draft ? (
                 <form action={startVoiceDraft}>
                   <input type="hidden" name="world_id" value={id} />
+                  <ReviewFields carried={carried} />
                   <button className={styles.button}>
                     Start version {published.version + 1} from this
                   </button>
@@ -129,6 +152,7 @@ export default async function VoicePage({
               {!draft ? (
                 <form action={startVoiceDraft}>
                   <input type="hidden" name="world_id" value={id} />
+                  <ReviewFields carried={carried} />
                   <button className={styles.button}>Write the first voice</button>
                 </form>
               ) : null}
@@ -142,6 +166,7 @@ export default async function VoicePage({
                   <span>Draft — version {draft.version}</span>
                   <form action={discardVoiceDraft}>
                     <input type="hidden" name="world_id" value={id} />
+                    <ReviewFields carried={carried} />
                     <input type="hidden" name="voice_id" value={draft.id} />
                     <button className={styles.buttonDanger}>
                       Discard this draft

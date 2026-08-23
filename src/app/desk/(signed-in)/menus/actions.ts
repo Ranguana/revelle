@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { query, queryOne } from "@/lib/db";
 import { setTags, validFacetIds } from "@/lib/desk/facets";
 import { COOKING_LEVELS, SEASONS, slugify } from "@/lib/desk/labels";
+import { carryReview } from "@/lib/desk/review";
 import { recordAction, requireStaff } from "@/lib/staff";
 
 /**
@@ -172,7 +173,8 @@ export async function saveMenu(
 
   revalidatePath("/desk/menus");
   revalidatePath(`/desk/menus/${menuId}`);
-  redirect(`/desk/menus/${menuId}?saved=1`);
+  // Back into the review it was saved from, if there was one. See review.ts.
+  redirect(carryReview(form, `/desk/menus/${menuId}?saved=1`));
 }
 
 export async function setMenuStatus(form: FormData): Promise<void> {

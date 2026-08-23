@@ -33,7 +33,7 @@
 // loaded directly by `node --test` and by scripts/check-facets.mjs, and Node
 // resolves real files with no extension-guessing step. See the note on
 // allowImportingTsExtensions in tsconfig.json.
-import { TONE_GROUPS, TONES } from "./voice.ts";
+import { TONE_GROUPS, TONES, type Tone } from "./voice.ts";
 
 /**
  * Stamped onto every submission. Bump on any change that alters what an answer
@@ -60,8 +60,21 @@ import { TONE_GROUPS, TONES } from "./voice.ts";
  * missing one. It was never asked, and everything downstream treats an
  * unanswered calendar the way it treats "still deciding": season weights
  * nothing and excludes nothing. See db/026.
+ *
+ * 2026-08-g asks HOW IT ENDS, and takes the gate off the hour.
+ *
+ * The new question is additive and would not on its own force a bump. What
+ * forces it is the OTHER half: `meal_time` was asked only of a host who had
+ * said there was a table, and it is now asked of everybody and worded as a
+ * START HOUR rather than as a course. Both halves of the stamp's own test are
+ * met — a reworded question, and a changed condition on who is shown it — and
+ * the consequence is that the same code means slightly different things on
+ * either side of this line. A `late_supper` written against 2026-08-f is a host
+ * who had a table and chose the late one; against 2026-08-g it may be a
+ * cocktail party that starts at eleven. Both resolve, and `quiz_version` on the
+ * row says which question she was actually shown. See db/037.
  */
-export const QUIZ_VERSION = "2026-08-f";
+export const QUIZ_VERSION = "2026-08-g";
 
 export type QuizOption = {
   /** Permanent. Stored in the database. */
@@ -335,7 +348,7 @@ const EVENT_MONTHS: readonly QuizOption[] = [
 ];
 
 /**
- * WHICH MEAL — and only where the rest of the application has not already said.
+ * WHAT HOUR IT STARTS — asked of everyone, and it is the same four answers.
  *
  * db/023 gave a table five shapes and could reach two of them. Standing food
  * makes it a cocktail party, everything else fell through to a long dinner, and
@@ -351,26 +364,124 @@ const EVENT_MONTHS: readonly QuizOption[] = [
  * anniversary can be a late supper, and db/023 refused to fold the two axes
  * together for exactly that reason — an occasion is WHY, a meal shape is WHAT.
  *
- * ── SO IT IS ASKED ONCE, OF THE HOSTS IT APPLIES TO ─────────────────
+ * ── SUPERSEDED, AND KEPT: "ASKED ONCE, OF THE HOSTS IT APPLIES TO" ──
  *
- * `activeWhen` holds it to a host who has said there is a table. Somebody
- * throwing a cocktail party is never shown it, because her food answer already
- * settled it — `standing` carries the `no_seated_meal` exclusion and that IS the
- * cocktail party. One fact, stated once, by whichever question got there first.
+ * The argument this question shipped with, verbatim, because it was right about
+ * the thing it was looking at:
+ *
+ *     "`activeWhen` holds it to a host who has said there is a table. Somebody
+ *      throwing a cocktail party is never shown it, because her food answer
+ *      already settled it — `standing` carries the `no_seated_meal` exclusion
+ *      and that IS the cocktail party. One fact, stated once, by whichever
+ *      question got there first."
+ *
+ * WHAT BEAT IT: the food answer settles WHETHER THERE IS A TABLE. It does not
+ * settle WHAT TIME ANYONE ARRIVES, and the old argument silently treated those
+ * as one fact because, at the time, the only reader was `mealShape()`. They are
+ * two facts, and the second one had no other supplier: with the gate in place a
+ * cocktail party, a booked restaurant and a drinks-only evening never stated an
+ * hour ANYWHERE in the system. That is CLAUDE.md rule 15's DEFAULT-ONLY failure
+ * in its purest form — the matrix ranked `starts` against all eighteen rows for
+ * every applicant, and for a standing party the value it ranked was a fallback.
+ *
+ * Nothing the old argument protected is lost. `mealShape()` still refuses to
+ * call a standing party a lunch: `no_seated_meal` wins there and is checked
+ * FIRST, so her hour cannot invent a table she said she was not setting. The
+ * gate was doing that job in the wrong place — at the question, where it also
+ * deleted the hour — and the exclusion does it in the right one.
+ *
+ * ── SO IT IS WORDED OFF "MEAL" ──────────────────────────────────────
+ *
+ * "Brunch" is a course, and a woman throwing a cocktail party at noon cannot
+ * answer a question about courses without being made to lie. So the labels name
+ * HOURS — late morning, midday, evening, late — and the four still carry db/023's
+ * `meal_shape` codes underneath, because a code is permanent and this one is
+ * still the right code: an evening that starts at midday and has a table IS a
+ * lunch. The hint is what does the double duty, and each of the four is written
+ * to be true of a dinner and of a standing party alike.
+ *
+ * The field id stays `meal_time` for the same reason the codes do. It is the
+ * name of a column (db/026) and of a bridge row, and renaming it would retire a
+ * question that has not changed its subject — only its reach and its wording.
  *
  * The codes are the values of `meal_shape` in db/023, so the answer casts
  * straight into quiz_response.meal_time — the same arrangement `music_service`
  * has with soundtrack_delivery, and for the same reason: a derivation nobody has
- * to read is a derivation nobody can get wrong.
+ * to read is a derivation nobody can get wrong. db/037 adds a SECOND resolution
+ * of the same four codes, onto the matrix's `starts` levels, so the hour she
+ * names reaches the structural ranker as well as the table.
  */
-const MEAL_TIMES: readonly QuizOption[] = [
-  { code: "brunch", label: "Brunch", hint: "The morning after, and it runs long" },
-  { code: "lunch", label: "Lunch", hint: "Midday, and nobody is in a hurry" },
-  { code: "long_dinner", label: "Dinner", hint: "The table, after dark" },
+const START_HOURS: readonly QuizOption[] = [
+  {
+    code: "brunch",
+    label: "Late morning",
+    hint: "It starts before noon and runs long",
+  },
+  {
+    code: "lunch",
+    label: "Midday",
+    hint: "It starts at lunchtime and nobody is in a hurry after",
+  },
+  { code: "long_dinner", label: "Evening", hint: "Dark by the time it fills up" },
   {
     code: "late_supper",
-    label: "A late supper",
-    hint: "After the show, or after dancing",
+    label: "Late",
+    hint: "After the show, or after the dancing",
+  },
+];
+
+/**
+ * HOW IT ENDS — the other end of the clock, and everybody has an opinion.
+ *
+ * The matrix has carried an `ending` column since the contrast pass, with all
+ * eighteen rows filled and a level split of seven / seven / four that no other
+ * facet matches for balance. Nothing asked. It ranked every applicant on a cell
+ * she had never been given a chance to fill in, which is exactly the failure
+ * CLAUDE.md rule 15 was written for.
+ *
+ * ── THE OPTIONS ARE THE FOUNDER'S SENTENCES, NOT A PARAPHRASE ───────
+ *
+ * The facet was authored in docs/destination-contrasts.md as forced-choice
+ * SCENES rather than adjectives, and the three below are those scenes in the
+ * words they were written in. They are the copy. A tidier rewrite — "an early
+ * night", "a long one" — would lose the thing that makes the question
+ * answerable: each one contains its own judgement, so she is agreeing with a
+ * host rather than grading an evening.
+ *
+ * ── NO `activeWhen`, AND THAT IS THE POINT ──────────────────────────
+ *
+ * Every host has an opinion about how a party should end, and none of the other
+ * answers implies one. A dinner at a table can stop cleanly at eleven or run to
+ * five; a cocktail party can do either. There is no answer she has already given
+ * that settles this, which is the test `meal_time` failed for two migrations and
+ * this question is written not to repeat.
+ *
+ * ── AND IT IS NOT "WOULD YOU LIKE A LATE NIGHT" ─────────────────────
+ *
+ * It passes the two acceptance tests in docs/destination-contrasts.md. It is
+ * answerable without knowing the destinations exist; and it describes the
+ * EVENING rather than the guests, because the same group throws a Sunday lunch
+ * that stops cleanly and a birthday that goes until morning. That is the test
+ * `teasing` failed and it is why this facet may sort rooms and that one may not.
+ *
+ * The codes are the matrix's own levels, so the answer resolves to the facet
+ * without a translation step. See db/037 and src/lib/selection/structure.ts.
+ */
+const ENDINGS: readonly QuizOption[] = [
+  {
+    code: "clean_stop",
+    label: "It stops cleanly",
+    hint: "Everyone leaves at once, and it is perfect",
+  },
+  {
+    code: "dissolves",
+    label: "It dissolves",
+    hint: "It thins out slowly and the last hour is the best",
+  },
+  {
+    code: "until_morning",
+    label: "It goes until morning",
+    hint: "If it ends before very late, something went wrong",
   },
 ];
 
@@ -493,11 +604,33 @@ const AFFINITIES: readonly QuizOption[] = [
  * exist on the page without a meaning underneath it, and a meaning cannot be
  * edited without the label beside it.
  */
-const VOICE_TONES: readonly QuizOption[] = TONES.map((tone) => ({
-  code: tone.code,
-  label: tone.label,
-  group: tone.group,
-}));
+/*
+ * DRAFTS ARE NOT SHOWN, and this filter is CLAUDE.md rule 16 in one line.
+ *
+ * A draft tone is a word coined for a room that is not authored yet —
+ * src/lib/voice.ts says so on the flag — and until that room lands the tone is
+ * claimed by no destination, has no mark cut for it in design/tone-icons, and
+ * has no `facet` row in any migration. Rendered on the page it was a blank tile
+ * that a real host taps, that lands in quiz_response.voice_tones, and that
+ * `quiz_response_facet`'s inner join then drops on the floor. She spent one of
+ * seven taps on a code that resolves to nothing, and every surface in between
+ * reported success.
+ *
+ * The tones themselves stay in src/lib/voice.ts, drafts and all, because that
+ * file is the vocabulary and a word waiting for its room is not a mistake. What
+ * changes is that the QUIZ SURFACE takes only what it can honour.
+ */
+// Read through the declared type, exactly as src/lib/voice.test.ts does and for
+// the same reason: TONES is `as const`, so the compiler knows each entry as a
+// literal and a literal without the optional `draft` key has no such property
+// to test. The widening is what makes the flag readable at all.
+const VOICE_TONES: readonly QuizOption[] = (TONES as readonly Tone[])
+  .filter((tone) => !tone.draft)
+  .map((tone) => ({
+    code: tone.code,
+    label: tone.label,
+    group: tone.group,
+  }));
 
 /**
  * How many people. A BAND, not a number typed into a box.
@@ -625,32 +758,52 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
     title: "What are they eating?",
     fields: [{ id: "food_plan", type: "single", options: FOOD_PLANS }],
   },
-  // Straight after the food and not before it, because the second field on this
-  // screen is only asked of a host who has said there is a table — and a field
-  // that appears depending on an answer she has not given yet cannot appear at
-  // all. Before anything about taste, with the other facts about the evening:
-  // what she is planning, where it is, what is eaten, when.
+  // Straight after the food, with the other facts about the evening: what she
+  // is planning, where it is, what is eaten, when.
+  //
+  // IT USED TO HAVE TO BE HERE and now merely belongs here. The original reason
+  // was mechanical — the second field was conditional on the food answer, and a
+  // field that depends on an answer she has not given yet cannot appear at all —
+  // and that constraint is gone with the gate (see START_HOURS). The order does
+  // not change, because the editorial reason it was also right survives: these
+  // four screens are the facts, and taste starts on the screen after them.
   //
   // TWO FIELDS ON ONE SCREEN, which only the contrast question does, and it
-  // earns it by being a single question in two halves. So is this one. Which
-  // month and which meal are both "when", and splitting them would make the
-  // shorter of the two a whole screen asking a host who is having brunch to
-  // confirm that she is having brunch.
+  // earns it by being a single question in two halves. So is this one. The month
+  // and the hour are both "when", and splitting them would make the shorter of
+  // the two a whole screen asking what time a party starts.
   {
     key: "when",
     eyebrow: "The calendar",
     title: "When is it?",
-    help: "The month is enough. If it is not settled, say so.",
+    help: "The month is enough. The hour is when it starts, not when it ends.",
     fields: [
       { id: "event_month", type: "single", label: "The month", options: EVENT_MONTHS },
-      {
-        id: "meal_time",
-        type: "single",
-        label: "The meal",
-        options: MEAL_TIMES,
-        activeWhen: { field: "food_plan", is: ["sit_down"] },
-      },
+      { id: "meal_time", type: "single", label: "The hour", options: START_HOURS },
     ],
+  },
+  // Straight after "when is it", because it is the rest of that sentence. The
+  // screen before it asks what hour the evening starts and says so in its own
+  // help line — "not when it ends" — and this is the question that line is
+  // making room for. Splitting the clock across two screens rather than adding
+  // a third field to the one before it, because the two are not one question in
+  // two halves the way the month and the hour are: an hour is a fact she reads
+  // off a plan, and this is a judgement about what a good night does.
+  //
+  // Before anything about taste, and that is the same rule the three screens
+  // above follow. This describes the evening; the direction, the voice and the
+  // line describe how it should feel. The facts come first.
+  //
+  // NOT beside "where do games sit in this", which is the other question about
+  // shape rather than look. That one is about what happens in the middle and is
+  // read as a pair with "what would ruin it"; putting the ending next to it
+  // would turn two separate subjects into a programming screen.
+  {
+    key: "ending",
+    eyebrow: "The end of it",
+    title: "How does it end?",
+    help: "You already know this one.",
+    fields: [{ id: "how_it_ends", type: "single", options: ENDINGS }],
   },
   {
     key: "taste",
@@ -876,7 +1029,14 @@ export function stepErrors(step: QuizStep, answers: QuizAnswers): string[] {
  * stale answer, and a third in the bench that does the same. So the condition
  * moved onto the field, as `activeWhen`, and every reader consults the data.
  *
- * A field with no `activeWhen` is always active, which is every field but two.
+ * THE SECOND CONDITIONAL FIELD IS GONE. db/037 took the gate off `meal_time`,
+ * so `occasion_other` is once again the only field in the quiz that is not
+ * always shown. The mechanism stays exactly as it is: it was built because one
+ * hard-coded branch had already proved it would be copied, and a declaration
+ * three readers consult is right at one conditional field as it was at two. It
+ * is also what makes taking a gate off a one-line change rather than a hunt.
+ *
+ * A field with no `activeWhen` is always active, which is every field but one.
  */
 export function isFieldActive(field: QuizField, answers: QuizAnswers): boolean {
   const gate = field.activeWhen;

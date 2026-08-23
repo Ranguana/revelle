@@ -379,10 +379,23 @@ environment facet be tagged onto a destination or a cohort at all.
 
 It becomes a **second stage-3 filter dimension** instead, mechanically
 identical to the destination's own forbidden rule. Ingredients carry structural
-requirements — `requires_outdoors`, `requires_open_flame`,
-`requires_full_kitchen`, `noise_ceiling`, `deposit_safe` — and a room either
-affords them or it does not. Untagged means works anywhere, which is the safe
-default and the one to take whenever tagging is a judgement call.
+requirements — `requires_outdoors`, `outdoor_access`, `requires_open_flame`,
+`requires_full_kitchen` — and a room either affords them or it does not.
+Untagged means works anywhere, which is the safe default and the one to take
+whenever tagging is a judgement call.
+
+**Two of db/020's original five are gone, and the reason is the rule.** The list
+above read `requires_outdoors`, `requires_open_flame`, `requires_full_kitchen`,
+`noise_ceiling`, `deposit_safe` until db/039 cut the last two. Both were
+authored from the ROOM's side only — every environment had an affordance row,
+eight of them refusing, with notes in the house's voice — and nothing in the
+catalogue ever claimed either code, so the filter filtered nothing for its whole
+life. That is CLAUDE.md rule 15's remedy arm: unfed is wired or cut, and the
+tagging pass those two needed is a judgement about six hundred rows rather than
+a script's to make. db/020's argument for them, and the eight refusals
+themselves, are preserved in db/039. `outdoor_access` is the same lesson from
+the other direction: db/033 added the code without the matrix, and db/035 wired
+it rather than cutting it, because it had claimants waiting.
 
 The worked case: **a clambake in a studio apartment.** The boil-pot menu dies on
 `requires_outdoors`; NANTUCKET survives, because a destination is not a place;

@@ -3,14 +3,16 @@ import { notFound } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
 import { POOL_STATUS, money } from "@/lib/desk/labels";
+import { BANK_PER_PAGE, bankSequence } from "@/lib/desk/lists";
 import {
   requirementVocabulary,
   requirementsFor,
 } from "@/lib/desk/requirements";
+import { readReview, reviewPass } from "@/lib/desk/review";
 
 import styles from "../../../desk.module.css";
 import Thread from "../../Thread";
-import { Chips, Empty, Head, Seam, Status } from "../../bits";
+import { Chips, Empty, Head, Review, Seam, Status } from "../../bits";
 import BankForm, { type BankValues } from "../BankForm";
 import {
   attachIngredient,
@@ -43,7 +45,10 @@ export default async function BankItemPage({
 }: PageProps<"/desk/bank/[id]">) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const saved = (await searchParams).saved === "1";
+  const search = await searchParams;
+  const saved = search.saved === "1";
+  // The pass she is in, if any: this pool's filters and her place in them.
+  const carried = readReview(search);
 
   const item = await queryOne<Item>(
     `select b.id, b.slug::text as slug, b.world_id, b.kind::text as kind,
@@ -71,8 +76,12 @@ export default async function BankItemPage({
     requirements,
     vocabulary,
   ] = await Promise.all([
-    query<{ id: string; name: string }>(
-      `select id, name from world where status <> 'retired' order by name`
+    // `slug` as well as the name: the name fills the form's select, the slug is
+    // what the bank's destination filter matches on, and a pass has to resolve
+    // that filter exactly as the list screen did. src/lib/desk/lists.ts.
+    query<{ id: string; name: string; slug: string }>(
+      `select id, name, slug::text as slug from world
+        where status <> 'retired' order by name`
     ),
     // ONLY PRINTED CARDS ARE OFFERED, because only a printed card may be one —
     // db/031 enforces it from a trigger and refuses anything else by name. The
@@ -124,6 +133,25 @@ export default async function BankItemPage({
   const declared = new Set(requirements.map((row) => row.code));
   const undeclared = vocabulary.filter((kind) => !declared.has(kind.code));
 
+  // Asked only when a review is running, and asked LIVE: the sequence is
+  // recounted here rather than carried, so a line published off a drafts-only
+  // pass reports that it has left the list instead of pretending it has not.
+  const sequence = carried
+    ? await bankSequence(carried.search, {
+        destinations: destinations.map((row) => row.slug),
+        requirements: vocabulary.map((entry) => entry.code),
+      })
+    : [];
+  const pass = carried
+    ? reviewPass({
+        path: "/desk/bank",
+        ids: sequence,
+        id,
+        carried,
+        perPage: BANK_PER_PAGE,
+      })
+    : null;
+
   return (
     <>
       <Head eyebrow="The bank" title={item.name}>
@@ -133,11 +161,18 @@ export default async function BankItemPage({
         </Link>
       </Head>
 
+      {pass ? <Review pass={pass} noun="lines" /> : null}
+
       {saved ? <p className={styles.ok}>Saved.</p> : null}
 
       <div className={styles.panels}>
         <div>
-          <BankForm values={item} destinations={destinations} cards={cards} />
+          <BankForm
+            values={item}
+            carried={carried}
+            destinations={destinations}
+            cards={cards}
+          />
         </div>
         <div>
           {/*

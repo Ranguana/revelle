@@ -10,6 +10,7 @@ import {
   declareRequirement,
   requirementNamed,
 } from "@/lib/desk/requirements";
+import { carryReview } from "@/lib/desk/review";
 import { recordAction, requireStaff } from "@/lib/staff";
 
 /**
@@ -198,7 +199,8 @@ export async function saveBankItem(
 
   revalidatePath("/desk/bank");
   revalidatePath(`/desk/bank/${itemId}`);
-  redirect(`/desk/bank/${itemId}?saved=1`);
+  // Back into the review it was saved from, if there was one. See review.ts.
+  redirect(carryReview(form, `/desk/bank/${itemId}?saved=1`));
 }
 
 /** The one-click move from draft to offered, and back. Dishes' gesture exactly. */

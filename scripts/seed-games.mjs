@@ -17,8 +17,67 @@
  * ─────────────────────────────────────────────────────────────────────
  * WHAT IT WILL AND WILL NOT DO
  *
- *   · A game that does not exist is created as a DRAFT. Deciding that
- *     something is active is a curator's decision, not a script's.
+ *   · A game that does not exist is created LIVE, unless its own text carries
+ *     a founder-pending question — see THE HOLD-BACK below. The pool stocks
+ *     itself (db/038, CLAUDE.md rule 13) and the desk VETOES at /desk/stocked
+ *     rather than consents.
+ *
+ *     ── SUPERSEDED, AND KEPT WHOLE PER RULE 14 ──────────────────────
+ *
+ *     This bullet used to read "A game that does not exist is created as a
+ *     DRAFT. Deciding that something is active is a curator's decision, not a
+ *     script's", under the heading THIS SEEDER DID NOT CHANGE WHEN THE OTHERS
+ *     DID, AND THAT IS A DECISION. The argument was:
+ *
+ *       db/036 and rule 13 made pool content stock itself, and every other
+ *       pool seeder now creates live rows: dishes, drinks, menus, bank items.
+ *       Rule 13 names the classes it moved — "dishes, drinks, bank items,
+ *       menus, products and tracklists" — and the `game` TABLE is not among
+ *       them. What the rule's bank list calls "games" is `bank_kind = 'game'`,
+ *       a line in the atmosphere bank, not one of these: a `game` row carries
+ *       rules, bounds, runbook steps, contingencies and a host role, and it is
+ *       the only pool row a member is walked through live by somebody reading
+ *       it aloud. So it stays behind the old gate until the founder classifies
+ *       it, and the restraint is the point rather than caution. The rule
+ *       db/036 replaced was RIGHT ABOUT WHAT IT PROTECTED and wrong about its
+ *       SCOPE — it was written for destinations and applied to everything.
+ *       Reading the new rule wider than it was written would be the identical
+ *       mistake with the sign flipped. A game is either a pool class or it is
+ *       not, and that sentence belongs in rule 13 and a migration, not in an
+ *       inference made here.
+ *
+ *     THE INSTINCT TO STOP AND ASK WAS RIGHT AND THE OUTCOME IS REVERSED. The
+ *     founder answered the question rather than the reasoning, and what beat
+ *     it is a fact the argument above did not have — THE TWO-TABLE WRINKLE,
+ *     written down here because a future reader will otherwise re-derive it:
+ *
+ *       `bank_kind = 'game'` and the `game` table are the same product
+ *       category in two tables. The bank rows are the PHYSICAL GOODS — the
+ *       tombola kit, the dice cups, the printed card decks — and seed-bank has
+ *       been stocking them live since db/036. The `game` table is the PLAYABLE
+ *       CONTENT for the same games. Holding one and not the other put one
+ *       category under two publication regimes, and the shape of that bug is
+ *       specific: A MEMBER COULD RECEIVE THE SHIPPED KIT FOR A GAME WHOSE
+ *       RULES CONTENT SAT IN DRAFT. Nothing in either table would have said
+ *       so.
+ *
+ *     Rule 13 now carries the test that decides the next content type without
+ *     another stop-and-ask: POOL means selection CHOOSES AMONG rows, GOVERNED
+ *     means a row DEFINES WHAT A MEMBER CAN BE PROMISED. A game row is SHELF,
+ *     not WORLD — assembly selects among games, a room filters which are
+ *     eligible, a dealbreaker never touches one, and no voice depends on one.
+ *     The old bullet's true observation — that a game is walked through live
+ *     by somebody reading it aloud — is a fact about how a game is USED at a
+ *     party, not about whether the house may offer it, and those are different
+ *     questions.
+ *
+ *   · THE HOLD-BACK IS THE ROW'S OWN TEXT, exactly as the bank's is. A game
+ *     whose authored prose contains the founder-pending marker is created as a
+ *     DRAFT and gets no ledger entry, because nothing was offered. There is no
+ *     list of held slugs here or anywhere: a list is a thing that falls out of
+ *     date, and text cannot. NO GAME CARRIES THE MARKER TODAY — the mechanism
+ *     is in place before it is needed, which is the only order in which it can
+ *     be trusted. db/038 makes the same test in SQL over the same columns.
  *   · A game that already exists is LEFT ALONE — name, rules, bounds and all.
  *     A curator's edit in the tool outranks the module, and silently
  *     overwriting her work is the failure this house cares about most. What
@@ -40,9 +99,16 @@
  * Re-running with nothing changed does nothing at all. The whole run is one
  * transaction: a failure halfway leaves no half-seeded game.
  *
- * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL and is
- * deliberately not wired into a deploy: putting a game in the catalogue is a
- * decision.
+ * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL.
+ *
+ * IT IS IN THE DEPLOY CHAIN. This line used to end "and is deliberately not
+ * wired into a deploy: putting a game in the catalogue is a decision", which
+ * stopped being true when `npm run seed:games` was added to render.yaml's
+ * preDeployCommand — and CLAUDE.md rule 12 is about exactly the damage a
+ * seeder's own claim about the chain can do when it is wrong. It runs on every
+ * deploy and the games it creates are LIVE, which is the first bullet above.
+ * That second half also used to read "are drafts", and it is corrected rather
+ * than deleted for the same reason as everything else in this header.
 *
  * ── ONE ASYMMETRY, STATED SO IT IS NOT A SURPRISE ────────────────────
  *
@@ -53,9 +119,18 @@
  * BUT THE FLAG HAS NOTHING TO DO WITH STATUS, WHICH IS THE PART THAT MATTERS.
  * No seeder in this repo writes `status` on a row that already exists — not
  * one, checked across all five. `--overwrite` rewrites name, contents, season,
- * notes; `--activate` only touches rows the seeder itself just created. So
- * PUBLISHING IS ONE-WAY FOR EVERY POOL, and the only way back is a person
- * withdrawing a row by hand at the desk.
+ * notes; a status is written once, on the way in, and never again.
+ *
+ * The next two sentences used to read: "`--activate` only touches rows the
+ * seeder itself just created. So PUBLISHING IS ONE-WAY FOR EVERY POOL, and the
+ * only way back is a person withdrawing a row by hand at the desk." They are
+ * kept because CLAUDE.md rule 14 keeps a reversed argument, and they are now
+ * false in both halves for every pool INCLUDING this one: `--activate` is gone
+ * from seed:menus, seed:drinks and seed:dishes and is REFUSED BY NAME here,
+ * and /desk/stocked sends a run of auto-published rows back to draft in one
+ * gesture. This paragraph carried a third sentence for one round — "For GAMES
+ * both halves still hold, because this seeder still creates drafts" — which
+ * db/038 made false.
  *
  * An earlier version of this note said the asymmetry was about reversibility
  * and named the wrong scripts. It was wrong twice, and it is corrected here
@@ -66,6 +141,61 @@
 import pg from "pg";
 
 import { ALL_GAMES } from "../src/lib/games.ts";
+
+import {
+  HELD,
+  LIVE,
+  carriesFounderQuestion,
+  recordAutoPublish,
+  refuseActivateFlag,
+  stockingRun,
+} from "./catalogue-vocabulary.mjs";
+
+refuseActivateFlag("seed-games");
+
+/** One id for this run, so /desk/stocked can group what it put out. */
+const RUN = stockingRun();
+
+/**
+ * THE AUTHORED PROSE OF A GAME, as the columns that hold it.
+ *
+ * The hold-back reads every free-text column the seeder writes from the module
+ * — anywhere an author could plausibly put a question — and NOT the game's
+ * children. A runbook step, a contingency answer and a supply note are all
+ * prose too, but a step is not the game: holding a whole game back because one
+ * of its fourteen steps carries a question would be a different rule, and it
+ * is not this one.
+ *
+ * `name` and `slug` are excluded because they are identifiers, and
+ * `external_name` / `external_url` because they are somebody else's product.
+ *
+ * DB/038 MAKES THE SAME TEST OVER THE SAME COLUMNS and says so in its own
+ * prose. If a column joins or leaves this list, that migration's successor has
+ * to move with it, or a game the migration would hold is one the seeder
+ * offers.
+ */
+const PROSE = [
+  ["description", (g) => g.description],
+  ["how_it_works", (g) => g.howItWorks],
+  ["materials", (g) => g.materials],
+  ["scoring", (g) => g.scoring],
+  ["caveat", (g) => g.caveat],
+  ["source_note", (g) => g.sourceNote],
+  ["notes", (g) => g.notes],
+  ["host_note", (g) => g.runbook.hostNote],
+];
+
+/**
+ * Does this game carry a question with the founder's name on it?
+ *
+ * The same shape as scripts/seed-bank.mjs's `isHeldBack`, over this pool's own
+ * prose. No game in src/lib/games.ts carries the marker today; the mechanism
+ * exists before the first row that needs it, because a hold-back written on
+ * the day it is first needed is a hold-back written under pressure.
+ */
+function isHeldBack(game) {
+  return carriesFounderQuestion(PROSE.map(([, read]) => read(game)));
+}
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -137,6 +267,8 @@ try {
   // ── the games ──────────────────────────────────────────────────────
 
   const idBySlug = new Map();
+  let created = 0;
+  let heldBack = 0;
 
   for (const game of ALL_GAMES) {
     const { rows: existing } = await client.query(
@@ -146,7 +278,14 @@ try {
 
     let gameId;
     if (existing.length === 0) {
+      const held = isHeldBack(game);
       const { rows } = await client.query(
+        // THE PLACEHOLDERS RUN $1..$21 WITH NO GAP. `status` was the literal
+        // 'draft' until db/038 and is now bound like everything else, which is
+        // the moment a column list gets renumbered wrongly — see the note in
+        // scripts/seed-bank.mjs's insert, where exactly that left $7 skipped
+        // and the statement running off the end. src/lib/seed-binds.test.ts
+        // now checks this statement and every other one in the tree.
         `insert into game (
            slug, name, description, how_it_works, materials,
            shape, sourcing,
@@ -157,7 +296,7 @@ try {
            source_note, notes, host_role, host_note, status)
          values ($1,$2,$3,$4,$5,$6::game_shape,$7::game_sourcing,
                  $8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,
-                 $19::host_role,$20,'draft')
+                 $19::host_role,$20,$21::product_status)
          returning id`,
         [
           game.slug,
@@ -180,10 +319,32 @@ try {
           game.notes ?? null,
           game.runbook.hostRole,
           game.runbook.hostNote ?? null,
+          // The whole of the first bullet in one expression: the pool stocks
+          // itself, except where the row itself carries the founder's question.
+          held ? HELD : LIVE,
         ]
       );
       gameId = rows[0].id;
-      log(`created  ${game.slug} (draft, ${game.shape}, ${game.sourcing})`);
+      created += 1;
+      if (held) {
+        heldBack += 1;
+        log(
+          `held     ${game.slug} (draft, ${game.shape}, ${game.sourcing}) — ` +
+            `its own text carries a founder-pending question`
+        );
+      } else {
+        // In the same transaction as the row, so a game cannot go out with
+        // nothing in the ledger saying it did.
+        await recordAutoPublish(client, {
+          table: "game",
+          id: gameId,
+          name: game.name,
+          seeder: "seed-games",
+          run: RUN,
+          source: "src/lib/games.ts",
+        });
+        log(`created  ${game.slug} (live, ${game.shape}, ${game.sourcing})`);
+      }
     } else {
       gameId = existing[0].id;
       log(`exists   ${game.slug} — left as it is`);
@@ -499,6 +660,24 @@ try {
 
   await client.query("commit");
   log(`done. ${ALL_GAMES.length} games in the module.`);
+
+  if (created - heldBack > 0) {
+    console.log(
+      `\n${created - heldBack} game(s) went LIVE on this run. The pool stocks ` +
+        `itself (db/038); the desk\nis where that gets vetoed, not where it ` +
+        `gets approved. /desk/stocked lists this run\nand sends one game or ` +
+        `all ${created - heldBack} back to draft.`
+    );
+  }
+  if (heldBack > 0) {
+    console.log(
+      `\n${heldBack} game(s) stayed DRAFT because the row itself carries a ` +
+        `FOUNDER-PENDING question.\nThey are at /desk/publish, which is where ` +
+        `a question that has been answered gets\nsaid yes to. Removing the ` +
+        `question from src/lib/games.ts does NOT publish an\nexisting row: ` +
+        `no seeder here rewrites the status of a row it did not create.`
+    );
+  }
 } catch (err) {
   try {
     await client.query("rollback");

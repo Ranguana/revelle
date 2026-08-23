@@ -9,6 +9,15 @@ import {
   SEASONS,
 } from "@/lib/desk/labels";
 
+import {
+  DISH_FROM,
+  DISH_ORDER,
+  DISH_PER_PAGE,
+  POOL_STATUSES,
+  dishList,
+} from "@/lib/desk/lists";
+import { one, passHref } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setDishStatus } from "./actions";
@@ -61,28 +70,16 @@ type Row = {
   meals: string[];
 };
 
-const PER_PAGE = 100;
-
-const STATUSES = ["draft", "active", "discontinued"];
+/**
+ * THE FILTERS ARE NOT DECIDED HERE. src/lib/desk/lists.ts holds them, together
+ * with this table's FROM and ORDER BY, so that a review pass over this screen
+ * walks the sequence this screen is showing.
+ */
 
 const label = (
   list: readonly { code: string; label: string }[],
   code: string
 ) => list.find((entry) => entry.code === code)?.label ?? code;
-
-/** One value out of the query string, or "" — never a decision, only a read. */
-function one(value: string | string[] | undefined): string {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-/** A value that must be one of a closed set, or "" for "no filter". */
-function oneOf(
-  value: string | string[] | undefined,
-  allowed: readonly string[]
-): string {
-  const picked = one(value);
-  return allowed.includes(picked) ? picked : "";
-}
 
 export default async function DishesPage({
   searchParams,
@@ -94,56 +91,37 @@ export default async function DishesPage({
       where status <> 'retired' order by name`
   );
 
-  const q = one(params.q).slice(0, 80);
-  const destination = oneOf(
-    params.destination,
-    destinations.map((row) => row.slug)
-  );
-  const course = oneOf(params.course, COURSES.map((entry) => entry.code));
-  const making = oneOf(params.making, DISH_LEVELS.map((entry) => entry.code));
-  const season = oneOf(params.season, SEASONS.map((entry) => entry.code));
-  const meal = oneOf(params.meal, MEAL_SHAPES.map((entry) => entry.code));
-  const status = oneOf(params.status, STATUSES);
+  // Resolved once, in src/lib/desk/lists.ts. Every argument for what each
+  // control means travelled there with the code.
+  const list = dishList(params, {
+    destinations: destinations.map((row) => row.slug),
+  });
+  const q = list.value.q;
+  const destination = list.value.destination;
+  const course = list.value.course;
+  const making = list.value.making;
+  const season = list.value.season;
+  const meal = list.value.meal;
+  const status = list.value.status;
   const page = Math.max(1, Number(one(params.page)) || 1);
 
-  // Built as a list of (clause, value) pairs so that adding a filter is one
-  // line and cannot get the placeholder numbering wrong — which is the bug
-  // every hand-numbered dynamic WHERE eventually has.
-  const clauses: string[] = [];
-  const values: unknown[] = [];
-  const where = (sql: string, value: unknown) => {
-    values.push(value);
-    clauses.push(sql.replace("$?", `$${values.length}`));
-  };
+  const values = [...list.binds];
 
-  if (q) where("d.name ilike '%' || $? || '%'", q);
-  if (destination) where("$? = any(d.world_slugs)", destination);
-  if (course) where("d.course::text = $?", course);
-  if (making) where("d.making::text = $?", making);
-  if (season) where("d.season::text = $?", season);
-  // db/023, and the read is over the view's array rather than a join, so that
-  // "no claim means every shape" is visible in the query: an untagged dish is
-  // NOT matched by a shape filter, which is what a curator asking "what do I
-  // have for brunch" means — she is asking what was tagged.
-  if (meal) where("$? = any(m.meals)", meal);
-  if (status) where("d.status::text = $?", status);
-
-  const filter = clauses.length > 0 ? `where ${clauses.join(" and ")}` : "";
+  const filter = list.where;
 
   const [{ total, everything }] = await query<{
     total: string;
     everything: string;
   }>(
-    `select (select count(*) from dish_card d
-               join dish_meal_card m on m.id = d.id ${filter}) as total,
+    `select (select count(*) from ${DISH_FROM} ${filter}) as total,
             (select count(*) from dish_card) as everything`,
     values
   );
 
   const matched = Number(total);
-  const pages = Math.max(1, Math.ceil(matched / PER_PAGE));
+  const pages = Math.max(1, Math.ceil(matched / DISH_PER_PAGE));
   const current = Math.min(page, pages);
-  const offset = (current - 1) * PER_PAGE;
+  const offset = (current - 1) * DISH_PER_PAGE;
 
   const rows = await query<Row>(
     // Qualified on `d`, because both views carry an `id` and Postgres is right
@@ -152,11 +130,10 @@ export default async function DishesPage({
             d.making::text as making, d.season::text as season, d.season_note,
             d.season_strict, d.status::text as status, d.world_slugs, d.tags,
             m.meals
-       from dish_card d
-       join dish_meal_card m on m.id = d.id
+       from ${DISH_FROM}
        ${filter}
-      order by name
-      limit ${PER_PAGE} offset ${offset}`,
+      order by ${DISH_ORDER}
+      limit ${DISH_PER_PAGE} offset ${offset}`,
     values
   );
 
@@ -184,9 +161,9 @@ export default async function DishesPage({
     return search ? `/desk/dishes?${search}` : "/desk/dishes";
   };
 
-  const filtered = clauses.length > 0;
+  const filtered = list.filtered;
   const first = matched === 0 ? 0 : offset + 1;
-  const last = Math.min(offset + PER_PAGE, matched);
+  const last = Math.min(offset + DISH_PER_PAGE, matched);
 
   return (
     <>
@@ -286,7 +263,7 @@ export default async function DishesPage({
           className={styles.select}
         >
           <option value="">Any status</option>
-          {STATUSES.map((code) => (
+          {POOL_STATUSES.map((code) => (
             <option key={code} value={code}>
               {POOL_STATUS[code]}
             </option>
@@ -365,10 +342,22 @@ export default async function DishesPage({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row, seat) => (
               <TableRow key={row.id} status={row.status}>
                 <td>
-                  <Link href={`/desk/dishes/${row.id}`} className={styles.whoEmail}>
+                  {/*
+                    Into the review, carrying this view's filters and the place
+                    this row holds in the whole filtered set — not in this page,
+                    because a pass runs across pages.
+                  */}
+                  <Link
+                    href={passHref(
+                      `/desk/dishes/${row.id}`,
+                      list.search,
+                      offset + seat + 1
+                    )}
+                    className={styles.whoEmail}
+                  >
                     {row.name}
                   </Link>
                   {row.tags.length > 0 ? <Chips items={row.tags} /> : null}

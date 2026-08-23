@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { query, queryOne } from "@/lib/db";
 import { groupFacets, tagsFor, taggingVocabulary } from "@/lib/desk/facets";
 import { POOL_STATUS } from "@/lib/desk/labels";
+import { DISH_PER_PAGE, dishSequence } from "@/lib/desk/lists";
+import { readReview, reviewPass } from "@/lib/desk/review";
 
 import styles from "../../../desk.module.css";
 import Thread from "../../Thread";
-import { Head, Status } from "../../bits";
+import { Head, Review, Status } from "../../bits";
 import DishForm, { type DishValues } from "../DishForm";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +20,9 @@ export default async function DishPage({
 }: PageProps<"/desk/dishes/[id]">) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
-  const saved = (await searchParams).saved === "1";
+  const search = await searchParams;
+  const saved = search.saved === "1";
+  const carried = readReview(search);
 
   const dish = await queryOne<DishValues & { status: string; name: string }>(
     `select id, slug::text as slug, name, course::text as course,
@@ -32,8 +36,12 @@ export default async function DishPage({
   const [groups, tags, destinations, attached, meals] = await Promise.all([
     taggingVocabulary("dish").then(groupFacets),
     tagsFor("dish", id),
-    query<{ id: string; name: string }>(
-      `select id, name from world where status <> 'retired' order by name`
+    // `slug` too: the name fills the form's boxes, the slug is what the pool's
+    // destination filter matches on, and a pass has to resolve that filter
+    // exactly as the list screen did.
+    query<{ id: string; name: string; slug: string }>(
+      `select id, name, slug::text as slug from world
+        where status <> 'retired' order by name`
     ),
     // THE CLAIM, and not "everything that is not a veto". The box beside it
     // asks "which destinations was it written for", which is db/019's `native`
@@ -58,6 +66,24 @@ export default async function DishPage({
     (tag) => tag.dimension_code !== "season" && tag.dimension_code !== "making"
   );
 
+  // Asked live, and only during a review: the sequence is recounted here rather
+  // than carried, so a dish offered off a drafts-only pass reports that it has
+  // left the list instead of pretending it has not.
+  const sequence = carried
+    ? await dishSequence(carried.search, {
+        destinations: destinations.map((row) => row.slug),
+      })
+    : [];
+  const pass = carried
+    ? reviewPass({
+        path: "/desk/dishes",
+        ids: sequence,
+        id,
+        carried,
+        perPage: DISH_PER_PAGE,
+      })
+    : null;
+
   return (
     <>
       <Head eyebrow="The table" title={dish.name}>
@@ -67,12 +93,15 @@ export default async function DishPage({
         </Link>
       </Head>
 
+      {pass ? <Review pass={pass} noun="dishes" /> : null}
+
       {saved ? <p className={styles.ok}>Saved.</p> : null}
 
       <div className={styles.panels}>
         <div>
           <DishForm
             values={dish}
+            carried={carried}
             groups={groups}
             selected={handTags.map((tag) => tag.facet_id)}
             weights={handTags.map((tag) => [tag.facet_id, tag.weight] as const)}

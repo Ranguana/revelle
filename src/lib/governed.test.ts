@@ -17,8 +17,12 @@ import { test } from "node:test";
  *
  * So db/036 split them:
  *
- *   POOL CLASSES stock themselves — dish, drink, bank_item, menu, product,
- *   tracklist — and the desk vetoes rather than consents.
+ *   POOL CLASSES stock themselves — dish, drink, bank_item, menu, game,
+ *   product, tracklist — and the desk vetoes rather than consents. `game`
+ *   joined a round late (db/038): rule 13 did not name the table, and what
+ *   settled it was that `bank_kind = 'game'` — the shipped kit for the same
+ *   game — was already stocking itself, so one product category sat under two
+ *   publication regimes.
  *
  *   GOVERNED CLASSES stay founder-signed — `world` (a destination, its gesture)
  *   and `world_voice` (how the house speaks). Each is a claim about a world or

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { query } from "@/lib/db";
 import { MIXING_LEVELS, POOL_STATUS, SEASONS } from "@/lib/desk/labels";
 
+import { statusSearch } from "@/lib/desk/lists";
+import { passHref } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Status, StatusLegend, rowClass } from "../bits";
 import { setDrinkStatus } from "./actions";
@@ -90,11 +93,16 @@ export default async function DrinksPage({
         </Empty>
       ) : (
         <ul className={styles.rows}>
-          {rows.map((row) => (
+          {rows.map((row, seat) => (
             <li key={row.id} className={rowClass(row.status)}>
               <div className={styles.who}>
+                {/* Into the review, carrying this view and this row's place. */}
                 <Link
-                  href={`/desk/drinks/${row.id}`}
+                  href={passHref(
+                    `/desk/drinks/${row.id}`,
+                    statusSearch(filter),
+                    seat + 1
+                  )}
                   className={styles.whoEmail}
                 >
                   {row.name}
@@ -146,7 +154,14 @@ export default async function DrinksPage({
                     {row.status === "active" ? "Withdraw" : "Offer it"}
                   </button>
                 </form>
-                <Link href={`/desk/drinks/${row.id}`} className={styles.filter}>
+                <Link
+                  href={passHref(
+                    `/desk/drinks/${row.id}`,
+                    statusSearch(filter),
+                    seat + 1
+                  )}
+                  className={styles.filter}
+                >
                   Open
                 </Link>
               </div>

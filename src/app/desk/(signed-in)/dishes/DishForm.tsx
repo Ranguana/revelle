@@ -11,7 +11,10 @@ import {
   SEASONS,
 } from "@/lib/desk/labels";
 
+import type { Carried } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
+import { ReviewFields } from "../bits";
 import FacetPicker from "../FacetPicker";
 import { saveDish, type DishState } from "./actions";
 
@@ -52,6 +55,7 @@ export default function DishForm({
   destinations,
   attached,
   meals,
+  carried,
 }: {
   values: DishValues;
   groups: readonly FacetGroup[];
@@ -61,6 +65,8 @@ export default function DishForm({
   attached: readonly string[];
   /** db/023's meal_shape codes this dish claims. Empty means every shape. */
   meals: readonly string[];
+  /** the review this save must land back inside, if one is running */
+  carried?: Carried | null;
 }) {
   const [state, action, pending] = useActionState(saveDish, INITIAL);
   const isAttached = new Set(attached);
@@ -69,6 +75,8 @@ export default function DishForm({
   return (
     <form action={action} className={`${styles.form} ${styles.formWide}`}>
       {values.id ? <input type="hidden" name="id" value={values.id} /> : null}
+      {/* So that saving mid-review does not end the review. See review.ts. */}
+      <ReviewFields carried={carried ?? null} />
       {state.error ? <p className={styles.error}>{state.error}</p> : null}
 
       <div className={styles.grid2}>

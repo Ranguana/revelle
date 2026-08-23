@@ -9,10 +9,20 @@ import {
   shipsWord,
 } from "@/lib/desk/labels";
 import {
+  BANK_FROM,
+  BANK_ORDER,
+  BANK_PER_PAGE,
+  NEEDS_NOTHING,
+  POOL_STATUSES,
+  SHIPPING,
+  bankList,
+} from "@/lib/desk/lists";
+import {
   requirementVocabulary,
   requirementsForMany,
   type CarriedRequirement,
 } from "@/lib/desk/requirements";
+import { one, passHref } from "@/lib/desk/review";
 
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Seam, Status, StatusLegend, TableRow } from "../bits";
@@ -106,29 +116,13 @@ type Destination = {
   venue_requirement_demand: string | null;
 };
 
-const PER_PAGE = 100;
-
-const STATUSES = ["draft", "active", "discontinued"];
-
 /**
- * The requirement filter's one value that is not a requirement code.
- *
- * "Only the ones that need nothing" is a real question — it is how a curator
- * finds the lines that survive any room — and it cannot be asked with a code,
- * because the answer is the ABSENCE of a row. It is a sentinel rather than a
- * code for the same reason `bank_venue`'s `none` had to go: there is no row
- * that says "works anywhere", only no row at all.
- *
- * A code from `structural_requirement` can never collide with it: db/020's
- * codes are lower-case identifiers and this is not one.
+ * THE FILTERS ARE NOT DECIDED HERE. src/lib/desk/lists.ts holds them, together
+ * with this table's FROM and ORDER BY, because a review pass over this screen
+ * has to walk the sequence this screen is showing — the same filters, the same
+ * order, asked once. `NEEDS_NOTHING` and `SHIPPING` moved there with them; the
+ * arguments for both are at their new home.
  */
-const NEEDS_NOTHING = "-none";
-
-/** The two answers the `ships` filter can give, as words rather than a boolean. */
-const SHIPPING = [
-  { code: "ships", label: "Only what ships", value: true },
-  { code: "owned", label: "Only owned-if-present", value: false },
-];
 
 const label = (
   list: readonly { code: string; label: string }[],
@@ -166,20 +160,6 @@ function Needs({ needs }: { needs?: readonly CarriedRequirement[] }) {
   );
 }
 
-/** One value out of the query string, or "" — never a decision, only a read. */
-function one(value: string | string[] | undefined): string {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-/** A value that must be one of a closed set, or "" for "no filter". */
-function oneOf(
-  value: string | string[] | undefined,
-  allowed: readonly string[]
-): string {
-  const picked = one(value);
-  return allowed.includes(picked) ? picked : "";
-}
-
 export default async function BankPage({
   searchParams,
 }: PageProps<"/desk/bank">) {
@@ -202,78 +182,29 @@ export default async function BankPage({
     requirementVocabulary(),
   ]);
 
-  const q = one(params.q).slice(0, 80);
-  const destination = oneOf(
-    params.destination,
-    destinations.map((row) => row.slug)
-  );
-  const kind = oneOf(params.kind, BANK_KINDS.map((entry) => entry.code));
-  const phase = oneOf(params.phase, BANK_PHASES.map((entry) => entry.code));
-  const needs = oneOf(params.needs, [
-    NEEDS_NOTHING,
-    ...vocabulary.map((entry) => entry.code),
-  ]);
-  const shipping = oneOf(params.ships, SHIPPING.map((entry) => entry.code));
-  const status = oneOf(params.status, STATUSES);
+  // Resolved once, in src/lib/desk/lists.ts, so that a review pass over this
+  // screen walks the sequence this screen shows. Every argument for what each
+  // control means — the phase sentinel, the requirement sentinel, why a grade
+  // is not widened into its lesser one — travelled there with the code.
+  const list = bankList(params, {
+    destinations: destinations.map((row) => row.slug),
+    requirements: vocabulary.map((entry) => entry.code),
+  });
+  const q = list.value.q;
+  const destination = list.value.destination;
+  const kind = list.value.kind;
+  const phase = list.value.phase;
+  const needs = list.value.needs;
+  const shipping = list.value.ships;
+  const status = list.value.status;
   const page = Math.max(1, Number(one(params.page)) || 1);
 
-  // (clause, value) pairs, so that adding a filter is one line and cannot get
-  // the placeholder numbering wrong — the bug every hand-numbered dynamic WHERE
-  // eventually has. Lifted from /desk/dishes deliberately.
-  const clauses: string[] = [];
-  const values: unknown[] = [];
-  /** A clause with no value of its own. Only "needs nothing" is one. */
-  const clause = (sql: string) => clauses.push(sql);
-  const where = (sql: string, value: unknown) => {
-    values.push(value);
-    clause(sql.replace("$?", `$${values.length}`));
-  };
+  const values = [...list.binds];
 
-  if (q) where("b.name ilike '%' || $? || '%'", q);
-  if (destination) where("w.slug::text = $?", destination);
-  if (kind) where("b.kind::text = $?", kind);
-  // A phase filter of "no opinion" asks for the rows that make no claim, which
-  // is a real question and not the same as "any phase" — that is the empty
-  // filter above it in the select.
-  if (phase) where("b.phase::text = $?", phase);
-  // WHAT IT NEEDS OF THE ROOM — an EXISTS over db/020's polymorphic side table
-  // rather than a column comparison, because that is where the answer lives
-  // after db/033. The sentinel is the mirror question: the rows that carry no
-  // requirement at all, which is the pool that survives any room.
-  //
-  // The filter matches the tag a row actually carries and does not widen a
-  // grade into its lesser one. Asking for `outdoor_access` therefore does NOT
-  // return the rows tagged `requires_outdoors`, even though anything that
-  // satisfies the harder one satisfies the softer. That is deliberate: this
-  // screen is for finding what a curator TAGGED, and a filter that silently
-  // returned rows she did not tag would be the bridge db/033 removed, rebuilt
-  // in the desk. The note on the screen says so.
-  if (needs === NEEDS_NOTHING) {
-    clause(`not exists (select 1 from ingredient_requirement r
-                         where r.entity_table = 'bank_item'
-                           and r.entity_id = b.id)`);
-  } else if (needs) {
-    where(
-      `exists (select 1 from ingredient_requirement r
-                where r.entity_table = 'bank_item'
-                  and r.entity_id = b.id
-                  and r.requirement = $?)`,
-      needs
-    );
-  }
-  if (shipping) {
-    where(
-      "b.ships = $?",
-      SHIPPING.find((entry) => entry.code === shipping)?.value ?? true
-    );
-  }
-  if (status) where("b.status::text = $?", status);
-
-  const filter = clauses.length > 0 ? `where ${clauses.join(" and ")}` : "";
+  const filter = list.where;
 
   const counted = await query<{ total: string; everything: string }>(
-    `select (select count(*) from bank_item b
-               join world w on w.id = b.world_id ${filter}) as total,
+    `select (select count(*) from ${BANK_FROM} ${filter}) as total,
             (select count(*) from bank_item) as everything`,
     values
   );
@@ -282,9 +213,9 @@ export default async function BankPage({
   // shape they arrived in.
   const matched = Number(counted[0]?.total ?? 0);
   const everything = Number(counted[0]?.everything ?? 0);
-  const pages = Math.max(1, Math.ceil(matched / PER_PAGE));
+  const pages = Math.max(1, Math.ceil(matched / BANK_PER_PAGE));
   const current = Math.min(page, pages);
-  const offset = (current - 1) * PER_PAGE;
+  const offset = (current - 1) * BANK_PER_PAGE;
 
   const rows = await query<Row>(
     `select b.id, b.slug::text as slug, b.name, b.description,
@@ -295,12 +226,11 @@ export default async function BankPage({
             c.id as card_id, c.name as card_name,
             (select count(*) from bank_item_ingredient i
               where i.bank_item_id = b.id) as ingredients
-       from bank_item b
-       join world w on w.id = b.world_id
+       from ${BANK_FROM}
        left join bank_item c on c.id = b.technique_card_id
        ${filter}
-      order by w.name, b.kind, b.name
-      limit ${PER_PAGE} offset ${offset}`,
+      order by ${BANK_ORDER}
+      limit ${BANK_PER_PAGE} offset ${offset}`,
     values
   );
 
@@ -335,9 +265,9 @@ export default async function BankPage({
     return search ? `/desk/bank?${search}` : "/desk/bank";
   };
 
-  const filtered = clauses.length > 0;
+  const filtered = list.filtered;
   const first = matched === 0 ? 0 : offset + 1;
-  const last = Math.min(offset + PER_PAGE, matched);
+  const last = Math.min(offset + BANK_PER_PAGE, matched);
   const house = destinations.find((row) => row.slug === destination) ?? null;
 
   return (
@@ -475,7 +405,7 @@ export default async function BankPage({
           className={styles.select}
         >
           <option value="">Any status</option>
-          {STATUSES.map((code) => (
+          {POOL_STATUSES.map((code) => (
             <option key={code} value={code}>
               {POOL_STATUS[code]}
             </option>
@@ -564,10 +494,24 @@ export default async function BankPage({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row, seat) => (
               <TableRow key={row.id} status={row.status}>
                 <td>
-                  <Link href={`/desk/bank/${row.id}`} className={styles.whoEmail}>
+                  {/*
+                    Into the review, not just into the row: what travels is this
+                    view's filters and the place this line holds in them, so
+                    Next is the next line of THIS pool and not of a default one.
+                    Its place counts from the first row of the whole filtered
+                    set, not of this page — a pass runs across pages.
+                  */}
+                  <Link
+                    href={passHref(
+                      `/desk/bank/${row.id}`,
+                      list.search,
+                      offset + seat + 1
+                    )}
+                    className={styles.whoEmail}
+                  >
                     {row.name}
                   </Link>
                   <div className={styles.when}>

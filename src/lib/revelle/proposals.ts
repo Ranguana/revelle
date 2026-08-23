@@ -64,13 +64,43 @@ export type Queryable = {
 /**
  * Every pool the engine can place, and where an approved pick lands.
  *
- * A fixed constant of this module — the values never come from a request, and
- * `pool` arriving from the database is FK'd to `ingredient_pool` and is looked
- * up in this map rather than interpolated, so an unregistered pool is an
- * exception here instead of an identifier in a statement. Same argument
- * src/lib/selection/catalogue.ts makes for the read side.
+ * ── THE ARGUMENT THIS KEEPS, AND THE HALF OF IT THAT WAS WRONG ───────
  *
- * Adding a sixth pool is one entry, exactly as it is there.
+ * It read, verbatim (CLAUDE.md rule 14):
+ *
+ *     A fixed constant of this module — the values never come from a request,
+ *     and `pool` arriving from the database is FK'd to `ingredient_pool` and
+ *     is looked up in this map rather than interpolated, so an unregistered
+ *     pool is an exception here instead of an identifier in a statement. Same
+ *     argument src/lib/selection/catalogue.ts makes for the read side.
+ *
+ *     Adding a sixth pool is one entry, exactly as it is there.
+ *
+ * The first paragraph stands and is still why `poolSpec` exists: a value FK'd
+ * to a registry is not the same thing as a value safe to concatenate, and the
+ * lookup is what converts one into the other.
+ *
+ * The last sentence is the one CLAUDE.md rule 19 reverses. "Adding a pool is
+ * one entry" is exactly the shape of a list that lies in wait — it is correct
+ * until the migration runs and then wrong WITHOUT BEING BROKEN. The list had
+ * already gone stale twice over: `dish` (db/021) and `bank_item` (db/031) were
+ * both registered pools with join tables, and neither was here. Both are now.
+ *
+ * ── WHY THIS ONE STAYS A MAP AND `portal/picks.ts` DID NOT ───────────
+ *
+ * Because what is looked up here is not WHICH POOLS EXIST — the registry
+ * settles that, and every reader of this map is already handed a pool that
+ * came out of `revelle_proposal_pick.pool`, which is FK'd to it. What is
+ * looked up is the column holding the sentence a curator reads, and that is a
+ * fact about authoring rather than about the schema: a menu's line of dishes
+ * IS the thing (db/012), a drink has two authored lines on one row (db/017),
+ * and a dish has no description column at all because the plate is the
+ * sentence (db/021). src/lib/portal/picks.ts makes the same split for the same
+ * reason and its essay is the long version.
+ *
+ * So the loud form here is `poolSpec` rather than a registry loop, and rule
+ * 19's requirement is met by making sure NOTHING SLIPS PAST IT — see the note
+ * on `readPicks` below, which is where a missing entry used to be swallowed.
  */
 const POOLS: readonly {
   pool: string;
@@ -83,15 +113,28 @@ const POOLS: readonly {
   { pool: "tracklist", table: "tracklist", describe: "description" },
   { pool: "menu", table: "menu", describe: "dishes" },
   { pool: "drink", table: "drink", describe: "cocktails" },
+  // db/021's pool. `describe` is the dish's own NAME: there is no description
+  // column and db/021 declines to add one, because the plate is the sentence.
+  { pool: "dish", table: "dish", describe: "name" },
+  // db/031's atmosphere pool — goods, host acts, games and printed cards.
+  { pool: "bank_item", table: "bank_item", describe: "description" },
 ];
 
+/**
+ * The pool, or a named failure.
+ *
+ * The only door onto POOLS, and both the read and the write path go through it
+ * so the two cannot come to disagree about which pools this module handles.
+ */
 function poolSpec(pool: string): (typeof POOLS)[number] {
   const spec = POOLS.find((entry) => entry.pool === pool);
   if (!spec) {
     throw new Error(
       `pool ${JSON.stringify(pool)} is not one this module knows how to ` +
         `materialise. Add it to POOLS in src/lib/revelle/proposals.ts, the ` +
-        `same entry src/lib/selection/catalogue.ts needs.`
+        `same entry src/lib/selection/catalogue.ts needs, and the entry ` +
+        `RENDERING in src/lib/portal/picks.ts needs before anything issued ` +
+        `into it can reach a member.`
     );
   }
   return spec;
@@ -448,6 +491,23 @@ export async function readProposals(
  * A union over the pool registry rather than five round trips, and the pool
  * list is this module's constant — never a value from a request — which is what
  * makes composing the identifiers safe in the one way that matters.
+ *
+ * ── THE SILENT HALF, NOW CLOSED ──────────────────────────────────────
+ *
+ * `n` is a LEFT join and its miss coalesces to "(no longer in the catalogue)".
+ * That sentence is right for the case it was written for — an ingredient
+ * retired out from under a proposal nobody has decided yet — and it was a LIE
+ * for the case nobody thought of: a pick from a pool simply absent from POOLS
+ * printed the same words, and the row was in the catalogue the whole time,
+ * offered and live. A curator reading that would reject a good proposal for a
+ * reason that does not exist.
+ *
+ * So every pool that comes back is put through `poolSpec` before anything is
+ * built from it. Same door as the write path, same named error. A pool this
+ * module cannot read is now a failure at the desk — which is the house's own
+ * surface, where a failure is a thing somebody can fix — instead of a
+ * plausible sentence on a screen. CLAUDE.md rule 16: refuse it, drop it
+ * visibly, or honour it; never take it in quietly.
  */
 async function readPicks(
   db: Queryable,
@@ -477,6 +537,10 @@ async function readPicks(
 
   const out = new Map<string, ProposalPick[]>();
   for (const row of rows) {
+    // Throws by name on a pool POOLS does not carry. See the note above: the
+    // alternative is this row rendering as "(no longer in the catalogue)"
+    // about an ingredient that is sitting in the catalogue, live.
+    poolSpec(str(row.pool));
     const key = str(row.proposal_id);
     const list = out.get(key) ?? [];
     list.push({
@@ -646,6 +710,14 @@ export async function approve(
       // install_revelle_ingredients() builds in db/002. Both halves come from
       // POOLS above — a constant of this module, never a request — which is
       // what makes composing them into a statement safe.
+      //
+      // SAFE IS NOT THE SAME AS COMPLETE, which is CLAUDE.md rule 19's point
+      // and the reason `poolSpec` is called on the line above rather than the
+      // map being indexed. A pool missing from POOLS cannot silently write
+      // nothing here: it raises, inside the transaction, and the approval
+      // rolls back whole. That is the loud form this path needs — a Revelle
+      // materialised minus one of its pools is the same silent thinning the
+      // portal read was fixed for, one table upstream.
       `insert into revelle_${spec.table}
          (revelle_id, ${spec.table}_id, slot, slot_code, position)
        values ($1, $2, $3::section_kind, $4, $5)

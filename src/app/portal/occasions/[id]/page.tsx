@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireMember } from "@/lib/members";
-import { readOccasion } from "@/lib/portal/occasions";
+import { readOccasion, type Occasion } from "@/lib/portal/occasions";
+import { UnrenderableIngredients } from "@/lib/portal/picks";
 import { inHouseOrder, inWords, longDate } from "@/lib/portal/sections";
 import { themeCss } from "@/lib/tokens";
 
@@ -56,7 +57,41 @@ export default async function OccasionPage({
   const member = await requireMember();
   const { id } = await params;
 
-  const occasion = await readOccasion(member.id, id);
+  /*
+   * THE ONE FAILURE THIS PAGE IS ALLOWED TO KNOW ABOUT.
+   *
+   * `readPicks` reads every pool the registry knows about, and it raises when
+   * a pool held rows of hers that it could not turn into anything readable —
+   * CLAUDE.md rule 19, and the essay at the top of src/lib/portal/picks.ts.
+   * The query is the only place that failure is still visible; one statement
+   * further on, a row nothing could read and a row that never existed are the
+   * same absence. So detection lives there and TRANSLATION lives here, because
+   * this is the only file that knows who is standing in front of it.
+   *
+   * Caught BY TYPE and nothing else. A bare try/catch around this call would
+   * be a blanket that turns every future bug in the read into the same calm
+   * page, which is the failure mode rule 16 is about — anything else rethrows
+   * and breaks as loudly as it should.
+   *
+   * This is not the empty-state branch the header above forbids. That rule is
+   * about a PIECE she did not receive, and it is untouched: a slot the pool
+   * could not fill still renders as nothing at all, silently, for ever. This
+   * branch is about the whole occasion being UNREADABLE, and it is the same
+   * judgement `memberRevelle()` already makes when it throws on a blocked
+   * candidate rather than handing over something thinner.
+   */
+  let occasion: Occasion | null;
+  try {
+    occasion = await readOccasion(member.id, id);
+  } catch (err) {
+    if (!(err instanceof UnrenderableIngredients)) throw err;
+    // WHAT THE HOUSE SEES. The pool names, the counts and the revelle id, on
+    // the server, where the desk and the Render log can find it — and nowhere
+    // near her screen. Everything below this line is written for her instead.
+    console.error(`[portal] ${err.message}`);
+    return <Withheld />;
+  }
+
   // Not hers, not openable, or not there. One answer for all three: there is
   // nothing here to acknowledge the existence of.
   if (!occasion) notFound();
@@ -297,6 +332,51 @@ export default async function OccasionPage({
         </div>
       </main>
     </>
+  );
+}
+
+/**
+ * WHAT SHE SEES WHEN HER PACKAGE CANNOT BE READ WHOLE.
+ *
+ * Not a stack trace, not an error code, not a list of what is missing — and
+ * not the usual page with the unreadable parts quietly dropped out of it,
+ * which is the whole thing being prevented. docs/selection-spec.md's slot
+ * minimums exist so a member never receives silently thinned goods; showing
+ * her "what we could read" would deliver that harm anyway, and she would plan
+ * an evening around it.
+ *
+ * So she is told the truth at the altitude that concerns her: this is not
+ * ready, it is not her doing, the house already knows, and nothing is lost.
+ * It names no pool and no count, because which pool failed is house work and
+ * the wall in src/lib/selection/member.ts does not thin for a bad day.
+ *
+ * Unthemed on purpose. The destination's palette is painted from the row this
+ * page could not finish reading, and guessing at it would be the same class of
+ * mistake one shade smaller. The house's own tokens are the honest ground.
+ */
+function Withheld() {
+  return (
+    <main className={styles.page}>
+      <div className={styles.inner}>
+        <header className={styles.masthead}>
+          <Link className={styles.back} href="/portal">
+            Revelle Société
+          </Link>
+        </header>
+
+        <div className={styles.rule} aria-hidden="true" />
+
+        <h1 className={styles.name}>Not ready to open.</h1>
+        <p className={styles.tagline}>
+          Something in this one is not right, and the house would rather show
+          you nothing than show you a version of it with pieces missing.
+        </p>
+        <p className={styles.premise}>
+          Nothing has been lost and there is nothing for you to do. It has been
+          raised with us already. Everything else on your shelf is unaffected.
+        </p>
+      </div>
+    </main>
   );
 }
 

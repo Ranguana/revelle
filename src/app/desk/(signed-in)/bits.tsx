@@ -1,3 +1,7 @@
+import Link from "next/link";
+
+import { AT, REVIEW, type Carried, type Pass } from "@/lib/desk/review";
+
 import styles from "../desk.module.css";
 
 /**
@@ -221,6 +225,97 @@ export function Head({
 
 export function Empty({ children }: { children: React.ReactNode }) {
   return <p className={styles.empty}>{children}</p>;
+}
+
+/**
+ * WHERE SHE IS IN A REVIEW, AND THE TWO STEPS OUT OF IT.
+ *
+ * The pager's shape, deliberately: Previous, a count, Next, in the same row of
+ * small caps every list already ends with. A review is paging through rows
+ * instead of paging through pages, so it should not look like a second idea.
+ *
+ * ── A BOUNDARY IS INERT TEXT, NOT A DEAD LINK ───────────────────────
+ *
+ * The first row has no Previous and the last has no Next, and neither wraps —
+ * wrapping is how one row gets judged twice while another is missed, with
+ * nothing on the screen to say which happened. The word still occupies its
+ * place, greyed, so the other control does not slide under the cursor between
+ * one row and the next. It is a <span>, for the reason /desk/bank's pager
+ * gives: `aria-disabled` on an anchor is a lie a screen reader repeats, because
+ * the link still navigates.
+ *
+ * ── AND THE LINE UNDERNEATH ─────────────────────────────────────────
+ *
+ * Only drawn when something has happened that the count cannot say. The common
+ * one is not exotic: on a pass filtered to drafts, publishing the row in front
+ * of her removes it from the list she is walking. Saying so, and pointing Next
+ * at the row that took its place, is the honest version of what an automatic
+ * jump would have done silently. See the head of src/lib/desk/review.ts.
+ */
+export function Review({ pass, noun }: { pass: Pass; noun: string }) {
+  const note = pass.adrift
+    ? pass.total === 0
+      ? "Nothing matches those filters any more."
+      : pass.next
+        ? `No longer in this list. You were at ${pass.wasAt ?? "—"} of them, and Next is the row that has taken that place.`
+        : "No longer in this list, and it was the last of them."
+    : pass.capped
+      ? `More than ${pass.total} match. This pass walks the first ${pass.total}; narrowing the filters reaches the rest.`
+      : null;
+
+  return (
+    <>
+      <div className={styles.filters}>
+        {pass.previous ? (
+          <Link href={pass.previous} className={styles.filter}>
+            Previous
+          </Link>
+        ) : (
+          <span className={`${styles.filter} ${styles.filterOff}`}>Previous</span>
+        )}
+        <span className={styles.hint}>
+          {pass.position
+            ? `${pass.position} of ${pass.total} ${noun}`
+            : pass.total === 0
+              ? "nothing matches now"
+              : `no longer among these ${pass.total} ${noun}`}
+        </span>
+        {pass.next ? (
+          <Link href={pass.next} className={styles.filter}>
+            Next
+          </Link>
+        ) : (
+          <span className={`${styles.filter} ${styles.filterOff}`}>Next</span>
+        )}
+        <Link href={pass.list} className={styles.filter}>
+          Back to the list
+        </Link>
+      </div>
+      {note ? <p className={styles.hint}>{note}</p> : null}
+    </>
+  );
+}
+
+/**
+ * The pass, as two hidden fields, so a save lands back inside it.
+ *
+ * Every form that redirects after saving needs these, and its action needs
+ * `carryReview`. Without the pair the strip vanishes the first time she edits
+ * anything, which is the moment a review is most likely to be under way.
+ *
+ * Not a server component — the catalogue forms are client components and this
+ * is two inputs with no state, so it compiles into either graph.
+ */
+export function ReviewFields({ carried }: { carried: Carried | null }) {
+  if (!carried) return null;
+  return (
+    <>
+      <input type="hidden" name={REVIEW} value={carried.search} />
+      {carried.at !== null ? (
+        <input type="hidden" name={AT} value={String(carried.at)} />
+      ) : null}
+    </>
+  );
 }
 
 /**

@@ -32,11 +32,31 @@
  * is right and it is not being weakened here: this is the curator saying yes,
  * in one place, out loud, with a record of what it touched.
  *
- * seed:menus, seed:drinks and seed:dishes each take `--activate`, which applies
- * only to rows THEY create. seed:games has no such flag and never had one, and
- * a destination's status is not something any seeder sets at all. So "activate
- * everything" was three different gestures and one impossibility. This is the
- * missing one.
+ * WHAT THAT PARAGRAPH USED TO BE FOLLOWED BY, kept because CLAUDE.md rule 14
+ * keeps a reversed argument rather than deleting it:
+ *
+ *   "seed:menus, seed:drinks and seed:dishes each take `--activate`, which
+ *    applies only to rows THEY create. seed:games has no such flag and never
+ *    had one, and a destination's status is not something any seeder sets at
+ *    all. So 'activate everything' was three different gestures and one
+ *    impossibility. This is the missing one."
+ *
+ * NONE OF THOSE THREE FLAGS EXISTS ANY MORE. db/036 and CLAUDE.md rule 13 made
+ * pool content stock itself: a dish, drink, menu or bank item a seeder creates
+ * is live on the way in and lands in `staff_action` under `auto:
+ * pool-stocking`, and the founder VETOES at /desk/stocked rather than
+ * consenting. The old rule was right about what it protected — a world, a
+ * voice — and wrong about its scope, which is why it still governs `world` and
+ * `world_voice` word for word and nothing else.
+ *
+ * So this script has almost nothing left to move in the pools, and that is
+ * success rather than obsolescence. What it still does is the part that was
+ * always the point: the destinations, under the voice rule below, plus the few
+ * rows a person drafted by hand or a seeder held back on a founder-pending
+ * question. It is the shell-side twin of /desk/publish and calls the same
+ * functions, which is the only reason it may still exist (CLAUDE.md rule 9: the
+ * database is unreachable from a laptop, so this is a Render-shell gesture and
+ * the screen is the one a curator can actually reach).
  *
  * ── THE ONE RULE THAT IS NOT NEGOTIABLE ──────────────────────────────
  *
@@ -60,11 +80,15 @@
  *
  * ── AND ONE-WAY ──────────────────────────────────────────────────────
  *
- * No seeder in this repository can undo what this does. `--activate` only ever
- * touches rows a seeder creates; `--overwrite` (menus, drinks, dishes) lets the
- * file beat a curator's edit on the WORDS and writes no status at all. The way
- * back is by hand, one row at a time, at the desk. See IRREVERSIBLE in
- * src/lib/desk/publish.ts, where that claim is checked against all four.
+ * No seeder in this repository can undo what this does. No seeder writes a
+ * status on a row that already exists; `--overwrite` (menus, drinks, dishes)
+ * lets the file beat a curator's edit on the WORDS and writes no status at
+ * all. The way back is by hand, one row at a time, at the desk. See
+ * IRREVERSIBLE in src/lib/desk/publish.ts, where that claim is checked against
+ * every seeder — and where the ONE asymmetry is argued: a row a SEEDER offered
+ * without asking goes back in bulk at /desk/stocked, because a veto has to be
+ * as cheap as the act it answers. A row this script or that screen published
+ * does not, because somebody decided it.
  */
 
 import pg from "pg";

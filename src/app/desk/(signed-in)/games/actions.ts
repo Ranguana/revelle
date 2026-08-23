@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { query, queryOne } from "@/lib/db";
 import { setTags, validFacetIds } from "@/lib/desk/facets";
 import { slugify } from "@/lib/desk/labels";
+import { carryReview } from "@/lib/desk/review";
 import { recordAction, requireStaff } from "@/lib/staff";
 
 /**
@@ -240,7 +241,8 @@ export async function saveGame(
 
   revalidatePath("/desk/games");
   revalidatePath(`/desk/games/${gameId}`);
-  redirect(`/desk/games/${gameId}?saved=1`);
+  // Back into the review it was saved from, if there was one. See review.ts.
+  redirect(carryReview(form, `/desk/games/${gameId}?saved=1`));
 }
 
 /**
@@ -283,7 +285,9 @@ export async function setGameStatus(form: FormData): Promise<void> {
       summary: `${before.name} refused → ${status}`,
       detail: { status, refusal: words },
     });
-    redirect(`/desk/games/${id}?refused=${encodeURIComponent(words)}`);
+    redirect(
+      carryReview(form, `/desk/games/${id}?refused=${encodeURIComponent(words)}`)
+    );
   }
 
   await recordAction(staff, {

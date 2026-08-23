@@ -3,7 +3,6 @@
  * Put the authored dishes into the database.
  *
  *   npm run seed:dishes
- *   npm run seed:dishes -- --activate    also move new dishes to 'active'
  *   npm run seed:dishes -- --overwrite   let the file beat the curator's edits
  *
  * The sibling of scripts/seed-menus.mjs and scripts/seed-drinks.mjs,
@@ -95,14 +94,35 @@
  * BUT THE FLAG HAS NOTHING TO DO WITH STATUS, WHICH IS THE PART THAT MATTERS.
  * No seeder in this repo writes `status` on a row that already exists — not
  * one, checked across all five. `--overwrite` rewrites name, contents, season,
- * notes; `--activate` only touches rows the seeder itself just created. So
- * PUBLISHING IS ONE-WAY FOR EVERY POOL, and the only way back is a person
- * withdrawing a row by hand at the desk.
+ * notes; a status is written once, on the way in, and never again.
  *
- * An earlier version of this note said the asymmetry was about reversibility
- * and named the wrong scripts. It was wrong twice, and it is corrected here
- * rather than deleted because the distinction it missed — words are revertible,
- * offered-ness is not — is the one worth knowing.
+ * WHAT THIS PARAGRAPH USED TO END WITH, kept because it was the thing worth
+ * knowing and because CLAUDE.md rule 14 says a reversed decision keeps its
+ * argument:
+ *
+ *   "`--activate` only touches rows the seeder itself just created. So
+ *    PUBLISHING IS ONE-WAY FOR EVERY POOL, and the only way back is a person
+ *    withdrawing a row by hand at the desk."
+ *
+ *   (And before that, an earlier version said the asymmetry was about
+ *    reversibility and named the wrong scripts. It was wrong twice. The
+ *    distinction it missed — words are revertible, offered-ness is not — is
+ *    the one worth knowing.)
+ *
+ * BOTH HALVES OF THAT ARE NOW FALSE FOR THIS POOL, and it is worth being exact
+ * about which part lost. `--activate` is gone (db/036, CLAUDE.md rule 13): a
+ * dish this seeder creates is LIVE on the way in, because nobody reads 372
+ * dishes to decide whether a dish may exist. And publishing is no longer
+ * one-way — /desk/stocked lists what a seeder put out, run by run, and sends
+ * one row or a whole run back to draft in a click. The founder vetoes; she no
+ * longer consents.
+ *
+ * What did NOT change is the sentence the old rule was really protecting, which
+ * still governs `world` and `world_voice` word for word: deciding that a
+ * DESTINATION is offered is a curator's decision and not a script's. This
+ * seeder can create a draft stub for a destination and it still cannot publish
+ * one — see the stub note at the end of the run, and src/lib/governed.test.ts,
+ * which fails the build if it tries.
 
  */
 import { readFileSync } from "node:fs";
@@ -112,16 +132,23 @@ import pg from "pg";
 
 import {
   DESTINATIONS,
+  LIVE,
   MEALS,
   SEASONS,
   SEASON_NARROWED,
   ensureWorld,
+  recordAutoPublish,
+  refuseActivateFlag,
+  stockingRun,
 } from "./catalogue-vocabulary.mjs";
 
 const SOURCE = fileURLToPath(new URL("../docs/dishes.md", import.meta.url));
 
-const activate = process.argv.includes("--activate");
+refuseActivateFlag("seed-dishes");
 const overwrite = process.argv.includes("--overwrite");
+
+/** One id for this run, so /desk/stocked can group what it put out. */
+const RUN = stockingRun();
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -630,11 +657,24 @@ try {
           dish.seasonNote,
           dish.seasonStrict,
           dish.sourceNote,
-          activate ? "active" : "draft",
+          // Live on the way in. A dish is an ingredient, not a world; the
+          // argument is in the asymmetry note at the top of this file and in
+          // db/036, and the veto is at /desk/stocked.
+          LIVE,
         ]
       );
       dishId = rows[0].id;
       created += 1;
+      // In the same transaction as the row, so a dish cannot go out with
+      // nothing in the ledger saying it did.
+      await recordAutoPublish(client, {
+        table: "dish",
+        id: dishId,
+        name: dish.name,
+        seeder: "seed-dishes",
+        run: RUN,
+        source: "docs/dishes.md",
+      });
     } else {
       dishId = existing[0].id;
       const row = existing[0];
@@ -778,9 +818,11 @@ if (stubbed.length > 0) {
   );
 }
 
-if (!activate && created > 0) {
+if (created > 0) {
   console.log(
-    `\n${created} dish(es) are drafts. Offering one is a decision: activate ` +
-      `them at the desk, or re-run with --activate.`
+    `\n${created} dish(es) went LIVE on this run. The pool stocks itself ` +
+      `(db/036); the desk\nis where that gets vetoed, not where it gets ` +
+      `approved. /desk/stocked lists this run\nand sends one dish or all ` +
+      `${created} back to draft.`
   );
 }

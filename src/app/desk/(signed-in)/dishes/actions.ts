@@ -12,6 +12,7 @@ import {
   SEASONS,
   slugify,
 } from "@/lib/desk/labels";
+import { carryReview } from "@/lib/desk/review";
 import { recordAction, requireStaff } from "@/lib/staff";
 
 /**
@@ -214,7 +215,8 @@ export async function saveDish(
 
   revalidatePath("/desk/dishes");
   revalidatePath(`/desk/dishes/${dishId}`);
-  redirect(`/desk/dishes/${dishId}?saved=1`);
+  // Back into the review it was saved from, if there was one. See review.ts.
+  redirect(carryReview(form, `/desk/dishes/${dishId}?saved=1`));
 }
 
 export async function setDishStatus(form: FormData): Promise<void> {

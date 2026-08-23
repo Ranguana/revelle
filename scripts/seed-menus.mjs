@@ -3,7 +3,6 @@
  * Put the authored menus into the database.
  *
  *   npm run seed:menus
- *   npm run seed:menus -- --activate    also move new menus to 'active'
  *   npm run seed:menus -- --overwrite   let the file beat the curator's edits
  *
  * ─────────────────────────────────────────────────────────────────────
@@ -24,9 +23,24 @@
  * ─────────────────────────────────────────────────────────────────────
  * WHAT IT WILL AND WILL NOT DO
  *
- *   · A menu that does not exist is created as a DRAFT. Deciding that
- *     something is offered is a curator's decision, not a script's — exactly
- *     the rule seed-destinations.mjs states. `--activate` is how you say yes.
+ *   · A menu that does not exist is created LIVE, and this line used to say
+ *     the opposite. What it said, kept whole because CLAUDE.md rule 14 says a
+ *     reversed decision keeps its argument:
+ *
+ *       "A menu that does not exist is created as a DRAFT. Deciding that
+ *        something is offered is a curator's decision, not a script's —
+ *        exactly the rule seed-destinations.mjs states. `--activate` is how
+ *        you say yes."
+ *
+ *     That rule was RIGHT ABOUT WHAT IT PROTECTED and wrong about its scope.
+ *     It was written when the only content in the house was destinations, and
+ *     seed-destinations.mjs still states it, unchanged, because a destination
+ *     is an authored world and a menu is a list of four dishes. Holding both
+ *     behind one signature left the whole catalogue in a queue nobody could
+ *     clear. db/036 and CLAUDE.md rule 13 split the two: pool content stocks
+ *     itself and the founder VETOES it at /desk/stocked, one row or a whole
+ *     run, instead of consenting to it one row at a time. `--activate` is
+ *     gone, and refused by name rather than ignored.
  *   · A menu that already exists is LEFT ALONE and any difference is REPORTED.
  *     A curator's edit at the desk outranks the file. `--overwrite` reverses
  *     that, deliberately and only when asked.
@@ -61,14 +75,21 @@ import pg from "pg";
 
 import {
   DESTINATIONS,
+  LIVE,
   SEASONS,
   ensureWorld,
+  recordAutoPublish,
+  refuseActivateFlag,
+  stockingRun,
 } from "./catalogue-vocabulary.mjs";
 
 const SOURCE = fileURLToPath(new URL("../docs/menus.md", import.meta.url));
 
-const activate = process.argv.includes("--activate");
+refuseActivateFlag("seed-menus");
 const overwrite = process.argv.includes("--overwrite");
+
+/** One id for this run, so /desk/stocked can group what it put out. */
+const RUN = stockingRun();
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -290,14 +311,23 @@ try {
           menu.seasonStrict,
           menu.cooking,
           menu.cookingNote,
-          activate ? "active" : "draft",
+          // Live on the way in — see the second bullet at the top of this file.
+          LIVE,
         ]
       );
       menuId = rows[0].id;
       created += 1;
-      console.log(
-        `[seed-menus] created  ${slug} ${activate ? "(active)" : "(draft)"} — ${menu.name}`
-      );
+      // In the same transaction as the row, so a menu cannot go out with
+      // nothing in the ledger saying it did.
+      await recordAutoPublish(client, {
+        table: "menu",
+        id: menuId,
+        name: menu.name,
+        seeder: "seed-menus",
+        run: RUN,
+        source: "docs/menus.md",
+      });
+      console.log(`[seed-menus] created  ${slug} (live) — ${menu.name}`);
     } else {
       menuId = existing[0].id;
       const row = existing[0];
@@ -393,9 +423,11 @@ if (stubbed.length > 0) {
       `npm run seed:destinations, which completes a stub in place.`
   );
 }
-if (!activate && created > 0) {
+if (created > 0) {
   console.log(
-    `\n${created} menu(s) are drafts. Offering one is a decision: activate ` +
-      `them at the desk, or re-run with --activate.`
+    `\n${created} menu(s) went LIVE on this run. The pool stocks itself ` +
+      `(db/036); the desk\nis where that gets vetoed, not where it gets ` +
+      `approved. /desk/stocked lists this run\nand sends one menu or all ` +
+      `${created} back to draft.`
   );
 }

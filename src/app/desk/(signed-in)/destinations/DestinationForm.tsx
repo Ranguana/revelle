@@ -4,10 +4,12 @@ import { useActionState } from "react";
 
 import type { FacetGroup } from "@/lib/desk/facets";
 import { OCCASIONS, optionLabel } from "@/lib/desk/labels";
+import type { Carried } from "@/lib/desk/review";
 import { HOUSE } from "@/lib/tokens";
 
 import styles from "../../desk.module.css";
 import FacetPicker from "../FacetPicker";
+import { ReviewFields } from "../bits";
 import { saveDestination, type DestinationState } from "./actions";
 
 /**
@@ -79,11 +81,14 @@ export default function DestinationForm({
   groups,
   selected,
   weights,
+  carried,
 }: {
   values: DestinationValues;
   groups: readonly FacetGroup[];
   selected: readonly string[];
   weights?: readonly (readonly [string, string])[];
+  /** the review this save must land back inside, if one is running */
+  carried?: Carried | null;
 }) {
   const [state, action, pending] = useActionState(saveDestination, INITIAL);
 
@@ -95,6 +100,8 @@ export default function DestinationForm({
   return (
     <form action={action} className={`${styles.form} ${styles.formWide}`}>
       {values.id ? <input type="hidden" name="id" value={values.id} /> : null}
+      {/* So that saving mid-review does not end the review. See review.ts. */}
+      <ReviewFields carried={carried ?? null} />
       {state.error ? <p className={styles.error}>{state.error}</p> : null}
 
       <div className={styles.grid2}>

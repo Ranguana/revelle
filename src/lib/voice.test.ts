@@ -114,10 +114,15 @@ test("the question asks for the tones, and asks for them the way it says", () =>
   assert.equal(field.layout, "tiles");
   assert.equal(field.quiet, true, "a browsed field must not count out loud");
   assert.equal(field.max, 7, "the ceiling is seven; see db/007");
+  // THE SHIPPED TONES, NOT ALL OF THEM. Drafts are words waiting for their
+  // rooms and are filtered off the page (src/lib/quiz.ts, CLAUDE.md rule 16);
+  // "no draft tone reaches the quiz" below asserts that boundary in both
+  // directions. Counting against TONES.length would fail the moment a
+  // fourteenth draft is coined, which is a correct state of the world.
   assert.equal(
     field.options.length,
-    TONES.length,
-    "the page and the vocabulary disagree about how many tones there are"
+    ALL.filter((t) => !t.draft).length,
+    "the page and the vocabulary disagree about how many SHIPPED tones there are"
   );
   for (const option of field.options) {
     assert.ok(TONE_CODES.has(option.code), `${option.code} is not a tone`);
@@ -350,13 +355,71 @@ test("every tone is claimed by at least one destination", () => {
       `tap on nothing: ${orphans.join(", ")}`
   );
 
-  // A draft tone must not be shown to a host. It has no destination to reach.
-  const shown = ALL.filter((t) => t.draft && claimed.has(t.code)).map((t) => t.code);
+  // A draft whose room has arrived is no longer a draft, and the flag has to be
+  // cleared or the assertion above stops covering it.
+  //
+  // THIS USED TO CARRY THE COMMENT "A draft tone must not be shown to a host",
+  // WHICH IT DOES NOT CHECK. It compares drafts against DESTINATION_TONES —
+  // what the library claims — and the quiz surface is a different list
+  // entirely, so the rule the comment stated was asserted nowhere and thirteen
+  // draft tones rendered as blank tiles for as long as the flag existed. The
+  // comment is corrected to what this assertion does; the rule it named is
+  // asserted below, against the surface it is about. CLAUDE.md rule 16: an
+  // input the system does not honour must be refused where the person is
+  // standing, and a test that describes a rule it does not check is the same
+  // failure one layer up.
+  const claimedDrafts = ALL.filter((t) => t.draft && claimed.has(t.code)).map(
+    (t) => t.code
+  );
+  assert.deepEqual(
+    claimedDrafts,
+    [],
+    `these are still marked draft but a destination now claims them — clear ` +
+      `the flag so the assertion above covers them: ${claimedDrafts.join(", ")}`
+  );
+});
+
+/**
+ * A DRAFT TONE IS NOT SHOWN TO A HOST — asserted against the quiz itself.
+ *
+ * The rule this states is CLAUDE.md rule 16's own worked example: a draft tile
+ * has no mark, so it renders blank; no destination claims it, so it can win
+ * nothing; and no migration gives it a facet row, so `quiz_response_facet`'s
+ * inner join drops the answer. Every one of those failures is silent, and the
+ * host has spent one of seven taps.
+ *
+ * It is asserted HERE and not in the quiz's own tests because the draft flag
+ * lives in this file's vocabulary, and the day somebody coins a fourteenth
+ * draft this is the file they are already in.
+ */
+test("no draft tone reaches the quiz", () => {
+  const field = QUIZ_STEPS.flatMap((step) => step.fields).find(
+    (f) => f.id === "voice_tones"
+  ) as MultiField | undefined;
+  assert.ok(field, "the voice question has gone missing");
+
+  const offered = new Set(field.options.map((o) => o.code));
+  const drafts = ALL.filter((t) => t.draft).map((t) => t.code);
+
+  const shown = drafts.filter((code) => offered.has(code));
   assert.deepEqual(
     shown,
     [],
-    `these are still marked draft but a destination now claims them — clear ` +
-      `the flag so the assertion above covers them: ${shown.join(", ")}`
+    `these tones are marked draft and are on the page. A host can tap them, ` +
+      `they render without a mark, no destination claims them and nothing ` +
+      `resolves them: ${shown.join(", ")}`
+  );
+
+  // And the other direction, so the filter cannot be over-eager: everything
+  // that is NOT a draft is offered. A shipped tone missing from the page is a
+  // destination nobody can reach.
+  const missing = ALL.filter((t) => !t.draft && !offered.has(t.code)).map(
+    (t) => t.code
+  );
+  assert.deepEqual(
+    missing,
+    [],
+    `these tones ship and are not on the page: ${missing.join(", ")}`
   );
 });
 

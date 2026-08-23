@@ -15,18 +15,46 @@
  * of them.
  *
  * ─────────────────────────────────────────────────────────────────────
- * 1. THERE IS NO `--activate`, AND THAT IS NOT AN OVERSIGHT
+ * 1. THE HOLD-BACK IS THE ROW'S OWN TEXT, NOT A FLAG AND NOT A QUEUE
  *
- * Every other pool seeder has one. This one does not, on the founder's
- * instruction for this drop, verbatim:
+ * THE OLD RULE, KEPT WHOLE. This section used to be headed "THERE IS NO
+ * `--activate`, AND THAT IS NOT AN OVERSIGHT", and it read:
  *
- *   "Everything is created as status = 'draft'. No exceptions."
+ *   "Every other pool seeder has one. This one does not, on the founder's
+ *    instruction for this drop, verbatim: 'Everything is created as
+ *    status = draft. No exceptions.' The bank is a brainstorm consolidated in
+ *    one pass; nothing in it has been costed, sourced or legally read, and
+ *    three of its lines are open questions with the founder's name on them.
+ *    CLAUDE.md rule 8 already says activation is a human gesture — here the
+ *    flag is absent as well, so that not even a typo in a deploy can offer a
+ *    draft to a member. Activation happens at the desk."
  *
- * The bank is a brainstorm consolidated in one pass; nothing in it has been
- * costed, sourced or legally read, and three of its lines are open questions
- * with the founder's name on them. CLAUDE.md rule 8 already says activation is
- * a human gesture — here the flag is absent as well, so that not even a typo in
- * a deploy can offer a draft to a member. Activation happens at the desk.
+ * WHAT BEAT IT, AND WHAT DID NOT. db/036 and CLAUDE.md rule 13 make bank items
+ * a POOL CLASS: they stock themselves on deploy and the founder vetoes at
+ * /desk/stocked rather than consenting row by row. Rule 8 was right about what
+ * it protected — a world, a voice, a claim about how the house speaks — and
+ * wrong about its scope. 180 rows sat behind a signature that adds nothing,
+ * because nobody reads 180 party favours to decide whether a party favour may
+ * exist.
+ *
+ * BUT THE REAL ARGUMENT IN THAT PARAGRAPH SURVIVES INTACT, and it is the last
+ * sentence of it: three of these lines are OPEN QUESTIONS WITH THE FOUNDER'S
+ * NAME ON THEM. Those do not go live, and the way they are held back is the
+ * part worth reading twice:
+ *
+ *   AN ITEM CARRYING A FOUNDER-PENDING QUESTION STAYS DRAFT, AND IT KNOWS WHO
+ *   IT IS BECAUSE SECTION 7 BELOW WROTE THE QUESTION INTO ITS DESCRIPTION.
+ *
+ * There is no second list of held-back slugs anywhere — not in this file, not
+ * in a table, not in db/036, which does the same thing with the same test
+ * (`description not like '%FOUNDER-PENDING%'`). A list would be a thing that
+ * falls out of date the day somebody edits the ledger; the marker cannot,
+ * because it IS the content. Answer the question, remove the marker from the
+ * row at the desk, and the item becomes ordinary — that is the whole mechanism.
+ *
+ * `--activate` is still absent, and is now REFUSED BY NAME rather than silently
+ * ignored: it did nothing here before and it would do nothing now, and a flag
+ * that silently means nothing is worse than one that says so and exits.
  *
  * ─────────────────────────────────────────────────────────────────────
  * 2. `--dry-run` EXISTS BECAUSE THE DATABASE IS UNREACHABLE
@@ -150,7 +178,18 @@ import { fileURLToPath } from "node:url";
 
 import pg from "pg";
 
-import { DESTINATIONS, ROOM_HEADINGS, ensureWorld } from "./catalogue-vocabulary.mjs";
+import {
+  DESTINATIONS,
+  FOUNDER_PENDING,
+  HELD,
+  LIVE,
+  ROOM_HEADINGS,
+  carriesFounderQuestion,
+  ensureWorld,
+  recordAutoPublish,
+  refuseActivateFlag,
+  stockingRun,
+} from "./catalogue-vocabulary.mjs";
 
 const SOURCE = fileURLToPath(
   new URL("../docs/atmosphere-idea-bank-v1.md", import.meta.url)
@@ -159,8 +198,33 @@ const SOURCE_NAME = "docs/atmosphere-idea-bank-v1.md";
 const DISHES_DOC = fileURLToPath(new URL("../docs/dishes.md", import.meta.url));
 const DRINKS_DOC = fileURLToPath(new URL("../docs/drinks.md", import.meta.url));
 
+refuseActivateFlag("seed-bank");
 const dryRun = process.argv.includes("--dry-run");
 const overwrite = process.argv.includes("--overwrite");
+
+/** One id for this run, so /desk/stocked can group what it put out. */
+const RUN = stockingRun();
+
+/**
+ * Does this row carry a question with the founder's name on it?
+ *
+ * The same test db/036 makes in SQL (`description not like '%FOUNDER-PENDING%'`)
+ * and it must stay the same test: the migration cleared the backlog with it and
+ * this seeder holds new rows with it, so a divergence would mean a row that the
+ * migration would have held and the seeder offers.
+ *
+ * THE MARKER ITSELF USED TO BE A `const` RIGHT HERE, and it moved to
+ * scripts/catalogue-vocabulary.mjs when seed-games became the second pool that
+ * needed it (db/038). The argument for spelling it once did not change — it is
+ * the only hold-back list there is and it lives in the content rather than
+ * beside it, per section 1 — it just now has two readers instead of one.
+ *
+ * Section 7 writes it into the description of every item a ledger entry names,
+ * which is why only `description` is read here.
+ */
+function isHeldBack(row) {
+  return carriesFounderQuestion(row.description);
+}
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -344,6 +408,168 @@ const PHASE_WORDS = [
 
 /** Time words the document uses that PHASE_WORDS does not map. Reported. */
 const TIME_WORDS = /\bdawn\b|\bmidnight\b|\bdusk\b|\bsundown\b|\bafternoon\b|\bnine o'clock\b|\b2 a\.m\.\b|\blate-phase\b/i;
+
+/**
+ * PHASE RULINGS — the few rows whose phase a PERSON decided, not the document.
+ *
+ * PHASE_WORDS above reads the words she wrote. This table is the other source,
+ * and it exists because a ROOM can change after the document was written while
+ * the document stays exactly as it was. `docs/atmosphere-idea-bank-v1.md` is a
+ * v1 and is not edited to make a seeder come out right — it is the record of
+ * what was said in one pass, and rewriting the record to move a tag would
+ * destroy the only evidence of what the tag was derived FROM.
+ *
+ * So: derivation stays honest, and a ruling sits beside it in the open, named,
+ * dated, and printed on every run. Two authorities, never one pretending to be
+ * the other.
+ *
+ * ── WHY THERE ARE THREE OF THEM, AND WHY THEY ARE TAHITI'S ───────────
+ *
+ * TAHITI WIDENED. The founder's ruling of 2026-08-23 (recorded against
+ * `tahiti.starts` and the Tahiti premise cell in data/destination-matrix.json)
+ * turns the room from an evening party into an AFTERNOON-THROUGH-MORNING ARC:
+ * it now begins in daylight and runs until morning. The staging arc formally
+ * gains the daylight phase. `bank_phase` has carried `daylight` since db/031,
+ * so nothing about the schema changed — only which value is true.
+ *
+ * The founder named three items by hand: the blossom bowl, the lei craft, the
+ * floated flowers. All three are things MADE, ARRANGED OR FLOATED WHILE THE SUN
+ * IS UP — the daylight is not a circumstance they tolerate, it is what they
+ * are. The rest of Tahiti's twelve rows are left alone and the reason is in
+ * the report: "could happen in daylight" is not the test, and rule 13 means a
+ * retag here reaches a member on the next deploy with nobody in between.
+ *
+ * ── WHAT THIS TABLE CANNOT SAY, SAID PLAINLY ─────────────────────────
+ *
+ * `bank_item.phase` is ONE VALUE PER ROW — a scalar `bank_phase` column in
+ * db/031, not an array and not a join table. "Include daylight" is therefore
+ * expressible only as a REPLACEMENT. That is harmless for all three rows here
+ * and only because all three read `all`, which db/031 glosses as NO OPINION
+ * rather than "every phase": replacing no-opinion with daylight destroys no
+ * claim, it makes one where none stood.
+ *
+ * It would NOT be harmless for a row that already says `dusk`. Tahiti has one
+ * of those — `tahiti-the-conch-blown-at-dusk` — and it is deliberately not in
+ * this table. See the report section, and db/034: the conch at dusk is the
+ * room's gesture. Anything that wants to be daylight AND dusk at once needs a
+ * schema change, and it does not get invented here.
+ *
+ * ── THE HINGE DOES NOT MOVE ──────────────────────────────────────────
+ *
+ * The turn of Tahiti's evening is the torches lit in full daylight — "torches
+ * that go up one at a time long before anybody is hungry", the room's tagline
+ * and premise in src/lib/destinations.ts. The founder ruled it unaltered and
+ * unmoved by the widening. No row below touches it: Tahiti carries no candle
+ * or torch bank item at all (the NEW CONTENT CLASSES candle-surface line in the
+ * source document lists eleven rooms and Tahiti is not one of them), so the
+ * hinge lives in the destination record where the widening left it.
+ *
+ * `was` is not decoration. It is the derivation this ruling is overruling, and
+ * it is asserted rather than assumed: if the document ever gains a phase word
+ * for one of these lines, the premise of the ruling has changed and the run
+ * FAILS instead of quietly winning the argument.
+ */
+const PHASE_RULINGS = [
+  {
+    slug: "tahiti-blossom-bowl-of-single-tiare-tuberose",
+    was: "all",
+    phase: "daylight",
+    why:
+      "A bowl of single blossoms, arranged, with the left/taken-right/looking " +
+      "lore riding on a card beside it. It is arranged in the light and it is " +
+      "read in the light.",
+  },
+  {
+    slug: "tahiti-lei-making-kit",
+    was: "all",
+    phase: "daylight",
+    why:
+      "The craft the founder named: needle, thread, blossoms, an opt-in table " +
+      "of people making things. Threading a lei is daylight work and the room " +
+      "now has an afternoon to do it in.",
+  },
+  {
+    slug: "tahiti-floated-blossoms",
+    was: "all",
+    phase: "daylight",
+    why:
+      "Blossoms floated on water, which is a thing done while the sun is up " +
+      "and seen while the sun is up.",
+  },
+];
+
+/**
+ * Tahiti rows the widened arc did NOT reach, and why — printed on every run.
+ *
+ * This list is as much of the ruling as the one above it. "Where it is
+ * obvious" was the founder's own qualifier, and a table of retags with no
+ * record of what was considered and declined reads, six months from now, as
+ * though nothing else was considered at all.
+ */
+const PHASE_RULINGS_DECLINED = [
+  {
+    slug: "tahiti-the-conch-blown-at-dusk",
+    phase: "dusk",
+    why:
+      "Not a daylight item and never was. The conch at dusk is the room's " +
+      "GESTURE (db/034) and the line that calls dinner; `dusk` here is the " +
+      "founder's own words in the source document, not an artefact of the old " +
+      "evening-only arc. Widening the arc added an afternoon in front of this " +
+      "moment; it did not move the moment.",
+  },
+  {
+    slug: "tahiti-single-flower-or-shell-leis",
+    phase: "all",
+    why:
+      "The lei CRAFT was named. The finished leis were not, and a lei is worn " +
+      "at whatever hour it is handed over. A question for the founder rather " +
+      "than a guess.",
+  },
+  {
+    slug: "tahiti-lore-card",
+    phase: "all",
+    why:
+      "Rides with the blossom bowl, which is now daylight — but a printed card " +
+      "is read whenever it is picked up, and following a parent row's tag is " +
+      "inference, not evidence (CLAUDE.md rule 3). Left `all`, and flagged: a " +
+      "daylight bowl with a no-opinion card is a real question about whether " +
+      "an attachment should inherit a phase at all.",
+  },
+  {
+    slug: "tahiti-kui-method-technique-card",
+    phase: "all",
+    why: "Rides with the lei-making kit. Same reasoning as the lore card.",
+  },
+  {
+    slug: "tahiti-star-kit",
+    phase: "all",
+    why:
+      "\"What's overhead\" is if anything a DARK line, and the widened arc is " +
+      "no licence to tag it — nobody ruled on it. Left at NO OPINION.",
+  },
+  {
+    slug: "tahiti-the-conch",
+    phase: "all",
+    why: "An object that lives on her shelf afterwards. It has no hour.",
+  },
+  {
+    slug: "tahiti-banana-leaf-runner",
+    phase: "all",
+    why:
+      "Laid on the table and there for the whole party. Could be laid in " +
+      "daylight; so could most of the room. Not obvious.",
+  },
+  {
+    slug: "tahiti-half-coconut-bowls",
+    phase: "all",
+    why: "Serving vessels, in use from the first plate to the last. Not obvious.",
+  },
+  {
+    slug: "tahiti-monoi-as-object",
+    phase: "all",
+    why: "An object on a surface, with no hour of its own.",
+  },
+];
 
 /**
  * VENUE, FROM THE TAG AND NOTHING ELSE.
@@ -1167,7 +1393,11 @@ for (const entry of LEDGER) {
     why: entry.why ?? null,
   };
   if (entry.match) {
-    const flag = `FOUNDER-PENDING — ${authored.text.trim()} (${SOURCE_NAME}, FOUNDER-PENDING LEDGER ${entry.n}.)`;
+    // The marker and the hold-back are the SAME STRING, on purpose: what
+    // section 1 calls "the row knows who it is" is this constant appearing in
+    // the description, and `isHeldBack`, beside that constant, is the only
+    // test there is.
+    const flag = `${FOUNDER_PENDING} — ${authored.text.trim()} (${SOURCE_NAME}, ${FOUNDER_PENDING} LEDGER ${entry.n}.)`;
     for (const phrase of entry.match) {
       const needle = phrase.toLowerCase();
       const found = items.filter(
@@ -1262,6 +1492,51 @@ for (const item of items) {
 }
 
 const allRows = [...cardRows, ...items];
+
+/* ── the phase rulings, applied once, over the finished rows ────────── */
+
+// After the slugs exist and before anything is reported or written, so that
+// every later reader — the report, the dry run, the insert, the `differs`
+// comparison against what is already in the database — sees one phase per row
+// and not a derived value that something downstream quietly corrects.
+for (const ruling of PHASE_RULINGS) {
+  const row = allRows.find((candidate) => candidate.slug === ruling.slug);
+  if (!row) {
+    fail(
+      `the phase ruling for "${ruling.slug}" names a row this document no ` +
+        `longer produces. A ruling about a row that does not exist is a ` +
+        `ruling nobody can see is dead — reword it or remove it, but it does ` +
+        `not get to sit here looking applied.`
+    );
+  }
+  if (row.phase !== ruling.was) {
+    fail(
+      `the phase ruling for "${ruling.slug}" overrules a derived phase of ` +
+        `'${ruling.was}' and the document now derives '${row.phase}'. The ` +
+        `ruling's premise has changed: decide again with a person, rather ` +
+        `than letting the table win an argument it was not given.`
+    );
+  }
+  row.phase = ruling.phase;
+}
+
+for (const declined of PHASE_RULINGS_DECLINED) {
+  const row = allRows.find((candidate) => candidate.slug === declined.slug);
+  if (!row) {
+    fail(
+      `the declined-ruling note for "${declined.slug}" names a row this ` +
+        `document no longer produces. The declines are the other half of the ` +
+        `ruling and go stale the same way the retags do.`
+    );
+  }
+  if (row.phase !== declined.phase) {
+    fail(
+      `"${declined.slug}" is recorded as LEFT AT '${declined.phase}' by the ` +
+        `widened-arc ruling and now reads '${row.phase}'. Something retagged ` +
+        `a row the ruling declined to retag.`
+    );
+  }
+}
 
 /* ── the report ─────────────────────────────────────────────────────── */
 
@@ -1377,6 +1652,35 @@ function report() {
     console.log(`   WHY: a sentence that belongs to no labelled block. Not swallowed into the block above it.`);
   }
 
+  section("PHASE RULINGS — TAHITI'S WIDENED ARC");
+  console.log(
+    `\nTahiti became an AFTERNOON-THROUGH-MORNING arc by founder ruling on ` +
+      `2026-08-23.\nThe room now begins in daylight, so items whose whole ` +
+      `character is daylight are\nsaid so outright instead of carrying the ` +
+      `NO OPINION the evening-only room left\nthem with. db/040 makes the ` +
+      `same three changes to rows already in the database.\n` +
+      `\nThe hinge is UNMOVED: the torches go up in full daylight, as they ` +
+      `always did.\nIt lives on the destination record, not in the bank — no ` +
+      `row below can shift it.`
+  );
+  console.log(`\nRETAGGED (${PHASE_RULINGS.length})`);
+  for (const ruling of PHASE_RULINGS) {
+    console.log(`   ${ruling.slug}: ${ruling.was} -> ${ruling.phase}`);
+    console.log(`      ${ruling.why}`);
+  }
+  console.log(`\nLEFT ALONE (${PHASE_RULINGS_DECLINED.length})`);
+  for (const declined of PHASE_RULINGS_DECLINED) {
+    console.log(`   ${declined.slug}: stays ${declined.phase}`);
+    console.log(`      ${declined.why}`);
+  }
+  console.log(
+    `\n   "Where it is obvious" was the founder's qualifier and the LEFT ` +
+      `ALONE list is\n   where it did the work. Two of those rows are open ` +
+      `questions rather than\n   settled noes — the finished leis, and ` +
+      `whether a technique card should\n   inherit the phase of the item it ` +
+      `rides with.`
+  );
+
   section("JUDGEMENTS AND GAPS");
   const byKind = new Map();
   for (const note of notes) {
@@ -1447,10 +1751,17 @@ function report() {
       String(allRows.length).padStart(7),
     ].join("")
   );
+  const holding = allRows.filter(isHeldBack);
   console.log(
-    `\nEvery row above is status = 'draft'. There is no --activate flag on this ` +
-      `seeder;\nsee 1 in this file's header for why.`
+    `\n${allRows.length - holding.length} row(s) above go LIVE on the way in ` +
+      `and ${holding.length} stay in draft\nbecause they carry a ` +
+      `${FOUNDER_PENDING} question in their own text. There is still no ` +
+      `--activate\nflag on this seeder; see 1 in this file's header for why, ` +
+      `and for what replaced it.`
   );
+  for (const row of holding) {
+    console.log(`  held  ${row.slug} — ${row.name}`);
+  }
 }
 
 function reportRoutes(lines, docPath, docName) {
@@ -1500,6 +1811,7 @@ let created = 0;
 let left = 0;
 let updated = 0;
 let attached = 0;
+let heldBack = 0;
 let gesturesWritten = 0;
 const stubbed = [];
 
@@ -1534,12 +1846,22 @@ try {
     );
 
     if (existing.length === 0) {
+      const held = isHeldBack(row);
       const { rows: inserted } = await client.query(
+        // THE PLACEHOLDERS RUN $1..$11 WITH NO GAP, and that is a fix rather
+        // than a tidy-up. This statement and the update below both skipped $7
+        // and then ran off the end at $11 — the shape left behind when db/033
+        // dropped `venue` from the column list and nobody renumbered what came
+        // after it. Postgres would have refused the bind ("11 parameters
+        // required, 10 supplied") on the first row of the first run, and this
+        // seeder was not in preDeployCommand until 2026-08-23, so nothing ever
+        // executed it. CLAUDE.md rule 12's failure and this one are the same
+        // failure twice: a seeder that never runs is never wrong.
         `insert into bank_item
            (slug, world_id, kind, name, description, phase,
             min_lead_days, ships, weight, status, source_citation)
          values ($1, $2, $3::bank_kind, $4, $5, $6::bank_phase,
-                 $8, $9, $10, 'draft'::product_status, $11)
+                 $7, $8, $9, $10::product_status, $11)
          returning id`,
         [
           row.slug,
@@ -1551,11 +1873,28 @@ try {
           row.minLeadDays,
           row.ships,
           row.weight,
+          // The whole of section 1, in one expression: the pool stocks itself,
+          // except where the row itself carries the founder's question.
+          held ? HELD : LIVE,
           row.citation,
         ]
       );
       idBySlug.set(row.slug, inserted[0].id);
       created += 1;
+      if (held) {
+        heldBack += 1;
+      } else {
+        // In the same transaction as the row, so a bank item cannot go out
+        // with nothing in the ledger saying it did.
+        await recordAutoPublish(client, {
+          table: "bank_item",
+          id: inserted[0].id,
+          name: row.name,
+          seeder: "seed-bank",
+          run: RUN,
+          source: SOURCE_NAME,
+        });
+      }
     } else {
       idBySlug.set(row.slug, existing[0].id);
       const differs =
@@ -1576,10 +1915,20 @@ try {
         );
       } else if (differs) {
         await client.query(
+          // $1..$9 with no gap — the same renumbering as the insert above, and
+          // the same reason. Before it, `min_lead_days` was being handed the
+          // value of `ships`, `ships` the weight and `weight` the citation, and
+          // `source_citation = $10` did not exist at all.
+          //
+          // `status` is still absent from this list and that is not an
+          // oversight: no seeder writes a status on a row that already exists.
+          // --overwrite lets the file beat a curator's WORDS; whether a row is
+          // offered is settled once, on the way in, and after that it belongs
+          // to the desk.
           `update bank_item set name = $2, description = $3, kind = $4::bank_kind,
                   phase = $5::bank_phase,
-                  min_lead_days = $7, ships = $8, weight = $9,
-                  source_citation = $10
+                  min_lead_days = $6, ships = $7, weight = $8,
+                  source_citation = $9
              where id = $1`,
           [
             existing[0].id,
@@ -1653,7 +2002,10 @@ if (stubbed.length > 0) {
 }
 
 console.log(
-  `\nEvery row is a DRAFT and this seeder has no --activate flag: ` +
-    `"Everything is created\nas status = 'draft'. No exceptions." Offering one ` +
-    `is a decision, made at the desk.`
+  `\n${created - heldBack} of the ${created} row(s) created went LIVE, and ` +
+    `${heldBack} stayed in draft because\nthe row itself carries a ` +
+    `${FOUNDER_PENDING} question. The pool stocks itself (db/036);\n` +
+    `/desk/stocked is where that gets vetoed, and it sends one row or the ` +
+    `whole run back.\nThe held rows are at /desk/publish, which is where a ` +
+    `question that has been answered\ngets said yes to.`
 );

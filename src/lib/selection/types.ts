@@ -276,14 +276,17 @@ export type EligibilityClaim = {
  * See src/lib/selection/venue.ts for the rule, and db/020 for the five terms.
  */
 export type StructuralRequirement = {
-  /** structural_requirement.code — 'requires_outdoors', 'noise_ceiling', … */
+  /** structural_requirement.code — 'requires_outdoors', 'outdoor_access', … */
   code: string;
   /** "Needs a full kitchen". For a curator. */
   label: string;
   /**
    * The verb phrase that completes "it …" in a rejection sentence: "needs to
-   * be outdoors", "will not survive a deposit". Held on the row so the reading
-   * of a code like `noise_ceiling` is never inferred from its name.
+   * be outdoors", "needs a door to somewhere". Held on the row so the reading
+   * of a code is never inferred from its name — which mattered most for the two
+   * codes that were nouns rather than requirements, `noise_ceiling` and
+   * `deposit_safe`, and still matters: `outdoor_access` is a grade and not a
+   * synonym for the flag above it.
    */
   demand: string;
   /** The curator's note on THIS ingredient carrying it, when there is one. */
@@ -645,6 +648,26 @@ export type PreferenceVector = {
   blend: { stated: number; history: number; cohort: number };
   /** How much of her own evidence there was. Drives the shrinkage. */
   evidenceCount: number;
+  /**
+   * WHAT SHE SAID THAT THIS VECTOR DOES NOT SCORE.
+   *
+   * Every stated facet a NON_TASTE_DIMENSIONS rule kept out — the room she is
+   * in, the money, the platform, the meal shape, and now the taste direction.
+   * They are excluded from `weights` for the reasons written beside that list
+   * in src/lib/selection/vector.ts, and they are kept HERE because "not scored"
+   * and "not said" are different facts and something downstream needs the
+   * difference.
+   *
+   * THE READER THAT PROVED IT NEEDED: voiceClashGap() in destination.ts keys a
+   * catalogue gap on the AESTHETIC she asked for, and read it out of
+   * `vector.terms`. The day `taste_direction` left the vector, that gap would
+   * have started reporting an empty aesthetic — an instrument going quiet
+   * without going red, which is exactly the failure CLAUDE.md rule 15 names.
+   *
+   * Never scored, by anything. A reader that wants to weight one of these has
+   * misunderstood the list it came off.
+   */
+  unscored: Facet[];
 };
 
 // ── results ──────────────────────────────────────────────────────────

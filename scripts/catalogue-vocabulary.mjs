@@ -416,3 +416,192 @@ export async function ensureWorld(client, heading, by, displayName = heading) {
   );
   return { id: rows[0].id, slug, created: true };
 }
+
+/* ── stocking the pool, and saying so in the ledger ─────────────────── */
+
+/**
+ * WHAT REPLACED "A SEEDER PRODUCES DRAFTS", AND WHAT SURVIVED OF IT.
+ *
+ * Every seeder in this tree used to carry one sentence:
+ *
+ *   "deciding that something is offered to a customer is a curator's decision
+ *    and not a script's"
+ *
+ * It is kept here, whole, because it was RIGHT ABOUT WHAT IT PROTECTED and
+ * wrong about its scope. It was written when the only content was destinations,
+ * and a destination is an authored world: a look, a voice, a claim about how an
+ * evening feels. A dish is an ingredient. Holding both behind one signature
+ * meant 372 dishes and 180 bank rows sat in a queue nobody could clear, waiting
+ * on a gesture that adds nothing — because nobody reads 372 dishes to decide
+ * whether a dish may exist.
+ *
+ * db/036 split the two and CLAUDE.md rule 13 states the split:
+ *
+ *   POOL CLASSES stock themselves — dish, drink, menu, bank_item, game,
+ *   product, tracklist. They go live on deploy and the founder VETOES at the
+ *   desk.
+ *
+ *   `game` joined that list one round late, and the delay is worth keeping:
+ *   rule 13 first named its classes by name, the `game` table was not among
+ *   them, and a seeder that read the rule wider than it was written would have
+ *   made the identical scope mistake with the sign flipped. What settled it was
+ *   not a wider reading but a FACT — `bank_kind = 'game'` (the tombola kit, the
+ *   dice cups) was already stocking itself out of seed-bank while the `game`
+ *   table stayed governed, so one product category was split across two
+ *   publication regimes and a member could receive the shipped kit for a game
+ *   whose rules sat in draft. Rule 13 now carries the test that decides the
+ *   next one without a stop-and-ask: POOL means selection CHOOSES AMONG rows,
+ *   GOVERNED means a row DEFINES WHAT A MEMBER CAN BE PROMISED.
+ *
+ *   GOVERNED CLASSES keep the old rule word for word — `world` (a destination,
+ *   its gesture) and `world_voice`. Each is a claim about a world or about how
+ *   the house speaks, and one of those reaching a member unread is a different
+ *   kind of wrong from a dish doing it. src/lib/governed.test.ts fails the
+ *   build if a seeder here signs for either.
+ *
+ * So the sentence did not lose an argument. It lost a jurisdiction.
+ *
+ * ── THE LEDGER HAS TO BE ABLE TO SAY "NOBODY" ────────────────────────
+ *
+ * A veto is only possible if the veto-er can SEE what happened, so every
+ * auto-publish writes a `staff_action` row: `staff_id` null, `actor` the system
+ * actor below, and a dotted verb in the same convention a person's act uses.
+ * db/036 made `staff_id` nullable and added `actor` beside it precisely so the
+ * ledger never has to attribute a machine's act to a person — there is a CHECK
+ * on the table that keeps the two columns honest about each other.
+ */
+export const POOL_STOCKING_ACTOR = "auto: pool-stocking";
+
+/**
+ * The two `product_status` values a seeder ever writes, named once.
+ *
+ * `product_status` (db/002) is shared by dish, drink, menu, product, game and
+ * bank_item, and `ingredient_pool.active_value` is where the DESK reads which
+ * value means offered. A seeder writes the enum literal directly — it is
+ * inserting into a known table with a known column — so the pair is named here
+ * rather than spelled into six INSERT statements that would have to be found
+ * and changed together if the enum ever grew a third position.
+ */
+export const LIVE = "active";
+export const HELD = "draft";
+
+/**
+ * THE MARKER THAT HOLDS A ROW BACK, spelled ONCE for the whole house.
+ *
+ * The hold-back is not an approval queue and there is no list of held slugs
+ * anywhere. A row that must not go out CARRIES THE FOUNDER'S QUESTION IN ITS
+ * OWN TEXT, and this string is how the question announces itself — to the
+ * seeder that is about to write the row, to the migration that clears an
+ * existing backlog, and to the curator reading the row at the desk, who cannot
+ * miss it because it is inline in the prose she is already reading.
+ *
+ * A list would be a thing that falls out of date. Text cannot: delete the
+ * question and the row goes out on the next run of the seeder that owns it.
+ *
+ * IT LIVES HERE BECAUSE TWO PLACES MUST MAKE THE SAME TEST. scripts/seed-bank
+ * holds new rows with it, db/036 cleared the bank's backlog with it, and
+ * db/038 cleared the games' — and a divergence between them would mean a row
+ * the migration would have held and the seeder offers. It used to be a `const`
+ * inside seed-bank; the second pool that needed it is what moved it.
+ *
+ * The SQL side cannot import this, so it spells the literal. Any migration
+ * testing for it must write the same eleven characters, and it is worth
+ * grepping for the string before changing it.
+ */
+export const FOUNDER_PENDING = "FOUNDER-PENDING";
+
+/**
+ * Does any of this row's own text carry a question with the founder's name?
+ *
+ * `texts` is whatever prose the row holds — one string per authored field,
+ * nulls welcome. The caller decides WHICH fields count, because that differs
+ * per pool and is a claim about where an author would write such a question;
+ * the caller must also make sure the migration that clears its backlog reads
+ * the same fields.
+ */
+export function carriesFounderQuestion(texts) {
+  return texts.some(
+    (text) => typeof text === "string" && text.includes(FOUNDER_PENDING)
+  );
+}
+
+/**
+ * One id for one run of one seeder, so the desk can group a deploy's work.
+ *
+ * The wall clock rather than a random id, because the value is read by a human
+ * on /desk/stocked and "which run was that" is a question about WHEN. Two
+ * seeders in one deploy get two runs on purpose: the feed's unit is "seed-dishes
+ * put 41 dishes out", not "a deploy happened".
+ */
+export function stockingRun() {
+  return new Date().toISOString();
+}
+
+/**
+ * Refuse `--activate` by name.
+ *
+ * seed:menus, seed:drinks and seed:dishes each took the flag when `draft` was
+ * the default; `active` is the default now, so the flag has nothing left to
+ * mean. It is REFUSED rather than ignored: a flag that silently means nothing
+ * is worse than one that is gone, because an old runbook, an old shell history
+ * entry or an old habit still types it and still reads as if it controlled
+ * something. Exiting here is the only way the person finds out.
+ *
+ * seed:bank never had the flag (its header argues why at length) and refuses it
+ * too, for the same reason — it was silently ignored there before.
+ */
+export function refuseActivateFlag(seeder) {
+  if (!process.argv.includes("--activate")) return;
+  console.error(
+    `[${seeder}] --activate is gone. Pool content stocks itself now: rows this ` +
+      `seeder creates\nare live on the way in (db/036, CLAUDE.md rule 13), so ` +
+      `the flag has nothing left to mean.\nWhat went live is at /desk/stocked, ` +
+      `where one row or a whole run goes back to draft.\nA row that must NOT go ` +
+      `live carries a founder-pending question in its own text; see\n` +
+      `scripts/seed-bank.mjs for the only pool that has any today.`
+  );
+  process.exit(2);
+}
+
+/**
+ * Record that a seeder — not a person — put a row in front of members.
+ *
+ * Called INSIDE the seeder's transaction, with the same client, so a row and
+ * the record of it going live commit together or not at all. A published row
+ * with no ledger entry is invisible to the veto, which is the one failure this
+ * whole arrangement cannot afford.
+ *
+ * It does not swallow errors, unlike `recordAction` in src/lib/staff.ts. That
+ * function is right to: a person's edit is worth more than the note about it.
+ * Here the note is the ONLY thing standing between an auto-publish and nobody
+ * ever knowing, so a ledger failure must roll the publish back with it.
+ *
+ * @param client   an open pg client, mid-transaction
+ * @param table    the entity table: 'dish', 'drink', 'menu', 'bank_item'
+ * @param id       the row's uuid
+ * @param name     what to call it in the feed
+ * @param seeder   'seed-dishes' — which script did it
+ * @param run      `stockingRun()`, once per process
+ * @param source   the authored document the row came out of
+ */
+export async function recordAutoPublish(
+  client,
+  { table, id, name, seeder, run, source }
+) {
+  await client.query(
+    `insert into staff_action
+       (staff_id, actor, action, entity_table, entity_id, summary, detail)
+     values (null, $1, $2, $3, $4::uuid, $5, $6::jsonb)`,
+    [
+      POOL_STOCKING_ACTOR,
+      // db/011's CHECK on `action`: dotted, lower case, past tense. db/036
+      // writes 'dish.auto_published' and 'bank_item.auto_published'; a seeder
+      // writing a different verb for the same event would split the feed.
+      `${table}.auto_published`,
+      table,
+      id,
+      `${name} — stocked by ${seeder}`,
+      JSON.stringify({ run, seeder, source, created: true, went: "live" }),
+    ]
+  );
+}

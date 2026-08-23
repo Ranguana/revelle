@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import { query, queryOne } from "@/lib/db";
 import { setTags, validFacetIds } from "@/lib/desk/facets";
 import { slugify } from "@/lib/desk/labels";
+import { PLAIN_STATUSES, retirementFrom } from "@/lib/desk/retirement";
+import { carryReview } from "@/lib/desk/review";
 import { voiceFromForm } from "@/lib/desk/voice-form";
 import { recordAction, requireStaff } from "@/lib/staff";
 
@@ -33,7 +35,23 @@ import { recordAction, requireStaff } from "@/lib/staff";
  * invisible.
  */
 
-const STATUSES = ["draft", "published", "retired"];
+/**
+ * THE STATUSES THE PLAIN STATUS BUTTON MAY SET — and the one it may not.
+ *
+ * This list used to read `["draft", "published", "retired"]`. Nothing on any
+ * screen ever sent `retired`, so it was a value the action accepted and no
+ * control offered — which was harmless until db/042, and is not any more:
+ * `world_retired_has_reason` refuses a retirement that carries no note, so a
+ * form post of `status=retired` would now reach a curator as
+ * `violates check constraint "world_retired_has_reason"`.
+ *
+ * It is refused BY NAME instead, in the action below, with the reason — rule
+ * 16 — and the transition lives in `retireDestination`, which asks for the
+ * words. The list itself is `PLAIN_STATUSES` in src/lib/desk/retirement.ts so
+ * that the guard is a value a test can hold rather than a sentence a test has
+ * to grep for.
+ */
+const STATUSES = PLAIN_STATUSES;
 
 const PALETTE_KEYS = [
   "ground", "ground2", "ink", "inkSoft", "inkFaint", "rule", "aqua",
@@ -179,7 +197,10 @@ export async function saveDestination(
 
   revalidatePath("/desk/destinations");
   revalidatePath(`/desk/destinations/${worldId}`);
-  redirect(`/desk/destinations/${worldId}?saved=1`);
+  // A save mid-review lands back INSIDE the review. Without this the strip
+  // disappears the first time she edits anything, which is exactly when a
+  // review is most likely to be running. src/lib/desk/review.ts.
+  redirect(carryReview(form, `/desk/destinations/${worldId}?saved=1`));
 }
 
 /**
@@ -206,6 +227,29 @@ export async function setDestinationStatus(form: FormData): Promise<void> {
   const staff = await requireStaff();
   const id = String(form.get("id") ?? "");
   const status = String(form.get("status") ?? "");
+  // REFUSED BY NAME, not dropped. A silent `return` on a status this action
+  // will not perform is rule 16's failure exactly: the post succeeded, the page
+  // re-rendered, and nothing anywhere says the room is still published. The
+  // refusal names the reason and points at the door that does work.
+  if (status === "retired") {
+    const said =
+      "A retirement carries its reason (CLAUDE.md rule 17), and this button " +
+      "carries only a status. Retire the room from its own page, where there " +
+      "is somewhere to write why.";
+    await recordAction(staff, {
+      action: "destination.status_refused",
+      entityTable: "world",
+      entityId: id,
+      summary: "refused → retired (no reason given)",
+      detail: { status, refusal: said },
+    });
+    redirect(
+      carryReview(
+        form,
+        `/desk/destinations/${id}?refused=${encodeURIComponent(said)}`
+      )
+    );
+  }
   if (!STATUSES.includes(status)) return;
 
   try {
@@ -232,7 +276,12 @@ export async function setDestinationStatus(form: FormData): Promise<void> {
       summary: `refused → ${status}`,
       detail: { status, refusal: said },
     });
-    redirect(`/desk/destinations/${id}?refused=${encodeURIComponent(said)}`);
+    redirect(
+      carryReview(
+        form,
+        `/desk/destinations/${id}?refused=${encodeURIComponent(said)}`
+      )
+    );
   }
 
   await recordAction(staff, {
@@ -245,6 +294,113 @@ export async function setDestinationStatus(form: FormData): Promise<void> {
 
   revalidatePath("/desk/destinations");
   revalidatePath(`/desk/destinations/${id}`);
+}
+
+/**
+ * CLOSING A ROOM, WITH THE REASON ATTACHED.
+ *
+ * The only door from the desk into `status = 'retired'`, and the reason it is
+ * a separate action rather than a third value on the status button: a
+ * retirement is not a status change with a different word in it. It is an
+ * ADJUDICATION, and CLAUDE.md rule 17 says an adjudication that arrives without
+ * its opinion is not one. db/028 retired Cap Ferrat and the argument lived in a
+ * SQL comment, so "folded into Côte d'Azur" had to be reconstructed out of a
+ * conversation a year later. That is the failure this function exists to make
+ * impossible from here.
+ *
+ * ── ONE STATEMENT, WHICH IS THE RULE'S OWN WORDING ──────────────────
+ *
+ * "every transition writes WHY, in the same statement that writes the status".
+ * The status, the note and the lineage move together in one UPDATE — not
+ * because it is tidier, but because db/042's CHECK is evaluated per row per
+ * statement: split into two statements, the first one is a retirement with no
+ * reason and the database refuses it. The rule and the mechanism agree, which
+ * is what makes this the easy path rather than the disciplined one.
+ *
+ * `published_at` is nulled in the same breath, because
+ * `world_published_has_timestamp` (db/001) is an IFF and would refuse the row
+ * otherwise. The retirement note is NOT nulled on the way back out — see
+ * db/042 — which is the asymmetry between STATE and RECORD.
+ *
+ * ── WHAT IS VALIDATED HERE AND WHAT IS LEFT TO THE DATABASE ─────────
+ *
+ * `retirementFrom` refuses a blank reason and a room folded into itself, in
+ * words a curator can act on, before any query runs. Everything else — a
+ * successor that does not exist, a successor deleted underneath her — is the
+ * database's to refuse, and its refusal is shown VERBATIM, the same rule
+ * db/019's voice guard is handled under a few functions up.
+ */
+export async function retireDestination(form: FormData): Promise<void> {
+  const staff = await requireStaff();
+  const id = String(form.get("id") ?? "");
+
+  const draft = retirementFrom(
+    String(form.get("retirement_note") ?? ""),
+    String(form.get("superseded_by") ?? ""),
+    id
+  );
+
+  const refuse = async (said: string) => {
+    await recordAction(staff, {
+      action: "destination.retirement_refused",
+      entityTable: "world",
+      entityId: id,
+      summary: "refused → retired",
+      detail: { refusal: said },
+    });
+    redirect(
+      carryReview(
+        form,
+        `/desk/destinations/${id}?refused=${encodeURIComponent(said)}`
+      )
+    );
+  };
+
+  // `refuse` redirects, which throws, so the return below never runs. It is
+  // written anyway because the compiler cannot know that, and the alternative
+  // is a non-null assertion on the line after — which is the same claim made
+  // where nothing can check it.
+  if (draft.error !== null) {
+    await refuse(draft.error);
+    return;
+  }
+  const record = draft.value;
+
+  try {
+    await query(
+      `update world
+          set status = 'retired',
+              published_at = null,
+              retirement_note = $2,
+              superseded_by = $3
+        where id = $1`,
+      [id, record.note, record.successorId]
+    );
+  } catch (err) {
+    const refusal = err as { message?: string; hint?: string };
+    await refuse(
+      [refusal?.message ?? String(err), refusal?.hint].filter(Boolean).join(" ")
+    );
+  }
+
+  await recordAction(staff, {
+    action: "destination.retired",
+    entityTable: "world",
+    entityId: id,
+    // The reason travels into the ledger as well as into the column. The column
+    // is what the desk renders; the ledger is what says WHO decided and when,
+    // which the column cannot hold and db/027 exists to answer.
+    summary: `→ retired — ${record.note}`,
+    detail: {
+      status: "retired",
+      retirement_note: record.note,
+      superseded_by: record.successorId,
+    },
+  });
+
+  revalidatePath("/desk/destinations");
+  revalidatePath(`/desk/destinations/${id}`);
+  redirect(carryReview(form, `/desk/destinations/${id}`));
 }
 
 /* ── the voice ──────────────────────────────────────────────────────── */
@@ -278,7 +434,7 @@ export async function startVoiceDraft(form: FormData): Promise<void> {
     [worldId]
   );
   if (existing) {
-    redirect(`/desk/destinations/${worldId}/voice`);
+    redirect(carryReview(form, `/desk/destinations/${worldId}/voice`));
   }
 
   await query(
@@ -303,7 +459,7 @@ export async function startVoiceDraft(form: FormData): Promise<void> {
   });
 
   revalidatePath(`/desk/destinations/${worldId}/voice`);
-  redirect(`/desk/destinations/${worldId}/voice`);
+  redirect(carryReview(form, `/desk/destinations/${worldId}/voice`));
 }
 
 export async function saveVoiceDraft(
@@ -373,5 +529,5 @@ export async function discardVoiceDraft(form: FormData): Promise<void> {
   });
 
   revalidatePath(`/desk/destinations/${worldId}/voice`);
-  redirect(`/desk/destinations/${worldId}/voice`);
+  redirect(carryReview(form, `/desk/destinations/${worldId}/voice`));
 }

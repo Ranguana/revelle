@@ -3,13 +3,32 @@
  * Put the authored drinks into the database.
  *
  *   npm run seed:drinks
- *   npm run seed:drinks -- --activate    also move new drinks to 'active'
  *   npm run seed:drinks -- --overwrite   let the file beat the curator's edits
  *
  * The sibling of scripts/seed-menus.mjs, deliberately: same document shape,
  * same flags, same refusal to guess, same rule that a curator's edit at the
  * desk outranks the file. Read that script's header for the argument; only the
  * differences are written out here.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * A DRINK THIS SCRIPT CREATES IS LIVE, AND USED NOT TO BE
+ *
+ * It used to be created as a draft, and `--activate` was how a curator said
+ * yes, "because deciding that something is offered to a customer is a curator's
+ * decision and not a script's". The full argument — what that rule protected,
+ * why it was right about that and wrong about its scope, and what db/036 and
+ * CLAUDE.md rule 13 replaced it with — is preserved at the top of
+ * scripts/seed-menus.mjs, where it was originally written. It is not repeated
+ * here for the same reason nothing else in this header is: two copies of one
+ * argument become two arguments.
+ *
+ * What it means HERE: a programme this seeder creates is offered on the way in,
+ * `--activate` is refused by name rather than silently ignored, and every one
+ * of them lands in `staff_action` under the pool-stocking actor so /desk/stocked
+ * can show the run and send any of it back to draft. The mirror rule below is
+ * untouched and matters more than ever now that nobody signs off row by row:
+ * a drink whose mocktail build is missing still fails the run rather than
+ * reaching a table.
  *
  * ─────────────────────────────────────────────────────────────────────
  * THE MIRROR IS THE RECORD, AND THIS SCRIPT IS WHERE IT COULD BE LOST
@@ -65,14 +84,21 @@ import pg from "pg";
 
 import {
   DESTINATIONS,
+  LIVE,
   SEASONS,
   ensureWorld,
+  recordAutoPublish,
+  refuseActivateFlag,
+  stockingRun,
 } from "./catalogue-vocabulary.mjs";
 
 const SOURCE = fileURLToPath(new URL("../docs/drinks.md", import.meta.url));
 
-const activate = process.argv.includes("--activate");
+refuseActivateFlag("seed-drinks");
 const overwrite = process.argv.includes("--overwrite");
+
+/** One id for this run, so /desk/stocked can group what it put out. */
+const RUN = stockingRun();
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
 function needsSsl(url) {
@@ -359,14 +385,23 @@ try {
           drink.season,
           drink.seasonNote,
           drink.making,
-          activate ? "active" : "draft",
+          // Live on the way in — see the note at the top of this file.
+          LIVE,
         ]
       );
       drinkId = rows[0].id;
       created += 1;
-      console.log(
-        `[seed-drinks] created  ${slug} ${activate ? "(active)" : "(draft)"} — ${drink.name}`
-      );
+      // In the same transaction as the row, so a programme cannot go out with
+      // nothing in the ledger saying it did.
+      await recordAutoPublish(client, {
+        table: "drink",
+        id: drinkId,
+        name: drink.name,
+        seeder: "seed-drinks",
+        run: RUN,
+        source: "docs/drinks.md",
+      });
+      console.log(`[seed-drinks] created  ${slug} (live) — ${drink.name}`);
     } else {
       drinkId = existing[0].id;
       const row = existing[0];
@@ -461,9 +496,11 @@ if (stubbed.length > 0) {
       `npm run seed:destinations, which completes a stub in place.`
   );
 }
-if (!activate && created > 0) {
+if (created > 0) {
   console.log(
-    `\n${created} drink(s) are drafts. Offering one is a decision: activate ` +
-      `them at the desk, or re-run with --activate.`
+    `\n${created} drink(s) went LIVE on this run. The pool stocks itself ` +
+      `(db/036); the desk\nis where that gets vetoed, not where it gets ` +
+      `approved. /desk/stocked lists this run\nand sends one programme or all ` +
+      `${created} back to draft.`
   );
 }

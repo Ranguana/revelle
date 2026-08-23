@@ -5,7 +5,10 @@ import { useActionState } from "react";
 import type { FacetGroup } from "@/lib/desk/facets";
 import { COOKING_LEVELS, POOL_STATUS, SEASONS } from "@/lib/desk/labels";
 
+import type { Carried } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
+import { ReviewFields } from "../bits";
 import FacetPicker from "../FacetPicker";
 import { saveMenu, type MenuState } from "./actions";
 
@@ -46,6 +49,7 @@ export default function MenuForm({
   weights,
   destinations,
   attached,
+  carried,
 }: {
   values: MenuValues;
   groups: readonly FacetGroup[];
@@ -53,6 +57,8 @@ export default function MenuForm({
   weights?: readonly (readonly [string, string])[];
   destinations: readonly { id: string; name: string }[];
   attached: readonly string[];
+  /** the review this save must land back inside, if one is running */
+  carried?: Carried | null;
 }) {
   const [state, action, pending] = useActionState(saveMenu, INITIAL);
   const isAttached = new Set(attached);
@@ -60,6 +66,8 @@ export default function MenuForm({
   return (
     <form action={action} className={`${styles.form} ${styles.formWide}`}>
       {values.id ? <input type="hidden" name="id" value={values.id} /> : null}
+      {/* So that saving mid-review does not end the review. See review.ts. */}
+      <ReviewFields carried={carried ?? null} />
       {state.error ? <p className={styles.error}>{state.error}</p> : null}
 
       <div className={styles.field}>

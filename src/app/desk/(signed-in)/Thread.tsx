@@ -107,7 +107,7 @@ export default async function Thread({
         />
         <div className={styles.buttonRow}>
           <button className={styles.button} type="submit">
-            Say it
+            Admin Chat
           </button>
         </div>
       </form>

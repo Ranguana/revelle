@@ -11,6 +11,7 @@ import {
   type Standing,
   type WorldStanding,
 } from "@/lib/desk/publish";
+import { POOL_SCREEN } from "@/lib/desk/stocked";
 
 import styles from "../../desk.module.css";
 import { Empty, Head, Seam } from "../bits";
@@ -56,6 +57,30 @@ import { publishSelected } from "./actions";
  * one row at a time, on the pool's own screen, where the row can be looked at.
  * The seam at the bottom of this page says so out loud, along with the pools
  * that have no screen at all.
+ *
+ * ── AND THEN MOST OF ITS WORK WENT AWAY ──────────────────────────────
+ *
+ * Everything above is kept because it is why this screen exists and because
+ * CLAUDE.md rule 14 keeps a reversed argument. The first sentence of it is no
+ * longer true of most of the library: db/036 and CLAUDE.md rule 13 made pool
+ * content stock itself, so dishes, drinks, menus and bank items are live on the
+ * way in and the 372-dish backlog this screen was built to clear cannot form
+ * again. `--activate` is gone from the seeders that had it.
+ *
+ * THE SCREEN IS NOT REDUNDANT, IT IS BACK TO ITS REAL SIZE. Three things still
+ * arrive in draft and still need a person:
+ *
+ *   · DESTINATIONS, which were always the thing the rule was written for. The
+ *     whole world panel below is untouched by any of this, voice rule and all.
+ *   · A pool row a curator drafted by hand at the desk.
+ *   · A BANK ITEM HELD BACK ON A QUESTION. seed-bank writes the founder's own
+ *     open question into the row's description and leaves it in draft; when
+ *     the question is answered and the marker comes off, this is the screen
+ *     where the answer becomes an offer. That is the case worth knowing about,
+ *     because it is the one that looks like the old backlog and is not one.
+ *
+ * The mirror of this screen is /desk/stocked: what a seeder offered without
+ * asking, and one click to take it back. Consent here, veto there.
  */
 
 export const dynamic = "force-dynamic";
@@ -63,28 +88,15 @@ export const dynamic = "force-dynamic";
 /** `query` is exactly the shape the shared module asks for. */
 const ask: Ask = query;
 
-/**
- * Where a row of each pool can be looked at and, if it comes to it, withdrawn.
- *
- * A fact about the DESK's routes, not about the database, so it is written here
- * rather than derived from `ingredient_pool` — the registry has no column for
- * it and should not grow one. A pool that is absent is not a bug in this map;
- * it is a pool this screen can publish and the desk cannot otherwise show, and
- * the seam at the bottom names it for exactly that reason.
+/*
+ * Where a row of each pool can be looked at and, if it comes to it, withdrawn:
+ * POOL_SCREEN, in src/lib/desk/stocked.ts. It used to be a copy right here, and
+ * a second copy in publish/actions.ts that had already drifted — this one knew
+ * about `bank_item` and that one did not, so offering a bank item left
+ * /desk/bank stale. A pool absent from the map is not a bug in it; it is a pool
+ * this screen can publish and the desk cannot otherwise show, and the seam at
+ * the bottom names it for exactly that reason.
  */
-const SCREENS: Readonly<Record<string, string>> = {
-  // Added with /desk/bank. Without it the confirmation text tells a curator
-  // "there is no desk screen for this pool, so there is no way back from here
-  // at all" — in the warning for an IRREVERSIBLE bulk publish, which was false
-  // the moment the section shipped.
-  bank_item: "/desk/bank",
-  menu: "/desk/menus",
-  drink: "/desk/drinks",
-  dish: "/desk/dishes",
-  game: "/desk/games",
-  product: "/desk/products",
-  world: "/desk/destinations",
-};
 
 /** The desk's word for `world`. `ingredient_pool.label` says "Creative worlds". */
 const WORLD_LABEL = "Destinations";
@@ -133,11 +145,17 @@ export default async function PublishPage({
       </Head>
 
       <p className={styles.note}>
-        Every seeder creates drafts, because deciding that something is offered
-        to a customer is a curator&rsquo;s decision and not a script&rsquo;s.
-        This is where that decision gets made for more than one thing at a time.
-        The engine cannot see a draft, so nothing below has ever reached a
-        member — and nothing below goes back to draft on its own once it has.
+        Deciding that a DESTINATION is offered to a member is a
+        curator&rsquo;s decision and not a script&rsquo;s, and this is where it
+        gets made for more than one at a time. The pools no longer queue here:
+        a dish, drink, menu or bank item a seeder creates is offered on the way
+        in, and what went out that way is at{" "}
+        <Link href="/desk/stocked">Stocked</Link>, where it can be taken back.
+        What is left below is the rest — destinations, anything drafted by
+        hand, and the bank items a seeder held back because they carry an open
+        question with your name on it. The engine cannot see a draft, so nothing
+        below has ever reached a member, and nothing below goes back to draft on
+        its own once it has.
       </p>
 
       {refused ? <p className={styles.error}>{refused}</p> : null}
@@ -191,10 +209,12 @@ export default async function PublishPage({
       )}
 
       <Seam title="What this screen will not do">
-        It only ever moves a row OUT of draft. Withdrawing something is one row
-        at a time, on the pool&rsquo;s own screen, on purpose — no seeder in this
-        repository can put a published row back, so there is no fast way to
-        reverse a fast mistake.{" "}
+        It only ever moves a row OUT of draft. Withdrawing something you
+        offered here is one row at a time, on the pool&rsquo;s own screen, on
+        purpose: a decision somebody made is worth the walk back. What a SEEDER
+        offered is the other case and has its own screen —{" "}
+        <Link href="/desk/stocked">Stocked</Link> sends a whole run back in one
+        gesture, because a veto has to be as cheap as the act it answers.{" "}
         {unscreened.length > 0 ? (
           <>
             And {unscreened.join(", ")} can be published here and looked at
@@ -214,7 +234,7 @@ export default async function PublishPage({
 /** Pools this screen can publish and no other desk screen can show. */
 function missing(registry: readonly Pool[]): string[] {
   return registry
-    .filter((pool) => !SCREENS[pool.code])
+    .filter((pool) => !POOL_SCREEN[pool.code])
     .map((pool) => pool.label);
 }
 
@@ -342,10 +362,10 @@ function PoolPanel({ board }: { board: Standing }) {
       <Empty>
         Nothing in the {pool.label.toLowerCase()} pool is in draft.{" "}
         {board.active} offered.
-        {SCREENS[pool.code] ? (
+        {POOL_SCREEN[pool.code] ? (
           <>
             {" "}
-            <Link href={SCREENS[pool.code]}>The pool</Link> is where one row
+            <Link href={POOL_SCREEN[pool.code]}>The pool</Link> is where one row
             goes back.
           </>
         ) : null}
@@ -396,16 +416,17 @@ function PoolPanel({ board }: { board: Standing }) {
  * checked and argued in src/lib/desk/publish.ts, not asserted here.
  */
 function warning(pool: Pool): string {
-  const back = SCREENS[pool.code]
+  const back = POOL_SCREEN[pool.code]
     ? "The only way back is one row at a time, by hand, at " +
-      SCREENS[pool.code] +
+      POOL_SCREEN[pool.code] +
       "."
     : "There is no desk screen for this pool, so there is no way back from " +
       "here at all.";
   return (
-    "I am offering these to members. No seeder can undo it — `--activate` " +
-    "only touches rows a seeder creates, and `--overwrite` rewrites the words " +
-    "and never the status. " +
+    "I am offering these to members. No seeder can undo it — none of them " +
+    "writes a status on a row that already exists, and `--overwrite` rewrites " +
+    "the words and never the status. Nor can /desk/stocked, which only ever " +
+    "takes back what a seeder offered without asking. " +
     back
   );
 }

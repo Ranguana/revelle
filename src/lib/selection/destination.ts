@@ -348,11 +348,36 @@ function voiceClashGap(
   judged: readonly { destination: Destination; tone: number | null }[],
   options: EngineOptions
 ): CatalogueGap {
-  const asked = Object.keys(vector.weights)
+  /*
+   * READ FROM BOTH HALVES OF THE VECTOR, and the second half is why this is not
+   * a one-liner any more.
+   *
+   * `taste_direction` left the scoring vector as a hotfix (see
+   * NON_TASTE_DIMENSIONS in vector.ts — nothing in the catalogue is tagged in
+   * it, so her terms only damped the terms that matched). Reading the aesthetic
+   * out of `vector.terms` alone would therefore have made this report an EMPTY
+   * ASKED LIST from that day on: the gap would still be filed, still be keyed,
+   * still look like it worked, and would no longer name the thing that is
+   * missing. An instrument going quiet without going red is the failure
+   * CLAUDE.md rule 15 is about, and it would have been introduced by the fix
+   * for another instance of it.
+   *
+   * So it reads `vector.unscored` as well, which is what she SAID as opposed to
+   * what is SCORED. Both halves are kept rather than swapping one for the
+   * other, so that the day the catalogue is tagged and the hotfix line comes
+   * out, this keeps working with no edit.
+   */
+  const scored = Object.keys(vector.weights)
     .filter((id) => vector.terms[id]?.facet.dimension === "taste_direction")
     .filter((id) => vector.weights[id] > 0)
-    .map((id) => vector.terms[id].facet)
-    .sort((a, b) => a.code.localeCompare(b.code));
+    .map((id) => vector.terms[id].facet);
+
+  const said = vector.unscored.filter(
+    (facet) => facet.dimension === "taste_direction"
+  );
+
+  const byId = new Map([...scored, ...said].map((facet) => [facet.id, facet]));
+  const asked = [...byId.values()].sort((a, b) => a.code.localeCompare(b.code));
 
   const closest = judged
     .slice()

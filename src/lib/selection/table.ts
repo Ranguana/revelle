@@ -256,6 +256,15 @@ export function groupOf(slot: UnitSlot): string | null {
  * Read off the resolved answers, like `statedRung` and `statedSeason`, so that
  * the option code arrives through db/026's bridge rather than out of a raw
  * column somebody has to remember to cast.
+ *
+ * IT IS NOW ASKED OF EVERYONE, AND THIS FUNCTION DID NOT CHANGE. db/037 took
+ * the `activeWhen` gate off the question and reworded it as a start hour, so
+ * the four codes now arrive from hosts who have no table at all. The dimension
+ * filter below is what makes that safe: this reads the `meal_shape` resolution
+ * of her answer and nothing else, and `mealShape()` immediately below decides
+ * whether that shape is what the evening actually is. The same answer's OTHER
+ * resolution — onto the matrix's `starts` levels — is read by
+ * src/lib/selection/structure.ts and never reaches this file.
  */
 export function statedMeal(
   stated: readonly { field: string; dimension: string; code: string }[]
@@ -277,10 +286,20 @@ export function statedMeal(
  *   1. `no_seated_meal` WINS, and it is not a tie being broken. That exclusion
  *      is what db/022 hangs off `food_plan = 'standing'` — the very same answer
  *      that removes the main and the dessert is the answer that makes it a
- *      cocktail party. A host cannot be shown the meal question at all in that
- *      case (src/lib/quiz.ts holds it to a seated food plan), so this can only
- *      ever fire against a stale answer or a hand-rolled one, and it fires
- *      against them correctly: there is no table, so it is not a lunch.
+ *      cocktail party.
+ *
+ *      THIS BRANCH IS NOW LOAD-BEARING RATHER THAN DEFENSIVE, and the change is
+ *      worth stating because the reasoning it replaces is still correct as far
+ *      as it went. It read: "A host cannot be shown the meal question at all in
+ *      that case (src/lib/quiz.ts holds it to a seated food plan), so this can
+ *      only ever fire against a stale answer or a hand-rolled one, and it fires
+ *      against them correctly: there is no table, so it is not a lunch." Every
+ *      word of that was true while the gate existed. db/037 removed the gate —
+ *      the question is now the START HOUR and is asked of everyone, because a
+ *      standing party has an hour and had no way to say so — and this branch is
+ *      what keeps the old promise once the question no longer keeps it itself.
+ *      A cocktail party at midday now states `lunch`, and this returns
+ *      `cocktails` anyway. There is no table, so it is not a lunch.
  *   2. HER ANSWER, when she gave one. Four of the five shapes are hers, and
  *      until db/026 three of them were unreachable — which meant a dish tagged
  *      for brunch was not narrowed to brunch, it was removed from every table

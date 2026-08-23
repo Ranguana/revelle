@@ -20,6 +20,42 @@
  * scripts/activate-catalogue.mjs is still the canonical PROSE — read its header
  * for the argument. This is the canonical CODE.
  *
+ * ── AND THEN THE GATE MOVED. WHAT IS LEFT BEHIND IT ──────────────────
+ *
+ * The paragraph above is kept exactly as written, because it is the reason this
+ * module exists and because CLAUDE.md rule 14 keeps a reversed argument rather
+ * than deleting it. But its first sentence is no longer true of most of the
+ * library. db/036 and CLAUDE.md rule 13 split the catalogue in two:
+ *
+ *   POOL CLASSES stock themselves. A dish, drink, menu or bank item a seeder
+ *   creates is LIVE on the way in, every one of them lands in `staff_action`
+ *   under the `auto: pool-stocking` actor, and the founder VETOES at
+ *   /desk/stocked instead of consenting here. Nobody reads 372 dishes to
+ *   decide whether a dish may exist.
+ *
+ *   GOVERNED CLASSES do not, and the rule above governs them word for word:
+ *   `world` and `world_voice`. Each is a claim about a WORLD or about how the
+ *   house speaks. src/lib/governed.test.ts fails the build if a seeder signs
+ *   for either.
+ *
+ * So this module did not lose its job, it lost its BACKLOG. What still arrives
+ * in draft and still needs a person is:
+ *
+ *   · destinations, which is the whole of `worldStanding` and
+ *     `publishDestinations` below and is untouched by any of this;
+ *   · a pool row a curator drafted by hand at the desk;
+ *   · a pool row HELD BACK because it carries a founder-pending question in its
+ *     own text — a bank item (scripts/seed-bank.mjs section 1) or, since
+ *     db/038, a game (scripts/seed-games.mjs). That is the case worth naming:
+ *     the question gets answered, the marker comes off the row, and THIS
+ *     screen is where the answer becomes an offer. It has to be, because no
+ *     seeder rewrites the status of a row it did not create — taking the
+ *     question out of the source file publishes nothing by itself.
+ *
+ * The generic pool half is therefore a small screen now rather than a wall,
+ * and it stays because those three cases are real, not because it is load
+ * bearing for a deploy.
+ *
  * ── FRAMEWORK-FREE, ON PURPOSE ───────────────────────────────────────
  *
  * No React, no `server-only`, no `@/` alias, and the only import is a type that
@@ -124,21 +160,38 @@ export const CEILING = 500;
  * NO SEEDER CAN PUT ANY OF THIS BACK.
  *
  * The premise is easy to get wrong, so it is written down once, here, checked
- * against the four seeders that have a `--overwrite` flag:
+ * against every seeder in the tree:
  *
- *   · `--activate` (seed:menus, seed:drinks, seed:dishes) sets a status only on
- *     rows the seeder CREATES. It never touches a row that already exists.
  *   · `--overwrite` (seed:menus, seed:drinks, seed:dishes) lets the file beat a
  *     curator's edit — on the WORDS. Look at the three update statements: name,
- *     dishes, season, making, notes. `status` is in none of them.
+ *     dishes, season, making, notes. `status` is in none of them. Nor is it in
+ *     seed:bank's, which says so where it stands.
+ *   · No seeder writes a status on a row that already exists. A status is
+ *     settled once, on the way in, and after that it belongs to the desk.
  *   · seed:games and seed:destinations have no `--overwrite` at all, and
  *     seed:destinations says outright that it leaves status as it is.
  *
- * So publishing is one-way as far as every script in this repository is
- * concerned. The way back is by hand, one row at a time, at the pool's own desk
- * screen — and there is no desk screen for every pool. A bulk action that
- * cannot be reversed should feel like one, which is what the screen's
- * confirmation is for.
+ * So a row THIS SCREEN publishes is one-way as far as every script is
+ * concerned, and the way back is by hand, one row at a time, at the pool's own
+ * desk screen. A bulk action that cannot be reversed should feel like one,
+ * which is what the screen's confirmation is for.
+ *
+ * ── ONE ROW OF THAT LIST USED TO READ DIFFERENTLY ────────────────────
+ *
+ * It said: "`--activate` (seed:menus, seed:drinks, seed:dishes) sets a status
+ * only on rows the seeder CREATES. It never touches a row that already
+ * exists." The flag is gone (db/036) — those seeders create live rows now and
+ * refuse the flag by name — and the sentence is kept because it is what the
+ * whole premise rested on and because CLAUDE.md rule 14 keeps a reversed
+ * argument.
+ *
+ * The premise itself survives, but the SHAPE of the reversal has changed and
+ * this constant would be misread without it: an AUTO-published row is
+ * reversible, in bulk, at /desk/stocked, because a machine's act is not a
+ * decision anybody made and a veto has to be as cheap as the act it answers. A
+ * row a person published HERE is not, because she made a decision and undoing
+ * a decision is worth the walk to the pool's own screen. Same database column,
+ * two different gestures, on purpose.
  */
 export const IRREVERSIBLE = true;
 
@@ -146,6 +199,11 @@ export const IRREVERSIBLE = true;
 
 /**
  * Build a statement whose TABLE and COLUMN names come from the registry.
+ *
+ * Exported for src/lib/desk/stocked.ts, which composes over the same registry
+ * for the same reason — a second copy of this would be a second opinion about
+ * how an identifier out of a table gets quoted, which is the kind of second
+ * opinion that becomes an injection.
  *
  * Composed by Postgres's own `format()` with %I and %L rather than by string
  * interpolation here — db/002 makes the same point about why a predicate string
@@ -156,7 +214,7 @@ export const IRREVERSIBLE = true;
  * The returned text may still contain `$1`; `format` does not touch it, which
  * is how the id restriction below stays a bound parameter.
  */
-async function composed(
+export async function composed(
   ask: Ask,
   template: string,
   args: readonly string[]

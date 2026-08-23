@@ -9,6 +9,9 @@ import {
   stamp,
 } from "@/lib/desk/labels";
 
+import { statusSearch } from "@/lib/desk/lists";
+import { passHref } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setGameStatus } from "./actions";
@@ -167,13 +170,21 @@ export default async function GamesPage({
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => {
+            {rows.map((row, seat) => {
               const steps = Number(row.steps);
               const unanswered = Number(row.unanswered);
               return (
                 <TableRow key={row.id} status={row.status}>
                   <td>
-                    <Link href={`/desk/games/${row.id}`} className={styles.whoEmail}>
+                    {/* Into the review, carrying this view and this place. */}
+                    <Link
+                      href={passHref(
+                        `/desk/games/${row.id}`,
+                        statusSearch(filter),
+                        seat + 1
+                      )}
+                      className={styles.whoEmail}
+                    >
                       {row.name}
                     </Link>
                     <div className={styles.when}>

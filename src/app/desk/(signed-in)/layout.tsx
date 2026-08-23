@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 
 import { deskSummary } from "@/lib/desk/room";
+import { schemaPosition } from "@/lib/desk/schema";
 import { requireStaff } from "@/lib/staff";
 
 import styles from "../desk.module.css";
 import Rail from "./Rail";
+import { SchemaBanner, SchemaFoot } from "./SchemaBanner";
 import { signOutAction } from "./actions";
 
 /**
@@ -20,6 +22,16 @@ import { signOutAction } from "./actions";
  * Server Actions are checked separately, in each action, because an action is
  * its own entry point and is reachable without rendering the page whose form
  * calls it.
+ *
+ * ── AND THE ONE FACT THAT IS TRUE OF EVERY SCREEN UNDER IT ──────────
+ *
+ * WHERE THE DATABASE STANDS. It is read here, once, for the same reason the
+ * guard is here: there is nowhere to add a page that escapes this file. A
+ * database stuck at db/032 does not make one list wrong and the rest right, it
+ * makes every list in the tool a report about a schema weeks out of date — so
+ * the fact belongs to the shell, not to a page somebody would have to think to
+ * open. See SchemaBanner.tsx for the argument, and src/lib/desk/schema.ts for
+ * why it can never throw.
  */
 
 export const metadata: Metadata = {
@@ -30,6 +42,7 @@ export const metadata: Metadata = {
 export default async function DeskLayout({ children }: LayoutProps<"/desk">) {
   const staff = await requireStaff();
   const summary = await deskSummary(staff);
+  const schema = await schemaPosition();
 
   return (
     <div className={styles.shell}>
@@ -45,9 +58,13 @@ export default async function DeskLayout({ children }: LayoutProps<"/desk">) {
               Sign out
             </button>
           </form>
+          <SchemaFoot state={schema} />
         </div>
       </div>
-      <main className={styles.main}>{children}</main>
+      <main className={styles.main}>
+        <SchemaBanner state={schema} />
+        {children}
+      </main>
     </div>
   );
 }

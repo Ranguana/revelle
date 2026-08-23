@@ -3,6 +3,9 @@ import Link from "next/link";
 import { query } from "@/lib/db";
 import { COOKING_LEVELS, POOL_STATUS, SEASONS } from "@/lib/desk/labels";
 
+import { statusSearch } from "@/lib/desk/lists";
+import { passHref } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Status, StatusLegend, rowClass } from "../bits";
 import { setMenuStatus } from "./actions";
@@ -88,10 +91,18 @@ export default async function MenusPage({
         </Empty>
       ) : (
         <ul className={styles.rows}>
-          {rows.map((row) => (
+          {rows.map((row, seat) => (
             <li key={row.id} className={rowClass(row.status)}>
               <div className={styles.who}>
-                <Link href={`/desk/menus/${row.id}`} className={styles.whoEmail}>
+                {/* Into the review, carrying this view and this row's place. */}
+                <Link
+                  href={passHref(
+                    `/desk/menus/${row.id}`,
+                    statusSearch(filter),
+                    seat + 1
+                  )}
+                  className={styles.whoEmail}
+                >
                   {row.name}
                 </Link>
                 <span className={styles.when}>{row.slug}</span>
@@ -137,7 +148,14 @@ export default async function MenusPage({
                     {row.status === "active" ? "Withdraw" : "Offer it"}
                   </button>
                 </form>
-                <Link href={`/desk/menus/${row.id}`} className={styles.filter}>
+                <Link
+                  href={passHref(
+                    `/desk/menus/${row.id}`,
+                    statusSearch(filter),
+                    seat + 1
+                  )}
+                  className={styles.filter}
+                >
                   Open
                 </Link>
               </div>

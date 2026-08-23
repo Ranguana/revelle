@@ -55,6 +55,56 @@
  * it simply runs.
  *
  * ─────────────────────────────────────────────────────────────────────
+ * THE RUN RECORD — WHY A LEDGER OF FILES IS NOT ENOUGH
+ *
+ * `schema_migrations` answers "which files are applied". It cannot answer the
+ * question that actually cost this project four weeks: DID THE LAST DEPLOY'S
+ * MIGRATION STEP RUN AT ALL?
+ *
+ * Those are not the same question, and the difference is invisible from the
+ * ledger alone. If nobody wrote a migration for a fortnight, the head is
+ * identical whether this script ran sixty times or zero, so a head number on
+ * its own is consistent with a pipeline that has been dead since March.
+ *
+ * db/032 shipped an assertion that could never be true. It raised on every
+ * database it touched, this script exited non-zero, and — correctly — Render
+ * failed the deploy. The old instance kept serving. That is the safe outcome
+ * and it was also the silent one: for weeks the running code was old, the
+ * database was old, every screen agreed with itself, and the only evidence
+ * lived in a deploy log nobody opens. db/033, 034, 035 and 036 never applied,
+ * and seven seeders never executed, and NOTHING SAID SO.
+ *
+ * Here is the part that decides the design. When a deploy fails at this step,
+ * THE NEW CODE NEVER SERVES. So the running instance cannot discover the
+ * problem by looking at its own `db/` directory — its copy of the repo is the
+ * old commit, whose newest migration is exactly the one the database is at.
+ * It looks current. It is not.
+ *
+ * The ONE THING the failing deploy and the still-serving old instance share is
+ * the database. So the failing deploy writes what it knows INTO the database,
+ * on its way out:
+ *
+ *   schema_migration_run — one row per invocation of this script.
+ *     when it started and finished, whether it ended ok or failed,
+ *     the head before and after, what it applied, WHICH FILE FAILED,
+ *     which migrations therefore never ran, and which deploy steps
+ *     after this one therefore never ran either.
+ *
+ * `src/lib/desk/schema.ts` reads that row and the desk puts it on screen. That
+ * is the whole channel: a deploy that dies in Render's log still reaches a
+ * person, because it left a note in the only room both processes are in.
+ *
+ * Like the ledger, this table CANNOT live in a migration file. A database
+ * wedged at db/032 would never reach db/041, so the recorder of the wedge has
+ * to exist before the first migration runs. Both are bootstrapped below with
+ * `create table if not exists`, under the advisory lock.
+ *
+ * The row is written at the START as `running` and updated at the end. A run
+ * that is killed mid-flight (an instance recycled, a deploy cancelled) then
+ * leaves a `running` row that never finished, which is a distinguishable state
+ * rather than one that looks like "never ran".
+ *
+ * ─────────────────────────────────────────────────────────────────────
  * CONCURRENCY
  *
  * Two deploys (or a rollback racing a deploy) can run this simultaneously. The
@@ -99,6 +149,53 @@ const SENTINELS = {
   "001-schema.sql": "public.customer",
 };
 
+/**
+ * A single token nobody types by accident, on its own line in the failure
+ * block. `grep REVELLE_MIGRATE_FAILED` over a Render log, a CI log or a
+ * scrollback finds every failed run and nothing else.
+ */
+const FAIL_MARK = "REVELLE_MIGRATE_FAILED";
+
+/**
+ * The ledger and the run record — MIGRATION ZERO, both of them.
+ *
+ * Neither may live in a db/*.sql file: the whole point of the run record is to
+ * describe a database that is wedged BEFORE reaching some file, and a recorder
+ * that needs that file to have run is a recorder that is silent exactly when
+ * it matters. See THE RUN RECORD at the top.
+ *
+ * `if not exists` plus the advisory lock already held makes both safe on an
+ * empty database and on one that has run this a hundred times.
+ */
+const BOOTSTRAP = [
+  `create table if not exists schema_migrations (
+     filename    text primary key,
+     applied_at  timestamptz not null default now()
+   )`,
+  `create table if not exists schema_migration_run (
+     id                    bigserial primary key,
+     started_at            timestamptz not null default now(),
+     finished_at           timestamptz,
+     status                text not null
+                             check (status in ('running', 'ok', 'failed')),
+     -- The newest db/*.sql in the REPO THAT RAN THIS. Compared against the
+     -- running instance's own db/ directory, it is how a still-serving old
+     -- instance learns that a newer deploy tried and did not land.
+     repo_head             text,
+     head_before           text,
+     head_after            text,
+     applied               text[] not null default '{}',
+     adopted               text[] not null default '{}',
+     failed_file           text,
+     error                 text,
+     -- The line that was missing. Not "what failed" — what NEVER RAN AS A
+     -- RESULT, on both sides of the failure: the migrations behind it, and the
+     -- seeders after it in preDeployCommand.
+     never_ran_migrations  text[] not null default '{}',
+     never_ran_steps       text[] not null default '{}'
+   )`,
+];
+
 function fail(message, err) {
   console.error(`\n[migrate] FAILED: ${message}`);
   if (err) console.error(`[migrate]   ${err.message}`);
@@ -139,6 +236,195 @@ async function appliedFilenames(client) {
   return new Set(rows.map((r) => r.filename));
 }
 
+/**
+ * The highest recorded filename, by BYTE order.
+ *
+ * `max(filename)` would use the database's collation, and the ORDERING RULE at
+ * the top of this file exists because locale collation ignores punctuation and
+ * would put these files in a different order than the loop applies them in.
+ * `collate "C"` is byte order, which for this filename shape is the same
+ * comparison JavaScript's `<` makes. The head must be computed the same way it
+ * is ordered, or the number on the desk is from a different sort than the run.
+ */
+async function recordedHead(client) {
+  const { rows } = await client.query(
+    `select filename from schema_migrations
+      order by filename collate "C" desc limit 1`
+  );
+  return rows[0]?.filename ?? null;
+}
+
+/**
+ * Every `npm run …` in render.yaml's preDeployCommand, in order.
+ *
+ * Read from the deploy rather than listed here, for the reason
+ * scripts/smoke-seeders.mjs gives at length: a copy of the chain drifts from
+ * the chain. The parser is duplicated from that script rather than shared,
+ * following the same convention as `needsSsl` (which lives in three files) —
+ * smoke-seeders.mjs runs top-level code on import and cannot be imported.
+ *
+ * Returns null rather than throwing, and the caller SAYS SO. A failure summary
+ * that quietly omits "and here is what never ran" because it could not parse a
+ * YAML block is this whole file's bug wearing a smaller hat.
+ */
+function deployChain() {
+  try {
+    const path = fileURLToPath(new URL("../render.yaml", import.meta.url));
+    const lines = readFileSync(path, "utf8").split("\n");
+    const start = lines.findIndex((line) =>
+      /^\s*preDeployCommand:\s*>-\s*$/.test(line)
+    );
+    if (start < 0) return null;
+
+    const indent = (line) => line.length - line.trimStart().length;
+    const base = indent(lines[start]);
+    const steps = [];
+    for (const line of lines.slice(start + 1)) {
+      if (line.trim() === "") break;
+      if (indent(line) <= base) break;
+      const m = /npm run ([A-Za-z0-9:_-]+)/.exec(line);
+      if (m) steps.push(m[1]);
+    }
+    return steps.length > 0 ? steps : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Everything in the chain after `migrate` — the steps a failure here cancels. */
+function stepsAfterMigrate(chain) {
+  if (!chain) return null;
+  const at = chain.indexOf("migrate");
+  return at < 0 ? null : chain.slice(at + 1);
+}
+
+/* ── the run record ──────────────────────────────────────────────────── */
+
+async function startRun(client, repoHead, headBefore) {
+  const { rows } = await client.query(
+    `insert into schema_migration_run (status, repo_head, head_before)
+     values ('running', $1, $2) returning id`,
+    [repoHead, headBefore]
+  );
+  return rows[0].id;
+}
+
+/**
+ * Close the run row out.
+ *
+ * Wrapped so that a recorder failure can never mask the real error — and when
+ * it does fail it says so, because a recorder that goes quiet is the exact bug
+ * this file is fixing. If this write is lost the desk still has one signal
+ * left: the previous run's age, which is why the desk shows that even when
+ * everything looks fine.
+ */
+async function finishRun(client, runId, fields) {
+  if (runId === null) return;
+  try {
+    await client.query(
+      `update schema_migration_run
+          set finished_at = now(),
+              status = $2,
+              head_after = $3,
+              applied = $4,
+              adopted = $5,
+              failed_file = $6,
+              error = $7,
+              never_ran_migrations = $8,
+              never_ran_steps = $9
+        where id = $1`,
+      [
+        runId,
+        fields.status,
+        fields.headAfter ?? null,
+        fields.applied ?? [],
+        fields.adopted ?? [],
+        fields.failedFile ?? null,
+        fields.error ? String(fields.error).slice(0, 4000) : null,
+        fields.neverRanMigrations ?? [],
+        fields.neverRanSteps ?? [],
+      ]
+    );
+  } catch (err) {
+    console.error(
+      `[migrate] COULD NOT RECORD THIS RUN (${err.message}). The desk will ` +
+        `have no row for it, so the only remaining signal is that the last ` +
+        `recorded run is older than this deploy. Say so out loud if you are ` +
+        `reading this.`
+    );
+  }
+}
+
+/**
+ * THE FAILURE BLOCK.
+ *
+ * Everything a person needs to act, in one screen, with no other file to open:
+ * where the database now stands, which file refused, what is behind it, and —
+ * the line that was missing when db/032 wedged the pipeline — WHICH DEPLOY
+ * STEPS NEVER EXECUTED BECAUSE OF IT. Seven seeders did not run that day and
+ * nothing in the log mentioned their names.
+ */
+function loudFailure(report, err) {
+  const bar = "─".repeat(70);
+  const out = [];
+  const say = (line = "") => out.push(line === "" ? "[migrate]" : `[migrate] ${line}`);
+
+  say(bar);
+  say(FAIL_MARK);
+  say("MIGRATION FAILED. THE DEPLOY STOPS HERE AND THE OLD CODE KEEPS SERVING.");
+  say(bar);
+  say(
+    `database was at : ${report.headBefore ?? "(nothing recorded — empty database)"}`
+  );
+  say(`repo expects    : ${report.repoHead ?? "(no migrations found in db/)"}`);
+  say();
+
+  const moved = [...report.applied, ...report.adopted];
+  say(
+    moved.length > 0
+      ? `applied this run (${moved.length}): ${moved.join(", ")}`
+      : "applied this run: NOTHING — the file that failed was the first one outstanding."
+  );
+  say();
+  say(`FAILED AT: ${report.failedFile ?? "(before any file — see the error)"}`);
+  for (const line of String(err?.message ?? err).split("\n")) say(`  ${line}`);
+  say();
+
+  say(
+    report.neverRanMigrations.length > 0
+      ? `NEVER RAN — ${report.neverRanMigrations.length} migration(s) behind the failure:`
+      : "NEVER RAN — no migrations were behind the failure."
+  );
+  for (const file of report.neverRanMigrations) say(`  db/${file}`);
+  say();
+
+  if (report.neverRanSteps === null) {
+    say(
+      "NEVER RAN — deploy steps: UNKNOWN. render.yaml's `preDeployCommand: >-`"
+    );
+    say(
+      "  block could not be read, so this cannot name what else was cancelled."
+    );
+    say("  Fix that before trusting this block again.");
+  } else if (report.neverRanSteps.length === 0) {
+    say("NEVER RAN — deploy steps: none. `migrate` is the last step in the chain.");
+  } else {
+    say(
+      `NEVER RAN — ${report.neverRanSteps.length} deploy step(s) after this one, ` +
+        `from render.yaml:`
+    );
+    for (const step of report.neverRanSteps) say(`  npm run ${step}`);
+    say("  Every one of those is a seeder. None of them executed.");
+  }
+
+  say();
+  say("This is recorded in schema_migration_run and will appear at /desk on");
+  say("the instance that is still serving. Nobody has to be watching this log.");
+  say(bar);
+
+  console.error(`\n${out.join("\n")}\n`);
+}
+
 async function sentinelExists(client, relation) {
   const { rows } = await client.query(
     `select to_regclass($1) is not null as present`,
@@ -147,24 +433,18 @@ async function sentinelExists(client, relation) {
   return rows[0].present;
 }
 
-async function runMigrations(client) {
-  // The ledger is migration zero and cannot itself live in a migration file.
-  // `if not exists` plus the advisory lock already held makes this safe on an
-  // empty database and on one that has run this a hundred times.
-  await client.query(`
-    create table if not exists schema_migrations (
-      filename    text primary key,
-      applied_at  timestamptz not null default now()
-    )
-  `);
-
-  const files = discoverMigrations();
+/**
+ * Apply what is outstanding, filling `report` as it goes.
+ *
+ * The report is a parameter rather than a return value because the CAUGHT case
+ * is the one that has to be complete: when this throws, the caller still needs
+ * what had already been applied and what was left behind. A function that only
+ * describes its successes has nothing to say on the day it matters.
+ */
+async function runMigrations(client, files, report) {
   const done = await appliedFilenames(client);
 
-  let ran = 0;
-  let adopted = 0;
-
-  for (const file of files) {
+  for (const [index, file] of files.entries()) {
     if (done.has(file)) {
       console.log(`[migrate] skip     ${file} (already applied)`);
       continue;
@@ -180,7 +460,7 @@ async function runMigrations(client) {
       console.log(
         `[migrate] adopt    ${file} (${sentinel} already exists — recorded, not re-run)`
       );
-      adopted += 1;
+      report.adopted.push(file);
       continue;
     }
 
@@ -200,15 +480,22 @@ async function runMigrations(client) {
       } catch {
         // A failed rollback is not the error worth reporting.
       }
+      report.failedFile = file;
+      // Everything behind the failure that is not already recorded. This is
+      // the "what never ran because of it" list, and it is computed here
+      // rather than guessed at by the reader of a log.
+      report.neverRanMigrations = files
+        .slice(index + 1)
+        .filter((name) => !done.has(name));
       throw new Error(`migration ${file} failed: ${err.message}`);
     }
     console.log(`[migrate] apply    ${file}`);
-    ran += 1;
+    report.applied.push(file);
   }
 
   console.log(
-    `[migrate] ${ran} applied, ${adopted} adopted, ` +
-      `${files.length - ran - adopted} already recorded`
+    `[migrate] ${report.applied.length} applied, ${report.adopted.length} adopted, ` +
+      `${files.length - report.applied.length - report.adopted.length} already recorded`
   );
 }
 
@@ -236,16 +523,69 @@ try {
 }
 
 let locked = false;
+let runId = null;
+
+/**
+ * What this invocation did, whatever way it ends. Populated as the run goes so
+ * that the failure path has a complete story rather than a stack trace.
+ */
+const report = {
+  repoHead: null,
+  headBefore: null,
+  applied: [],
+  adopted: [],
+  failedFile: null,
+  neverRanMigrations: [],
+  neverRanSteps: stepsAfterMigrate(deployChain()),
+};
+
 try {
   // Blocks rather than failing if another deploy is mid-run. Session-level:
   // released below, or by the server the moment this connection drops.
   await client.query("select pg_advisory_lock($1::bigint)", [ADVISORY_LOCK_KEY]);
   locked = true;
 
-  await runMigrations(client);
+  for (const ddl of BOOTSTRAP) await client.query(ddl);
 
+  const files = discoverMigrations();
+  report.repoHead = files.at(-1) ?? null;
+  report.headBefore = await recordedHead(client);
+  runId = await startRun(client, report.repoHead, report.headBefore);
+
+  await runMigrations(client, files, report);
+
+  const headAfter = await recordedHead(client);
+  await finishRun(client, runId, {
+    status: "ok",
+    headAfter,
+    applied: report.applied,
+    adopted: report.adopted,
+  });
+
+  console.log(
+    `[migrate] head is now ${headAfter ?? "(none)"}; repo expects ` +
+      `${report.repoHead ?? "(none)"}`
+  );
   console.log("[migrate] done");
 } catch (err) {
+  loudFailure(report, err);
+  await finishRun(client, runId, {
+    status: "failed",
+    headAfter: await recordedHead(client).catch(() => null),
+    applied: report.applied,
+    adopted: report.adopted,
+    failedFile: report.failedFile,
+    error: err.message,
+    neverRanMigrations: report.neverRanMigrations,
+    // null (chain unreadable) is not the same as [] (nothing after migrate).
+    // The column cannot hold null, so the unreadable case is written as the
+    // sentinel below rather than as an empty list that would read as "nothing
+    // was cancelled" — which is a claim this run cannot make.
+    neverRanSteps:
+      report.neverRanSteps === null
+        ? ["(render.yaml unreadable — this run cannot say what else was cancelled)"]
+        : report.neverRanSteps,
+  });
   fail(err.message);
 } finally {
   try {

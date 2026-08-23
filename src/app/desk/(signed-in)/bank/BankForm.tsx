@@ -9,7 +9,10 @@ import {
   POOL_STATUS,
 } from "@/lib/desk/labels";
 
+import type { Carried } from "@/lib/desk/review";
+
 import styles from "../../desk.module.css";
+import { ReviewFields } from "../bits";
 import { saveBankItem, type BankState } from "./actions";
 
 /**
@@ -67,9 +70,12 @@ export default function BankForm({
   values,
   destinations,
   cards,
+  carried,
 }: {
   values: BankValues;
   destinations: readonly { id: string; name: string }[];
+  /** the review this save must land back inside, if one is running */
+  carried?: Carried | null;
   /** Every `printed_card` in the library, and nothing else. See the hint. */
   cards: readonly { id: string; name: string; world_name: string }[];
 }) {
@@ -83,6 +89,8 @@ export default function BankForm({
   return (
     <form action={action} className={`${styles.form} ${styles.formWide}`}>
       {values.id ? <input type="hidden" name="id" value={values.id} /> : null}
+      {/* So that saving mid-review does not end the review. See review.ts. */}
+      <ReviewFields carried={carried ?? null} />
       {state.error ? <p className={styles.error}>{state.error}</p> : null}
 
       <div className={styles.grid2}>

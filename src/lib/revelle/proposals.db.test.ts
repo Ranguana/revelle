@@ -488,6 +488,7 @@ function runOf(fx: Fixture, worldIds: readonly string[]): SelectionResult {
       dealbreakers: [],
       blend: { stated: 0.55, history: 0, cohort: 0.45 },
       evidenceCount: 0,
+      unscored: [],
     },
     emphasis: noEmphasis(),
     eliminated: [],

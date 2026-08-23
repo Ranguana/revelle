@@ -35,14 +35,7 @@ import "server-only";
 
 import { query, queryOne } from "@/lib/db";
 import { memberRevelle, type MemberRevelle } from "@/lib/selection/member";
-import type {
-  Candidate,
-  Ingredient,
-  Pick,
-  PrintedPiece,
-  SectionKind,
-  UnitSlot,
-} from "@/lib/selection/types";
+import { candidateFrom, readPicks } from "@/lib/portal/picks";
 import { readTheme } from "@/lib/portal/theme";
 import type { Theme } from "@/lib/tokens";
 
@@ -197,7 +190,12 @@ export async function readOccasion(
   );
   if (!row) return null;
 
-  const picks = await readPicks(row);
+  // Every registered pool, out of `ingredient_pool` — see the essay at the top
+  // of src/lib/portal/picks.ts. THIS CALL CAN THROW, and the throw is the
+  // point: `UnrenderableIngredients` means her package cannot be read whole,
+  // and it travels up out of here unhandled because this module has no
+  // business deciding what a member is shown. The page catches it by type.
+  const picks = await readPicks(query, row.id);
   const look = readTheme(
     merged(row.tokens, row.tokens_override),
     row.world_slug
@@ -209,7 +207,18 @@ export async function readOccasion(
     premise: row.description ?? "",
     dedication: row.dedication,
     theme: look.theme,
-    revelle: memberRevelle(candidateFrom(row, picks)),
+    revelle: memberRevelle(
+      candidateFrom(
+        {
+          worldId: row.world_id,
+          worldSlug: row.world_slug,
+          name: row.name,
+          tagline: row.tagline,
+          guestCount: row.guest_count,
+        },
+        picks
+      )
+    ),
     prep: await readPrep(row.id),
   };
 }
@@ -237,280 +246,6 @@ function merged(base: unknown, override: unknown): unknown {
     out[key] = value;
   }
   return out;
-}
-
-type PickRow = {
-  pool: string;
-  entity_id: string;
-  slug: string;
-  name: string;
-  description: string;
-  /** drink.mocktails — the second build of the same record. Null elsewhere. */
-  mirror: string | null;
-  slot_code: string | null;
-  slot_label: string | null;
-  slot_section: string | null;
-  slot_per_guest: boolean | null;
-  slot_position: number | null;
-  section: string | null;
-  position: number | null;
-  printed_matter: unknown;
-};
-
-/**
- * WHAT IS IN HER REVELLE, from the join tables and nowhere else.
- *
- * One statement per pool rather than a union over `revelle_ingredient`,
- * because that view carries only ids and the name and the authored text are
- * the whole point. The pool list is a constant of this module — never a value
- * from a request — so composing the identifiers into SQL is safe in the one
- * way that matters, exactly as src/lib/selection/catalogue.ts argues.
- *
- * A pool with no row for this Revelle contributes nothing and says nothing.
- */
-const POOLS: readonly {
-  pool: string;
-  table: string;
-  describe: string;
-  /** drink.mocktails. The mirror travels with the drink or not at all. */
-  mirror: string | null;
-  printed: string | null;
-}[] = [
-  { pool: "product", table: "product", describe: "description", mirror: null, printed: null },
-  { pool: "game", table: "game", describe: "description", mirror: null, printed: "game_printed_matter" },
-  { pool: "tracklist", table: "tracklist", describe: "description", mirror: null, printed: null },
-  // A menu has no description and its line of dishes IS the thing — db/012.
-  { pool: "menu", table: "menu", describe: "dishes", mirror: null, printed: null },
-  // A drink has two authored lines on ONE row — the cocktails and the mocktail
-  // mirror of the same glass (db/017). Both are read here so that a delivered
-  // Revelle can never show one without the other.
-  { pool: "drink", table: "drink", describe: "cocktails", mirror: "mocktails", printed: null },
-];
-
-async function readPicks(row: RevelleRow): Promise<PickRow[]> {
-  const out: PickRow[] = [];
-
-  for (const spec of POOLS) {
-    const idColumn = `${spec.table}_id`;
-    const rows = await query<PickRow>(
-      `select '${spec.pool}'::text as pool,
-              t.id as entity_id, t.slug::text as slug, t.name,
-              t.${spec.describe} as description,
-              ${spec.mirror ? `t.${spec.mirror}` : "null::text"} as mirror,
-              j.slot_code, j.slot::text as section, j.position,
-              sk.label     as slot_label,
-              sk.section::text as slot_section,
-              sk.per_guest as slot_per_guest,
-              sk.position  as slot_position,
-              ${
-                spec.printed
-                  ? `coalesce(
-                (select jsonb_agg(jsonb_build_object(
-                          'piece', pm.piece, 'label', pm.label,
-                          'description', pm.description,
-                          'per_guest', pm.per_guest, 'quantity', pm.quantity)
-                        order by pm.position, pm.piece)
-                   from ${spec.printed} pm where pm.${idColumn} = t.id),
-                '[]'::jsonb)`
-                  : "'[]'::jsonb"
-              } as printed_matter
-         from revelle_${spec.table} j
-         join ${spec.table} t on t.id = j.${idColumn}
-         left join slot_kind sk on sk.code = j.slot_code
-        where j.revelle_id = $1`,
-      [row.id]
-    );
-    out.push(...rows);
-  }
-
-  return out;
-}
-
-/**
- * The rows, as a Candidate.
- *
- * Every house-side field is empty because there is nothing to put in it: the
- * search that produced these rows happened elsewhere, and what it rejected was
- * never written down beside what it chose. `blocked` is null because a stored
- * Revelle has already been delivered — the uniqueness guard in db/002 refused
- * it or it would not be a row.
- *
- * The scoring numbers on each Pick are zeroes rather than reconstructions. A
- * Pick's score is a fact about a search, not about a thing she owns, and
- * inventing one would be inventing evidence.
- */
-function candidateFrom(row: RevelleRow, picks: PickRow[]): Candidate {
-  return {
-    rank: 1,
-    destination: {
-      id: row.world_id,
-      slug: row.world_slug,
-      name: row.name,
-      tagline: row.tagline,
-      facets: {},
-      occasions: [],
-      issuance: null,
-      isFixture: row.world_slug.startsWith("fixture-"),
-    },
-    destinationScore: 0,
-    destinationRank: 1,
-    ditheredRank: 1,
-    picks: picks.map((pick) => toPick(pick, row.guest_count)),
-    dropped: [],
-    gaps: [],
-    swaps: [],
-    fingerprint: null,
-    budget: {
-      guests: null,
-      guestsAreConfirmed: false,
-      planning: null,
-      ceiling: null,
-      totalCents: 0,
-      totalPerHeadCents: null,
-      overage: null,
-      overagePerHead: null,
-      unbounded: false,
-      unpricedItems: [],
-    },
-    score: 0,
-    lowConfidence: false,
-    blocked: null,
-    explanation: {
-      headline: "",
-      destination: [],
-      eliminated: [],
-      forced: [],
-      dropped: [],
-      swapped: [],
-      budget: [],
-      emphasis: [],
-      venue: [],
-      gaps: [],
-      excluded: [],
-      confidence: [],
-      secret: null,
-    },
-  };
-}
-
-function toPick(row: PickRow, guestCount: number | null): Pick {
-  // slot_code is nullable: db/009 allows an ingredient placed by hand at the
-  // desk to name no slot. It still has to render, and the block it renders
-  // into is `slot`, which is the coarser fact and is always recorded.
-  const section = (row.slot_section ?? row.section ?? "details") as SectionKind;
-  const perGuest = row.slot_per_guest ?? false;
-
-  const slot: UnitSlot = {
-    key: `${row.pool}:${row.entity_id}`,
-    slotCode: row.slot_code ?? section,
-    label: row.slot_label ?? "",
-    section,
-    pool: row.pool,
-    required: false,
-    quantity: perGuest ? Math.max(guestCount ?? 1, 1) : 1,
-    perGuest,
-    dayIndex: null,
-    position: row.slot_position ?? row.position ?? 0,
-    note: "",
-  };
-
-  const ingredient: Ingredient = {
-    pool: row.pool,
-    id: row.entity_id,
-    slug: row.slug,
-    name: row.name,
-    description: row.description ?? "",
-    priceCents: null,
-    facets: {},
-    occasions: [],
-    slots: [],
-    worlds: {},
-    issuance: null,
-    minGuests: null,
-    maxGuests: null,
-    shape: null,
-    printedMatter: printedMatterFor(row),
-    isFixture: row.slug.startsWith("fixture-"),
-  };
-
-  return {
-    slot,
-    ingredient,
-    unitCost: null,
-    lineCost: null,
-    facetMatch: 0,
-    affinity: 0,
-    issuancePenalty: 0,
-    similarityPenalty: 0,
-    score: 0,
-    forced: false,
-    alternatives: 0,
-  };
-}
-
-/**
- * What one stored pick prints. The same two rules the forward path applies in
- * src/lib/selection/catalogue.ts, and deliberately the same two: a menu is one
- * card made of its dishes, a game has its authored objects, everything else
- * prints nothing at all. Read that file's note for why.
- */
-function printedMatterFor(row: PickRow): PrintedPiece[] {
-  // A drink prints two objects from one row: the bar card and its mirror.
-  // Never one alone — db/017 makes the pair structural and this is where a
-  // delivered Revelle would otherwise be able to lose half of it.
-  if (row.pool === "drink") {
-    const cocktails = (row.description ?? "").trim();
-    const mirror = (row.mirror ?? "").trim();
-    if (cocktails.length === 0 || mirror.length === 0) return [];
-    return [
-      {
-        piece: "drink_card",
-        label: "The drinks",
-        description: cocktails,
-        perGuest: false,
-        quantity: null,
-      },
-      {
-        piece: "mirror_card",
-        label: "The mirror",
-        description: mirror,
-        perGuest: false,
-        quantity: null,
-      },
-    ];
-  }
-
-  if (row.pool === "menu") {
-    const dishes = (row.description ?? "").trim();
-    if (dishes.length === 0) return [];
-    return [
-      {
-        piece: "menu_card",
-        label: "The menu",
-        description: dishes,
-        perGuest: false,
-        quantity: null,
-      },
-    ];
-  }
-  return printedPieces(row.printed_matter);
-}
-
-function printedPieces(value: unknown): PrintedPiece[] {
-  if (!Array.isArray(value)) return [];
-  return value.map((entry) => {
-    const object = entry as Record<string, unknown>;
-    return {
-      piece: String(object.piece ?? ""),
-      label: String(object.label ?? ""),
-      description: String(object.description ?? ""),
-      perGuest: Boolean(object.per_guest),
-      quantity:
-        object.quantity === null || object.quantity === undefined
-          ? null
-          : Number(object.quantity),
-    };
-  });
 }
 
 /* ── the prep ───────────────────────────────────────────────────────── */

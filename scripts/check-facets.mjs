@@ -33,6 +33,11 @@
  * a point on an ordinal axis, or a month landing on a season. Its words are
  * supposed to differ from the facet's. See the note above `isTranslated`.
  *
+ * Reported in the same list since db/037: an answer that resolves to MORE THAN
+ * ONE vocabulary. "It starts at lunchtime" says both what the table is and what
+ * hour the evening begins, and one label cannot be both facets' label. Same
+ * verdict, same reason — resolution is checked, wording is not.
+ *
  * Exit code is non-zero only for MISSING.
  *
  * ─────────────────────────────────────────────────────────────────────
@@ -71,7 +76,8 @@ await client.connect();
 const { rows } = await client.query(`
   select m.quiz_field, m.option_code::text as option_code, m.answer_polarity,
          m.facet_id::text as facet_id, m.answer_weight::float8 as answer_weight,
-         f.code::text as facet_code, f.label, f.description, f.status
+         f.code::text as facet_code, f.dimension_code::text as dimension_code,
+         f.label, f.description, f.status
     from quiz_option_facet m
     join facet f on f.id = m.facet_id
 `);
@@ -100,7 +106,25 @@ const { rows: axisRows } = await client.query(`
 `);
 await client.end();
 
-const mapped = new Map(rows.map((r) => [`${r.quiz_field}/${r.option_code}`, r]));
+/*
+ * ONE ANSWER MAY NOW MEAN TWO THINGS, so this is a Map of LISTS.
+ *
+ * It was a Map of rows, keyed by field and option, which was right while
+ * quiz_option_facet was keyed the same way. db/037 widened that key to include
+ * the facet, because "it starts at lunchtime" is one fact with two consequences
+ * — the table is a lunch and the evening begins in the afternoon — and the two
+ * readers want different vocabularies. A Map of rows would have kept whichever
+ * of the two the database happened to return last and reported the other as
+ * missing or as drift, which is precisely the silent disagreement this script
+ * exists to catch.
+ */
+const mapped = new Map();
+for (const r of rows) {
+  const key = `${r.quiz_field}/${r.option_code}`;
+  const list = mapped.get(key);
+  if (list) list.push(r);
+  else mapped.set(key, [r]);
+}
 
 /*
  * SOME ANSWERS ARE THEIR FACET AND SOME ARE TRANSLATED INTO ONE, and the
@@ -148,11 +172,32 @@ for (const [fieldId, field] of Object.entries(FIELDS)) {
     const key = `${fieldId}/${option.code}`;
     seen.add(key);
 
-    const row = mapped.get(key);
-    if (!row) {
+    const resolutions = mapped.get(key);
+    if (!resolutions) {
       missing.push(key);
       continue;
     }
+
+    /*
+     * AN ANSWER WITH TWO RESOLUTIONS CANNOT HAVE ONE SET OF WORDS, so the
+     * wording check is skipped for exactly the reason it is skipped for a
+     * translation. `meal_time/lunch` resolves to `meal_shape/lunch` (what the
+     * table is) and to `evening_start/afternoon` (what hour it begins), and the
+     * option's label names an hour: it will match at most one of them and is not
+     * supposed to match both. What is still checked is the thing that matters —
+     * that it resolves at all — and every resolution is printed, so a bridge row
+     * added by accident is visible rather than averaged away.
+     */
+    if (resolutions.length > 1) {
+      shared.push(
+        `${key} -> ${resolutions
+          .map((r) => `${r.dimension_code ?? "?"}/${r.facet_code}`)
+          .join(" + ")} (one answer, ${resolutions.length} vocabularies)`
+      );
+      continue;
+    }
+
+    const row = resolutions[0];
     if (isTranslated(row, option)) {
       shared.push(
         `${key} -> ${row.facet_code} (weight ${row.answer_weight})`
@@ -182,10 +227,29 @@ const axes = new Map(axisRows.map((r) => [r.code, r]));
 const unresolved = [];
 const reweighted = [];
 
+/*
+ * DRAFTS ARE REPORTED, NOT FAILED — and the distinction is the whole reason the
+ * flag exists.
+ *
+ * The rule above is "a tone that resolves to nothing is fatal, because she can
+ * tap it and it means nothing". A DRAFT tone is one coined for a room that is
+ * not authored yet (src/lib/voice.ts says so on the flag): it is claimed by no
+ * destination, has no mark cut for it, has no row in any migration — and, since
+ * the filter in src/lib/quiz.ts, IS NOT ON THE PAGE. She cannot tap it, so the
+ * premise of the rule is false for exactly these thirteen and failing on them
+ * would make this check unrunnable for as long as a word is waiting for its
+ * room.
+ *
+ * It is still PRINTED, because a draft that has been waiting a long time is
+ * worth seeing, and because the day one is shipped without a migration this
+ * line is where it turns fatal by itself.
+ */
+const pending = [];
+
 for (const tone of TONES) {
   const rows = voiceRows.filter((r) => r.tone === tone.code);
   if (rows.length === 0) {
-    unresolved.push(tone.code);
+    (tone.draft ? pending : unresolved).push(tone.code);
     continue;
   }
   for (const { code, weight } of tone.facets) {
@@ -209,6 +273,12 @@ for (const facet of VOICE_FACETS) {
   if (row.label !== facet.label || row.description !== facet.description) {
     reweighted.push(`voice/${facet.code}: wording differs from voice.ts`);
   }
+}
+
+for (const code of pending) {
+  console.log(
+    `[check-facets] draft tone  ${code} (coined, no room yet, not on the page)`
+  );
 }
 
 for (const line of reweighted) console.log(`[check-facets] voice drift ${line}`);

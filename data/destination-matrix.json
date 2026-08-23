@@ -35,7 +35,8 @@
     "starts": [
       "morning",
       "afternoon",
-      "evening"
+      "evening",
+      "late"
     ],
     "size": [
       "few",
@@ -49,8 +50,51 @@
   },
   "facetNotes": {
     "schedule": "posted = the invitation names the hours. anchored = one thing happens AT ITS HOUR and the rest finds its own (Westhampton's drinks hour, New Orleans' second wind at midnight). standing = the house's own unannounced rhythms — nothing is named, but the night has always gone this way (Nantucket, Côte d'Azur's eternal lunch). unplanned = nobody decided anything; it became a party. anchored and standing were briefly ONE level on the argument that a host cannot tell them apart. That was wrong, and the collision proved it: Westhampton/Nantucket failed on [dress, food] with no schedule contribution, which is impossible if those two houses keep time differently — and they do. A named hour and an unnamed habit are different answers to 'does anything happen at a time?'",
+    "starts": "WHEN THE THING BEGINS, and only that — `ending` already answers how late it runs, and one facet cannot answer two questions (that is why `hour` was replaced by this in the contrast pass). FOUR LEVELS, AND THE FOURTH IS APPLICANT-SIDE ONLY. `late` was added when the hour question was ungated and reworded (db/037), because 'a late supper' is an hour a host can now name and morning/afternoon/evening had nowhere to put it. NO ROW HOLDS `late` AND NONE SHOULD BE MOVED TO IT: not one of the eighteen is authored as beginning at midnight, and re-declaring a cell to populate a level is fitting the evidence to the column. So the audit prints DEAD starts.late and that line is CORRECT — it is the catalogue saying, accurately, that the room which begins at one in the morning has not been written. See docs/proposals.md, 2026-08-23. The consequence for scoring is that the comparison is ASYMMETRIC — a member level against a row level, never row against row — and src/lib/selection/structure.ts holds the table and the argument. The rooms that ARE late-night are not reached through this facet at all; they are reached through `ending = until_morning`, which is a different claim and has its own question.",
+    "ending": "WHAT KIND OF NIGHT IT IS, which is not the same claim as `starts` and must not be collapsed into it. `starts` records the hour she named; this records what she thinks a good evening does with its last hour. The split is what lets a Sunday lunch that goes until dark and a dinner that stops at eleven both be said. Levels sit 7 / 7 / 4 across the eighteen rows, the most even split any facet has, and the audit scores it second only to `schedule` for pairs separated. Fed since db/037 by `how_it_ends`, whose three options are the founder's own scenes and whose codes ARE these levels, so the answer resolves with no translation step.",
     "size": "Pure headcount. few = 8 or under. table = 8 to 16. crowd = 16 and over. \"One long table\" is EVIDENCE for the middle band, never the definition — the furniture fact stays in the prose.",
     "spectacle": "performed = A SHOW THE ROOM WATCHES — a floor show, cliff divers, the band that is the point. EXCLUSION, written here because it will otherwise creep: a toast, or a carving at the table, is CEREMONY and not spectacle. The room attending to one person it knows is not an audience."
+  },
+  "fedBy": {
+    "note": "WHICH QUIZ ANSWER SUPPLIES EACH COLUMN. CLAUDE.md rule 15: nothing grades that does not prune, and every instrument traces to a supplier. This block is that trace, as data rather than as a claim in a comment, so that src/lib/selection/structure.ts can rank on exactly the fed facets and a test can assert the two lists are the same list. THREE STATES, and `field: null` covers the last two — an unfed column is one nothing supplies, and a column supplied by a hardcoded default identical for every applicant is the same thing wearing a number. An entry here is a promise that a HOST STATES THIS LEVEL, not that a level could be guessed from something she said: a veto ('a schedule that runs the day') is negative evidence about one level and does not state a cell, and a fact about her guests is not a fact about the evening. Reading a level out of an answer that meant something else is the retro-tagging failure this catalogue exists to escape (rule 3), so the honest entry for seven of the nine is null with the reason written down. THE RANKER IS DRIVEN BY THIS BLOCK. Adding a supplier is an entry here plus a bridge row in a migration; it is deliberately not a code change, so the column count the reveal claims can never drift from the column count it uses.",
+    "arrival": {
+      "field": null,
+      "why": "UNFED. No question asks how people come through the door. `assigned` is Catskills alone and is a fingerprint level, which makes this the most delicate of the seven to wire: a single question reaching it would name a room in one tap. Wiring it needs a scene question in the idiom of `how_it_ends`, not a tag borrowed from somewhere else."
+    },
+    "schedule": {
+      "field": null,
+      "why": "UNFED. The nearest answer is `anti_preferences/schedule` — 'a schedule that runs the day' — and it is a VETO. It says one level is unwanted; it does not say which of the remaining three the evening is, and `anchored` against `standing` is precisely the distinction it cannot make (see facetNotes). Negative evidence about one level is not a stated cell. It is also the facet carrying the most separation in the audit, which makes it the strongest candidate for the next question and the worst one to fake."
+    },
+    "volume": {
+      "field": null,
+      "why": "UNFED. `anti_preferences/loud` vetoes one end and `group_fun` describes HER PEOPLE, which rule 1 forbids as a source for a cell about the evening. docs/destination-contrasts.md keeps this facet on the argument that size and hour genuinely constrain it — that is an argument for the facet existing, not evidence of which level a given host is at."
+    },
+    "dress": {
+      "field": null,
+      "why": "UNFED. `group_fun/dress_up` is 'commit to an outfit', which is a thing her people enjoy rather than a rule this evening has, and `anti_preferences/costumes` vetoes a costume rule, which is not the same claim as `plain`. The weakest discriminator of the seven unfed and the most legible question that could be asked, which is the contrast doc's own note on it."
+    },
+    "food": {
+      "field": null,
+      "why": "UNFED, and it looks fed, which is why it is written out. `how_made` is an axis of EFFORT — actually made / half made / bought and arranged — and this facet is an axis of PROVENANCE, and they come apart at both ends: `arrived` (Tahiti alone) is not a rung on the making ladder, and `half_made` names no level here. `food_plan` says whether there is a table, not who cooked. Mapping either onto this column would be inventing a cell out of an answer about something else."
+    },
+    "ending": {
+      "field": "how_it_ends",
+      "dimension": "evening_ending",
+      "why": "FED by db/037. Three options, asked of everyone, no activeWhen. The option codes ARE these levels, so the bridge is an identity and there is no translation to get wrong."
+    },
+    "starts": {
+      "field": "meal_time",
+      "dimension": "evening_start",
+      "why": "FED by db/037, through a SECOND resolution of an answer that already had one. The same four codes resolve to `meal_shape` for the composed table and to `evening_start` for this column — brunch to morning, lunch to afternoon, dinner to evening, a late supper to `late`. Before db/037 the question was gated behind `food_plan = sit_down`, so a cocktail party, a booked restaurant and a drinks-only evening stated no hour anywhere and this column was ranked against a fallback for all three."
+    },
+    "size": {
+      "field": null,
+      "why": "UNFED, and the closest of the seven to being wireable. `guest_count_band` is arithmetic and this facet is pure headcount, so a bridge is available — but the bands and the levels do not line up: `from_13_to_20` straddles the 16 that divides `one_table` from `crowd`, and picking a side is a judgement rather than a translation. It is also a scale answer, which docs/destination-contrasts.md holds to a different stage on purpose ('guest count and spend are likewise filters, not taste'), so wiring it into a ranker is a decision about the seam and not only about a boundary."
+    },
+    "spectacle": {
+      "field": null,
+      "why": "UNFED. `group_fun/perform` is 'sing, badly, on purpose', which is her people volunteering — and the facet's own exclusion note says the room attending to one person it knows is CEREMONY and not spectacle. The two are near-opposites. Claimed by two rooms of eighteen, so the fingerprint risk is the same one `arrival` has."
+    }
   },
   "rows": {
     "westhampton-1976": [
@@ -283,7 +327,8 @@
     "nantucket.ending": "FOUNDER DECIDES. `dissolves` is CC's pass-1 reading; `clean_stop` was the original. See flipLog.",
     "nantucket.starts": "FOUNDER DECIDES. `evening` is CC's pass-1 reading; `afternoon` was the original. See flipLog.",
     "amalfi-1953.schedule": "provisional `unplanned` under the four-level split — founder decides",
-    "acapulco-1959.schedule": "NOT IN THE FOUNDER'S ASSIGNMENT LIST. Left at `anchored` from its own admission brief. Confirm."
+    "acapulco-1959.schedule": "NOT IN THE FOUNDER'S ASSIGNMENT LIST. Left at `anchored` from its own admission brief. Confirm.",
+    "tahiti.starts": "FOUNDER DECIDES. Tahiti widened to an afternoon-through-morning arc (founder ruling, 2026-08-23); the row still says `evening` and the party now begins in daylight. NOT re-declared by an agent. Note the choice is afternoon vs evening ONLY: `late` is applicant-side only by the same founder's ruling on db/037 — no row ever holds it, and Tahiti's late-night character is carried by ending = until_morning, which it already has. On ruling, re-run check:matrix and report Tahiti's distances to BIG SUR and COTE D'AZUR, the afternoon neighbours; food = arrived, ending = until_morning and the venue gate are expected to hold the gaps, but the numbers are reported, not assumed."
   },
   "rejectedFacets": {
     "speech": "Zero marginal information against `arrival` — separated 20 pairs, none that `arrival` did not.",
@@ -390,5 +435,8 @@
   },
   "awaitingVoice": {
     "westhampton-1976": "ROW RE-FOUNDED, PROSE NOT YET REWRITTEN. The row is Eothen/Capote — the house where the famous come to be off-duty — and src/lib/destinations.ts still holds the Locust Valley voice: deadpan, understated, low_voices, quiet, a card left on the hall table. The two disagree ON PURPOSE and temporarily. Every cell here is carried by a sentence in the founder's scene card: standing = 'people drift out from the city, the weekend has a shape nobody announces'; crowd = 'somebody famous is asleep on the porch'; until_morning = 'indiscreet by ten and legendary by midnight'; one_conversation = 'one person tells it, everyone leans in'; plain = 'the shoes came off at the door'; bought = 'nobody has ever seen this kitchen produce anything but ice'. The voice must be written TO this row. Tone tags also need re-cutting: deadpan/understated/explains_nothing were Locust Valley."
+  },
+  "awaitingText": {
+    "tahiti": "Premise and brief replaced under the widened arc — 'the barefoot one'. v2 texts to follow from the founder in the batch; NOT to be drafted by an agent. Staging arc gains the daylight phase formally (bank_phase already carries `daylight` from db/031 — no enum change needed). The turn is UNCHANGED AND UNMOVED: candles lit in full daylight remain the hinge."
   }
 }

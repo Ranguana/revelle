@@ -58,6 +58,27 @@ export {
   fingerprintOfPicks,
   ensureNovel,
 } from "./novelty.ts";
+/**
+ * THE STRUCTURAL MATRIX, HER SIDE OF IT. Exported so that the wiring change
+ * described at the top of structure.ts is an import and a call rather than a
+ * new module — nothing in src/ consumes these yet, and the file says so.
+ */
+export {
+  STRUCTURAL_FACETS,
+  STRUCTURAL_LEVELS,
+  STRUCTURAL_SUPPLIERS,
+  FED_FACETS,
+  rowFromCells,
+  statedEnding,
+  statedStartHour,
+  statedStructure,
+  structureOf,
+  structuralDistance,
+  rankByStructure,
+  type StructuralFacet,
+  type StructuralRow,
+} from "./structure.ts";
+
 export { explain } from "./explain.ts";
 export { dither, rng, arbitrarySeed, type Rng } from "./rng.ts";
 export {

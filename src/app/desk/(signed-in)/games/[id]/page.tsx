@@ -15,10 +15,12 @@ import {
   optionLabel,
   sectionLabel,
 } from "@/lib/desk/labels";
+import { gameSequence } from "@/lib/desk/lists";
+import { readReview, reviewPass } from "@/lib/desk/review";
 
 import styles from "../../../desk.module.css";
 import Thread from "../../Thread";
-import { Chips, Empty, Fact, Head, Status } from "../../bits";
+import { Chips, Empty, Fact, Head, Review, ReviewFields, Status } from "../../bits";
 import GameForm, { type GameValues } from "../GameForm";
 import { setGameStatus } from "../actions";
 
@@ -85,6 +87,7 @@ export default async function GamePage({
   // The database's own words when it refused a status change — db/025's
   // sourcing and shape guards. Shown verbatim; see actions.ts.
   const refused = typeof search.refused === "string" ? search.refused : null;
+  const carried = readReview(search);
 
   const game = await queryOne<GameValues & { status: string; name: string }>(
     `select id, slug::text as slug, name, description, how_it_works, materials,
@@ -271,6 +274,14 @@ export default async function GamePage({
 
   const claimed = minutes(game.duration_minutes, game.duration_max_minutes);
 
+  // Asked live, and only during a review: the sequence is recounted here rather
+  // than carried, so a game offered off a drafts-only pass reports that it has
+  // left the list instead of pretending it has not.
+  const sequence = carried ? await gameSequence(carried.search) : [];
+  const pass = carried
+    ? reviewPass({ path: "/desk/games", ids: sequence, id, carried })
+    : null;
+
   return (
     <>
       <Head eyebrow="The fun" title={game.name}>
@@ -280,6 +291,9 @@ export default async function GamePage({
         </Link>
         <form action={setGameStatus}>
           <input type="hidden" name="id" value={id} />
+          {/* db/025 can refuse this, and the refusal redirects. It must land
+              back inside the review it was refused from. */}
+          <ReviewFields carried={carried} />
           <input
             type="hidden"
             name="status"
@@ -291,12 +305,15 @@ export default async function GamePage({
         </form>
       </Head>
 
+      {pass ? <Review pass={pass} noun="games" /> : null}
+
       {refused ? <p className={styles.error}>{refused}</p> : null}
       {saved ? <p className={styles.ok}>Saved.</p> : null}
 
       <div className={styles.panels}>
         <div>
           <GameForm
+            carried={carried}
             values={game}
             groups={groups}
             selected={tags.map((tag) => tag.facet_id)}

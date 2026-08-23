@@ -28,6 +28,7 @@
     "build:tone-marks": "node scripts/build-tone-marks.mjs",
     "check:tone-marks": "node scripts/build-tone-marks.mjs --check",
     "activate:catalogue": "node scripts/activate-catalogue.mjs",
+    "smoke:seeders": "node scripts/smoke-seeders.mjs",
     "check:matrix": "node scripts/audit-matrix.mjs",
     "copy:source": "node scripts/copy-source.mjs",
     "check:voice-output": "node scripts/check-voice-output.mjs"

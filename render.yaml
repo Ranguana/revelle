@@ -86,6 +86,54 @@ services:
     # A non-zero exit here FAILS THE DEPLOY: the old instance keeps serving and
     # the new code is never promoted. Code that expects a column the database
     # does not have must not ship.
+    #
+    # ── AND THAT CORRECT BEHAVIOUR IS WHAT WENT WRONG ────────────────
+    #
+    # db/032 carried an assertion that could never be true. It raised on every
+    # database, `npm run migrate` exited non-zero, Render failed the deploy,
+    # and the old instance kept serving — every step of that is the system
+    # working. It was also completely silent. For four weeks the running code
+    # was old, the database was old, every screen agreed with itself, db/033
+    # through 036 never applied and the seven seeders below never once ran.
+    # It surfaced as a destination count that looked wrong on a dashboard.
+    #
+    # A FAILED DEPLOY IS NOT SELF-ANNOUNCING. Three things now make it one,
+    # and it is worth being precise about which layer catches what — because a
+    # warning system that is itself silent when it breaks is the bug above
+    # wearing a hat.
+    #
+    #   1. CI, .github/workflows/smoke.yml. The whole chain, including this
+    #      migration step, against a throwaway postgres:17 on every push and
+    #      pull request. This is the layer that actually PREVENTS db/032:
+    #      an assertion that has never executed has never been wrong, and CI
+    #      executes it before the commit can reach a deploy at all.
+    #
+    #   2. THE RUN RECORD. scripts/migrate.mjs writes one row per invocation
+    #      into `schema_migration_run` — what applied, which file failed, which
+    #      migrations never ran behind it, and which of the seeder steps below
+    #      were cancelled by it. It is written by the FAILING deploy, into the
+    #      one thing that deploy shares with the instance still serving.
+    #
+    #   3. THE DESK. src/lib/desk/schema.ts reads that row on every /desk
+    #      request and src/app/desk/(signed-in)/layout.tsx puts it on screen:
+    #      a line in the rail in every state, and a banner across every page
+    #      when the database is behind, a run failed, or the check cannot tell.
+    #
+    # ── WHAT RENDER ITSELF CANNOT BE MADE TO DO, SAID PLAINLY ────────
+    #
+    # There is no post-deploy hook, and no way to express "notify a human on
+    # pre-deploy failure" in this file. Render does send deploy-failure
+    # notifications, but they are a DASHBOARD SETTING on the service — they
+    # cannot be committed here, this repo cannot verify they are switched on,
+    # and a blueprint that pretended otherwise would be fiction of exactly the
+    # kind the header of this file was written to end. So: turn them on in the
+    # dashboard, and do not treat that as the mechanism. Layers 1–3 above are
+    # the mechanism, because they are the parts that live in the repo.
+    #
+    # And the honest limit of layer 3: A BANNER IS PULL, NOT PUSH. It is seen
+    # when somebody opens the desk. What it guarantees is that the question is
+    # answerable by LOOKING rather than by archaeology — not that anyone is
+    # looking. Nothing in this file can guarantee the second.
     # Migrate, then SEED. Both run inside Render on the private network, which
     # is the only place the database is reachable from — see the rule at the
     # top of this file.

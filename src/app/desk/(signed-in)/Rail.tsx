@@ -31,7 +31,14 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
     // not an instrument for reading the engine — it is the gesture that decides
     // what the seven lists above it are allowed to be. It belongs under them, at
     // the end, where the work ends.
+    //
+    // TWO GESTURES, SIDE BY SIDE, and the pairing is the point. Publish is
+    // consent and now governs one class of thing: destinations, plus whatever a
+    // person drafted or a seeder held back on a question. Stocked is the veto,
+    // for the pools that stock themselves (db/036, CLAUDE.md rule 13). Reading
+    // the two labels next to each other is reading the rule.
     { href: "/desk/publish", label: "Publish" },
+    { href: "/desk/stocked", label: "Stocked" },
   ],
   // The three screens that show what the library DOES rather than what is in
   // it. Their own group, above the messages, because they are the working
