@@ -18,6 +18,22 @@
 -- That is the whole reason this file exists. A fold is a code change plus a
 -- migration, and the code change alone looks complete.
 --
+-- ── RESERVED, NOT MERELY RETIRED ────────────────────────────────────
+--
+-- Cap Ferrat does NOT re-enter the single-evening catalogue. Its register lives
+-- inside Cote d'Azur, which absorbed its menus, drinks and dishes.
+--
+-- But the room is RESERVED as the founding destination of a DURATION TIER —
+-- multi-day residencies — if that tier is ever built. Read its premise again
+-- with that in mind: a villa taken for the month, shutters closed until the
+-- afternoon, a schedule that is very slow and entirely fixed, and a house that
+-- reassembles every July. That is a poor fit for one evening and the natural
+-- centre of a week, which is the deeper reason the fold was right.
+--
+-- So this is a reservation as much as a retirement, and it is why the slug
+-- stays claimed and the voice and facet tags stay attached to the room rather
+-- than being merged into Cote d'Azur's mouth.
+--
 -- ── RETIRED, NOT DELETED ─────────────────────────────────────────────
 --
 -- `world_status` already has 'retired' and that is the honest state. Deleting

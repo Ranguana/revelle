@@ -275,7 +275,8 @@
     "st-moritz-1984"
   ],
   "blocked": {
-    "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`."
+    "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`.",
+    "cap-ferrat": "RETIRED, AND RESERVED. Folded into Cote d'Azur on 2026-08-22 and retired in the database by db/028. It does NOT re-enter the single-evening catalogue — its register lives inside Cote d'Azur, which absorbed its menus, drinks and dishes. But the room is RESERVED as the founding destination of a DURATION TIER — multi-day residencies — if that tier is ever built. The villa taken for a month, the schedule that is very slow and entirely fixed, and a house that reassembles every July are a POOR fit for one evening and the natural centre of a week. That is why the fold was correct and the retirement is not a deletion: world_status is 'retired' rather than gone, the slug stays claimed, and its voice and facet tags stay attached to it rather than being merged into Cote d'Azur's mouth."
   },
   "founderPending": {
     "palm-springs-1965.schedule": "provisional `anchored` under the four-level split — founder decides",
@@ -289,7 +290,7 @@
     "teasing": "A property of her PEOPLE, not of the evening. It travels unchanged to every party they attend, so it cannot sort destinations. Measured on 16 rooms it separates 63/120 and rescues 0 across the gate. Havana/New Orleans being thin structurally is BY DESIGN — that pair is the seam's voice-tiebreak case.",
     "acquaintance": "Varies per event, so it passes the evening test, but it does not constrain WHICH WORLD FITS. A constraint that governs assembly, not a ranker.",
     "cuisine": "Eleven levels for sixteen rooms, seven of which reach exactly one room. Not a facet — a destination picker, and it memorises an answer key derived from the destinations in the first place.",
-    "audience": "Failed re-derivation. The reply convention is the correct evidence class — permeability with no room in it — but only New York is `counted` and six destinations have no reply convention at all. 1-vs-5 is a fingerprint, not an axis. The six gaps are a defect in those voice documents."
+    "audience": "Dropped, and the stated reason was WRONG. It was rejected because only six destinations carry a reply convention, so a permeability facet could not be derived for the other six. But EVERY destination carries a populated `voice.audience` field, which states the guest relation directly and is the better evidence class — Portofino's 'the few of us who came, who have all met before' against New Orleans' 'everybody coming, which is more people than were asked'. The wrong field was checked. NOT resurrected: the matrix is clean at nine facets and a tenth column would now solve a problem that no longer exists. But `voice.audience` is the evidence to use if permeability is ever needed, and it is what carried the Portofino/Cote d'Azur twin case."
   },
   "pendingVoice": {
     "oaxaca-1954": "Row admitted, voice unwritten. The anchor is the comida — one long afternoon meal from about two, mole going since yesterday, dissolving into the courtyard by early evening. Register is DOMESTIC ABUNDANCE, Sunday-afternoon-forever. If the voice drifts toward nightlife, or toward mariachi-as-floor-show, it converges on rooms that already exist.",
