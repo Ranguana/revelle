@@ -1,0 +1,1660 @@
+#!/usr/bin/env node
+/**
+ * Put the authored atmosphere bank into the database.
+ *
+ *   npm run seed:bank
+ *   npm run seed:bank -- --dry-run    parse and REPORT, touch no database
+ *   npm run seed:bank -- --overwrite  let the file beat the curator's edits
+ *
+ * The sibling of scripts/seed-dishes.mjs and scripts/seed-drinks.mjs,
+ * deliberately: same refusal to guess, same rule that a curator's edit at the
+ * desk outranks the file, same shared vocabulary in
+ * scripts/catalogue-vocabulary.mjs rather than a second copy of the destination
+ * map, same "left as the desk has it" reporting. Read seed-dishes' header for
+ * the argument; only the differences are written out here, and there are seven
+ * of them.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 1. THERE IS NO `--activate`, AND THAT IS NOT AN OVERSIGHT
+ *
+ * Every other pool seeder has one. This one does not, on the founder's
+ * instruction for this drop, verbatim:
+ *
+ *   "Everything is created as status = 'draft'. No exceptions."
+ *
+ * The bank is a brainstorm consolidated in one pass; nothing in it has been
+ * costed, sourced or legally read, and three of its lines are open questions
+ * with the founder's name on them. CLAUDE.md rule 8 already says activation is
+ * a human gesture — here the flag is absent as well, so that not even a typo in
+ * a deploy can offer a draft to a member. Activation happens at the desk.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 2. `--dry-run` EXISTS BECAUSE THE DATABASE IS UNREACHABLE
+ *
+ * render.yaml sets `ipAllowList: []`, so no laptop can connect and CLAUDE.md
+ * rule 9 forbids pointing a person at something that cannot be run. A parser
+ * for a 385-line prose document is exactly the kind of code that must be
+ * readable BEFORE it writes, so `--dry-run` prints every row it would create,
+ * every gesture it would set, every food and drink line it would route, and —
+ * the part that matters most — every clause it could NOT classify.
+ *
+ * The report is the deliverable of a dry run. Read the UNCLASSIFIED section
+ * first: it is the list of places where this script refused to guess.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 3. ROUTE BY HEADER. THE DOCUMENT SAYS SO AT THE TOP AND IT IS RIGHT.
+ *
+ * docs/atmosphere-idea-bank-v1.md opens with ROUTING RULES, and they are the
+ * whole parser:
+ *
+ *   GOODS:                  -> bank_item kind `good`
+ *   HOST ACTS:              -> bank_item kind `host_act`
+ *   GAMES: / GAMES/BOOKINGS -> bank_item kind `game`
+ *   GESTURE: or "(GESTURE)" -> world.gesture / world.gesture_note, NOT a row
+ *   ROUTE TO DISH POOL:     -> the dish pool. Not the bank. Emitted, see 6.
+ *   ROUTE TO DRINK PROGRAM: -> the drink program. Not the bank. Emitted.
+ *
+ * Printed matter named anywhere becomes `printed_card` regardless of the header
+ * it sits under, which is the one place the header does not decide — a rules
+ * card listed among GOODS is still a card. The vocabulary that makes that call
+ * is PRINTED_MATTER below, one phrase per line, argued where it is a judgement.
+ *
+ * AN UNKNOWN BLOCK LABEL IS AN ERROR, NOT A SKIP, exactly as an unknown `##`
+ * heading is in seed-dishes. A label nobody has mapped is a paragraph of the
+ * founder's thinking that would otherwise vanish silently, and silence is the
+ * failure this house cares about.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 4. THE GESTURE IS NOT IN THE BANK, AND THIS IS WHERE IT COULD BE LOST
+ *
+ * db/031 puts gestures on `world` and says why: "an invariant in a pool of
+ * variables eventually gets left out of a package." So a clause carrying the
+ * token GESTURE produces NO bank row at all — Westhampton's only host act is
+ * its gesture, and Westhampton therefore contributes zero `host_act` rows. That
+ * looks like a parser that lost a line and is not one; it is reported as such
+ * on every run so the two can never be confused.
+ *
+ * Where a gesture clause ALSO names shippable matter — Dolomites' genepì pour
+ * carries a kit at min_lead_days ~40, a bought fallback and a story card inside
+ * the same sentence — nothing is extracted. Pulling a good out of the middle of
+ * an invariant is precisely the guess this script does not make. It is REPORTED
+ * under UNCLASSIFIED with the whole sentence, for a person to split by hand.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 5. NAMES COME FROM HER PUNCTUATION, AND NOTHING IS EVER DISCARDED
+ *
+ * She writes an item as `<the thing> — <what it is>`, consistently, across all
+ * eighteen rooms: "TOMBOLA KIT — tombolone board, wooden tokens…", "the conch
+ * (pū) — object + act, lives on her shelf after". So:
+ *
+ *   name        = the clause, parentheticals removed, cut at the first em dash
+ *   description = THE CLAUSE VERBATIM, whole, in her punctuation
+ *
+ * The name is a handle and the description is the record. Nothing the parser
+ * shortens is lost, because the un-shortened line is in the row beside it. A
+ * clause containing an ellipsis is the one exception: "oyster... no — pasta
+ * board" is the founder changing her mind mid-line, and a machine that resolves
+ * that is a machine inventing content. It creates no row and reports the line.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 6. FOOD AND DRINK ARE EMITTED FOR A HUMAN, NOT WRITTEN INTO THE DOCUMENTS
+ *
+ * The brief allowed either. Emitting is right, for four reasons, and the fourth
+ * is the one that decides it:
+ *
+ *   · THE LINES ARE NOT DISHES. "second-pot timing ritual", "supper-expands
+ *     register", "NO descent (afternoon room)", "the pot (existing)" are notes
+ *     ABOUT a pool, not entries in one. docs/dishes.md holds `- <name> ·
+ *     <B|H|M>` and every line must carry a making level; none of these does,
+ *     and inventing one is the guess seed-dishes refuses by name ("a new
+ *     wording is a decision, not a default").
+ *   · SIX ROOMS HAVE NO SECTION TO WRITE INTO. Amalfi, Oaxaca, Acapulco, St.
+ *     Moritz, Aspen and Palm Springs appear in neither docs/dishes.md nor
+ *     docs/drinks.md, and docs/needs-a-human.md §C already books Amalfi's fifty
+ *     dishes as founder WRITING. Opening a section with three lines in it would
+ *     turn "not written yet" into "written, and short".
+ *   · THE MANIFEST WOULD HAVE TO LIE. seed-dishes' PER_DESTINATION exists so a
+ *     count can never move unwatched. Adding rooms to it in the same commit
+ *     would bless a number nobody authored as the expected count.
+ *   · EVERY DRINK NEEDS A MIRROR. docs/drinks.md's guarantee is that "nobody at
+ *     the table is visibly not drinking", and seed-drinks "fails rather than
+ *     writing a drink whose mirror is missing or blank". The bank supplies no
+ *     mirrors. There is no honest way to write these lines into that file, and
+ *     a half-written entry would break the one promise the file makes.
+ *
+ * So the run prints a ROUTED-OUT section, per room, per destination heading,
+ * grouped by whether the line names a dish or describes the pool — ready to
+ * paste, with the manifest edit named. A person decides; that is the point.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 7. THE FOUNDER-PENDING LEDGER IS ATTACHED, NEVER SKIPPED
+ *
+ * The founder: "flag every item on the founder-pending ledger as
+ * draft-with-question rather than skipping it."
+ *
+ * So each of the ten ledger lines is matched to the room it names and to the
+ * item it is about, and the line goes VERBATIM into that item's description
+ * behind a `FOUNDER-PENDING —` marker, where a curator reviewing the row cannot
+ * miss it. Three of the ten are not about a bank item at all — a matrix row
+ * re-run, a bench with no material in it yet, and a product-level question
+ * about children — and those are reported by name with the reason no row is
+ * their right home. Inventing a `good` called "Westhampton bench provisional"
+ * would put a non-item in a pool selection reads from, which is the same
+ * mistake db/031 refuses for gestures.
+ *
+ * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL unless
+ * --dry-run.
+ */
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
+import pg from "pg";
+
+import { DESTINATIONS, ROOM_HEADINGS, ensureWorld } from "./catalogue-vocabulary.mjs";
+
+const SOURCE = fileURLToPath(
+  new URL("../docs/atmosphere-idea-bank-v1.md", import.meta.url)
+);
+const SOURCE_NAME = "docs/atmosphere-idea-bank-v1.md";
+const DISHES_DOC = fileURLToPath(new URL("../docs/dishes.md", import.meta.url));
+const DRINKS_DOC = fileURLToPath(new URL("../docs/drinks.md", import.meta.url));
+
+const dryRun = process.argv.includes("--dry-run");
+const overwrite = process.argv.includes("--overwrite");
+
+/** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
+function needsSsl(url) {
+  if (/sslmode=disable/.test(url)) return false;
+  return !/@(localhost|127\.0\.0\.1|\[::1\])/.test(url);
+}
+
+function fail(message) {
+  console.error(`\n[seed-bank] FAILED: ${message}`);
+  process.exit(1);
+}
+
+/* ── the document's own vocabulary ───────────────────────────────────
+ *
+ * Everything below is a table and not a rule, for the reason DESTINATIONS and
+ * COURSES are tables in the two seeders beside this one: a rule that gets one
+ * entry of twelve wrong is worse than a list, and a list can be argued with.
+ */
+
+/**
+ * The block label -> what the router does with it.
+ *
+ * `kind` names the bank_kind the block's clauses become. `null` means the block
+ * is REAL CONTENT THAT IS NOT BANK CONTENT: it is parsed, kept, reported and
+ * written nowhere, which is a different thing from being ignored.
+ *
+ * The six routed labels are the document's own ROUTING RULES. The six unrouted
+ * ones are argued one line each, because each is a place where a reader would
+ * reasonably expect a row and does not get one.
+ */
+const BLOCKS = new Map([
+  ["GOODS", { kind: "good" }],
+  ["HOST ACTS", { kind: "host_act" }],
+  ["GAMES", { kind: "game" }],
+  ["GAMES/BOOKINGS", { kind: "game" }],
+
+  // Not a bank row. db/031: an invariant in a pool of variables eventually gets
+  // left out of a package. Goes to world.gesture.
+  ["GESTURE", { kind: null, sink: "gesture" }],
+
+  // Food and drink. Routed out of the bank entirely; see 6 in the header.
+  ["ROUTE TO DISH POOL", { kind: null, sink: "dish" }],
+  ["ROUTE TO DRINK PROGRAM", { kind: null, sink: "drink" }],
+
+  // A kill is a decision that something does NOT exist. Recording it as a draft
+  // row would resurrect exactly what the founder struck out.
+  ["KILLED", { kind: null, sink: "killed" }],
+
+  // "(not staged)" is in the label. The scene card may describe empty rosé
+  // bottles accumulating; nothing ships, so there is nothing to put in a pool
+  // of shippable things.
+  ["SCENE-CARD EVIDENCE", { kind: null, sink: "scene_card" }],
+
+  // "nothing shipped, sourced, or instructed", and founder + counsel have not
+  // decided whether even the glance ships. A draft row is still a row.
+  ["CANNABIS", { kind: null, sink: "counsel" }],
+
+  // Its three tiers are already rows: sparklers and the loud cork are host acts
+  // above it, and the live-musician booking belongs to the music split, not the
+  // bank. Writing them again here would double-count two of the three.
+  ["SPECTACLE TIERS", { kind: null, sink: "spectacle" }],
+
+  // Runsheet framing — the ORDER of an evening, which is db/025's runbook and
+  // db/022's table, not an item anybody selects.
+  ["SEQUENCE NOTE", { kind: null, sink: "runsheet" }],
+
+  // The soundtrack is db/005 and has its own pool.
+  ["SOUND", { kind: null, sink: "sound" }],
+]);
+
+/**
+ * The three `##` sections that are not rooms.
+ *
+ * Listed rather than detected, so that a nineteenth room whose heading is
+ * mistyped fails loudly instead of being read as prose.
+ */
+const NOT_A_ROOM = new Set([
+  "ROUTING RULES — READ FIRST",
+  "NEW CONTENT CLASSES (schema-relevant)",
+  "FOUNDER-PENDING LEDGER (from this bank)",
+]);
+
+/**
+ * PRINTED MATTER, AS PHRASES AND NOT AS THE WORD "CARD".
+ *
+ * The brief: "Printed matter named anywhere (ledgers, call cards, award
+ * certificates, prompt decks, Smorfia sheets, bingo calls, stakes lists,
+ * technique cards) -> kind printed_card."
+ *
+ * A bare `\bcard\b` test cannot do this. Four rooms carry a PLAYING-card deck —
+ * "Napoletane-pattern 40-card deck", "Baraja española 40-card deck",
+ * "northern-Italian pattern card deck", the Thoth tarot — and a deck of playing
+ * cards is an object a house owns, not printed matter this catalogue authors.
+ * The distinction is the whole difference between shipping a deck and writing
+ * one.
+ *
+ * So: phrases. Each is a thing the house PRINTS.
+ */
+const PRINTED_MATTER = [
+  "technique card",
+  "rules card",
+  "story card",
+  "lore card",
+  "call card",
+  "prompt deck",
+  "prompt slips",
+  "stakes-suggestion card",
+  "menu cards",
+  "place cards",
+  "translation sheet",
+  "cartelle",
+  "certificates",
+  "stationery",
+  "apology cards",
+  "broadsheet",
+  "ledger",
+  // Big Sur's "noun-game 1971 slips" and Vegas's "~80 printed marquee-ticket
+  // slips". A slip is printed matter by definition — the slips rule in the
+  // document is about nothing else.
+  "slips",
+];
+
+/**
+ * Words that SOUND like printed matter and are not caught above.
+ *
+ * Not used to classify anything. Every clause that matches one of these and no
+ * PRINTED_MATTER phrase is REPORTED, so the vocabulary above can be extended by
+ * a person who has looked at the line rather than by a regex that guessed at
+ * it. This is the list that keeps a phrase table honest.
+ */
+const SOUNDS_PRINTED = /\bcards?\b|\bdecks?\b|\bsheets?\b|\bprinted\b|\bposter\b|\bpad\b|\btags\b|\bpaper\b/i;
+
+/**
+ * A KIT IS A GOOD EVEN WHEN IT CONTAINS PRINTED MATTER.
+ *
+ * "Bingo kit with corny pre-written call card", "Pick-a-Number kit (rules card
+ * + a wrapped prize)", "TOMBOLA KIT — … printed cartelle, Smorfia translation
+ * sheet …". A kit is one boxed thing that ships as one line on an order, and
+ * filing it as a printed card because there is paper inside it would misfile
+ * the board, the tokens, the beans and the five wrapped prizes with it.
+ *
+ * Every kit's printed contents are reported, because a curator may well want
+ * the card broken out as its own row later — that is her call and not this
+ * script's.
+ */
+const IS_A_KIT = /\bkits?\b/i;
+
+/**
+ * OWNED-IF-PRESENT -> ships = false.
+ *
+ * db/031: "FALSE is owned-if-present: the scene card may GLANCE at it, and
+ * nothing ships." The document writes it two ways — the tag itself, and the
+ * verb "glance" — and both are the same decision. "TV muted, glanced" at Aspen
+ * carries no tag and is unmistakably the same thing.
+ *
+ * "ship cheap or owned" (Nantucket's cribbage board) is NOT here. It is an
+ * unresolved either/or, `ships` defaults true, and the line is reported.
+ */
+const OWNED_IF_PRESENT = /owned-if-present|\bglanced\b|\bglance only\b|\bglance\b/i;
+
+/**
+ * PHASE, FROM WORDS SHE ACTUALLY WROTE.
+ *
+ * `bank_phase` defaults to `all`, which db/031 glosses as NO OPINION rather
+ * than "every phase", and CLAUDE.md rule 3 forbids inference from silence. So
+ * the map is small on purpose: five phrases, each of which names a time of day
+ * outright.
+ *
+ * `dawn` IS DELIBERATELY ABSENT and is a finding rather than an omission — see
+ * the GAPS section of the report. Havana's dawn pour and St. Moritz's dawn
+ * breakfast are real content and `bank_phase` has no value for them; `dark` is
+ * the nearest and is not true, because dawn is the moment dark ends.
+ */
+const PHASE_WORDS = [
+  ["at dusk", "dusk"],
+  ["dusk act", "dusk"],
+  ["dusk call", "dusk"],
+  ["sundown", "dusk"],
+  ["midnight", "dark"],
+];
+
+/** Time words the document uses that PHASE_WORDS does not map. Reported. */
+const TIME_WORDS = /\bdawn\b|\bmidnight\b|\bdusk\b|\bsundown\b|\bafternoon\b|\bnine o'clock\b|\b2 a\.m\.\b|\blate-phase\b/i;
+
+/**
+ * VENUE, FROM THE TAG AND NOTHING ELSE.
+ *
+ * db/031's two grades are already the document's own words — pétanque says
+ * `requires_outdoors`, the sparkler kit says `outdoor_access` — so there is
+ * nothing to translate and no judgement to make. Anything that merely sounds
+ * outdoor stays `none`, which is the safe default db/020 argues for at length:
+ * a wrong tag deletes a deliverable silently and forever.
+ */
+const VENUE_TAGS = [
+  ["requires_outdoors", "requires_outdoors"],
+  ["outdoor_access", "outdoor_access"],
+];
+
+/**
+ * The one graded word in the document.
+ *
+ * Big Sur: "reading aloud (pooled, LOW weight — founder flag: preciousness
+ * risk)". `weight` in db/031 is "a nudge, not a gate", and 0.5 is half of the
+ * default rather than a number with a theory behind it. It is reported on every
+ * run for that reason.
+ */
+const LOW_WEIGHT = 0.5;
+
+/**
+ * The short names the NEW CONTENT CLASSES section uses -> the DESTINATIONS key.
+ *
+ * The candle-surface line writes "NY" and "NOLA" where the room headings write
+ * "NEW YORK, 1938" and "NEW ORLEANS, 1956". Six lines rather than a rule.
+ */
+const SHORT_NAMES = new Map([
+  ["NY", "New York"],
+  ["NOLA", "New Orleans"],
+  ["Oaxaca", "Oaxaca"],
+  ["Westhampton", "Westhampton"],
+  ["Dolomites", "Dolomites"],
+  ["Côte d'Azur", "Côte d'Azur"],
+  ["Acapulco", "Acapulco"],
+  ["St. Moritz", "St. Moritz"],
+  ["Big Sur", "Big Sur"],
+  ["Aspen", "Aspen"],
+  ["Catskills", "Catskills"],
+  ["Nantucket", "Nantucket"],
+]);
+
+/** What a candle-surface note is appended to. */
+const A_CANDLE = /\bcandles?\b|\bvotives?\b|\btapers?\b|\bhurricanes?\b|\blanterns?\b|\bpillars?\b|\bcandlesticks?\b/i;
+
+/**
+ * The founder-pending ledger -> the room, and the words that find the item.
+ *
+ * Ten entries, ten lines. `room` is the DESTINATIONS key the entry is about;
+ * `match` is the phrase that identifies the item inside that room, tested
+ * against the item's NAME. `match: null` means the entry is not about a bank
+ * item at all and says why — those are reported rather than invented into rows.
+ *
+ * A ledger entry that matches NO item is an error and not a skip, for the same
+ * reason an unknown heading is: the founder asked for every one of these to be
+ * carried through, and an entry that quietly found nothing to attach to is an
+ * entry that was skipped.
+ */
+const LEDGER = [
+  { n: 1, room: "Westhampton", match: null,
+    why: "A matrix row re-run, not a bank item. Belongs beside the Eothen " +
+         "row in data/destination-matrix.json and docs/needs-a-human.md." },
+  // The question IS the gesture, and db/031 keeps gestures off the bank. It
+  // rides on world.gesture_note, with world.gesture left NULL until she picks.
+  { n: 2, room: "Catskills", match: ["FOUNDER DECIDES"] },
+  { n: 3, room: "Vegas", match: ["flaming dessert", "tableside Caesar"] },
+  { n: 4, room: "Amalfi Coast", match: ["TOMBOLIERE", "arrivals applauded"] },
+  { n: 5, room: "Acapulco", match: ["the loud cork", "sparklers lit"] },
+  { n: 6, room: "Oaxaca", match: ["papel picado"] },
+  { n: 7, room: "Big Sur", match: ["reading aloud"] },
+  { n: 8, room: "Aspen", match: ["shot-ski"] },
+  { n: 9, room: "Palm Springs", match: null,
+    why: "A bench with no material in it yet. There is nothing to attach a " +
+         "question to; the room's three goods and one gesture are all the " +
+         "document holds." },
+  { n: 10, room: null, match: null,
+    why: "Product-level and catalogue-wide, raised by the sparklers. Not a " +
+         "property of any one room, so no row is its right home." },
+];
+
+/* ── the parser ─────────────────────────────────────────────────────── */
+
+/**
+ * A slug from a name.
+ *
+ * Not imported from src/lib/desk/labels.ts for the reason seed-dishes gives:
+ * that one truncates at 60 for a curator typing into a box, and truncation is
+ * how two long names collide silently. `bank_item.slug` has no length limit, so
+ * neither does this.
+ */
+function slugify(name) {
+  return name
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Split on a character only where the parentheses are balanced.
+ *
+ * The document nests semicolons inside parentheses in three rooms — Tahiti's
+ * "(left, taken; right, looking)", Vegas's "everyone wins eventually; that's
+ * the game", Acapulco's "(GESTURE; spectacle deliverable tier 1 …)" — so a
+ * plain split on ";" would cut three items in half and lose the second half of
+ * each. Depth-aware costs four lines and cannot make that mistake.
+ */
+function splitDepthZero(text, separator) {
+  const parts = [];
+  let depth = 0;
+  let current = "";
+  for (const char of text) {
+    if (char === "(") depth += 1;
+    if (char === ")") depth = Math.max(0, depth - 1);
+    if (char === separator && depth === 0) {
+      parts.push(current);
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  parts.push(current);
+  return parts.map((part) => part.trim()).filter((part) => part.length > 0);
+}
+
+/** The depth-0 parentheticals of a clause, and the clause without them. */
+function peelParentheses(text) {
+  const parens = [];
+  let depth = 0;
+  let spine = "";
+  let current = "";
+  for (const char of text) {
+    if (char === "(") {
+      depth += 1;
+      if (depth === 1) continue;
+    }
+    if (char === ")") {
+      depth -= 1;
+      if (depth === 0) {
+        parens.push(current.trim());
+        current = "";
+        continue;
+      }
+    }
+    if (depth === 0) spine += char;
+    else current += char;
+  }
+  return { spine: spine.replace(/\s+/g, " ").trim(), parens };
+}
+
+/**
+ * Join the document's hard-wrapped lines back into one string.
+ *
+ * She wraps at about 72 columns, and the wrap falls inside a hyphenated word
+ * four times ("last-up-turns-off-the-" / "string-lights", "bright-" / "vessel",
+ * "theme-party-" / "saturated") and after a solidus once ("anchoïade/" /
+ * "tapenade"). Joining those with a space produces "the- string-lights", which
+ * is a different word. So a line ending in `-` or `/` joins with nothing and
+ * every other line joins with a space.
+ */
+function joinWrapped(previous, line) {
+  if (previous.length === 0) return line;
+  if (/[-/]$/.test(previous)) return previous + line;
+  return `${previous} ${line}`;
+}
+
+/**
+ * A block is finished when its text has reached a full stop OUTSIDE a
+ * parenthesis.
+ *
+ * The depth test is not fussiness. Aspen wraps mid-parenthesis on "…the
+ * catalog's light spectrum against St." — an abbreviation, at the end of a
+ * line, inside a bracket that has not closed — and a rule that read the full
+ * stop as the end of the block would drop "Moritz's dark)." on the floor and
+ * ship a good whose description stops mid-word. A sentence cannot end while a
+ * bracket is open, so the two conditions together are the honest test.
+ */
+function isClosed(text) {
+  if (text.length === 0) return true;
+  if (!/\.$/.test(text)) return false;
+  let depth = 0;
+  for (const char of text) {
+    if (char === "(") depth += 1;
+    if (char === ")") depth = Math.max(0, depth - 1);
+  }
+  return depth === 0;
+}
+
+const LABEL = /^([A-Z][A-Z0-9/'’ -]*[A-Z])(\s*\([^)]*\))?:\s*(.*)$/;
+const ROOM = /^##\s+(.+?),\s*(\d{4})\s*(.*)$/;
+const SECTION = /^##\s+(.+?)\s*$/;
+
+/**
+ * The document -> rooms, each holding labelled blocks of joined text.
+ *
+ * The three structural hazards, each handled where it occurs:
+ *
+ *   A ROOM HEADING'S NOTE WRAPS. Four headings carry a `*(…)*` aside that runs
+ *     onto the next line. The continuation is consumed until the `)*` closes,
+ *     rather than being read as an orphan sentence.
+ *
+ *   A CONTINUATION LINE CAN LOOK LIKE A LABEL. Aspen wraps onto "FOUNDER CALL:
+ *     ships or owned-if-present", which matches the label pattern exactly. A
+ *     label therefore only opens a block when the block above it has REACHED A
+ *     FULL STOP; mid-sentence, it is what it is, a continuation.
+ *
+ *   A SENTENCE CAN BELONG TO NO BLOCK. Palm Springs ends with "Everything else
+ *     pending founder material." under no label at all. It is not swallowed
+ *     into HOST ACTS — which would corrupt that room's gesture — it is recorded
+ *     as an orphan and reported.
+ */
+function parse(text) {
+  const lines = text.split("\n");
+  const rooms = [];
+  const orphans = [];
+  const ledgerLines = [];
+  let candleLine = null;
+
+  let room = null;
+  let section = null;
+  let block = null;
+
+  const closeBlock = () => {
+    if (block && block.text.length > 0) room.blocks.push(block);
+    block = null;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trim();
+
+    /* ── headings ── */
+    if (line.startsWith("## ")) {
+      closeBlock();
+      const asRoom = ROOM.exec(line);
+      const asSection = SECTION.exec(line);
+
+      if (asRoom) {
+        let heading = `${asRoom[1]}, ${asRoom[2]}`;
+        let note = asRoom[3] ?? "";
+        // A wrapped `*( … )*` aside.
+        while (note.includes("*(") && !note.includes(")*") && i + 1 < lines.length) {
+          i += 1;
+          note = joinWrapped(note, lines[i].trim());
+        }
+        const key = ROOM_HEADINGS[heading];
+        if (!key) {
+          fail(
+            `line ${i + 1}: "${heading}" is not a room this catalogue knows. ` +
+              `Add it to ROOM_HEADINGS in scripts/catalogue-vocabulary.mjs — ` +
+              `an unknown heading is a decision, not a skip, and ` +
+              `docs/new-destination.md §5 is about exactly this step.`
+          );
+        }
+        if (!Object.hasOwn(DESTINATIONS, key)) {
+          fail(
+            `line ${i + 1}: ROOM_HEADINGS maps "${heading}" to "${key}", ` +
+              `which is not in DESTINATIONS. The two maps must agree.`
+          );
+        }
+        room = {
+          heading,
+          key,
+          slug: DESTINATIONS[key],
+          note: note.replace(/^\*\(|\)\*$/g, "").replace(/\*/g, "").trim(),
+          line: i + 1,
+          blocks: [],
+        };
+        rooms.push(room);
+        section = null;
+        continue;
+      }
+
+      const name = asSection ? asSection[1] : line.slice(3).trim();
+      if (!NOT_A_ROOM.has(name)) {
+        fail(
+          `line ${i + 1}: "${name}" is a "##" heading that is neither a room ` +
+            `("NAME, YEAR") nor one of the document's three non-room ` +
+            `sections. An unknown section is a decision, not a skip.`
+        );
+      }
+      room = null;
+      section = name;
+      continue;
+    }
+
+    if (line.length === 0 || line === "---" || line.startsWith("# ")) {
+      closeBlock();
+      continue;
+    }
+
+    /* ── the two non-room sections that carry data ── */
+    if (section === "NEW CONTENT CLASSES (schema-relevant)") {
+      if (line.includes("Candle-surface dimension")) {
+        let joined = line;
+        while (!/\bFeeds check:staging\.?/.test(joined) && i + 1 < lines.length) {
+          i += 1;
+          joined = joinWrapped(joined, lines[i].trim());
+        }
+        candleLine = joined;
+      }
+      continue;
+    }
+    if (section === "FOUNDER-PENDING LEDGER (from this bank)") {
+      const numbered = /^(\d+)\.\s+(.*)$/.exec(line);
+      if (numbered) {
+        ledgerLines.push({ n: Number(numbered[1]), text: numbered[2], line: i + 1 });
+      } else if (ledgerLines.length > 0) {
+        const last = ledgerLines[ledgerLines.length - 1];
+        last.text = joinWrapped(last.text, line);
+      } else {
+        orphans.push({ room: null, line: i + 1, text: line });
+      }
+      continue;
+    }
+    if (section !== null) continue;
+    if (room === null) continue;
+
+    /* ── labelled blocks ── */
+    const label = LABEL.exec(line);
+    if (label && isClosed(block ? block.text : "")) {
+      closeBlock();
+      const name = label[1];
+      if (!BLOCKS.has(name)) {
+        fail(
+          `line ${i + 1}: "${name}:" is a block label nobody has mapped, in ` +
+            `${room.heading}. Add it to BLOCKS in this file and say what the ` +
+            `router does with it — an unmapped label is a paragraph of the ` +
+            `founder's thinking that would otherwise vanish silently.`
+        );
+      }
+      block = {
+        label: name,
+        qualifier: (label[2] ?? "").trim(),
+        text: label[3].trim(),
+        line: i + 1,
+      };
+      continue;
+    }
+
+    if (block === null || isClosed(block.text)) {
+      closeBlock();
+      orphans.push({ room: room.heading, line: i + 1, text: line });
+      continue;
+    }
+
+    block.text = joinWrapped(block.text, line);
+  }
+
+  closeBlock();
+
+  if (rooms.length === 0) fail(`no rooms found in ${SOURCE_NAME}`);
+  return { rooms, orphans, ledgerLines, candleLine };
+}
+
+/* ── clause -> row ──────────────────────────────────────────────────── */
+
+/** Is this clause's name printed matter the house authors? */
+function isPrintedMatter(name) {
+  if (IS_A_KIT.test(name)) return false;
+  const lower = name.toLowerCase();
+  return PRINTED_MATTER.some((phrase) => lower.includes(phrase));
+}
+
+/**
+ * The cards riding with an item, pulled out of the clause.
+ *
+ * Two shapes, both hers:
+ *
+ *   `(+technique card: 1938 spec — ~2:1, stirred, lemon twist)`  a parenthetical
+ *       that OPENS with a plus. Everything after the colon is the card's spec.
+ *
+ *   `… + Watten/briscola rules card`  a trailing segment of the spine that ends
+ *       in "card" AND names what kind of card it is. The second half of that
+ *       test is load-bearing: Acapulco's sparkler kit ends "+ NYC-legality flag
+ *       on card", which is a note ABOUT the kit's card, not a second card, and
+ *       a rule that only looked at the last word would have made one up.
+ */
+const CARD_KINDS = /\b(technique|rules|story|lore|call|prompt|translation|apology|stakes)\b/i;
+
+function extractCards(spine, parens) {
+  const cards = [];
+  const keptParens = [];
+
+  for (const paren of parens) {
+    // The plus is not always first. "(pool act, +card)" and "(pool act,
+    // +technique card)" put a note before it, so the card is everything from
+    // the plus to the end of the parenthesis and the note is what came before.
+    const plus = paren.indexOf("+");
+    if (plus === -1) {
+      keptParens.push(paren);
+      continue;
+    }
+    const before = paren.slice(0, plus).replace(/[,;\s]+$/, "").trim();
+    const body = paren.slice(plus + 1).trim();
+    // She separates a card's NAME from its SPEC three ways — a colon, an em
+    // dash, or a comma — and uses all three within four rooms of each other:
+    // "+technique card: 1938 spec", "+technique card — water then never ice
+    // first", "+card, small flame". First one wins.
+    const at = [/:/, / — /, /,/]
+      .map((pattern) => {
+        const found = pattern.exec(body);
+        return found ? { index: found.index, length: found[0].length } : null;
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.index - b.index)[0];
+    const phrase = at ? body.slice(0, at.index).trim() : body;
+    const spec = at ? body.slice(at.index + at.length).trim() : "";
+
+    // A plus inside a parenthesis is not always a card. Catskills writes
+    // "(pre-written categories + blanks)" and St. Moritz writes "('for the
+    // weekend,' … + blanks)" — both are parts of the thing, not cards riding
+    // with it. So the text after the plus has to SAY it is a card.
+    if (!/\bcards?\b/i.test(phrase)) {
+      keptParens.push(paren);
+      continue;
+    }
+    if (before.length > 0) keptParens.push(before);
+    cards.push({ phrase, spec, from: "parenthetical" });
+  }
+
+  const segments = splitDepthZero(spine, "+");
+  const kept = [];
+  for (let index = 0; index < segments.length; index++) {
+    const segment = segments[index];
+    if (index > 0 && /cards?$/i.test(segment) && CARD_KINDS.test(segment)) {
+      cards.push({ phrase: segment, spec: "", from: "spine" });
+      continue;
+    }
+    kept.push(segment);
+  }
+
+  return { spine: kept.join(" + "), parens: keptParens, cards };
+}
+
+/**
+ * The clause -> everything the row needs, or a refusal.
+ *
+ * Returns `{ skip, reason }` where the parser will not commit to a row.
+ */
+function readClause(raw, context) {
+  const clause = raw.replace(/\.$/, "").trim();
+
+  // Her own thinking-out-loud. "oyster... no — pasta board, flour scoop for the
+  // lesson" is a line being changed mid-write, and a machine that picks one of
+  // the two halves is a machine authoring content.
+  if (/\.\.\./.test(clause)) {
+    return { skip: true, reason: "the line changes its mind mid-sentence ('…')" };
+  }
+
+  const isGesture = /\bGESTURE\b/.test(clause);
+
+  const peeled = peelParentheses(clause);
+  const extracted = extractCards(peeled.spine, peeled.parens);
+
+  let name = extracted.spine.split(" — ")[0].trim();
+  name = name.replace(/[.,;:]+$/, "").trim();
+
+  if (name.length === 0) {
+    return { skip: true, reason: "nothing is left of the clause once its parentheses come off" };
+  }
+
+  if (/^none\b/i.test(name)) {
+    return { skip: true, reason: "the room says none, on purpose", declined: true };
+  }
+
+  const lower = clause.toLowerCase();
+
+  let phase = "all";
+  for (const [word, value] of PHASE_WORDS) {
+    if (lower.includes(word)) {
+      phase = value;
+      break;
+    }
+  }
+
+  let venue = "none";
+  for (const [tag, value] of VENUE_TAGS) {
+    if (clause.includes(tag)) {
+      venue = value;
+      break;
+    }
+  }
+
+  const lead = /min_lead_days\s*~?\s*(\d+)/.exec(clause);
+  const leadNamed = /min_lead_days/.test(clause);
+
+  return {
+    skip: false,
+    raw: clause,
+    name,
+    isGesture,
+    cards: extracted.cards,
+    phase,
+    venue,
+    minLeadDays: lead ? Number(lead[1]) : null,
+    leadNamedWithoutNumber: leadNamed && !lead,
+    ships: !OWNED_IF_PRESENT.test(clause),
+    weight: /\blow weight\b/i.test(clause) ? LOW_WEIGHT : 1,
+    context,
+  };
+}
+
+/* ── the build ──────────────────────────────────────────────────────── */
+
+const document = readFileSync(SOURCE, "utf8");
+const { rooms, orphans, ledgerLines, candleLine } = parse(document);
+
+if (ledgerLines.length !== LEDGER.length) {
+  fail(
+    `the founder-pending ledger has ${ledgerLines.length} entries and this ` +
+      `file's LEDGER table expects ${LEDGER.length}. A ledger entry that is ` +
+      `not in the table is one nobody carried through — add it, with the room ` +
+      `it names and the words that find its item.`
+  );
+}
+
+/** The candle surfaces, read off the NEW CONTENT CLASSES line. */
+const candleSurfaces = new Map();
+const candleUnmapped = [];
+if (candleLine) {
+  const body = candleLine.replace(/^.*?answers "on what" — /, "").replace(/Feeds check:staging\.?$/, "");
+  for (const piece of body.split("·")) {
+    const at = piece.indexOf(":");
+    if (at === -1) continue;
+    const label = piece.slice(0, at).trim();
+    const surface = piece.slice(at + 1).trim().replace(/[.\s]+$/, "");
+    for (const part of label.split("&").map((p) => p.trim())) {
+      const key = SHORT_NAMES.get(part);
+      if (!key) {
+        candleUnmapped.push(part);
+        continue;
+      }
+      candleSurfaces.set(key, surface);
+    }
+  }
+}
+if (candleUnmapped.length > 0) {
+  fail(
+    `the candle-surface line names ${candleUnmapped.join(", ")}, which ` +
+      `SHORT_NAMES in this file does not map. Add it — a room whose candles ` +
+      `have no surface is a check:staging line that cannot be written.`
+  );
+}
+
+const items = [];
+const gestures = [];
+const routed = { dish: [], drink: [] };
+const notBank = [];
+const unclassified = [];
+const notes = [];
+const declined = [];
+
+const takenSlugs = new Map();
+function claimSlug(worldSlug, name, what) {
+  const slug = `${worldSlug}-${slugify(name)}`;
+  if (!/^[a-z][a-z0-9-]*$/.test(slug)) {
+    fail(
+      `"${name}" becomes the slug "${slug}", which bank_item.slug's CHECK in ` +
+        `db/031 refuses ('^[a-z][a-z0-9-]*$').`
+    );
+  }
+  const clash = takenSlugs.get(slug);
+  if (clash) {
+    fail(
+      `"${name}" (${what}) and "${clash}" both become the slug "${slug}". ` +
+        `bank_item.slug is unique across the whole catalogue — reword one of ` +
+        `them in ${SOURCE_NAME}.`
+    );
+  }
+  takenSlugs.set(slug, name);
+  return slug;
+}
+
+for (const room of rooms) {
+  const surface = candleSurfaces.get(room.key) ?? null;
+
+  // Destination-level requires_outdoors, from the heading's own aside. NOT
+  // applied to the rooms' items: db/031's `venue` is a property of an ITEM, and
+  // stamping every good in Tahiti with requires_outdoors would say that a
+  // banana-leaf runner cannot be laid indoors, which is false. Reported.
+  if (/requires_outdoors/.test(room.note)) {
+    notes.push({
+      room: room.heading,
+      kind: "destination-level venue",
+      text:
+        `The heading carries destination-level requires_outdoors ` +
+        `("${room.note}"). NOTHING IN THE SCHEMA CAN HOLD IT: db/020's ` +
+        `ingredient_requirement is CHECKed to ` +
+        `('product','game','tracklist','menu','drink') and does not admit ` +
+        `'world', and db/031's bank_item.venue is per item. No column was ` +
+        `invented and no item was stamped.`,
+    });
+  }
+
+  for (const block of room.blocks) {
+    const spec = BLOCKS.get(block.label);
+    const citation = `${SOURCE_NAME} — ${room.heading}, ${block.label}:`;
+
+    if (spec.sink === "dish" || spec.sink === "drink") {
+      for (const clause of splitDepthZero(block.text, ";")) {
+        routed[spec.sink].push({
+          room: room.heading,
+          key: room.key,
+          text: clause.replace(/\.$/, "").trim(),
+          line: block.line,
+        });
+      }
+      continue;
+    }
+
+    if (spec.kind === null && spec.sink !== "gesture") {
+      notBank.push({
+        room: room.heading,
+        label: block.label + (block.qualifier ? ` ${block.qualifier}` : ""),
+        sink: spec.sink,
+        text: block.text.trim(),
+        line: block.line,
+      });
+      continue;
+    }
+
+    if (spec.sink === "gesture") {
+      // A `GESTURE:` block of its own — only Catskills has one, and it is a
+      // question rather than an answer.
+      gestures.push({
+        room: room.heading,
+        key: room.key,
+        slug: room.slug,
+        gesture: null,
+        note: block.text.trim(),
+        citation,
+        line: block.line,
+        undecided: /FOUNDER DECIDES/.test(block.text),
+      });
+      continue;
+    }
+
+    for (const raw of splitDepthZero(block.text, ";")) {
+      const read = readClause(raw, citation);
+      if (read.skip) {
+        if (read.declined) {
+          declined.push({ room: room.heading, label: block.label, text: raw.trim() });
+        } else {
+          unclassified.push({
+            room: room.heading,
+            label: block.label,
+            line: block.line,
+            text: raw.trim(),
+            reason: read.reason,
+          });
+        }
+        continue;
+      }
+
+      if (read.isGesture) {
+        gestures.push({
+          room: room.heading,
+          key: room.key,
+          slug: room.slug,
+          // Seventeen rooms mark the gesture with a parenthesis, which peels
+          // off with every other parenthesis. Vegas marks it with a sentence —
+          // "flaming dessert is the GESTURE" — and the sentence is not the
+          // gesture's name. One documented trim, and the whole clause is in
+          // gesture_note either way.
+          gesture: read.name.replace(/\s+is the GESTURE$/, "").trim(),
+          note: read.raw,
+          citation,
+          line: block.line,
+          undecided: false,
+        });
+        // Anything shippable named INSIDE an invariant is not extracted. See 4
+        // in the header.
+        if (read.cards.length > 0 || /\bKIT\b|min_lead_days/.test(read.raw)) {
+          unclassified.push({
+            room: room.heading,
+            label: block.label,
+            line: block.line,
+            text: read.raw,
+            reason:
+              "a GESTURE clause that also names shippable matter (" +
+              [
+                read.cards.length > 0 ? `${read.cards.length} card(s)` : null,
+                /\bKIT\b/.test(read.raw) ? "a kit" : null,
+                /min_lead_days/.test(read.raw) ? "a lead time" : null,
+              ]
+                .filter(Boolean)
+                .join(", ") +
+              "). The gesture goes to world.gesture; splitting a good out of " +
+              "the middle of an invariant is a decision a person makes",
+          });
+        }
+        continue;
+      }
+
+      const kind = isPrintedMatter(read.name) ? "printed_card" : spec.kind;
+
+      const description = [read.raw];
+      if (surface && A_CANDLE.test(read.raw)) {
+        description.push(
+          `Candle surface: ${surface}. (${SOURCE_NAME}, NEW CONTENT CLASSES — ` +
+            `candle-surface dimension. Feeds check:staging.)`
+        );
+      }
+
+      const item = {
+        room: room.heading,
+        key: room.key,
+        worldSlug: room.slug,
+        label: block.label,
+        line: block.line,
+        kind,
+        name: read.name,
+        description,
+        phase: read.phase,
+        venue: read.venue,
+        minLeadDays: read.minLeadDays,
+        ships: read.ships,
+        weight: read.weight,
+        citation,
+        cards: [],
+        raw: read.raw,
+      };
+
+      for (const card of read.cards) {
+        // A generic "+technique card" has no name of its own; a named one does.
+        const generic = /^(\+?\s*)?(technique )?cards?$/i.test(card.phrase.trim());
+        const cardName = generic
+          ? `${read.name} — ${card.phrase.trim() || "card"}`
+          : card.phrase.trim();
+        item.cards.push({
+          name: cardName,
+          spec: card.spec,
+          from: card.from,
+        });
+      }
+
+      if (read.leadNamedWithoutNumber) {
+        notes.push({
+          room: room.heading,
+          kind: "lead time without a number",
+          text:
+            `"${read.name}" says min_lead_days but names no number ` +
+            `("${read.raw}"). db/031: "Nulls mean no lead time, not unknown", ` +
+            `so NULL would be a lie here. Left NULL and reported rather than ` +
+            `guessed at.`,
+        });
+      }
+      if (read.weight !== 1) {
+        notes.push({
+          room: room.heading,
+          kind: "weight",
+          text: `"${read.name}" is written "low weight"; ${LOW_WEIGHT} is half the default and has no theory behind it.`,
+        });
+      }
+      if (!read.ships) {
+        notes.push({
+          room: room.heading,
+          kind: "owned-if-present",
+          text: `"${read.name}" ships = false. ${read.raw}`,
+        });
+      }
+      if (/\bowned\b/i.test(read.raw) && read.ships) {
+        unclassified.push({
+          room: room.heading,
+          label: block.label,
+          line: block.line,
+          text: read.raw,
+          reason:
+            "says 'owned' but not 'owned-if-present' — an unresolved " +
+            "either/or (ships cheap OR the house has one). Left ships = true, " +
+            "which is the direction that costs a curator a second look rather " +
+            "than deleting a deliverable",
+        });
+      }
+      // Only where NOTHING was pulled out. A clause that already produced its
+      // card is a clause the vocabulary handled, and reporting it again would
+      // bury the sixteen that nobody has looked at under thirty-two that
+      // somebody has.
+      if (kind !== "printed_card" && item.cards.length === 0 && SOUNDS_PRINTED.test(read.raw)) {
+        notes.push({
+          room: room.heading,
+          kind: "printed matter, uncaught",
+          text:
+            `"${read.name}" (${kind}) names something that sounds printed and ` +
+            `PRINTED_MATTER does not catch: "${read.raw}". Extend the phrase ` +
+            `table if it should be a card of its own.`,
+        });
+      }
+      if (TIME_WORDS.test(read.raw)) {
+        notes.push({
+          room: room.heading,
+          kind: "time of day",
+          text: `"${read.name}" -> phase ${item.phase}. ${read.raw}`,
+        });
+      }
+
+      items.push(item);
+    }
+  }
+}
+
+/* ── the founder-pending ledger, attached ───────────────────────────── */
+
+const pending = [];
+for (const entry of LEDGER) {
+  const authored = ledgerLines.find((l) => l.n === entry.n);
+  if (!authored) {
+    fail(`the ledger has no entry ${entry.n}; the LEDGER table in this file expects one.`);
+  }
+  const record = {
+    n: entry.n,
+    room: entry.room,
+    question: authored.text.trim(),
+    line: authored.line,
+    attached: [],
+    why: entry.why ?? null,
+  };
+  if (entry.match) {
+    const flag = `FOUNDER-PENDING — ${authored.text.trim()} (${SOURCE_NAME}, FOUNDER-PENDING LEDGER ${entry.n}.)`;
+    for (const phrase of entry.match) {
+      const needle = phrase.toLowerCase();
+      const found = items.filter(
+        (item) => item.key === entry.room && item.name.toLowerCase().includes(needle)
+      );
+      // Four of the ten ledger entries are about the room's GESTURE rather than
+      // about anything in the pool — Catskills' whole entry is which gesture it
+      // has, and Amalfi's and Acapulco's each name a gesture and an act in one
+      // sentence. A gesture is not a bank row, so the flag goes where db/031
+      // put the gesture: world.gesture_note.
+      const onGesture = gestures.filter(
+        (gesture) =>
+          gesture.key === entry.room &&
+          `${gesture.gesture ?? ""} ${gesture.note}`.toLowerCase().includes(needle)
+      );
+      if (found.length === 0 && onGesture.length === 0) {
+        fail(
+          `founder-pending ledger ${entry.n} names "${phrase}" at ` +
+            `${entry.room}, and neither a parsed item nor the room's gesture ` +
+            `carries it. The founder asked that every ledger item be flagged ` +
+            `rather than skipped, so an entry that finds nothing to attach to ` +
+            `is one that was skipped. Fix LEDGER in this file or the document.`
+        );
+      }
+      // One ledger line can name two things that turn out to be ONE clause —
+      // Vegas's "confirm flaming dessert as gesture, Caesar as pool act" is a
+      // single sentence in the document, "tableside Caesar … OR flaming
+      // dessert". The question is asked once, so it is written once.
+      for (const item of found) {
+        if (item.description.includes(flag)) continue;
+        item.description.push(flag);
+        record.attached.push(`${item.worldSlug}: ${item.name}`);
+      }
+      for (const gesture of onGesture) {
+        if (gesture.note.includes(flag)) continue;
+        gesture.note += ` ${flag}`;
+        record.attached.push(`${gesture.slug}: world.gesture_note`);
+      }
+    }
+  }
+  pending.push(record);
+}
+
+/* ── slugs, and the cards as rows of their own ──────────────────────── */
+
+const cardRows = [];
+for (const item of items) {
+  item.slug = claimSlug(item.worldSlug, item.name, item.kind);
+}
+for (const item of items) {
+  item.cardSlugs = [];
+  for (const [index, card] of item.cards.entries()) {
+    const row = {
+      room: item.room,
+      key: item.key,
+      worldSlug: item.worldSlug,
+      kind: "printed_card",
+      name: card.name,
+      description: [
+        card.spec.length > 0 ? card.spec : `As written: "${item.raw}"`,
+        `Rides with: ${item.name}.`,
+      ],
+      phase: "all",
+      venue: "none",
+      minLeadDays: null,
+      ships: true,
+      weight: 1,
+      citation: item.citation,
+      ridesWith: item.slug,
+      // db/031 holds ONE technique_card_id per row. A second card can be
+      // created but cannot be attached, and that is a schema finding rather
+      // than something to solve by picking a favourite.
+      attachable: index === 0,
+      label: item.label,
+      line: item.line,
+    };
+    row.slug = claimSlug(item.worldSlug, card.name, "printed_card");
+    item.cardSlugs.push(row.slug);
+    if (index > 0) {
+      notes.push({
+        room: item.room,
+        kind: "two cards, one attachment",
+        text:
+          `"${item.name}" rides with ${item.cards.length} cards. ` +
+          `db/031's technique_card_id is a single self-reference, so ` +
+          `"${card.name}" is created and left UNATTACHED rather than ` +
+          `displacing "${item.cards[0].name}".`,
+      });
+    }
+    cardRows.push(row);
+  }
+}
+
+const allRows = [...cardRows, ...items];
+
+/* ── the report ─────────────────────────────────────────────────────── */
+
+const KINDS = ["good", "host_act", "game", "printed_card"];
+
+function section(title) {
+  console.log(`\n${"─".repeat(72)}\n${title}\n${"─".repeat(72)}`);
+}
+
+function report() {
+  console.log(
+    `[seed-bank] ${SOURCE_NAME}: ${rooms.length} rooms, ` +
+      `${allRows.length} bank_item rows (${items.length} from clauses, ` +
+      `${cardRows.length} printed cards pulled out of them), ` +
+      `${gestures.length} gestures, ` +
+      `${routed.dish.length} dish lines and ${routed.drink.length} drink ` +
+      `lines routed out.` + (dryRun ? " DRY RUN — nothing was written." : "")
+  );
+
+  section("EVERY ROW, PER DESTINATION");
+  for (const room of rooms) {
+    const mine = allRows.filter((row) => row.key === room.key);
+    const counts = KINDS.map((kind) => `${kind} ${mine.filter((r) => r.kind === kind).length}`).join(" · ");
+    console.log(`\n## ${room.heading}  [${room.slug}]  ${mine.length} rows — ${counts}`);
+    if (mine.length === 0) console.log("   (no bank rows — see the gestures and the not-bank sections)");
+    for (const row of mine) {
+      const flags = [
+        `phase=${row.phase}`,
+        `venue=${row.venue}`,
+        `ships=${row.ships}`,
+        row.minLeadDays === null ? null : `lead=${row.minLeadDays}d`,
+        row.weight === 1 ? null : `weight=${row.weight.toFixed(3)}`,
+        row.ridesWith ? `rides-with=${row.ridesWith}${row.attachable ? "" : " (UNATTACHED)"}` : null,
+        row.cardSlugs && row.cardSlugs.length > 0 ? `card=${row.cardSlugs[0]}` : null,
+      ]
+        .filter(Boolean)
+        .join(" ");
+      console.log(`   [${row.kind.padEnd(12)}] ${row.slug}`);
+      console.log(`       name  ${row.name}`);
+      console.log(`       ${flags}`);
+      for (const paragraph of row.description) console.log(`       desc  ${paragraph}`);
+      console.log(`       cite  ${row.citation}`);
+    }
+  }
+
+  section("GESTURES — world.gesture / world.gesture_note, NOT bank rows");
+  for (const gesture of gestures) {
+    console.log(`\n${gesture.slug}`);
+    console.log(`   gesture       ${gesture.gesture ?? "NULL — the founder has not decided"}`);
+    console.log(`   gesture_note  ${gesture.note} [${gesture.citation}]`);
+  }
+  const missing = rooms.filter((room) => !gestures.some((g) => g.key === room.key));
+  if (missing.length > 0) {
+    console.log(
+      `\nNO GESTURE AT ALL: ${missing.map((r) => r.heading).join(", ")}. ` +
+        `The document marks a gesture in seventeen of eighteen rooms; this one ` +
+        `is not marked and none was inferred.`
+    );
+  }
+
+  section("ROUTED OUT — FOOD");
+  console.log(
+    `Emitted, not written. docs/dishes.md holds "- <name> · <B|H|M>" lines and\n` +
+      `every line must carry a making level; none of these does. Paste under the\n` +
+      `destination heading named, add the making level, and update\n` +
+      `PER_DESTINATION in scripts/seed-dishes.mjs IN THE SAME COMMIT.`
+  );
+  reportRoutes(routed.dish, DISHES_DOC, "docs/dishes.md");
+
+  section("ROUTED OUT — DRINK");
+  console.log(
+    `Emitted, not written. docs/drinks.md entries are five bullets and the\n` +
+      `second is the MOCKTAIL MIRROR; seed-drinks fails rather than writing a\n` +
+      `drink whose mirror is missing. The bank supplies no mirrors, so every\n` +
+      `line below needs one authored before it can be an entry.`
+  );
+  reportRoutes(routed.drink, DRINKS_DOC, "docs/drinks.md");
+
+  section("FOUNDER-PENDING LEDGER — ten items, none skipped");
+  for (const entry of pending) {
+    console.log(`\n${entry.n}. ${entry.question}`);
+    if (entry.attached.length > 0) {
+      console.log(`   flagged draft-with-question on:`);
+      for (const where of entry.attached) console.log(`     · ${where}`);
+    } else {
+      console.log(`   NO BANK ROW IS ITS RIGHT HOME. ${entry.why}`);
+    }
+  }
+
+  section("NOT BANK CONTENT — parsed, kept, written nowhere");
+  for (const block of notBank) {
+    console.log(`\n${block.room} — ${block.label}  (${block.sink})`);
+    console.log(`   ${block.text}`);
+  }
+  if (declined.length > 0) {
+    console.log(`\nROOMS THAT DECLINE A KIND ON PURPOSE:`);
+    for (const entry of declined) {
+      console.log(`   ${entry.room} — ${entry.label}: ${entry.text}`);
+    }
+  }
+
+  section("COULD NOT CLASSIFY — read this first");
+  if (unclassified.length === 0 && orphans.length === 0) {
+    console.log("Nothing. Which would be surprising; check the parser.");
+  }
+  for (const entry of unclassified) {
+    console.log(`\n${entry.room} — ${entry.label}, line ${entry.line}`);
+    console.log(`   ${entry.text}`);
+    console.log(`   WHY: ${entry.reason}.`);
+  }
+  for (const orphan of orphans) {
+    console.log(`\n${orphan.room ?? "(no room)"} — line ${orphan.line}, under no block label`);
+    console.log(`   ${orphan.text}`);
+    console.log(`   WHY: a sentence that belongs to no labelled block. Not swallowed into the block above it.`);
+  }
+
+  section("JUDGEMENTS AND GAPS");
+  const byKind = new Map();
+  for (const note of notes) {
+    const list = byKind.get(note.kind) ?? [];
+    list.push(note);
+    byKind.set(note.kind, list);
+  }
+  for (const [kind, list] of byKind) {
+    console.log(`\n${kind.toUpperCase()} (${list.length})`);
+    for (const note of list) console.log(`   ${note.room}: ${note.text}`);
+  }
+  console.log(`\nBANK_PHASE HAS NO 'dawn'`);
+  console.log(
+    `   Havana's dawn pour and St. Moritz's dawn breakfast are authored ` +
+      `content\n   and db/031's bank_phase is (daylight, dusk, dark, all). ` +
+      `'dark' is the\n   nearest and is not true — dawn is the moment dark ` +
+      `ends. Both rows are\n   phase='all' (NO OPINION) rather than wrongly ` +
+      `dark.`
+  );
+  console.log(`\nA DISH CANNOT CARRY A STRUCTURAL REQUIREMENT`);
+  console.log(
+    `   Big Sur routes "s'mores (requires_outdoors)" to the dish pool, and\n` +
+      `   db/020's ingredient_requirement is CHECKed to ('product', 'game',\n` +
+      `   'tracklist', 'menu', 'drink'). 'dish' is not in the list, so that\n` +
+      `   requirement has nowhere to live either.`
+  );
+  console.log(`\nTHE 'descent' TAG DOES NOT EXIST YET`);
+  console.log(
+    `   The routing rules introduce it as a new dish tag ("one deliberately\n` +
+      `   humble late plate, till-morn/late rooms only"). db/021's dish table\n` +
+      `   has no such column and six rooms say "NO descent" explicitly, which\n` +
+      `   is positive evidence worth keeping. A migration, not a seeder.`
+  );
+  console.log(`\nbank_item_ingredient IS EMPTY BY DESIGN THIS RUN`);
+  console.log(
+    `   db/031's shoppable-atmosphere table points at canonical product rows.\n` +
+      `   The bank names no products, so nothing is linked and nothing was\n` +
+      `   invented.`
+  );
+  console.log(`\n'outdoor_access' IS NOT A structural_requirement`);
+  console.log(
+    `   db/031's bank_venue adds it as the softer grade; db/020's\n` +
+      `   structural_requirement table has only 'requires_outdoors'. The two\n` +
+      `   vocabularies do not line up, so venueEligibility() cannot read a\n` +
+      `   bank item's venue the way it reads a menu's requirement.`
+  );
+
+  section("COUNTS");
+  const header = ["destination".padEnd(22), ...KINDS.map((k) => k.padStart(13)), "total".padStart(7)].join("");
+  console.log(header);
+  for (const room of rooms) {
+    const mine = allRows.filter((row) => row.key === room.key);
+    console.log(
+      [
+        room.slug.padEnd(22),
+        ...KINDS.map((kind) => String(mine.filter((r) => r.kind === kind).length).padStart(13)),
+        String(mine.length).padStart(7),
+      ].join("")
+    );
+  }
+  console.log(
+    [
+      "TOTAL".padEnd(22),
+      ...KINDS.map((kind) => String(allRows.filter((r) => r.kind === kind).length).padStart(13)),
+      String(allRows.length).padStart(7),
+    ].join("")
+  );
+  console.log(
+    `\nEvery row above is status = 'draft'. There is no --activate flag on this ` +
+      `seeder;\nsee 1 in this file's header for why.`
+  );
+}
+
+function reportRoutes(lines, docPath, docName) {
+  let headings = new Set();
+  try {
+    for (const match of readFileSync(docPath, "utf8").matchAll(/^##\s+(.+?)\s*$/gm)) {
+      headings.add(match[1]);
+    }
+  } catch {
+    headings = new Set();
+  }
+  let room = null;
+  for (const line of lines) {
+    if (line.room !== room) {
+      room = line.room;
+      const has = headings.has(line.key);
+      console.log(
+        `\n${room}  ->  ${docName} "## ${line.key}"` +
+          (has ? "" : `   ⚠ NO SUCH SECTION YET — the room is not in ${docName} at all`)
+      );
+    }
+    console.log(`   · ${line.text}`);
+  }
+}
+
+report();
+
+/* ── the write ──────────────────────────────────────────────────────── */
+
+if (dryRun) {
+  console.log(`\n[seed-bank] --dry-run: no database was contacted.`);
+  process.exit(0);
+}
+
+const url = process.env.DATABASE_URL;
+if (!url) fail("DATABASE_URL is not set. Use --dry-run to read the report without one.");
+
+const client = new pg.Client({
+  connectionString: url,
+  ssl: needsSsl(url) ? { rejectUnauthorized: false } : undefined,
+  application_name: "revelle-seed-bank",
+});
+
+await client.connect();
+
+let created = 0;
+let left = 0;
+let updated = 0;
+let attached = 0;
+let gesturesWritten = 0;
+const stubbed = [];
+
+try {
+  await client.query("begin");
+
+  const worlds = new Map();
+  for (const room of rooms) {
+    // The stub name is the heading as db/029 writes it — "WESTHAMPTON, 1976" —
+    // because that migration made "NAME, YEAR" the canonical `world.name` and a
+    // stub with a shorter name would have to be corrected by hand later.
+    const world = await ensureWorld(client, room.key, "seed-bank", room.heading);
+    if (world.created) stubbed.push(world.slug);
+    worlds.set(room.key, world);
+  }
+
+  // Every row first, the attachments after. db/031's bank_item_card_kind
+  // trigger READS the row a technique_card_id points at, so a pointer written
+  // in the same statement as the row it names would fail. allRows puts the
+  // cards ahead of the items that ride with them for readability; the separate
+  // pass below is what actually makes the order safe.
+  const idBySlug = new Map();
+  for (const row of allRows) {
+    const world = worlds.get(row.key);
+    const description = row.description.join("\n\n");
+
+    const { rows: existing } = await client.query(
+      `select id, name, description, kind::text, phase::text, venue::text,
+              min_lead_days, ships, weight::text, source_citation
+         from bank_item where slug = $1`,
+      [row.slug]
+    );
+
+    if (existing.length === 0) {
+      const { rows: inserted } = await client.query(
+        `insert into bank_item
+           (slug, world_id, kind, name, description, phase, venue,
+            min_lead_days, ships, weight, status, source_citation)
+         values ($1, $2, $3::bank_kind, $4, $5, $6::bank_phase, $7::bank_venue,
+                 $8, $9, $10, 'draft'::product_status, $11)
+         returning id`,
+        [
+          row.slug,
+          world.id,
+          row.kind,
+          row.name,
+          description,
+          row.phase,
+          row.venue,
+          row.minLeadDays,
+          row.ships,
+          row.weight,
+          row.citation,
+        ]
+      );
+      idBySlug.set(row.slug, inserted[0].id);
+      created += 1;
+    } else {
+      idBySlug.set(row.slug, existing[0].id);
+      const differs =
+        existing[0].name !== row.name ||
+        existing[0].description !== description ||
+        existing[0].kind !== row.kind ||
+        existing[0].phase !== row.phase ||
+        existing[0].venue !== row.venue ||
+        (existing[0].min_lead_days ?? null) !== row.minLeadDays ||
+        existing[0].ships !== row.ships ||
+        Number(existing[0].weight) !== row.weight ||
+        existing[0].source_citation !== row.citation;
+
+      if (differs && !overwrite) {
+        left += 1;
+        console.log(
+          `[seed-bank] differs  ${row.slug} — left as the desk has it. ` +
+            `Re-run with --overwrite to let the file win.`
+        );
+      } else if (differs) {
+        await client.query(
+          `update bank_item set name = $2, description = $3, kind = $4::bank_kind,
+                  phase = $5::bank_phase, venue = $6::bank_venue,
+                  min_lead_days = $7, ships = $8, weight = $9,
+                  source_citation = $10
+             where id = $1`,
+          [
+            existing[0].id,
+            row.name,
+            description,
+            row.kind,
+            row.phase,
+            row.venue,
+            row.minLeadDays,
+            row.ships,
+            row.weight,
+            row.citation,
+          ]
+        );
+        updated += 1;
+        console.log(`[seed-bank] updated  ${row.slug} — from the file`);
+      }
+    }
+  }
+
+  // The attachments, once every row exists. Never overwritten: a curator may
+  // have pointed an act at a different card at the desk.
+  for (const item of items) {
+    if (item.cardSlugs.length === 0) continue;
+    const { rowCount } = await client.query(
+      `update bank_item set technique_card_id = $2
+         where id = $1 and technique_card_id is null`,
+      [idBySlug.get(item.slug), idBySlug.get(item.cardSlugs[0])]
+    );
+    attached += rowCount;
+  }
+
+  // The gestures. Written only where the column is still null — a gesture is
+  // the room's invariant and the desk outranks the file for it as for
+  // everything else.
+  for (const gesture of gestures) {
+    const world = worlds.get(gesture.key);
+    const { rowCount } = await client.query(
+      `update world
+          set gesture = coalesce(gesture, $2),
+              gesture_note = coalesce(nullif(gesture_note, ''), $3)
+        where id = $1
+          and (gesture is null or gesture_note is null or gesture_note = '')`,
+      [world.id, gesture.gesture, `${gesture.note} [${gesture.citation}]`]
+    );
+    gesturesWritten += rowCount;
+  }
+
+  await client.query("commit");
+} catch (err) {
+  await client.query("rollback");
+  console.error(`\n[seed-bank] FAILED: ${err.message}`);
+  process.exitCode = 1;
+} finally {
+  await client.end();
+}
+
+console.log(
+  `\n[seed-bank] ${created} row(s) created, ${updated} updated, ${left} left ` +
+    `as the desk has them; ${attached} technique card(s) attached; ` +
+    `${gesturesWritten} gesture(s) written.`
+);
+
+if (stubbed.length > 0) {
+  console.log(
+    `\nThese destinations had no world row and now have a DRAFT STUB:\n  ` +
+      stubbed.join("\n  ") +
+      `\nA draft destination is never chosen for a customer. Author the look ` +
+      `and the voice in src/lib/destinations.ts and run ` +
+      `npm run seed:destinations, which completes a stub in place.`
+  );
+}
+
+console.log(
+  `\nEvery row is a DRAFT and this seeder has no --activate flag: ` +
+    `"Everything is created\nas status = 'draft'. No exceptions." Offering one ` +
+    `is a decision, made at the desk.`
+);

@@ -20,6 +20,8 @@
     "seed:menus": "node scripts/seed-menus.mjs",
     "seed:drinks": "node scripts/seed-drinks.mjs",
     "seed:dishes": "node scripts/seed-dishes.mjs",
+    "seed:bank": "node scripts/seed-bank.mjs",
+    "check:bank": "node scripts/seed-bank.mjs --dry-run",
     "seed:fixtures": "node scripts/seed-fixtures.mjs",
     "seed:occasion": "node scripts/seed-occasion.mjs",
     "selection:demo": "node scripts/selection-demo.mjs",

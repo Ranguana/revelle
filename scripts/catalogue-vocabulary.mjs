@@ -61,6 +61,75 @@ export const DESTINATIONS = {
   "Big Sur": "big-sur",
   "New Orleans": "new-orleans",
   Portofino: "portofino",
+
+  /* ── THE SIX PROPOSED ROOMS ─────────────────────────────────────────
+   *
+   * Added for docs/atmosphere-idea-bank-v1.md, which is the FIRST authored
+   * document to carry all eighteen rooms — the menus, the drinks and the
+   * dishes still hold twelve, and docs/needs-a-human.md §C books the missing
+   * dish pools as founder writing.
+   *
+   * The slugs are `proposed` in data/destination-matrix.json and are taken
+   * from it verbatim rather than slugified from these keys: `amalfi-1953`
+   * carries its year and `st-moritz-1984` does too, which is a rule three of
+   * the twelve above already break in the other direction. The matrix is the
+   * committed source for a destination's identity (CLAUDE.md rule 7) and a
+   * second opinion about a slug is how the matrix forked once already.
+   *
+   * A world row for any of these does not exist yet. ensureWorld creates a
+   * DRAFT STUB, which is never chosen for a customer, and seed-destinations
+   * completes it when the room is authored — or the row is dropped if the
+   * founder blocks the room, which three of the six are still open questions
+   * about (docs/needs-a-human.md, DECISIONS 3 and 4).
+   */
+  "Amalfi Coast": "amalfi-1953",
+  Oaxaca: "oaxaca-1954",
+  Acapulco: "acapulco-1959",
+  "Palm Springs": "palm-springs-1965",
+  "St. Moritz": "st-moritz-1984",
+  Aspen: "aspen-1994",
+};
+
+/**
+ * The `## NAME, YEAR` heading of docs/atmosphere-idea-bank-v1.md -> the key of
+ * DESTINATIONS above.
+ *
+ * ── WHY A SECOND MAP AND NOT A SECOND LIST OF SLUGS ─────────────────
+ *
+ * The bank document heads its rooms the way db/029 names them — "WESTHAMPTON,
+ * 1976", "CÔTE D'AZUR, 1962" — because that migration made "NAME, YEAR" the
+ * canonical `world.name` and the founder wrote the bank in the same breath.
+ * The other three catalogue documents head theirs "## Westhampton". Two
+ * spellings of one room, and exactly the situation this file exists to stop
+ * being answered twice.
+ *
+ * So this map holds the SPELLING and DESTINATIONS holds the SLUG. There is
+ * still one place a room's slug is written down, which is the whole point; a
+ * new document with a third spelling adds eighteen lines here and no slugs
+ * anywhere.
+ *
+ * Two of the eighteen are not a case change and are why this is a table:
+ * "LAS VEGAS, 1960" is `Vegas` and "AMALFI COAST, 1953" is `Amalfi Coast`.
+ */
+export const ROOM_HEADINGS = {
+  "WESTHAMPTON, 1976": "Westhampton",
+  "NEW YORK, 1938": "New York",
+  "NEW ORLEANS, 1956": "New Orleans",
+  "DOLOMITES, 1956": "Dolomites",
+  "HAVANA, 1957": "Havana",
+  "LAS VEGAS, 1960": "Vegas",
+  "PORTOFINO, 1961": "Portofino",
+  "TAHITI, 1961": "Tahiti",
+  "CÔTE D'AZUR, 1962": "Côte d'Azur",
+  "CATSKILLS, 1963": "Catskills",
+  "PALM SPRINGS, 1965": "Palm Springs",
+  "BIG SUR, 1971": "Big Sur",
+  "NANTUCKET, 1972": "Nantucket",
+  "AMALFI COAST, 1953": "Amalfi Coast",
+  "OAXACA, 1954": "Oaxaca",
+  "ACAPULCO, 1959": "Acapulco",
+  "ST. MORITZ, 1984": "St. Moritz",
+  "ASPEN, 1994": "Aspen",
 };
 
 /**
@@ -303,9 +372,22 @@ export function isStubRow(row) {
  * longer a holding pen, it is the real scoping, and "Havana's daiquiris are not
  * an option at the Dolomites" (docs/drinks.md) is enforced rather than likely.
  *
+ * ── `displayName` ───────────────────────────────────────────────────
+ *
+ * Optional, and it defaults to the heading, so nothing that called this
+ * function before it existed behaves differently.
+ *
+ * It exists because db/029 made "NAME, YEAR" the canonical `world.name` for
+ * every destination — "WESTHAMPTON, 1976", not "Westhampton" — and one
+ * document, docs/atmosphere-idea-bank-v1.md, heads its rooms that way. A stub
+ * created from that document can therefore be created with the name it will
+ * keep, instead of with a shorter one somebody has to correct by hand later.
+ * The heading is still what the DESTINATIONS lookup is keyed on; this changes
+ * only what goes in the `name` column.
+ *
  * @returns {{ id: string, slug: string, created: boolean }}
  */
-export async function ensureWorld(client, heading, by) {
+export async function ensureWorld(client, heading, by, displayName = heading) {
   const slug = DESTINATIONS[heading];
   if (!slug) {
     throw new Error(
@@ -330,7 +412,7 @@ export async function ensureWorld(client, heading, by) {
     // The heading as she wrote it, and nothing else. A stub has no display
     // name of its own to invent: naming a destination is authoring, and the
     // seed that completes this row sets the real one.
-    [slug, heading, `${STUB_NOTE} Created by ${by}.`]
+    [slug, displayName, `${STUB_NOTE} Created by ${by}.`]
   );
   return { id: rows[0].id, slug, created: true };
 }
