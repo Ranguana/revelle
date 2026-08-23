@@ -4,7 +4,7 @@ import { query } from "@/lib/db";
 import { COOKING_LEVELS, POOL_STATUS, SEASONS } from "@/lib/desk/labels";
 
 import styles from "../../desk.module.css";
-import { Chips, Empty, Head, Status } from "../bits";
+import { Chips, Empty, Head, Status, StatusLegend, rowClass } from "../bits";
 import { setMenuStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -79,6 +79,8 @@ export default async function MenusPage({
         <span className={styles.hint}>{rows.length} shown</span>
       </div>
 
+      {rows.length > 0 ? <StatusLegend statuses={POOL_STATUS} /> : null}
+
       {rows.length === 0 ? (
         <Empty>
           Nothing yet. <code>npm run seed:menus</code> loads the twenty from
@@ -87,7 +89,7 @@ export default async function MenusPage({
       ) : (
         <ul className={styles.rows}>
           {rows.map((row) => (
-            <li key={row.id} className={styles.row}>
+            <li key={row.id} className={rowClass(row.status)}>
               <div className={styles.who}>
                 <Link href={`/desk/menus/${row.id}`} className={styles.whoEmail}>
                   {row.name}

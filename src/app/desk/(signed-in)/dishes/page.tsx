@@ -10,7 +10,7 @@ import {
 } from "@/lib/desk/labels";
 
 import styles from "../../desk.module.css";
-import { Chips, Empty, Head, Status } from "../bits";
+import { Chips, Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setDishStatus } from "./actions";
 
 /**
@@ -334,6 +334,8 @@ export default async function DishesPage({
         ) : null}
       </div>
 
+      {rows.length > 0 ? <StatusLegend statuses={POOL_STATUS} /> : null}
+
       {rows.length === 0 ? (
         <Empty>
           {filtered ? (
@@ -364,7 +366,7 @@ export default async function DishesPage({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.id}>
+              <TableRow key={row.id} status={row.status}>
                 <td>
                   <Link href={`/desk/dishes/${row.id}`} className={styles.whoEmail}>
                     {row.name}
@@ -411,7 +413,7 @@ export default async function DishesPage({
                     </button>
                   </form>
                 </td>
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </table>

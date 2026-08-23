@@ -25,6 +25,62 @@
   font-family: var(--body);
   font-size: 0.875rem;
   line-height: 1.5;
+
+  /* ── ROW COLOUR, DECIDED ONCE ───────────────────────────────────
+   *
+   * Every list in the tool colours a row by ONE thing: the row's STATUS.
+   * Not its destination, not its pool, not how old it is. The reason it is
+   * status and nothing else is that status is the only fact every list
+   * shares — an application, a dish, a game, a menu and a destination all
+   * have one — so one meaning can be applied identically everywhere, and a
+   * colour that means a different thing on each screen is a colour nobody
+   * can read.
+   *
+   * The three families are the ones `Status` in bits.tsx already draws, and
+   * the row is tinted the SAME hue as the status mark it carries. That is
+   * what makes the legend almost unnecessary and the mark the legend: the
+   * pill and the row agree, so the colour is learnable in one glance.
+   *
+   *   open    oxblood — drafted or newly arrived. Not offered to anyone.
+   *   live    aqua    — in play right now.
+   *   closed  faint   — withdrawn, retired, delivered, archived. Recedes.
+   *
+   * These are the house tokens (src/lib/tokens.ts), so dark mode is already
+   * handled: the tokens flip under prefers-color-scheme and these follow.
+   * There is no second palette here and there must never be one.
+   *
+   * ACCESSIBILITY. The wash is deliberately weak — under a tenth of the
+   * hue over the ground — so text contrast is essentially unchanged from
+   * the untinted row. Colour is never the only carrier: the status word is
+   * on every row it describes, and the left edge bar is a second, redundant
+   * cue for anyone who cannot separate the hues.
+   */
+  --row-open: var(--oxblood);
+  --row-live: var(--aqua);
+  --row-closed: var(--ink-faint);
+  /* The default: no status, no claim. The rule colour is the ordinary border. */
+  --row-mark: var(--rule);
+  --row-wash: 9%;
+  --row-wash-hover: 17%;
+  /* Separation, not meaning. Ink over the ground, so it works in both themes. */
+  --row-zebra: color-mix(in srgb, var(--ink) 3.5%, transparent);
+}
+
+/*
+ * The three families. One class sets one custom property, and everything that
+ * draws a row reads that property — so a card, a table row and a legend swatch
+ * cannot disagree about what "live" looks like.
+ */
+.markOpen {
+  --row-mark: var(--row-open);
+}
+
+.markLive {
+  --row-mark: var(--row-live);
+}
+
+.markClosed {
+  --row-mark: var(--row-closed);
 }
 
 @media (max-width: 60rem) {
@@ -181,9 +237,15 @@
   padding: 0;
 }
 
+/*
+ * A card row. The left edge and the wash are both `--row-mark`, which the
+ * status family class beside `.row` sets; with no family class the mark is the
+ * ordinary rule colour and the card looks exactly as it always did.
+ */
 .row {
   border: 1px solid var(--rule);
-  background: var(--ground2);
+  border-left: 3px solid var(--row-mark);
+  background: color-mix(in srgb, var(--row-mark) var(--row-wash), var(--ground2));
   padding: 0.625rem 0.75rem;
   display: grid;
   grid-template-columns: 15rem minmax(0, 1fr) 9rem;
@@ -197,9 +259,15 @@
   }
 }
 
-.rowNew {
-  border-left: 3px solid var(--oxblood);
-}
+/*
+ * WAS: `.rowNew`, a 3px oxblood left border on an application whose status is
+ * `new`, set by hand in the inbox and nowhere else. It was right about the
+ * idiom and wrong about the reach — one screen knew the trick and six did not,
+ * so the same fact was drawn on one list and invisible on the others. Its
+ * border is now `.row`'s own left edge and its colour is `--row-open`, which
+ * every list gets from `statusFamily` rather than from a hand-written
+ * condition. The argument it was making is kept, generalised, above.
+ */
 
 .who {
   min-width: 0;
@@ -388,8 +456,42 @@
   vertical-align: top;
 }
 
+/*
+ * Separation, and only separation. Zebra is not the semantic colour below — it
+ * says nothing except "this line is not that line", which is the half of the
+ * complaint that striping actually answers. It is a translucent ink wash, so
+ * the status tint painted on the cells composes over it instead of hiding it.
+ */
+.table tbody tr:nth-child(even) {
+  background: var(--row-zebra);
+}
+
 .table tr:hover td {
   background: var(--ground2);
+}
+
+/*
+ * A table row that carries a status. Same two cues as the card: a wash across
+ * the cells and a bar down the left edge. The bar is an inset shadow rather
+ * than a border because the table is `border-collapse: collapse`, where a
+ * left border on the first cell is shared with the table edge and drawn at the
+ * browser's discretion; an inset shadow is drawn inside the cell, always.
+ */
+.table tbody tr.tableRow td {
+  background: color-mix(in srgb, var(--row-mark) var(--row-wash), transparent);
+}
+
+.table tbody tr.tableRow td:first-child {
+  box-shadow: inset 3px 0 0 var(--row-mark);
+  padding-left: 0.5rem;
+}
+
+.table tbody tr.tableRow:hover td {
+  background: color-mix(
+    in srgb,
+    var(--row-mark) var(--row-wash-hover),
+    var(--ground2)
+  );
 }
 
 .numeric {
@@ -941,6 +1043,27 @@
   text-align: center;
 }
 
+/*
+ * The swatch in a row-colour legend. `aria-hidden` in the markup: it is the
+ * second copy of something the words beside it already say, and a screen
+ * reader announcing an empty box helps nobody.
+ */
+.legendSwatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex: none;
+  align-self: center;
+  border: 1px solid var(--row-mark);
+  background: color-mix(in srgb, var(--row-mark) 45%, transparent);
+}
+
+.legendLead {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .matrixCell {
   width: 2.25rem;
   text-align: center;
@@ -1154,4 +1277,85 @@
 
 .link {
   color: var(--oxblood);
+}
+
+/* ── file-vs-database drift ───────────────────────────────────────── */
+
+/*
+ * TWO PANES, SIDE BY SIDE, NEITHER OF THEM AUTHORITATIVE.
+ *
+ * The layout is a deliberate refusal to take a side. A diff view with one
+ * column marked "wrong" would be a lie here: the database is what SHIPS and
+ * the file is what SEEDS A FRESH ENVIRONMENT, and both are somebody's work.
+ * So the two are drawn identically, labelled plainly, and left to a person.
+ */
+.driftPair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  margin: 0.25rem 0 0.875rem;
+}
+
+@media (max-width: 62rem) {
+  .driftPair {
+    grid-template-columns: 1fr;
+  }
+}
+
+.driftSide {
+  min-width: 0;
+}
+
+.driftText {
+  margin: 0.125rem 0 0;
+  padding: 0.4375rem 0.5rem;
+  border: 1px solid var(--rule);
+  background: var(--ground2);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+.driftField {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+/* The two sub-headings on the drift panel. Same caption idiom as `.label`,
+ * with the margins an h3 needs and does not have. */
+.driftHead {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 400;
+  margin: 1rem 0 0.25rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--rule);
+}
+
+/*
+ * The copyable block, and the only place in this feature where one side is
+ * offered as an answer. `user-select: all` makes one click take the whole
+ * thing, which is what it is for — it is meant to leave here whole and land in
+ * src/lib/destinations.ts whole. Gold, not aqua and not oxblood: it is neither
+ * a status nor an error, and it must not read as either.
+ */
+.copyBlock {
+  margin: 0.375rem 0 0;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--gold);
+  border-left-width: 3px;
+  background: var(--ground2);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow-x: auto;
+  user-select: all;
 }

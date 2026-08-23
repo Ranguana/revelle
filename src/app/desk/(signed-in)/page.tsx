@@ -11,7 +11,7 @@ import {
 } from "@/lib/desk/labels";
 
 import styles from "../desk.module.css";
-import { Chips, Empty, Fact, Head, Status } from "./bits";
+import { Chips, Empty, Fact, Head, Status, StatusLegend, rowClass } from "./bits";
 import {
   decisionLine,
   readDecisions,
@@ -227,6 +227,8 @@ export default async function Inbox({ searchParams }: PageProps<"/desk">) {
         ) : null}
       </div>
 
+      {rows.length > 0 ? <StatusLegend statuses={APPLICATION_STATUS} /> : null}
+
       {rows.length === 0 ? (
         <Empty>
           Nothing here. When someone applies, her answers land at the top of
@@ -237,7 +239,7 @@ export default async function Inbox({ searchParams }: PageProps<"/desk">) {
           {rows.map((row) => (
             <li
               key={row.id}
-              className={`${styles.row} ${row.status === "new" ? styles.rowNew : ""}`}
+              className={rowClass(row.status)}
             >
               <div className={styles.who}>
                 <Link href={`/desk/applications/${row.id}`} className={styles.whoEmail}>

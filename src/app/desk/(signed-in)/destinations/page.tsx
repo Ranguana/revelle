@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 import { query } from "@/lib/db";
+import { destinationDrift, driftSummary, hasDrift } from "@/lib/desk/drift";
 import { WORLD_STATUS, stamp } from "@/lib/desk/labels";
 
 import styles from "../../desk.module.css";
-import { Empty, Head, Status } from "../bits";
+import { Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setDestinationStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,20 @@ type Row = {
   lopsided: boolean;
   narrow: boolean;
   revelles: number;
+  // ── the three columns that exist only to be compared with the file ──
+  //
+  // Fetched here and nowhere sent: src/lib/desk/drift.ts runs on the server,
+  // and only its VERDICT reaches the browser. The voice document is the large
+  // one and it is still cheap — twelve rows, once, over the database
+  // connection — and the alternative, comparing versions instead of words,
+  // would miss the case the seed script's own log line describes: the same
+  // version number in force while the file was rewritten underneath it.
+  description: string | null;
+  voice: unknown;
+  /** [{ code, weight }], from json_agg. Typed unknown; parsed defensively. */
+  tones: unknown;
+  /** Tags in dimensions the file does not author. Not drift — see drift.ts. */
+  other_tags: number;
 };
 
 /**
@@ -53,7 +68,21 @@ export default async function DestinationsPage() {
             coalesce(c.thin, true) as thin,
             coalesce(c.lopsided, false) as lopsided,
             coalesce(c.narrow, true) as narrow,
-            (select count(*)::int from revelle r where r.world_id = w.id) as revelles
+            (select count(*)::int from revelle r where r.world_id = w.id) as revelles,
+            w.description, v.voice,
+            (select coalesce(
+                      json_agg(json_build_object(
+                        'code', f.code::text, 'weight', wf.weight::text)),
+                      '[]'::json)
+               from world_facet wf
+               join facet f on f.id = wf.facet_id
+              where wf.world_id = w.id
+                and f.dimension_code = 'voice_tone') as tones,
+            (select count(*)::int
+               from world_facet wf
+               join facet f on f.id = wf.facet_id
+              where wf.world_id = w.id
+                and f.dimension_code <> 'voice_tone') as other_tags
        from world w
        left join world_voice v on v.world_id = w.id and v.status = 'published'
        left join destination_facet_coverage c on c.id = w.id
@@ -74,6 +103,22 @@ export default async function DestinationsPage() {
         be changed.
       </p>
 
+      {/*
+        THE FILE COLUMN. Its argument is in src/lib/desk/drift.ts and the short
+        version is on every destination's own page; what belongs here is only
+        the sentence that stops the column being read as an error list.
+      */}
+      <p className={styles.note}>
+        <strong>Against the file</strong> compares each row with{" "}
+        <code>src/lib/destinations.ts</code>, which is what a fresh database is
+        seeded from and never what a live one is overwritten with. A difference
+        is not a fault — the database is what ships and the file is what seeds
+        — but a difference left alone means a rebuild would quietly revert
+        whatever was decided here. Open a destination to see both sides.
+      </p>
+
+      {rows.length > 0 ? <StatusLegend statuses={WORLD_STATUS} /> : null}
+
       {rows.length === 0 ? (
         <Empty>
           Nothing yet. <code>npm run seed:destinations</code> moves the
@@ -87,14 +132,28 @@ export default async function DestinationsPage() {
               <th>Voice</th>
               <th>Described</th>
               <th>Issued</th>
+              <th>Against the file</th>
               <th>Status</th>
               <th>Changed</th>
               <th />
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.id}>
+            {rows.map((row) => {
+              const drift = destinationDrift({
+                slug: row.slug,
+                name: row.name,
+                tagline: row.tagline,
+                description: row.description,
+                // `voice` is null when nothing is published, which is
+                // look-only and not a difference; drift.ts keeps that apart
+                // from "not fetched".
+                voice: row.voice,
+                tones: row.tones,
+                unauthoredTags: row.other_tags,
+              });
+              return (
+              <TableRow key={row.id} status={row.status}>
                 <td>
                   <Link
                     href={`/desk/destinations/${row.id}`}
@@ -140,6 +199,22 @@ export default async function DestinationsPage() {
                 </td>
                 <td className={styles.numeric}>{row.revelles}</td>
                 <td>
+                  {!drift.authored ? (
+                    <span className={styles.when}>not in the file</span>
+                  ) : hasDrift(drift) ? (
+                    <Link
+                      href={`/desk/destinations/${row.id}#file`}
+                      className={styles.link}
+                    >
+                      {driftSummary(drift).join(" · ")}
+                    </Link>
+                  ) : (
+                    <span className={styles.when}>
+                      matches{drift.voiceCompared ? "" : " — no voice yet"}
+                    </span>
+                  )}
+                </td>
+                <td>
                   <Status code={row.status} label={WORLD_STATUS[row.status]} />
                 </td>
                 <td className={styles.numeric}>{stamp(row.updated_at)}</td>
@@ -156,8 +231,9 @@ export default async function DestinationsPage() {
                     </button>
                   </form>
                 </td>
-              </tr>
-            ))}
+              </TableRow>
+              );
+            })}
           </tbody>
         </table>
       )}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
+import { destinationDrift } from "@/lib/desk/drift";
 import { groupFacets, tagsFor, taggingVocabulary } from "@/lib/desk/facets";
 import { WORLD_STATUS, stamp } from "@/lib/desk/labels";
 
@@ -9,6 +10,7 @@ import styles from "../../../desk.module.css";
 import Thread from "../../Thread";
 import { Fact, Head, Status } from "../../bits";
 import DestinationForm, { type DestinationValues } from "../DestinationForm";
+import Drift from "../Drift";
 import { setDestinationStatus } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +39,7 @@ export default async function DestinationPage({
   );
   if (!world) notFound();
 
-  const [groups, tags, voices, counts] = await Promise.all([
+  const [groups, tags, voices, counts, inForce] = await Promise.all([
     taggingVocabulary("world").then(groupFacets),
     tagsFor("world", id),
     query<{
@@ -63,7 +65,33 @@ export default async function DestinationPage({
               (select count(*)::int from world_section where world_id = $1) as sections`,
       [id]
     ),
+    // The voice in force, fetched on its own rather than added to the version
+    // list above: this is the only version there is anything to compare the
+    // file against (db/004 freezes a published row, so an earlier version is
+    // history and not a candidate), and pulling the document for every version
+    // to use one of them would be paying for the whole shelf to read one page.
+    queryOne<{ voice: unknown }>(
+      `select voice from world_voice
+        where world_id = $1 and status = 'published'`,
+      [id]
+    ),
   ]);
+
+  // Both halves of the tag comparison come off `tags`, which is already
+  // fetched — the file authors tone tags and nothing else, so everything in
+  // another dimension is counted rather than compared. See src/lib/desk/drift.ts.
+  const drift = destinationDrift({
+    slug: world.slug ?? "",
+    name: world.name,
+    tagline: world.tagline,
+    description: world.description,
+    voice: inForce ? inForce.voice : null,
+    tones: tags
+      .filter((tag) => tag.dimension_code === "voice_tone")
+      .map((tag) => ({ code: tag.code, weight: tag.weight })),
+    unauthoredTags: tags.filter((tag) => tag.dimension_code !== "voice_tone")
+      .length,
+  });
 
   return (
     <>
@@ -176,6 +204,13 @@ export default async function DestinationPage({
           />
         </div>
       </div>
+
+      {/*
+        Full width, below the form, rather than in the right-hand column: a
+        prose difference is two paragraphs side by side and a 1fr column cannot
+        hold one honestly. The link from the library list lands on #file.
+      */}
+      <Drift report={drift} name={world.name ?? ""} />
     </>
   );
 }

@@ -4,7 +4,7 @@ import { query } from "@/lib/db";
 import { POOL_STATUS, money, stamp } from "@/lib/desk/labels";
 
 import styles from "../../desk.module.css";
-import { Chips, Empty, Head, Status } from "../bits";
+import { Chips, Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setProductStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -71,6 +71,8 @@ export default async function ProductsPage({
         <span className={styles.hint}>{rows.length} shown</span>
       </div>
 
+      {rows.length > 0 ? <StatusLegend statuses={POOL_STATUS} /> : null}
+
       {rows.length === 0 ? (
         <Empty>
           Nothing in the pool yet. Add the thing you just found — one at a
@@ -91,7 +93,7 @@ export default async function ProductsPage({
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.id}>
+              <TableRow key={row.id} status={row.status}>
                 <td>
                   <Link href={`/desk/products/${row.id}`} className={styles.whoEmail}>
                     {row.name}
@@ -137,7 +139,7 @@ export default async function ProductsPage({
                     </form>
                   )}
                 </td>
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </table>

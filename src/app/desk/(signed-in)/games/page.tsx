@@ -10,7 +10,7 @@ import {
 } from "@/lib/desk/labels";
 
 import styles from "../../desk.module.css";
-import { Chips, Empty, Head, Status } from "../bits";
+import { Chips, Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setGameStatus } from "./actions";
 
 /**
@@ -135,6 +135,8 @@ export default async function GamesPage({
         <span className={styles.hint}>{rows.length} shown</span>
       </div>
 
+      {rows.length > 0 ? <StatusLegend statuses={POOL_STATUS} /> : null}
+
       {rows.length === 0 ? (
         <Empty>
           {filter === "all" ? (
@@ -169,7 +171,7 @@ export default async function GamesPage({
               const steps = Number(row.steps);
               const unanswered = Number(row.unanswered);
               return (
-                <tr key={row.id}>
+                <TableRow key={row.id} status={row.status}>
                   <td>
                     <Link href={`/desk/games/${row.id}`} className={styles.whoEmail}>
                       {row.name}
@@ -239,7 +241,7 @@ export default async function GamesPage({
                       </button>
                     </form>
                   </td>
-                </tr>
+                </TableRow>
               );
             })}
           </tbody>
