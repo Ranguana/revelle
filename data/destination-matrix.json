@@ -358,6 +358,21 @@
         "distance": 2,
         "voiceAffinity": null,
         "status": "UNVERIFIED — neither voice is written, so the affinity condition cannot be measured. Same handling as St. Moritz/Acapulco: the row is admitted and the twin claim is provisional until both voices exist."
+      },
+      {
+        "pair": [
+          "portofino",
+          "cote-dazur"
+        ],
+        "distance": 1,
+        "voiceAffinity": 0.401,
+        "status": "FOUNDER-SIGNED 2026-08-23. Both voices are written, so unlike the other two twins this one is MEASURED rather than promised.",
+        "case": [
+          "Voice affinity 0.401 — comfortably inside the strict cap of 0.65, which applies here because the pair sits at structural distance 1.",
+          "PERMEABILITY, in both rooms' own audience lines: Portofino is 'the few of us who came, who have all met before'; Cote d'Azur is 'the people already up here, and the ones still climbing'. Closed against open. The lexicons say it twice — `between us` against `come up: the road is the answer and nobody is counted`.",
+          "Distinct benches, gestures and signature dishes authored since the deferral."
+        ],
+        "note": "This pair was deliberately NOT declared when the rule was written, on the grounds that a twin declaration would settle the live question of whether Portofino exists by default instead of on purpose. It is declared now because the question was answered on the merits and signed, which is the difference the rule was protecting."
       }
     ],
     "candidatesNotDeclared": [
@@ -369,15 +384,6 @@
         "distance": 2,
         "voiceAffinity": 0.424,
         "note": "Would qualify on all four conditions. NOT declared — this pair is a consequence of the schedule reconciliation and of Nantucket's two founder-decides cells, and it should be resolved by deciding those rather than excused by a twin."
-      },
-      {
-        "pair": [
-          "portofino",
-          "cote-dazur"
-        ],
-        "distance": 1,
-        "voiceAffinity": 0.401,
-        "note": "Would qualify. NOT declared — this is the open question of whether Portofino exists, and a twin declaration would answer it by default instead of on purpose."
       }
     ]
   },
