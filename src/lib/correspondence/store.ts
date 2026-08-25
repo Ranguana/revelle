@@ -43,7 +43,7 @@ export type Correspondent = {
   eventDate: string | null;
   guestCount: number | null;
   /** How many days this occasion runs. One for an evening. */
-  days: number;
+  days: number | null;
 };
 
 type HeadRow = {
@@ -59,7 +59,7 @@ type HeadRow = {
   voice_override: unknown;
   event_date: Date | null;
   guest_count: number | null;
-  days: number;
+  days: number | null;
 };
 
 const OPENABLE = ["preview", "delivered", "archived"] as const;
@@ -84,7 +84,15 @@ export async function readCorrespondent(
             w.tokens, r.tokens_override,
             v.voice, v.version as voice_version, r.voice_override,
             r.event_date, r.guest_count,
-            coalesce(s.days, 1) as days
+            -- RAW, not coalesce(s.days, 1). A missing occasion_shape row and
+            -- a genuinely one-day occasion are different facts, and coalescing
+            -- them made the first indistinguishable from the second — which
+            -- decides how many morning bulletins a member is offered, so the
+            -- failure was to silently thin her correspondence with nothing
+            -- said anywhere (CLAUDE.md rules 16 and 19). db/009 seeds a row
+            -- per occasion, so a null here means an occasion code arrived
+            -- that the shape table does not know.
+            s.days as days
        from revelle r
        join world w on w.id = r.world_id
        join quiz_response q on q.id = r.quiz_response_id
@@ -102,6 +110,9 @@ export async function readCorrespondent(
     destination: destinationFrom(row),
     eventDate: day(row.event_date),
     guestCount: row.guest_count,
+    // A null `days` is not defaulted here either. The caller decides what to
+    // do about an occasion the shape table cannot describe; this layer's job
+    // is to stop pretending it knows.
     days: row.days,
   };
 }

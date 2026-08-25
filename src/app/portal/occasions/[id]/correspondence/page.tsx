@@ -75,7 +75,16 @@ export default async function CorrespondencePage({
   const theme = correspondent.destination?.look ?? null;
   const deskIsOpen = canWrite() && voice !== null;
 
-  const voiced = voice ? voicedChoices(correspondent.days) : [];
+  // A null `days` means the occasion_shape table has no row for her occasion
+  // — a lookup gap, not a one-day party. The store used to coalesce it to 1,
+  // which silently offered her a single morning bulletin for what might be a
+  // three-day weekend and said nothing to anybody. Offering the plain pieces
+  // and withholding the day-numbered ones is the honest reading: she keeps
+  // everything that does not depend on the count.
+  const voiced =
+    voice && correspondent.days !== null
+      ? voicedChoices(correspondent.days)
+      : [];
   const plain = voice ? plainChoices(voice) : [];
   const date = longDate(correspondent.eventDate);
 

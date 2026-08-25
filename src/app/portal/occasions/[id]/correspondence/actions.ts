@@ -132,6 +132,18 @@ export async function composeAction(
     };
   }
 
+  if (days === null) {
+    // Same gap the page handles by withholding the day-numbered choices. If
+    // one is submitted anyway, refuse it by name rather than defaulting the
+    // count — CLAUDE.md rule 16: never absorb input you cannot honour.
+    return {
+      error:
+        "We cannot tell how many days this occasion runs, so the pieces that " +
+        "depend on the count are not available. Nothing has been lost; it has " +
+        "been raised with us.",
+    };
+  }
+
   const choice = choiceFor(destination.voice, days, trimmed(form, "choice"));
   if (!choice) return { error: "Choose what it is first." };
 

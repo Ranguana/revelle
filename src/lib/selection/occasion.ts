@@ -312,6 +312,18 @@ export function humanOccasion(occasion: string): string {
     case "no_reason":
       return "evening for no reason";
     default:
-      return "occasion";
+      // THE CODE ITSELF, not the word "occasion". This is the only code→label
+      // helper in the repo that degraded to a generic WORD, and it feeds
+      // sentence templates in claimEligibility: an unrecognised code rendered
+      // as "written for a long dinner, not for an occasion", and two of them
+      // as the self-contradicting "written for an occasion, not for an
+      // occasion". A reader could not tell a scope from a lookup gap, and had
+      // no code left to go and look up. src/lib/desk/labels.ts already states
+      // the house answer — "falls back to the code itself, which is the honest
+      // answer" — and CLAUDE.md rule 16 is why: a fallback that cannot be
+      // distinguished from a real value has absorbed input it did not honour.
+      // Reachable today: src/lib/desk/bench.ts casts a free-text answer
+      // straight to OccasionCode with no membership check.
+      return occasion;
   }
 }
