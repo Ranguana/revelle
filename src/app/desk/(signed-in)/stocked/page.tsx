@@ -16,6 +16,7 @@ import {
 import styles from "../../desk.module.css";
 import { Empty, Head, Seam, Status, StatusLegend, TableRow } from "../bits";
 import { revertStocked } from "./actions";
+import { SyncPanel } from "./SyncPanel";
 
 /**
  * STOCKED — what the seeders put in front of members, and how to take it back.
@@ -109,6 +110,8 @@ export default async function StockedPage({
         other one. Tick what should not have gone out and it goes back to draft,
         with your name on it, under the seeder&rsquo;s row in the same ledger.
       </p>
+
+      <SyncPanel />
 
       {refused ? <p className={styles.error}>{refused}</p> : null}
       {withdrawn > 0 ? (

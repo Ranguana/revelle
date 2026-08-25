@@ -1,0 +1,87 @@
+# ── THE FIRST RUN HAPPENS HERE, NOT ON A DEPLOY ──────────────────────
+#
+# CLAUDE.md rule 12: a seeder not in `preDeployCommand` silently did not
+# happen. Its corollary, which cost a near-miss: an unwired seeder does not
+# merely fail to run — IT SHIELDS ITS OWN BUGS FROM EVER SURFACING.
+# scripts/seed-bank.mjs carried off-by-one bind placeholders that Postgres
+# would have refused on the first row of the first run; they survived a review
+# and a commit because the seeder was not in the chain, and they were found by
+# somebody opening the file for an unrelated reason.
+#
+# So the day rule 12 landed and every seeder joined the chain, every one of
+# them became a first-run risk at once — and the first run is a DEPLOY, where a
+# non-zero exit from preDeployCommand fails the release.
+#
+# This workflow moves that first run to a place where failing is free: a
+# throwaway Postgres in a service container, the real migration files, the real
+# seeders, the real authored content. `npm run smoke:seeders` reads the chain
+# out of render.yaml so it cannot run a stale list of what the deploy does.
+#
+# ── WHY THIS FILE EXISTS AT ALL ──────────────────────────────────────
+#
+# It is the repo's first CI. Everything before it ran either on a laptop (which
+# nothing may depend on) or on Render at deploy time (which is too late). The
+# real database is unreachable from anywhere but Render's private network by
+# design, and this does not change that: the smoke run creates and drops its
+# own scratch database on the service container and never sees DATABASE_URL.
+#
+# The cheap static half of the same guard — every parameterised query binds
+# $1..$N with N arguments — is src/lib/seed-binds.test.ts and runs in `npm
+# test`, with no database, in about a millisecond.
+
+name: smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    services:
+      # 17 is what render.yaml provisions. The version matters: an enum, a
+      # generated column or a constraint that behaves differently across majors
+      # is exactly what this is here to find.
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: smoke
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches render.yaml's NODE_VERSION. The seeders import TypeScript
+          # directly (`../src/lib/games.ts`), which needs Node 22's type
+          # stripping — on an older Node they do not start at all.
+          node-version: "22"
+          cache: npm
+
+      # `npm ci`, not `npm install`, so the committed lockfile is authoritative
+      # — the same rule render.yaml's buildCommand follows.
+      - run: npm ci
+
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm test
+
+      # Last, because it is the slowest and the one whose failure needs the
+      # others to have already been ruled out.
+      - name: seeders against a scratch database
+        env:
+          # Deliberately NOT named DATABASE_URL. scripts/smoke-seeders.mjs
+          # creates its own scratch database on this server and drops it again;
+          # pointing it at a database that matters is the one thing it must not
+          # be able to do by accident.
+          SMOKE_DATABASE_URL: postgres://postgres:smoke@localhost:5432/postgres
+        run: npm run smoke:seeders

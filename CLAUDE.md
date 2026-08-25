@@ -254,3 +254,27 @@ nicety: IF A POOL THE REGISTRY KNOWS ABOUT RETURNS ROWS A SURFACE CANNOT
 RENDER, THAT IS AN ERROR STATE, NOT AN EMPTY SECTION. When you find one of
 these, grep for its siblings in the same pass — they arrive in families,
 because whoever wrote one wrote the others.
+
+**20. THE FILE THAT DESCRIBES THE DEPLOY IS NOT THE DEPLOY.**
+`render.yaml` is a blueprint applied once; the live service is not linked to
+it, so the two drift and the SERVICE wins. `src/lib/deploy.test.ts` enforced
+rule 12 against the file, which meant rule 12 was GREEN IN THE REPO AND FALSE
+IN PRODUCTION: the committed chain listed `seed:bank`, the running chain did
+not, migrations landed for weeks while that seeder never once ran, and six
+destinations were missing from the desk with nothing reporting it. Anything
+that asserts a property of production must read PRODUCTION, or say plainly
+which of the two it checked. Same family as db/032's guard that tested a table
+name that could never match, and as a `DATABASE_URL` placeholder that let a
+seeder build 180 rows and print a convincing report before failing at connect:
+A REPORT GENERATED FROM SOMETHING OTHER THAN REALITY IS THE MOST CONVINCING
+FAILURE THIS SYSTEM PRODUCES.
+
+And its second half, which cost more than the first: **A FINDING THAT LIVES
+ONLY IN THE FILE WHERE IT WAS FOUND WILL BE REDISCOVERED AT FULL PRICE.**
+`src/app/api/desk/seed/route.ts` already documented this exact drift — "the
+committed blueprint is aspirational and the Render API refuses to change the
+command" — and it was rediscovered from first principles anyway, because it
+was written where only someone already looking would find it. When a session
+learns something structural, it goes HERE the same day, in the file every
+agent reads before working. The route was the workaround; this paragraph is
+the memory.

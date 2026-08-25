@@ -126,6 +126,26 @@ test(
   }
 );
 
+/**
+ * Remove fixture pools left behind by a bench run that was killed.
+ *
+ * Only ever touches `fixture_orphan_%` — a prefix no real pool can carry — and
+ * unregisters before dropping, so a half-swept row cannot leave a registry
+ * entry pointing at a table that is already gone.
+ */
+async function sweepOrphanFixtures(): Promise<void> {
+  const { rows } = await pool.query<{ entity_table: string }>(
+    `select entity_table from ingredient_pool where entity_table like 'fixture_orphan_%'`
+  );
+  for (const row of rows) {
+    await pool.query(`delete from ingredient_pool where entity_table = $1`, [
+      row.entity_table,
+    ]);
+    await pool.query(`drop table if exists revelle_${row.entity_table}`);
+    await pool.query(`drop table if exists ${row.entity_table}`);
+  }
+}
+
 /* ── the loud form ──────────────────────────────────────────────────── */
 
 test(
@@ -133,6 +153,17 @@ test(
   { skip },
   async () => {
     const fx = await fixture();
+
+    // SWEEP FIRST, because `finally` is not a guarantee. The teardown below
+    // drops this run's fixture, and it runs on a thrown assertion — but not on
+    // SIGKILL, and this session lost several bench runs to a sleeping machine.
+    // What survives is a pool registered with no renderer, which is precisely
+    // what the next test asserts against, so ONE killed run makes the suite
+    // fail forever on that database for a reason that is not in the code. A
+    // sweep at the start is the difference between a suite that is clean and a
+    // suite that is clean on databases where nothing has ever been killed.
+    await sweepOrphanFixtures();
+
     const table = `fixture_orphan_${stamp()}`.slice(0, 40).replace(/-/g, "_");
 
     try {
