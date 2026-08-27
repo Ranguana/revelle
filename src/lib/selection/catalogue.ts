@@ -654,6 +654,46 @@ const POOLS: readonly {
     printed: null,
     active: "t.status = 'active'",
   },
+  // ATMOSPHERE — db/031's pool, and the second one this list could not see.
+  //
+  // Read the menu note above before this one: it is the same failure, found
+  // again, four pools later. 174 published bank items existed and NOTHING in
+  // this directory mentioned `bank_item`, so every atmosphere slot was empty
+  // on every real package with no error anywhere — CLAUDE.md rule 19's worst
+  // shape, a pool the registry knows about that a surface cannot see.
+  //
+  // It could not simply be added, which is why it sat. db/031 called
+  // `install_revelle_ingredients` and none of the other four installers, so
+  // `bank_item_facet`, `bank_item_occasion`, `bank_item_slot` and
+  // `bank_item_world` did not exist and the query below composes from all
+  // four. db/043 makes the four calls db/012 made for `menu` — the precedent
+  // this file already named — and only then is an entry here enough.
+  //
+  // `describe` is the clause verbatim, in the founder's own punctuation, which
+  // is what seed-bank writes into `description`. Same ruling as db/012's line
+  // of dishes: the line IS the thing.
+  //
+  // No price, for db/012's reason unchanged: the bank document carries no cost
+  // and inventing one would be a number nobody authored driving a budget
+  // nobody checked. `min_lead_days` is not read here either — it is a
+  // fulfilment fact, not a selection one, and the slot rules say nothing about
+  // when an order has to be placed.
+  {
+    pool: "bank_item",
+    table: "bank_item",
+    describe: "description",
+    mirror: null,
+    price: null,
+    minGuests: null,
+    maxGuests: null,
+    season: null,
+    seasonStrict: null,
+    making: null,
+    meals: null,
+    shape: null,
+    printed: null,
+    active: "t.status = 'active'",
+  },
 ];
 
 async function loadIngredients(db: Queryable): Promise<Ingredient[]> {

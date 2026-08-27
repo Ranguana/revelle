@@ -144,7 +144,6 @@ export async function saveBankItem(
 
   const values = [
     slug,
-    worldId,
     kind,
     name,
     trimmed(form, "description"),
@@ -164,27 +163,49 @@ export async function saveBankItem(
     if (id) {
       await query(
         `update bank_item
-            set slug = $1, world_id = $2, kind = $3::bank_kind, name = $4,
-                description = $5, phase = $6::bank_phase,
-                min_lead_days = $7, ships = $8,
-                technique_card_id = $9, weight = $10::numeric,
-                status = $11::product_status, source_citation = $12
-          where id = $13`,
+            set slug = $1, kind = $2::bank_kind, name = $3,
+                description = $4, phase = $5::bank_phase,
+                min_lead_days = $6, ships = $7,
+                technique_card_id = $8, weight = $9::numeric,
+                status = $10::product_status, source_citation = $11
+          where id = $12`,
         [...values, id]
       );
     } else {
       const rows = await query<{ id: string }>(
         `insert into bank_item
-           (slug, world_id, kind, name, description, phase,
+           (slug, kind, name, description, phase,
             min_lead_days, ships, technique_card_id, weight, status,
             source_citation)
-         values ($1,$2,$3::bank_kind,$4,$5,$6::bank_phase,
-                 $7,$8,$9,$10::numeric,$11::product_status,$12)
+         values ($1,$2::bank_kind,$3,$4,$5::bank_phase,
+                 $6,$7,$8,$9::numeric,$10::product_status,$11)
          returning id`,
         values
       );
       itemId = rows[0].id;
     }
+
+    // THE DESTINATION, SINCE db/043 — a `native` row in bank_item_world
+    // rather than a column on the item. The form has one select and this
+    // statement makes it true: the chosen room becomes the item's only native
+    // claim, and a room deselected here stops being claimed. Anything else
+    // would be rule 16's failure — a select she changed that changed nothing.
+    //
+    // `affinity` rows are NOT touched. They are the other half of db/043 —
+    // "this lantern also suits Amalfi, at 0.4" — they carry no `native`, and
+    // a destination edit has no business deleting a weight somebody set.
+    await query(
+      `delete from bank_item_world
+        where bank_item_id = $1 and native and world_id <> $2`,
+      [itemId, worldId]
+    );
+    await query(
+      `insert into bank_item_world (bank_item_id, world_id, native, note)
+       values ($1, $2, true, 'Set at the desk.')
+       on conflict (bank_item_id, world_id)
+         do update set native = true, forbidden = false`,
+      [itemId, worldId]
+    );
   } catch (err) {
     return refusal(err, slug);
   }

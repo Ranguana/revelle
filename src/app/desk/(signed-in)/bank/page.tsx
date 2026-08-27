@@ -222,7 +222,11 @@ export default async function BankPage({
             b.kind::text as kind, b.phase::text as phase,
             b.min_lead_days, b.ships,
             b.weight::text as weight, b.status::text as status,
-            w.name as world_name,
+            -- Every destination the item claims, not one. db/043 made this an
+            -- array; joining them for display rather than showing the first is
+            -- the difference between a curator seeing a second home and never
+            -- learning it exists.
+            array_to_string(b.world_names, ' · ') as world_name,
             c.id as card_id, c.name as card_name,
             (select count(*) from bank_item_ingredient i
               where i.bank_item_id = b.id) as ingredients

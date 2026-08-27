@@ -170,6 +170,38 @@
  * would put a non-item in a pool selection reads from, which is the same
  * mistake db/031 refuses for gestures.
  *
+ * ─────────────────────────────────────────────────────────────────────
+ * 8. THE DESTINATION IS A CLAIM NOW, AND THE SLOT IS NOT THIS FILE'S BUSINESS
+ *
+ * db/043 replaced `bank_item.world_id` with `bank_item_world`, carrying
+ * `native` and `affinity` like every other pool. So the insert below no longer
+ * writes a world column and `claimDestination` writes the native row instead.
+ * Same content, same room, one less special case.
+ *
+ * THE SLOT — which of the four named atmosphere slots an item lands in — IS
+ * DELIBERATELY ABSENT FROM THIS FILE, and its absence is the mechanism.
+ *
+ * The obvious place to classify was right here: this parser already knows the
+ * document's GOODS / HOST ACTS / GAMES headers and could map them. It must
+ * not, for two reasons.
+ *
+ *   · THE HEADERS ANSWER A DIFFERENT QUESTION. GOODS/HOST ACTS/GAMES say who
+ *     performs a thing, which is `bank_kind` and is already a column. A slot
+ *     says where it lands in the evening. The lanterns and the lighting of
+ *     them are both the light; the header separates them and the slot must
+ *     not.
+ *   · TWO IMPLEMENTATIONS OF ONE RULE IS THE db/040 FAILURE. A rule written
+ *     here and again in a migration drifts, and the drift is silent: the next
+ *     sync quietly undoes the migration's classification and nothing reports
+ *     it. So the rule is a SQL function — `bank_item_default_slot()` — and
+ *     db/043 hangs an AFTER INSERT trigger on `bank_item` that applies it.
+ *     This seeder inserts a row and the claim appears. There is nothing for
+ *     the two to disagree about, which is stronger than agreeing today.
+ *
+ * The consequence worth knowing when you read a dry run: the report below says
+ * nothing about slots, because this script genuinely does not decide them. To
+ * see what a row was classified as, read `bank_item_card.slot_code`.
+ *
  * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL unless
  * --dry-run.
  */
@@ -224,6 +256,35 @@ const RUN = stockingRun();
  */
 function isHeldBack(row) {
   return carriesFounderQuestion(row.description);
+}
+
+/**
+ * THE DESTINATION, AS A CLAIM RATHER THAN A COLUMN — db/043, section 8 above.
+ *
+ * Written only where the item claims NO destination at all, which is the same
+ * shape as `gesture = coalesce(gesture, $2)` at the bottom of this file and the
+ * same reason: the desk outranks the file for a curator's decision, and moving
+ * a lantern from Positano to Amalfi is one. An `on conflict do nothing` alone
+ * would not do — it would re-add the room she had just removed, silently, on
+ * the next deploy.
+ *
+ * `native` because that is what `bank_item.world_id` meant. `affinity` stays at
+ * the default 0.000: the file has never said how strongly an item leans toward
+ * a room it was not written for, and a number invented here would be a weight
+ * nobody authored driving a score nobody checked.
+ */
+async function claimDestination(client, bankItemId, worldId) {
+  await client.query(
+    `insert into bank_item_world (bank_item_id, world_id, native, note)
+     select $1, $2, true, $3
+      where not exists (select 1 from bank_item_world
+                         where bank_item_id = $1 and native)`,
+    [
+      bankItemId,
+      worldId,
+      `Written for this destination in ${SOURCE_NAME}, by seed-bank.`,
+    ]
+  );
 }
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
@@ -1857,15 +1918,17 @@ try {
         // seeder was not in preDeployCommand until 2026-08-23, so nothing ever
         // executed it. CLAUDE.md rule 12's failure and this one are the same
         // failure twice: a seeder that never runs is never wrong.
+        //
+        // `world_id` LEFT THIS LIST IN db/043 and the destination is written
+        // one statement later, into bank_item_world. See section 8.
         `insert into bank_item
-           (slug, world_id, kind, name, description, phase,
+           (slug, kind, name, description, phase,
             min_lead_days, ships, weight, status, source_citation)
-         values ($1, $2, $3::bank_kind, $4, $5, $6::bank_phase,
-                 $7, $8, $9, $10::product_status, $11)
+         values ($1, $2::bank_kind, $3, $4, $5::bank_phase,
+                 $6, $7, $8, $9::product_status, $10)
          returning id`,
         [
           row.slug,
-          world.id,
           row.kind,
           row.name,
           description,
@@ -1880,6 +1943,7 @@ try {
         ]
       );
       idBySlug.set(row.slug, inserted[0].id);
+      await claimDestination(client, inserted[0].id, world.id);
       created += 1;
       if (held) {
         heldBack += 1;
@@ -1897,6 +1961,12 @@ try {
       }
     } else {
       idBySlug.set(row.slug, existing[0].id);
+      // Also on the row that already exists, and `on conflict do nothing`
+      // inside: this heals a row whose claim was deleted and changes nothing
+      // on the ordinary re-run. It is NOT part of `differs` — a destination a
+      // curator moved at the desk is hers, exactly as the gesture and the
+      // technique-card attachment are, and --overwrite governs her WORDS.
+      await claimDestination(client, existing[0].id, world.id);
       const differs =
         existing[0].name !== row.name ||
         existing[0].description !== description ||

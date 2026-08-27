@@ -51,17 +51,27 @@ export default async function BankItemPage({
   const carried = readReview(search);
 
   const item = await queryOne<Item>(
-    `select b.id, b.slug::text as slug, b.world_id, b.kind::text as kind,
+    // THE HOME ROOM, AFTER db/043. `bank_item.world_id` is gone; the item
+    // claims destinations through bank_item_world and may claim several.
+    // `home_id` is the first of them and is what the form edits, because the
+    // form has one select — and the gesture and the venue requirement shown
+    // beside it are facts about THAT room. Where a second claim exists, the
+    // list screen shows it and this screen's destination select says so; a
+    // multi-home editor is a screen somebody argues for, not a silent
+    // widening of this one.
+    `select b.id, b.slug::text as slug, b.home_id as world_id,
+            b.kind::text as kind,
             b.name, b.description, b.phase::text as phase,
             b.min_lead_days, b.ships,
             b.technique_card_id, b.weight::text as weight,
             b.status::text as status, b.source_citation,
-            w.name as world_name, w.gesture, w.gesture_note,
+            array_to_string(b.world_names, ' · ') as world_name,
+            w.gesture, w.gesture_note,
             w.venue_requirement as world_requirement,
             k.label as world_requirement_label,
             k.demand as world_requirement_demand
-       from bank_item b
-       join world w on w.id = b.world_id
+       from bank_item_card b
+       left join world w on w.id = b.home_id
        left join structural_requirement k on k.code = w.venue_requirement
       where b.id = $1`,
     [id]
@@ -88,11 +98,11 @@ export default async function BankItemPage({
     // picker matching the rule means a curator never provokes the refusal; the
     // refusal is still shown verbatim if she does, from actions.ts.
     query<{ id: string; name: string; world_name: string }>(
-      `select b.id, b.name, w.name as world_name
-         from bank_item b
-         join world w on w.id = b.world_id
+      `select b.id, b.name,
+              array_to_string(b.world_names, ' · ') as world_name
+         from bank_item_card b
         where b.kind = 'printed_card' and b.id <> $1
-        order by w.name, b.name`,
+        order by b.home_name, b.name`,
       [id]
     ),
     query<{

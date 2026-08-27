@@ -28,11 +28,13 @@ export default async function NewBankItemPage() {
       `select id, name from world where status <> 'retired' order by name`
     ),
     query<{ id: string; name: string; world_name: string }>(
-      `select b.id, b.name, w.name as world_name
-         from bank_item b
-         join world w on w.id = b.world_id
+      // db/043: a card's destinations come from bank_item_card, and there may
+      // be more than one of them. `home_name` orders; the joined names label.
+      `select b.id, b.name,
+              array_to_string(b.world_names, ' · ') as world_name
+         from bank_item_card b
         where b.kind = 'printed_card'
-        order by w.name, b.name`
+        order by b.home_name, b.name`
     ),
   ]);
 

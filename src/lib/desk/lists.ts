@@ -150,9 +150,13 @@ export function bankList(
   const controls: Control[] = [
     { name: "q", value: get("q").slice(0, 80), sql: "b.name ilike '%' || $? || '%'" },
     {
+      // Over the view's array, exactly as `dishList` reads `d.world_slugs`.
+      // "Claims this destination" rather than "is filed under it": db/043 let
+      // one lantern serve two rooms, and a curator asking what she has for
+      // Amalfi means everything that claims Amalfi.
       name: "destination",
       value: oneOf(get("destination"), allowed.destinations),
-      sql: "w.slug::text = $?",
+      sql: "$? = any(b.world_slugs)",
     },
     {
       name: "kind",
@@ -205,9 +209,23 @@ export function bankList(
   return listQuery(controls);
 }
 
-/** The bank's FROM and ORDER BY, shared so the pass cannot walk a different set. */
-export const BANK_FROM = `bank_item b join world w on w.id = b.world_id`;
-export const BANK_ORDER = `w.name, b.kind, b.name`;
+/**
+ * The bank's FROM and ORDER BY, shared so the pass cannot walk a different set.
+ *
+ * `bank_item_card` rather than a join through `bank_item.world_id`, because
+ * db/043 dropped that column: an atmosphere item now claims its destinations
+ * through `bank_item_world`, and it may claim more than one. The view is the
+ * sibling of `dish_card` and is read the same way — `world_slugs` as an array,
+ * filtered with `= any(...)` — so this screen and the dish screen ask the
+ * question in one shape rather than two.
+ *
+ * `home_name` is the alphabetically first destination the item claims, and it
+ * is what orders the list. Stable under an edit to any other column, which is
+ * what CLAUDE.md rule 18 requires of a list the review pass walks; `w.name`
+ * was stable for the same reason and this preserves it.
+ */
+export const BANK_FROM = `bank_item_card b`;
+export const BANK_ORDER = `b.home_name, b.kind, b.name`;
 
 export async function bankSequence(
   search: string,

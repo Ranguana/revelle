@@ -67,6 +67,8 @@ type Fixture = {
   voicedWorldId: string;
   silentWorldId: string;
   productId: string;
+  /** db/043's pool. See "atmosphere reaches a Revelle" below. */
+  bankItemId: string;
 };
 
 before(async () => {
@@ -239,6 +241,81 @@ test("approval makes a Revelle and the alternatives stop being options", { skip 
   assert.equal(again.ok, false);
 });
 
+/**
+ * ATMOSPHERE REACHES A REVELLE — the whole point of db/043.
+ *
+ * 174 published bank items existed and none of them could reach a member,
+ * because `src/lib/selection/catalogue.ts` did not list the pool and db/031
+ * had installed only one of the five things a pool needs. This test walks the
+ * last inch of that path: a bank item, in a named atmosphere slot, through
+ * approval, into `revelle_bank_item`. A migration that installs the tables
+ * proves nothing on its own — CLAUDE.md rule 19's four instances were all
+ * schemas that were correct and surfaces that could not see them.
+ *
+ * It also asserts the classification trigger fired on plain INSERT, with no
+ * caller doing anything. That is the mechanism by which scripts/seed-bank.mjs
+ * and db/043 cannot drift: there is one rule, in SQL, and neither of them
+ * carries a copy of it.
+ */
+test("atmosphere reaches a Revelle, in a named slot", { skip }, async () => {
+  const fx = await fixture();
+
+  // The trigger, unassisted. `bank_item_default_slot` reads "they go home in a
+  // pocket" and files it under the take-home; nothing in the insert said so.
+  const { rows: claim } = await pool.query<{ slot_code: string; fit: string }>(
+    `select slot_code, fit::text as fit from bank_item_slot
+      where bank_item_id = $1`,
+    [fx.bankItemId]
+  );
+  assert.equal(claim.length, 1, "one default claim, written by db/043's trigger");
+  assert.equal(claim[0].slot_code, "the_take_home");
+  assert.equal(
+    claim[0].fit,
+    "native",
+    "a native claim is a WHITELIST — it is what makes the four buckets a real " +
+      "partition and what lets an empty take-home be reportable"
+  );
+
+  const jobId = await makeJob(fx.quizResponseId);
+  const result = runOf(fx, [fx.voicedWorldId]);
+  result.candidates[0].picks.push(bankPick(fx));
+
+  await persistRun(db, {
+    jobId,
+    quizResponseId: fx.quizResponseId,
+    result,
+  });
+
+  const proposals = await readProposals(db, fx.quizResponseId);
+  const chosen = proposals[0];
+  assert.equal(
+    chosen.picks.length,
+    2,
+    "the proposal carries the atmosphere pick beside the product one"
+  );
+
+  const outcome = await inTransaction((tx) =>
+    approve(tx, { proposalId: chosen.id, staffId: fx.staffId })
+  );
+  assert.equal(outcome.ok, true);
+
+  const { rows } = await pool.query<{ n: string; slot_code: string }>(
+    `select count(*)::text as n, min(j.slot_code) as slot_code
+       from revelle_bank_item j
+       join revelle r on r.id = j.revelle_id
+      where r.quiz_response_id = $1 and j.bank_item_id = $2`,
+    [fx.quizResponseId, fx.bankItemId]
+  );
+  // count(*) comes back a STRING from node-postgres. Parsed once, here.
+  assert.equal(
+    Number(rows[0].n),
+    1,
+    "the bank item must land in revelle_bank_item — a Revelle materialised " +
+      "minus its atmosphere is the silent thinning this whole change removes"
+  );
+  assert.equal(rows[0].slot_code, "the_take_home");
+});
+
 test("delivery arms the ratchet, and after it nothing re-rolls", { skip }, async () => {
   const fx = await fixture();
   const jobId = await makeJob(fx.quizResponseId);
@@ -398,6 +475,20 @@ async function fixture(): Promise<Fixture> {
     [`dbtest-${stamp}-product`]
   );
 
+  // An atmosphere item, with no destination claim at all — general
+  // atmosphere, which db/043 says pools everywhere. Its slot claim is NOT
+  // written here: the AFTER INSERT trigger writes it, and the test below
+  // asserts that it did, because that trigger is the whole reason the seeder
+  // and the migration cannot disagree about classification.
+  const { rows: bank } = await pool.query<{ id: string }>(
+    `insert into bank_item (slug, kind, name, description, status)
+     values ($1, 'good', 'Matchbooks somebody takes home',
+             'Printed with the house rule. They go home in a pocket.',
+             'active')
+     returning id`,
+    [`dbtest-${stamp}-bank`]
+  );
+
   return {
     customerId: customer[0].id,
     quizResponseId: response[0].id,
@@ -405,6 +496,7 @@ async function fixture(): Promise<Fixture> {
     voicedWorldId: voiced,
     silentWorldId: silent,
     productId: product[0].id,
+    bankItemId: bank[0].id,
   };
 }
 
@@ -622,6 +714,62 @@ function candidateOf(fx: Fixture, worldId: string, rank: number): Candidate {
       confidence: [],
       secret: null,
     },
+  };
+}
+
+/**
+ * The atmosphere half of a candidate — one bank item in `the_take_home`.
+ *
+ * Written as an extra pick pushed onto an existing candidate rather than a
+ * second `candidateOf`, so that every other test in this file keeps the exact
+ * shape it was written against and this one adds only what it is about.
+ */
+function bankPick(fx: Fixture): Pick {
+  const slot: UnitSlot = {
+    key: "the_take_home#1",
+    slotCode: "the_take_home",
+    label: "The thing they take home",
+    section: "ending",
+    pool: "bank_item",
+    required: false,
+    quantity: 1,
+    perGuest: false,
+    dayIndex: null,
+    position: 87,
+    note: "",
+  };
+
+  const ingredient: Ingredient = {
+    pool: "bank_item",
+    id: fx.bankItemId,
+    slug: "dbtest-bank",
+    name: "Matchbooks somebody takes home",
+    description: "Printed with the house rule. They go home in a pocket.",
+    priceCents: null,
+    facets: {},
+    occasions: [],
+    slots: [{ slotCode: "the_take_home", fit: "native", note: null }],
+    worlds: {},
+    issuance: null,
+    minGuests: null,
+    maxGuests: null,
+    shape: null,
+    printedMatter: [],
+    isFixture: false,
+  };
+
+  return {
+    slot,
+    ingredient,
+    unitCost: 0,
+    lineCost: 0,
+    facetMatch: 0.1,
+    affinity: 0,
+    issuancePenalty: 0,
+    similarityPenalty: 0,
+    score: 0.1,
+    forced: false,
+    alternatives: 0,
   };
 }
 
