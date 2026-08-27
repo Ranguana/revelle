@@ -207,8 +207,42 @@ const COURSES = new Map([
 // all of them at once.
 //
 // Côte d'Azur is the outlier at 119 because it absorbed Cap Ferrat's pool.
+//
+// ── 2026-08-27: FIVE ROOMS JOIN, AND THEY JOIN AT SINGLE DIGITS ──────
+//
+// The twelve entries above are pools of 77–119, and reading this table it is
+// easy to take those numbers as the shape a room is supposed to have. They are
+// not. Amalfi Coast 8, Aspen 6, Palm Springs 7, St. Moritz 5 and Oaxaca 1 are
+// everything the founder's four deliverables sheets, her one Oaxaca
+// cell-evidence line and her pasta ruling actually contain, and THE THINNESS IS
+// THE RECORD — each sheet names between three and five foods, and inventing the
+// other seventy would be an agent authoring a room's food under her name. The
+// right response to a single-digit entry here is to get a sheet, not to pad the
+// document until the number looks like its neighbours.
+//
+// Amalfi is 8 rather than 6, and WESTHAMPTON MOVES 90 -> 91, because of two
+// founder rulings on 2026-08-27: "anyplace like ny, las vegas and italy have to
+// allow pasta", which reversed an earlier and defensible decision to give
+// Amalfi no pasta at all; and "th[ey] both can use spaghetti w clams, as can
+// westhampton", which puts one dish under three headings. Both arguments,
+// including the one that lost, are in docs/proposals.md per rule 14.
+//
+// WESTHAMPTON'S +1 IS WHY THIS TABLE IS PER-ROOM AND NOT A TOTAL. A ruling
+// about an Italian room moved an American room's count, because a shared dish
+// is written under every heading that claims it and deduped at import. A single
+// total would have absorbed that movement silently; a per-room manifest makes
+// somebody type the 91.
+//
+// Palm Springs has no Mains section at all, and that is her sheet being obeyed
+// rather than a course lost by the parser: "nothing requires a fork or your
+// full attention". A room may hold fewer than three courses.
+//
+// ACAPULCO IS DELIBERATELY ABSENT FROM THIS TABLE. It is in DESTINATIONS and it
+// has no deliverables sheet, so it has no `##` heading in the document and
+// therefore never reaches this check — `counts` only holds rooms the document
+// mentions. It is founder-owed food, not a manifest omission.
 const PER_DESTINATION = {
-  "Westhampton": 90,
+  "Westhampton": 91,
   "Nantucket": 85,
   "New York": 86,
   "Côte d'Azur": 119,
@@ -220,6 +254,11 @@ const PER_DESTINATION = {
   "Big Sur": 84,
   "New Orleans": 80,
   "Portofino": 80,
+  "Amalfi Coast": 8,
+  "Oaxaca": 1,
+  "Palm Springs": 7,
+  "St. Moritz": 5,
+  "Aspen": 6,
 };
 
 function fail(message) {

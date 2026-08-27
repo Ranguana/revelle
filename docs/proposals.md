@@ -785,7 +785,18 @@ un-parked, since it removes one of the reasons given for it.
 
 ---
 
-# Dishes for the six empty rooms — STAGED, NOT ADMITTED — 2026-08-27
+# Dishes for the six empty rooms — LANDED 2026-08-27
+
+> **LANDED 2026-08-27.** Everything below was written while these lines were
+> staged and un-admitted. They are now in `docs/dishes.md` and
+> `PER_DESTINATION` moved with them in the same commit. **The blockers are
+> resolved, not forgotten** — read the section at the end of this block,
+> "What landed them, and what the founder changed on the way", before acting on
+> anything here. Three claims below are now false and are marked in place:
+> Blocker 2 was answered by a ruling, the no-pasta cut was reversed, and
+> `Spaghetti with clams` turned out to be a shared row rather than a collision.
+> The reasoning is kept whole because rule 14 says the losing argument is the
+> part that gets lost.
 
 Six rooms hold zero dishes: `acapulco-1959`, `amalfi-1953`, `aspen-1994`,
 `oaxaca-1954`, `palm-springs-1965`, `st-moritz-1984`. The consequence is
@@ -894,6 +905,10 @@ they must not touch, and the count is what said so:
   plate under one slug. Ligurian is not Campanian. **Both cut, and no pasta was
   substituted**, because Amalfi's sheet names no pasta and reaching for one is
   precisely how a room becomes generically Italian.
+  **[REVERSED 2026-08-27 — see the landing section at the end of this block.
+  The founder: "anyplace like ny, las vegas and italy have to allow pasta,"
+  and "th[ey] both can use spaghetti w clams, as can westhampton." The half of
+  this bullet about `Lemon granita` STANDS.]**
 - **Portofino has already claimed the lemon desserts** — lemon sorbet, lemon
   granita, olive oil cake with citrus. The room whose sheet ends on the lemon
   liqueur therefore cannot have a lemon dessert without taking Portofino's row.
@@ -1049,4 +1064,176 @@ sheets name between three and five foods each; the rest of a pool that gives
 season and occasion something to choose between is not in her hand yet, and
 writing it is invention rather than transcription. **What is founder-owed is
 food, not permission.**
+
+---
+
+## What landed them, and what the founder changed on the way — 2026-08-27
+
+### The ruling that cleared Blocker 2
+
+> **"no holdback for food or drinks, if there are problems i will fix later."**
+
+Blocker 2 above is correct about the mechanism and was correct to stop on it:
+`FOUNDER-PENDING` cannot hold a dish back, and there is no field on a dish line
+that could carry it. The previous agent was right not to ship content she had
+not agreed to see live. **She has now agreed.** The dishes went into
+`docs/dishes.md` unmarked and unstaged, exactly as rule 13 describes — live on
+deploy, vetoed at `/desk/stocked` rather than consented to row by row. Nothing
+was built to hold them back, because building it would have been building the
+mechanism she had just said she did not want.
+
+### The pasta reversal, and the argument that lost
+
+The staged block cut all pasta from Amalfi with this reasoning, which is worth
+keeping because it is a good argument that lost on the founder's authority
+rather than on its merits:
+
+> *Both cut, and no pasta was substituted, because Amalfi's sheet names no
+> pasta and reaching for one is precisely how a room becomes generically
+> Italian.*
+
+**What beat it, 2026-08-27:** *"anyplace like ny, las vegas and italy have to
+allow pasta."* The cut was reasoning from silence about a sheet — rule 3's
+shape, applied to a menu rather than a matrix cell — and she has supplied the
+positive evidence it was missing.
+
+**Her ruling and rule 6 compose; neither is bent to fit the other.** Rule 6
+still decides WHICH pasta, and it says `regional` travels within its CUISINE:
+
+- **New York and Vegas** — Italian-American repertoire, which rule 6 already
+  names. **Both already had pasta and needed none added.** New York holds six
+  rows (Sunday gravy over rigatoni, spaghetti and meatballs, lasagna, pasta
+  with spring vegetables, linguine with white clam sauce, shrimp scampi) and
+  Vegas two (shrimp scampi, spaghetti with butter and parmesan, late). Checked
+  rather than assumed, because she named the two rooms specifically and their
+  absence would have been a gap she had just asked about.
+- **Amalfi** takes Campanian pasta and gets exactly one of its own:
+  **`Spaghetti with fried zucchini and provolone`** — spaghetti alla Nerano,
+  from the Amalfi peninsula itself. `regional`, Campanian, `summer`, and
+  marked as an extension rather than her words.
+- **Portofino keeps Liguria** — trofie with pesto, lasagne with pesto, ravioli
+  with walnut sauce — and gains nothing from this ruling.
+
+**One pasta and not three.** A first pass added a second Campanian line
+(`Paccheri with tomatoes and basil`) and it was withdrawn before commit: with
+the shared vongole row below, three pasta mains would have been a third of a
+nine-dish pool, in a room whose sheet names fish, tomatoes and mozzarella,
+bread and a lemon liqueur. A ruling that pasta is ALLOWED is not an instruction
+to fill the room with it.
+
+### `Spaghetti with clams` is a shared row, not a mis-assignment
+
+The staged block cut it from Amalfi because it deduped onto Portofino, and read
+that dedupe as a rule 6 violation about to happen. A second reading suspected
+the opposite — that spaghetti alle vongole is Campanian and PORTOFINO held it
+wrongly. **Both readings were wrong, and the founder settled it:**
+
+> **"th[ey] both can use spaghetti w clams, as can westhampton."**
+
+So it is one dish three houses serve, and it is written under three headings
+and deduped to one row at import — the document's own convention, stated at its
+top, and the same mechanism `Pigs in blankets` uses for Westhampton and Aspen.
+Verified: `spaghetti-with-clams` is a single `main` row claimed by Westhampton,
+Portofino and Amalfi Coast. **Nothing was moved.** Portofino's authored row was
+left exactly where it was; the two new lines join it.
+
+**Its tier is `repertoire`,** and rule 6's definitions leave nothing else. It is
+not `signature` — no room's most recognisable fact. It is not `regional` —
+`regional` travels within one CUISINE, and this crosses Ligurian, Campanian and
+a 1976 Long Island house. That leaves *"anywhere the register fits,"* and three
+coastal rooms that serve clams is exactly that.
+
+**AND THIS IS EVIDENCE ABOUT RULE 6 ITSELF, which is why it is written here.**
+Rule 6's only worked example runs one direction: *"Chicken parmesan is
+Italian-AMERICAN repertoire: New York and Vegas, never Portofino"* — a dish
+crossing INTO American rooms and being refused BY an Italian one. Spaghetti
+alle vongole runs the other way: two Italian rooms of different cuisines plus
+an American one, admitted. The rule is unchanged and predicts both. But a
+future reader deriving the rule from its example alone would get this case
+wrong, because the example set contains only the refusal and never the
+admission. **A rule whose examples all point one way is a rule that will be
+half-learned.**
+
+Written but NOT applied, because it is not an agent's call: `Linguine with
+clams` sits at Nantucket as a separate row, and whether it and
+`Spaghetti with clams` are one dish under two names is **founder-owed**,
+alongside the two adjacent pairs already flagged above (Amalfi's raw fish
+beside Portofino's crudo, Palm Springs' devilled eggs beside Westhampton's
+deviled eggs with paprika).
+
+### What the count said, run against the real document (rule 24)
+
+The committed parser, unmodified except for having its write half cut off, run
+against `docs/dishes.md` before and after:
+
+| | baseline | landed | delta |
+|---|---|---|---|
+| lines matched | 1037 | 1065 | **+28** |
+| bullet lines in the file | 1037 | 1065 | — |
+| lines the parser skipped | 0 | **0** | 0 |
+| deduped dish rows | 976 | 1001 | **+25** |
+| destinations | 12 | 17 | +5 |
+| season disagreements | 3 | 3 | **0** |
+
+28 lines, 25 new rows: `Pigs in blankets` and `Spaghetti with clams` (twice)
+dedupe onto rows that already exist. The three reported season disagreements
+are the same three as before — ambrosia, strawberry shortcake, fried chicken —
+and none of the new lines added a fourth.
+
+### One finding the count produced that reading would not have
+
+**`Garlic bread` changes slug in production, and nothing about it looks wrong.**
+Aspen's line puts garlic bread under **Mains**; New York and Vegas already hold
+it under **Appetizers**. The key is `(name, course)`, so those are two rows —
+correct, and the same shape as `Papaya with lime`, which is a Tahiti dessert and
+a Havana appetizer today. But `assignSlugs` appends the course to **both** rows
+once a name spans two courses, deliberately, so that neither is arbitrarily
+"the real one". The live `garlic-bread` row therefore becomes
+`garlic-bread-appetizer` plus a new `garlic-bread-main`, and the old slug is
+left behind as an ORPHAN — reported by name on the run, never deleted, exactly
+as the seeder's comment promises for a rename.
+
+Consequences, stated so nobody rediscovers them at full price: the first deploy
+after this commit creates **26** dish rows rather than 25 (the 25 above plus the
+re-slugged appetizer), and prints one orphan line for `garlic-bread`. Any
+curator edit made against the old `garlic-bread` row stays on the orphan and
+does not follow. **This is the seeder working as designed and is not a defect
+to fix here** — but it is the second cross-course name in the catalogue, and if
+a third arrives the orphan list becomes a place people stop reading.
+
+The meal-shape field was left OFF both new `Spaghetti with clams` lines on
+purpose. Meal claims are UNIONED across the lines of a deduped dish and a union
+can only narrow, so writing Amalfi's house style (`· · L, D`) onto a row
+Portofino and Westhampton already share would have quietly removed their
+spaghetti from every other meal shape. The row keeps its "no claim, so
+anywhere".
+
+### Still founder-owed after this pass
+
+- **Acapulco: food.** Zero dishes written, and it is deliberately absent from
+  `PER_DESTINATION` — it has no `##` heading, so the count check never sees it.
+  The reasoning above stands unchanged: its `menu_item` exemplars are an
+  agent's draft, and transcribing them into the pool under her name is
+  retro-tagging with a byline on it.
+- **Oaxaca: everything but the mole.** One line, hers. The tamales, tortillas,
+  beans and the chocolate beaten with water are still not in this repo in her
+  hand, and the paragraph that was circulating as her Oaxaca sheet **still does
+  not exist in this repository.**
+- **The three adjacency pairs** named above, plus linguine-versus-spaghetti
+  with clams.
+- **The thinness itself, and it is the finding that matters most.**
+  8, 6, 7, 5, 1 against 77–119. **THESE DISHES DO NOT UNMUTE RULE 26'S SECOND
+  NUMBER, and it would be easy to believe they did.** `EVIDENCE_FLOOR` in
+  `scripts/deliverables.mjs` is **12**, it is a floor on the SMALLER room, and
+  all five of these rooms are under it — 8, 6, 7, 5, 1. So `overlap()` still
+  returns `null` for every pair involving them, `deliverablesVerdict` still
+  reads `unknown`, and rule 26 still forbids reading `unknown` as `disjoint`.
+  Checked rather than assumed, because "the rooms have food now" is exactly
+  the sentence that would carry an unearned verdict.
+
+  The consequence for rule 28 is direct and should be said plainly: the founder's
+  *"once the drinks and food are added they r different enough"* is **still
+  neither true nor false**, and the tone cap still must not move. Amalfi is
+  closest — 8 of 12 — and would clear the floor on four more lines from her
+  sheet. Oaxaca, at 1, is nowhere near.
 

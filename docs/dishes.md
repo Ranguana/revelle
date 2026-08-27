@@ -4,7 +4,19 @@ Roughly 50 per destination: ~18 appetizers, ~18 mains, ~14 desserts.
 One line per dish. Level: **B** = bought and arranged · **H** = half made ·
 **M** = actually made. Season noted only where it binds.
 Dishes repeat across destinations on purpose — dedupe to one row with
-multiple destination tags at import.
+multiple destination tags at import. A dish two or three houses serve is
+written under each of their headings; the import makes it one row. Spaghetti
+with clams is written three times below and is one dish.
+
+**"Roughly 50" describes the first twelve rooms and NOT the last five.**
+Amalfi Coast, Aspen, Palm Springs, St. Moritz and Oaxaca hold single digits,
+because that is everything the founder's deliverables sheets actually name.
+The thinness is the record, not a gap to fill: padding a room to fifty is an
+agent authoring her food under her name. `PER_DESTINATION` in
+`scripts/seed-dishes.mjs` holds the exact count for every room here and fails
+the deploy if this document and that table disagree — they move in one commit.
+Palm Springs has no Mains and that is her sheet being obeyed. Acapulco has no
+section at all and is owed a sheet.
 
 ---
 
@@ -79,6 +91,7 @@ multiple destination tags at import.
 - Swordfish kebabs · H (summer)
 - Chicken salad with grapes and almonds · H
 - Cold sliced ham and potato salad · B (summer)
+- Spaghetti with clams · M
 
 ### Desserts
 - Baked alaska · M
@@ -1140,3 +1153,64 @@ multiple destination tags at import.
 - Torta di riso · M
 - Cherries in syrup over gelato · H (early summer)
 - Hazelnut semifreddo · M
+
+## Amalfi Coast
+
+### Appetizers
+- Raw fish sliced thin, lemon on it · M · · L, D
+- Tomatoes, mozzarella and oil · B · summer · L, D
+- Bread you will be told to finish · B
+
+### Mains
+- Peppers and onions stewed down soft · M · summer · L, D
+- Spaghetti with clams · M
+- Spaghetti with fried zucchini and provolone · M · summer · L, D
+
+### Desserts
+- Sfogliatella from the good place · B
+- Apricots and a knife · B · summer
+
+## Oaxaca
+
+### Mains
+- The mole, going since yesterday · M · · L, D
+
+## Palm Springs
+
+### Appetizers
+- Devilled eggs · M · · C
+- Cold shrimp · B · · C
+- Olives · B · · C
+- Things on picks · B · · C
+- One tray that looks expensive · B · · C
+
+### Desserts
+- A bowl of dates · B · · C
+- Grapefruit halves, cold · B · · C
+
+## St. Moritz
+
+### Appetizers
+- Smoked fish · B · · C
+- Cheese doing its best work · B · · C
+- Something hot in small cups · H · winter · C
+
+### Mains
+- Eggs at dawn · M · · LS
+
+### Desserts
+- Good chocolate, plated · B · · C
+
+## Aspen
+
+### Appetizers
+- Chips and the onion dip made from the packet · B · · C
+- Pigs in blankets · H · · C
+
+### Mains
+- One big pot, whatever gets made while dancing · M · · D
+- Garlic bread · H · · D
+
+### Desserts
+- The box of good chocolate · B
+- Ice cream eaten out of the carton · B
