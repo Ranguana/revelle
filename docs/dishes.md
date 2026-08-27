@@ -9,10 +9,13 @@ written under each of their headings; the import makes it one row. Spaghetti
 with clams is written three times below and is one dish.
 
 **"Roughly 50" describes the first twelve rooms and NOT the last five.**
-Amalfi Coast, Aspen, Palm Springs, St. Moritz and Oaxaca hold single digits,
-because that is everything the founder's deliverables sheets actually name.
-The thinness is the record, not a gap to fill: padding a room to fifty is an
-agent authoring her food under her name. `PER_DESTINATION` in
+Aspen, Palm Springs, St. Moritz and Oaxaca hold single digits, because that is
+everything the founder's deliverables sheets actually name. Amalfi Coast held
+single digits too until she sent a second sheet on 2026-08-27 and it went to
+22 — a room grows when more of her food exists, never because its number looked
+small next to its neighbours. The thinness is the record, not a gap to fill:
+padding a room to fifty is an agent authoring her food under her name.
+`PER_DESTINATION` in
 `scripts/seed-dishes.mjs` holds the exact count for every room here and fails
 the deploy if this document and that table disagree — they move in one commit.
 Palm Springs has no Mains and that is her sheet being obeyed. Acapulco has no
@@ -1160,15 +1163,29 @@ section at all and is owed a sheet.
 - Raw fish sliced thin, lemon on it · M · · L, D
 - Tomatoes, mozzarella and oil · B · summer · L, D
 - Bread you will be told to finish · B
+- Chargrilled octopus · M · · L, D
+- Zucchini flowers with ricotta and ham, fried in light batter, with zucchini sauce and smoked cheese · M · summer · L, D
+- Beet salad with almond cream, walnuts and herbs · M · · L, D
 
 ### Mains
 - Peppers and onions stewed down soft · M · summer · L, D
 - Spaghetti with clams · M
 - Spaghetti with fried zucchini and provolone · M · summer · L, D
+- Pizza · M · · L, D
+- Spaghetti with lemon · M · · L, D
+- Scialatielli with seafood · M · · L, D
+- Tagliolini with lemon cream and red prawns · M · · L, D
+- Risotto with leeks, candied lemon, basil and wild fennel · M · · L, D
+- Lumpfish on creamed spinach · M · · D
+- Turbot with leek and potato purée, fried leeks and coffee powder · M · · D
+- Veal fillet in a pistachio crust with blanched spinach, Sorrento orange and baked baby potatoes · M · · D
+- Lamb chops breaded with herbs and mustard, Provolone del Monaco sauce, paprika sweet potato purée and fried green beans · M · · D
 
 ### Desserts
 - Sfogliatella from the good place · B
 - Apricots and a knife · B · summer
+- Gelato · B
+- Lemon sorbet · B
 
 ## Oaxaca
 

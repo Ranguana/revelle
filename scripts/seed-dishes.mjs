@@ -237,6 +237,26 @@ const COURSES = new Map([
 // rather than a course lost by the parser: "nothing requires a fork or your
 // full attention". A room may hold fewer than three courses.
 //
+// ── 2026-08-27, LATER: AMALFI GOES 8 -> 22 ON A SECOND SHEET ─────────
+//
+// The paragraph above is kept whole (rule 14) and one of its numbers is now
+// superseded rather than wrong. It said the right response to a single digit is
+// TO GET A SHEET, and a sheet arrived: the founder sent fifteen Amalfi foods in
+// one message. Fourteen are new lines here — the fifteenth, spaghetti alla
+// Nerano, was already written that morning — so the room moves 8 -> 22.
+//
+// THE THINNESS ARGUMENT IS UNCHANGED AND STILL GOVERNS THE OTHER FOUR. Aspen 6,
+// Palm Springs 7, St. Moritz 5 and Oaxaca 1 stay exactly where they are. Amalfi
+// did not grow because 8 looked small; it grew because more of her food exists
+// now than did this morning. Nothing was padded and no line here is an agent's
+// invention.
+//
+// WHY THE NUMBER MATTERS BEYOND THIS FILE: `EVIDENCE_FLOOR` in
+// scripts/deliverables.mjs is 12, on the SMALLER room of a pair, so at 8 every
+// Amalfi pair read `unknown` and rule 26 forbids reading `unknown` as
+// `disjoint`. At 22 the room is measurable against all twelve wired rooms for
+// the first time. That is the whole reason a dish count is load-bearing.
+//
 // ACAPULCO IS DELIBERATELY ABSENT FROM THIS TABLE. It is in DESTINATIONS and it
 // has no deliverables sheet, so it has no `##` heading in the document and
 // therefore never reaches this check — `counts` only holds rooms the document
@@ -254,7 +274,7 @@ const PER_DESTINATION = {
   "Big Sur": 84,
   "New Orleans": 80,
   "Portofino": 80,
-  "Amalfi Coast": 8,
+  "Amalfi Coast": 22,
   "Oaxaca": 1,
   "Palm Springs": 7,
   "St. Moritz": 5,

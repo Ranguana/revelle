@@ -1453,3 +1453,266 @@ All of its rows are scoped to `westhampton-1976`, so **seventeen rooms have no
 eligible game-table row.** This work does not change that and does not claim
 to: it moved rows inside the bank, which is the shelf, and left the shelf's
 sibling table exactly where it was.
+
+---
+
+# 2026-08-27 — AMALFI'S SECOND SHEET, AND RULE 26'S SECOND NUMBER SPEAKS
+
+**LANDED.** The founder sent fifteen Amalfi foods in one message. Fourteen are
+new; the fifteenth was written this morning. `docs/dishes.md` goes **8 -> 22**
+at Amalfi and `PER_DESTINATION` moved with it in the same commit.
+
+**The result she was waiting on: AMALFI CLEARS THE EVIDENCE FLOOR.** At 22
+claims against a floor of 12 it is the first of the six thin rooms to become
+measurable, and `npm run check:voices` now prints a number instead of `unknown`
+for all twelve of its pairs with wired rooms.
+
+## What her list was, and what happened to every line of it
+
+Her message was **plainly pasted from a restaurant menu** — one line carried a
+price and one carried a restaurant's name — so it was mined, not transcribed.
+Fifteen items, fifteen written. **Nothing was cut.**
+
+| her line | written as | course | tier |
+|---|---|---|---|
+| gelato | `Gelato` | dessert | repertoire |
+| pizza | `Pizza` | main | regional (Campanian) |
+| chargrilled octopus | `Chargrilled octopus` | appetizer | repertoire |
+| Spaghetti alla Nerano | *already on Amalfi* as `Spaghetti with fried zucchini and provolone` | main | regional |
+| Spaghetti al Limone | `Spaghetti with lemon` | main | regional (Campanian) |
+| Scialatielli ai Frutti Di Mare | `Scialatielli with seafood` | main | **signature** |
+| Zucchini flowers with ricotta cheese, ham, fried in light batter, served with zucchini sauce and smoked cheese | `Zucchini flowers with ricotta and ham, fried in light batter, with zucchini sauce and smoked cheese` | appetizer | regional (Campanian) |
+| Tagliolini Antica Trattoria with lemon cream sauce, red prawns | `Tagliolini with lemon cream and red prawns` | main | regional (Campanian) |
+| lumpfish on creamed spinach | `Lumpfish on creamed spinach` | main | repertoire |
+| lemon sorbet | `Lemon sorbet` — **joins an existing row** | dessert | repertoire |
+| Turbot fish leek and potato purée, fried leeks and coffee powder | `Turbot with leek and potato purée, fried leeks and coffee powder` | main | repertoire |
+| Veal fillet in pistachio flour crust, blanched spinach, Sorrento orange reduction, baked baby potatoes | `Veal fillet in a pistachio crust with blanched spinach, Sorrento orange and baked baby potatoes` | main | regional (Campanian) |
+| Lamb chops € 43 breaded with herbs, mustard and Provolone del Monaco cheese sauce, paprika sweet potato puree and fried green beans | `Lamb chops breaded with herbs and mustard, Provolone del Monaco sauce, paprika sweet potato purée and fried green beans` | main | regional (Campanian) |
+| Beet salad almond cream, walnuts and mediterranean herbs | `Beet salad with almond cream, walnuts and herbs` | appetizer | repertoire |
+| Risotto with leeks, candied lemon, basil and wild fennel | `Risotto with leeks, candied lemon, basil and wild fennel` | main | repertoire |
+
+## THE FILTER THAT WAS APPLIED, AND THE ONE THAT WAS WITHDRAWN
+
+**Rule 25.3 was nearly misapplied, and the correction is the most valuable
+thing on this page.** Four of her lines — the turbot, the pistachio-crusted
+veal, the lamb chops with three garnishes, the lumpfish — were on their way to
+being "honestly reduced" as plated-to-order restaurant compositions a host
+cannot make for twelve people. **The founder stopped it:**
+
+> **"the host can of course make all of those things."**
+
+**Rule 25.3 is about STAFF, not about culinary difficulty.** Its own words are
+*"abundance is MADE IN ADVANCE, never SERVED"* and *"the moment a line implies
+somebody carrying a tray"* — a test on SERVICE. A host can crust a veal fillet
+in pistachio, reduce an orange, breadcrumb a lamb chop and make a cheese sauce;
+that requires a cook, and **the host IS the cook.** What the rule forbids is a
+dish that cannot exist without somebody plating it to order and carrying it out
+while she is at her own party.
+
+This is worth keeping because the misreading is attractive and repeatable: an
+ambitious dish LOOKS like a restaurant, and an agent applying 25.3 by aesthetic
+rather than by its text will quietly delete the founder's food and report it as
+rule compliance. **The test is whether the dish can be MADE IN ADVANCE, not
+whether it is hard.** The single word removed under 25.3 across all fifteen
+lines is `served` — "served with zucchini sauce" became "with zucchini sauce" —
+which is the service verb and costs no content.
+
+## The three proper-noun calls (rule 25.2)
+
+Rule 25.2 is *"no proper noun a guest would not say at the table."* The test is
+whether somebody would name it out loud while eating, and it cuts differently
+three times in one list:
+
+- **`Antica Trattoria` — CUT.** It names a restaurant. A restaurant's name in a
+  dish name is the menu it was pasted from, still attached. Nobody at her table
+  says it, and the dish is a tagliolini with lemon cream and red prawns
+  whatever the trattoria calls it.
+- **`Provolone del Monaco` — KEPT.** It is a CHEESE. A guest asks what the
+  sauce is and is told the name of the cheese; that is exactly a table word.
+  That it is also a DOP from the Monti Lattari — the Amalfi peninsula's own
+  ridge — makes it the most Campanian noun in her list.
+- **`Sorrento` — KEPT.** A place a guest would say, and here it is doing an
+  ingredient's work: a Sorrento orange is a kind of orange, the way a Meyer
+  lemon is a kind of lemon.
+- **`mediterranean herbs` — trimmed to `herbs`,** and this is the same call in
+  its least obvious costume. It is not a proper noun that names a thing; it is
+  a menu adjective that makes a plate sound like a region. A guest says
+  "herbs". Content cost: none.
+- **`€ 43` — CUT.** Menu furniture. Not a judgement call.
+
+## Tiers, and the one that is not obvious
+
+Rule 6: `signature` never travels · `regional` travels within its CUISINE ·
+`repertoire` goes anywhere the register fits. Amalfi is the catalogue's only
+Campanian room, so `regional` here means "stays until a second Campanian room
+exists", and that is the point of tiering rather than hardcoding.
+
+- **`Scialatielli with seafood` is the one `signature`.** Scialatielli is a
+  pasta cut from the Amalfi peninsula itself and from nowhere else. Every other
+  line on her list can be imagined on another Italian table; this one names the
+  coast in the shape of the pasta. Rule 6's examples — pesto is Portofino,
+  gumbo is New Orleans — are exactly this shape.
+- **`Pizza` is `regional`, not `repertoire`, and the distinction is load-bearing.**
+  It is deliberately NOT free to travel: pizza in a New York room is a
+  different object with the same name, and `repertoire` would license precisely
+  the drift rule 6 exists to stop. Checked: the word `pizza` appears nowhere
+  else in `docs/dishes.md`, so this is a clean new row and not a claim on
+  somebody else's.
+- **The four continental plates — turbot, lumpfish, beet salad, risotto — are
+  `repertoire`**, argued rather than assumed. None is distinctively Campanian;
+  they are fine coastal-Italian cooking that would sit honestly at Portofino or
+  the Côte d'Azur. Calling them `regional` would fence food that is not fenced
+  in life. Calling the *veal* and the *lamb* repertoire would be the mirror
+  error — a Sorrento orange and a Provolone del Monaco sauce are Campanian by
+  their ingredients, not by their technique.
+- **`Gelato` and `Lemon sorbet` are `repertoire`**, and the second one is the
+  interesting case below.
+
+## `Lemon sorbet` deliberately joins a row it does not own
+
+`- Lemon sorbet · B` already existed at **Côte d'Azur AND Portofino**. Written
+under Amalfi it dedupes to **one dessert row claimed by three houses** — the
+document's own convention, stated at its top, and the exact shape the founder
+ruled correct for `Spaghetti with clams` earlier today.
+
+**This is the line a previous pass cut, and the reasoning that cut it is worth
+keeping (rule 14).** That pass wrote: *"Portofino has already claimed the lemon
+desserts… the room whose sheet ends on the lemon liqueur therefore cannot have
+a lemon dessert without taking Portofino's row"*, and cut `Lemon granita` on
+that basis. **What beat it: she named lemon sorbet for Amalfi herself.** The
+cut was an inference from Portofino's silence about sharing — rule 3's shape —
+and she has supplied the positive evidence it lacked. `Lemon granita` stays
+cut; she did not name it.
+
+That the row was ALREADY shared between a French room and a Ligurian one is the
+argument for `repertoire` rather than a problem to solve: it was travelling
+before Amalfi touched it.
+
+**No meal-shape codes were written on it, on purpose.** Meal claims are UNIONED
+across a deduped dish's lines and a union can only narrow, so writing Amalfi's
+house style (`· · L, D`) onto a row two other rooms share would have quietly
+removed their lemon sorbet from cocktails and late suppers. Same reasoning the
+`Spaghetti with clams` lines were written under. The row keeps its "no claim,
+so anywhere".
+
+## What the count said (rule 24)
+
+The committed `scripts/seed-dishes.mjs` parser, run against the real document
+before and after with only its write half cut off:
+
+| | baseline | after | delta |
+|---|---|---|---|
+| lines matched | 1065 | 1079 | **+14** |
+| bullet lines in the file | 1065 | 1079 | — |
+| lines the parser skipped | 0 | **0** | 0 |
+| deduped dish rows | 1001 | 1014 | **+13** |
+| destinations | 17 | 17 | 0 |
+| season disagreements | 3 | 3 | **0** |
+
+**14 lines, 13 new rows.** The one line that becomes no new row is `Lemon
+sorbet`. The three season disagreements are the same three as ever — ambrosia,
+strawberry shortcake, fried chicken — and none of the fourteen added a fourth.
+
+**Checked and clean, because these are how this seeder bites:** no new name
+spans two courses, so nothing re-slugs and no live row is orphaned the way
+`garlic-bread` was. The only two cross-course names in the catalogue are still
+`Garlic bread` and `Papaya with lime`. No making-level disagreement: the shared
+`Lemon sorbet` is `B` at all three houses, and a disagreement there is a hard
+failure rather than a widening.
+
+**Not verified, and said plainly rather than claimed:** no database was
+touched. `initdb` still dies at `shmget … Cannot allocate memory` on this
+machine, `seed:dishes` has no `--dry-run`, and the live catalogue is
+unreachable by design (rule 9). The LIVE delta is therefore arithmetic, not a
+measurement: the seeder would create **13 dish rows, all `active` on the way
+in** (rule 13), plus one new `dish_world` row attaching Amalfi to the existing
+`lemon-sorbet`.
+
+## THE FLOOR RESULT — what actually changed about rule 26
+
+`npm run check:voices`, before and after:
+
+| | before | after |
+|---|---|---|
+| measurable pairs | 66 | **78** |
+| `unknown` pairs | 87 | **75** |
+| rooms with no measurable pool | acapulco (0), **amalfi (8)**, aspen (6), oaxaca (1), palm-springs (7), st-moritz (5) | acapulco (0), aspen (6), oaxaca (1), palm-springs (7), st-moritz (5) |
+
+**Amalfi's twelve pairs with the wired rooms all read a number now.** The three
+that are not zero:
+
+| pair | tone | deliverables | shared |
+|---|---|---|---|
+| `amalfi / portofino` | 0.116 | **0.091** | spaghetti with clams · lemon sorbet |
+| `amalfi / cote-dazur` | 0.055 | 0.045 | lemon sorbet |
+| `amalfi / westhampton` | −0.119 | 0.045 | spaghetti with clams |
+
+**Her own validation case half-lands, and the honest reading is that it points
+the right way without settling anything.** `deliverables.mjs` says the number
+would be evidenced when *"Amalfi/Portofino should read HIGH (same coast, shared
+plate) and Oaxaca/Havana LOW"*. Amalfi/Portofino is now Amalfi's highest pair
+by a factor of two and the **second-highest in the entire field** (behind
+las-vegas/new-york at 0.112) — the measure does find the shared plate between
+the two rooms that share a coast. **But 0.091 is nowhere near the 0.2
+threshold, and the other half of her case is still unmeasurable** because
+Oaxaca holds one dish. `DELIVERABLES_CLOSE` therefore stays FOUNDER-PENDING and
+untuned, and this pass did not move it.
+
+**What this does NOT do, stated because it is the sentence somebody will
+otherwise write:** it does not release the ten-tone cap. Rule 28's sequence
+holds. Amalfi is measurable against the twelve WIRED rooms only — the floor is
+on the SMALLER room, so `amalfi / st-moritz` (0.721, and Amalfi is that room's
+nearest neighbour), `amalfi / oaxaca` (0.781), `amalfi / aspen`, `amalfi /
+palm-springs` and `amalfi / acapulco` **all still read `unknown`**, and rule 26
+forbids reading `unknown` as `disjoint`. Five rooms remain under the floor.
+`ADMITTED ON THE SECOND NUMBER` is still **0**, because no Amalfi pair is
+tone-close in the first place: its highest is havana at 0.817, under the 0.92
+monitor ceiling.
+
+**The one thing that IS newly true, and it is hers:** *"once the drinks and food
+are added they r different enough"* was neither true nor false this morning for
+every pair in the catalogue. It is now **testable for Amalfi against twelve
+rooms, and it holds in all twelve** — including against `havana`, Amalfi's
+nearest neighbour in tone at 0.817, where the deliverables number is **0.000**.
+Two rooms that sound alike and share not one dish is exactly the configuration
+her ruling describes. One room down, five to go, and the five that are left are
+the ones the cap is actually waiting on.
+
+## Founder-owed after this pass
+
+- **Four adjacency pairs, up from three.** Each is two rows that are nearly one
+  dish, and merging or separating them is hers, not an agent's:
+  - `Gelato` (Amalfi) beside `Gelato assortment` (Portofino). **New this pass.**
+    Written as a separate row because she wrote the bare word and "assortment"
+    is Portofino's authored claim, not hers — but they may be one thing.
+  - `Veal fillet in a pistachio crust…` (Amalfi) beside `Roast veal with
+    hazelnuts` (Portofino). **New this pass, and it is the exact shape this
+    ledger's unratified rule warns about — "same frame, one ingredient
+    swapped".** Both are veal with a nut. They are genuinely different dishes
+    and both are authored, so neither was touched.
+  - `Raw fish sliced thin, lemon on it` (Amalfi) beside `Raw fish crudo with
+    lemon and oil` (Portofino) — carried forward.
+  - `Devilled eggs` (Palm Springs) beside `Deviled eggs with paprika`
+    (Westhampton) — carried forward, as is
+    `Linguine with clams` versus `Spaghetti with clams`.
+- **`Zucchini flowers with ricotta and ham…` (Amalfi) beside `Fried zucchini
+  blossoms` (Côte d'Azur + Portofino).** Deliberately NOT filed as an adjacency
+  pair: stuffed-and-battered against plain-fried is a real difference in the
+  kitchen, not a wording difference. Recorded so the next reader does not have
+  to re-derive that it was considered.
+- **The pasta balance, reported rather than adjudicated.** Amalfi's 22 run
+  6 appetizers / 12 mains / 4 desserts, and **six of the twelve mains are pasta
+  or rice** — Nerano, vongole, al limone, scialatielli, tagliolini, the risotto.
+  A previous pass withdrew a second Campanian pasta before commit on the
+  grounds that three pastas would be a third of a nine-dish pool. That
+  arithmetic has changed (6 of 22 is 27% of the room, not 33%) and **every one
+  of the six is on her list or her ruling** — none is an agent reaching for a
+  pasta. But it is a main-heavy, pasta-heavy room against the document's own
+  ~18/18/14 shape, and if that is not what she wants, the cut is hers.
+- **Period.** Scialatielli is generally dated to the 1970s and the room is
+  AMALFI COAST, **1953**. Nothing in the pool checks a year and no other room's
+  food has been audited for one, so this was not acted on — but she named it,
+  and if period fidelity binds the plate the way it binds the voice, it binds
+  more rooms than this one.
+- **Unchanged and still owed: Acapulco's food** (zero dishes, deliberately
+  absent from `PER_DESTINATION`) and **Oaxaca's everything-but-the-mole.**
