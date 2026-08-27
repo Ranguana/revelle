@@ -4903,6 +4903,5258 @@ export const TAHITI_TONES: readonly ToneWeight[] = [
 ];
 
 /**
+ * ACAPULCO, 1959.
+ *
+ * The loud room. Every other house in the library is quiet, or is loud about
+ * something it is performing; this one is loud about nothing in particular and
+ * has no intention of turning the music down. December, a terrace above the
+ * bay, and a lunch that never closes.
+ *
+ * ── THE TEXT BELOW IS THE FOUNDER'S, AND WHERE IT IS NOT, IT SAYS SO ─
+ *
+ * The premise, speaker, selfReference, audience, register, cadence, sentence,
+ * punctuation, orthography, humour mechanism and every `insteadOf` list are
+ * HERS, transcribed close to verbatim and deliberately not smoothed. The
+ * tagline is assembled out of two of her own sentences. The look, the
+ * formulae, the exemplars, the always/never lists and the rejected lines were
+ * DRAFTED BY AN AGENT against her voice and are hers to cut. Each is marked
+ * where it sits.
+ *
+ * Her prose keeps marks this room's own punctuation rule refuses — em-dashes
+ * in the premise, a semicolon inside the clause that says the room is too busy
+ * for semicolons. Left exactly as written. The rules govern what the room
+ * PRINTS; these fields are the brief, not the output, and correcting an author
+ * into consistency is how a voice gets flattened.
+ *
+ * ── THE TWO BORDERS, AND WHICH INSTRUMENT HOLDS EACH ─────────────────
+ *
+ * HAVANA is held by ADDRESS, and by nothing else. Both houses are warm, late,
+ * loud and unembarrassed, and once this voice is loud there is no lexicon rule
+ * cheap enough to keep them apart. So the border is grammatical: Havana speaks
+ * as a household in the first person plural and addresses the crowd, and
+ * nothing there is said to one person. Out here everything is. The voice hands
+ * YOU a drink you did not ask for and were about to want. That is an
+ * address-level separation, worth more than ten lexicon rules, and the founder
+ * asked that the reason be recorded rather than left to be re-derived — it is
+ * in `address.note` in her words. `nightlife` is refused for the same reason:
+ * it is Havana's word, and refusing it is the border said in one noun.
+ *
+ * WESTHAMPTON is held by WHO THE JOKE IS AIMED AT. Both rooms are funny and
+ * both are flat about it. Westhampton's risk is teasing a houseguest;
+ * Acapulco's overstatement is always about the night and never about anybody
+ * in it. Dinner moved to the pool, then the pool moved — nobody is the target.
+ *
+ * ── WHAT SUPERSEDED THE FIRST DRAFT (CLAUDE.md rule 14) ──────────────
+ *
+ * docs/voices-draft/acapulco-1959.md holds an earlier founder draft of this
+ * room and it is NOT what is written here. That one was a spectacle: divers
+ * going off the rock at dusk as the one fixed thing in the night, a host
+ * somewhere in the crowd pointing things out, wonder declared out loud. It was
+ * verified and not integrated, because as tagged it resolved to 0.682 against
+ * Havana — four of its seven tones were Havana's — and re-tagging toward
+ * theatricality moved it onto Las Vegas at 0.864. The corner was full.
+ *
+ * The argument is kept because it is the part that gets lost: the draft failed
+ * not on its prose but because it was tagged from what the voice IS rather
+ * than from what SEPARATES it, which is the retro-tagging failure this project
+ * exists to escape. What beat it is a different room, not a different tag set
+ * — the founder rewrote the premise. The divers are gone. The fixed point of
+ * the evening is gone with them, and what replaces it is a lunch that never
+ * ends and a table relaid around whoever refused to leave it. A room with no
+ * fixed point cannot be a spectacle room, so the Las Vegas collision the
+ * re-tagging produced is not available to this version to walk back into.
+ *
+ * ── THE GESTURE HAS NOWHERE TO LIVE IN THIS FILE ─────────────────────
+ *
+ * THE RESET. At some point the table is visibly relaid around the people who
+ * never left it: new cloth, new candles, going in around elbows, mid-sentence,
+ * with no announcement. It is the premise's first line made physical, it is
+ * the anti-clock ritual, and unlike a conch it transposes to any backyard.
+ *
+ * `Destination` in src/lib/tokens.ts HAS NO GESTURE FIELD. Tahiti's conch is
+ * not in this module either — db/034 wrote it to `world.gesture` with its
+ * argument in `world.gesture_note`, which is where every room's gesture lives.
+ * So the text above is recorded here to keep it from being lost, and it is NOT
+ * installed: it needs a migration setting `gesture` and `gesture_note` on the
+ * `acapulco-1959` world row, in the shape of db/034. Until that runs, this
+ * room has no gesture anywhere a surface can read.
+ */
+const ACAPULCO_LOOK: Theme = {
+  key: "acapulco-1959",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  // PROVISIONAL AND FOUNDER-PENDING. THIS IS HAVANA'S PLATE, UNCHANGED.
+  //
+  // Not a claim that these are Acapulco's colours. It is here so that the type
+  // stack and every palette key are present and legal while the room's own
+  // plate is cut, and Havana is the borrow because it is the nearest neighbour
+  // this room has: the same warm plaster, the same late hour, the same
+  // hemisphere and decade. It is also the room Acapulco is written to stand
+  // apart from, which makes the borrowing impossible to forget.
+  //
+  // A destination differentiates on palette and on voice (see the note at the
+  // top of this file), so two rooms sharing a plate is a real defect the day it
+  // reaches a member. The world row for `acapulco-1959` is DRAFT, so it cannot
+  // reach one today. An agent must not invent this with confidence; the founder
+  // cuts it.
+  palette: {
+    ground: "#F2DCC3",
+    ground2: "#E8C9A9",
+    ink: "#2B1D16",
+    inkSoft: "#63503F",
+    inkFaint: "#95826F",
+    rule: "#D8BC9B",
+    aqua: "#1E6B6E",
+    oxblood: "#B8452A",
+    gold: "#C08A2E",
+    night: "#152622",
+    night2: "#0E1B18",
+    nightInk: "#F2E2CB",
+    nightSoft: "#B4A18A",
+    nightAqua: "#5FB6AE",
+    nightOxblood: "#E4885C",
+    bone: "#F6F0E4",
+  },
+  paletteDark: {
+    ground: "#0E1B18",
+    ground2: "#152622",
+    ink: "#F2E2CB",
+    inkSoft: "#B4A18A",
+    inkFaint: "#83745F",
+    rule: "#2A403A",
+    aqua: "#5FB6AE",
+    oxblood: "#E4885C",
+    gold: "#DDA84E",
+  },
+};
+
+export const ACAPULCO_1959: Destination = {
+  key: "acapulco-1959",
+  name: "ACAPULCO, 1959",
+  // DRAFTED, out of two of her own sentences and no new words. Alternatives are
+  // in the handover note.
+  tagline: "Lunch never exactly ends. Nobody checks a clock again once the candles are lit.",
+  // HERS, verbatim.
+  premise:
+    "Acapulco, December 1959. Lunch never exactly ends — the table gets reset " +
+    "around whoever refuses to leave it, and somebody's in the water instead " +
+    "of dressing. Salt on skin under silk. Dinner starts when the last of you " +
+    "wanders back, and not before, and nobody checks a clock again once the " +
+    "candles are lit. This is the party where your people stop performing — " +
+    "where the photograph, if anyone takes one, catches everybody mid-sentence.",
+  look: ACAPULCO_LOOK,
+  voiceVersion: 1,
+  voice: {
+    // HERS.
+    speaker: "The terrace, an hour after it should have gone quiet.",
+    // HERS. Never a `we` that means host-and-staff: there is no staff in this
+    // voice, and things appear without anybody serving them.
+    selfReference: ["the table", "out here"],
+    // HERS.
+    audience:
+      "everybody still here, because in this room still-here is the only " +
+      "membership that counts",
+    address: {
+      mode: "second_person",
+      // HERS, with the Havana comparison stated against what that room's voice
+      // actually says rather than against an impression of it.
+      note:
+        "Second person, singular-feeling even to a group. The voice talks to " +
+        "you like the friend who hands you a drink you didn't ask for and were " +
+        "about to want. That is the whole Havana border, and an address-level " +
+        "separation is cheaper than ten lexicon rules: now that this voice is " +
+        "loud, address is the ENTIRE border. Havana speaks as a household and " +
+        "arranges the night for a crowd, and nothing there is said to one " +
+        "person. Out here everything is.",
+    },
+
+    // HERS.
+    register:
+      "Loud, warm, unembarrassed. Sounds like someone talking over music they " +
+      "have no intention of turning down.",
+    formality: "plain",
+    // HERS, semicolon included and deliberately not corrected.
+    cadence:
+      "Short sentences that pile up rather than trail. Comma splices allowed; " +
+      "too busy for semicolons.",
+    // HER NUMBERS, and her reason for the ceiling: past twenty words it is
+    // explaining, and this room never explains.
+    sentence: { typicalWords: 10, maxWords: 20 },
+    // HERS.
+    punctuation:
+      "Periods and commas only. No exclamation points ever — the room is loud " +
+      "in what it does, not in what it prints, and an exclamation mark is the " +
+      "voice performing volume instead of having it. No em-dashes. Ellipses at " +
+      "most once, trailing, never building suspense.",
+    // HER FIRST SENTENCE. The two that follow are DRAFTED, and they are
+    // consequences rather than additions: no-all-caps reaches the headings,
+    // which makes this the one page in the library not set in caps, and a room
+    // whose thesis is that nobody is checking cannot print an hour.
+    orthography:
+      "No all-caps, no title case on things that are not names. Headings are " +
+      "under the same rule, so they are not in caps either, which no other " +
+      "destination in the library can say. No clock hours once the candles are " +
+      "lit, because nobody is checking; time is said by what has happened.",
+
+    humour: {
+      mode: "absurd",
+      // HERS.
+      mechanism:
+        "Overstatement delivered flat. State the outrageous thing as logistics, " +
+        "then repeat it bigger: dinner moved to the pool. Then the pool moved. " +
+        "Never at anyone. Teasing is Westhampton's risk and the floor-show " +
+        "instinct is Havana's.",
+    },
+
+    // HER WORDS AND HER REFUSALS. Every `insteadOf` list below is exactly the
+    // set she wrote and has not been extended, because `insteadOf` is a HARD
+    // BAN in scripts/check-voice-output.mjs and an agent does not get to add
+    // enforcement she did not author. The glosses are drafted.
+    lexicon: [
+      {
+        term: "the water",
+        gloss:
+          "where somebody always is instead of dressing, at any hour. It runs through the whole day and it is never a view",
+      },
+      {
+        term: "salt",
+        gloss: "on skin, under silk. The room's one texture, and it is on everybody",
+      },
+      {
+        term: "your people",
+        gloss:
+          "the ones who came. Also everybody, also whoever's still here. Never a category, never a list",
+        insteadOf: ["guests"],
+      },
+      {
+        term: "the good glasses anyway",
+        gloss:
+          "the good ones, out here, wet, unremarked. This room's elegance is carried by objects doing casual duty and is never named",
+        insteadOf: ["elegant", "chic", "glamorous", "luxe"],
+      },
+      {
+        term: "out here",
+        gloss:
+          "the terrace, the water, whatever the evening has spilled into. The room would never describe itself: it is not a brochure for a place, it is the place",
+        insteadOf: ["paradise", "tropical", "exotic"],
+      },
+      {
+        term: "the evening",
+        gloss:
+          "what is happening. Also drinks, also tonight. Never an occasion with a name on it. `nightlife` is Havana's word and refusing it is the border",
+        insteadOf: ["nightlife", "cocktails", "party"],
+      },
+      {
+        term: "tomorrow",
+        gloss:
+          "the only future tense out here, and always something deferrable. Where another house would put an order of the night, this one cannot pronounce the word",
+        insteadOf: ["schedule", "agenda", "plan", "itinerary"],
+      },
+      {
+        term: "nobody is checking",
+        gloss:
+          "the room's whole thesis, and the reason it has no word for a verdict on the evening",
+        insteadOf: ["perfect"],
+      },
+      {
+        term: "another",
+        gloss:
+          "how anything arrives. Another one, handed over, nobody asked and nobody served",
+      },
+      {
+        term: "stay",
+        gloss: "the only instruction this room gives, and it gives it barefoot",
+      },
+    ],
+
+    // DRAFTED.
+    formulae: [
+      "{Meal} never exactly ends. {The table is reset around whoever stayed}.",
+      "Somebody is in the water. {The sentence goes on without them}.",
+      "{Drink} arrives. Nobody asked for it.",
+      "{The outrageous thing}, said as logistics. Then {the same thing, bigger}.",
+      "{Fact}, {fact}, {fact}.",
+      "Stay. {The plain reason}.",
+      "{Anything anybody owes} is tomorrow.",
+    ],
+
+    // HER REFUSALS, plus the house-wide list every other destination carries.
+    banned: [
+      "guests",
+      "elegant",
+      "chic",
+      "glamorous",
+      "luxe",
+      "paradise",
+      "tropical",
+      "exotic",
+      "nightlife",
+      "cocktails",
+      "party",
+      "schedule",
+      "agenda",
+      "plan",
+      "itinerary",
+      "perfect",
+      "escape",
+      "authentic",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    // DRAFTED.
+    signOffs: [
+      "Out here.",
+      "Stay.",
+      "The table is still going.",
+      "Tomorrow, then.",
+    ],
+
+    // DRAFTED, from her voice notes.
+    always: [
+      "Talk to one person, even with the whole terrace listening.",
+      "Hand somebody something. Nobody out here is served and nobody is asked.",
+      "Say the big thing flat, then say it bigger.",
+      "Let the sentences pile up. A comma is enough.",
+      "Name an object doing casual duty: silk on a wet shoulder, the good glasses out on the wall.",
+      "Defer it to tomorrow, and mean it.",
+      "Tell the time by what has happened, never by an hour.",
+    ],
+
+    // DRAFTED, except where her own words are quoted.
+    never: [
+      "Never an exclamation point. The room is loud in what it does, not in what it prints.",
+      "Never an em-dash, and never an ellipsis that builds to something. One trailing ellipsis, at most, in a whole piece.",
+      "Never guests. They are your people, everybody, whoever's still here.",
+      "Never name the feeling. No elegant, no chic, no glamorous, no luxe: the silk and the good glasses do it or nothing does.",
+      "Never describe the place. No paradise, no tropical, no exotic. It is not a brochure for a place, it is the place.",
+      "Never nightlife, never cocktails, never a party. There are drinks, there is the evening, there is tonight.",
+      "No schedule, no agenda, no plan, no itinerary. The room cannot pronounce them.",
+      "Never perfect. Nobody is checking, which is the whole thesis.",
+      "Never at anyone. The overstatement is about the night and never about somebody in it.",
+      "Never a we that means host and staff. Nobody serves out here; things appear.",
+      "Never a clock hour once the candles are lit.",
+      "Never all-caps, and never title case on anything that is not a name.",
+      "Never use italics.",
+    ],
+
+    // DRAFTED, on the pattern every other destination keeps.
+    breaksCharacterFor: [
+      "Anything somebody must act on to arrive or to be safe: the road, the water, the current, a doctor, what is in the food. Fact first, fewest words, and a clock hour if one is genuinely needed.",
+      "Anything about money.",
+      "Any message that lets someone go: a decline, an early flight, a way off a list. Written straight and made easy.",
+    ],
+
+    // DRAFTED. The one line marked below is hers.
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Come at four. Lunch will still be going.",
+      },
+      {
+        piece: "invitation",
+        text: "Lunch never exactly ends. Come out for it and stay for the part after.",
+      },
+      {
+        piece: "invitation",
+        text: "Dinner starts when the last of you wanders back. Not before.",
+        note: "The premise in eleven words, and the only arrangement this room makes.",
+      },
+      {
+        piece: "invitation",
+        text: "Bring a swimsuit. You will not go back up for it once you are down here.",
+      },
+      {
+        piece: "menu_item",
+        text: "Something cold in your hand before you have said hello.",
+      },
+      {
+        piece: "menu_item",
+        text: "Oysters on ice, and more lime than anybody needs.",
+      },
+      {
+        piece: "menu_item",
+        text: "Fish off the grill, whole, eaten with your hands and no ceremony.",
+      },
+      {
+        piece: "menu_item",
+        text: "Champagne opened loudly, out of the good glasses, on the wall.",
+      },
+      {
+        piece: "menu_item",
+        text: "Coconut ice, eaten wet, standing up.",
+      },
+      {
+        piece: "notice",
+        text: "The table gets reset around whoever refuses to leave it.",
+      },
+      {
+        piece: "notice",
+        text: "Somebody is always in the water. The conversation goes on without them.",
+      },
+      {
+        piece: "notice",
+        text: "Dinner moved to the pool. Then the pool moved.",
+        note: "The founder's own line, and the humour mechanism entire: the outrageous thing said as logistics, then said bigger, flat, at nobody.",
+      },
+      {
+        piece: "notice",
+        text: "Nobody checks a clock again once the candles are lit.",
+      },
+      {
+        piece: "house_note",
+        text: "Your room is up the steps. The door sticks, and you will be barefoot by then anyway.",
+      },
+      {
+        piece: "house_note",
+        text: "Towels are on the wall, wet since this morning. Take one anyway.",
+      },
+      {
+        piece: "place_card",
+        text: "Names are not written down. You sit where you were sitting.",
+      },
+      {
+        piece: "place_card",
+        text: "Beto, at the end where the talking is.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everybody names the last song. Whoever names one already played goes in the water.",
+      },
+      {
+        piece: "bulletin",
+        text: "Sunday. Lunch is still going. Two people have not dressed and nobody has mentioned it.",
+      },
+      { piece: "heading", text: "Lunch, and what it turns into" },
+      { piece: "heading", text: "After the candles" },
+      { piece: "sign_off", text: "Out here." },
+      { piece: "sign_off", text: "Stay." },
+    ],
+
+    // DRAFTED, and every one of them derived from a refusal SHE wrote rather
+    // than from a sin invented for the occasion. These are what
+    // scripts/check-voice-output.mjs matches shape proximity against, so they
+    // are load-bearing: a refusal with no line beside it catches nothing.
+    rejected: [
+      {
+        text: "The best nightlife in Acapulco, and you are on the list.",
+        why: "Nightlife is Havana's word and this room's border against it. It also sells the evening as a category with a door. Out here there are drinks, there is the evening, there is tonight.",
+      },
+      {
+        text: "A weekend in paradise, tropical and impossibly chic.",
+        why: "The room describing itself, twice. It is not a brochure for a place, it is the place, and elegance is carried by the silk and the good glasses or it is not carried at all.",
+      },
+      {
+        text: "The perfect evening, from the first drink to the last song.",
+        why: "Perfect is a verdict, and the room's whole thesis is that nobody is checking. Nothing out here is being marked.",
+      },
+      {
+        text: "Somebody is in the pool already!",
+        why: "Volume printed instead of done. The fact is right and the mark is the voice performing loudness instead of having it. Drop the point and the line is correct.",
+      },
+      {
+        text: "Marisol has not dressed since Thursday and we have all noticed.",
+        why: "Aimed at a person, which is Westhampton's risk and not this room's. The overstatement here is always about the night: dinner moved to the pool, then the pool moved.",
+      },
+      {
+        text: "Drinks at seven, dinner at nine, dancing after. The schedule is inside.",
+        why: "The room cannot pronounce schedule, and it has just printed three clock hours. Dinner starts when the last of you wanders back, and that is the only hour there is.",
+      },
+      {
+        text: "Guests are asked to be seated by eight.",
+        why: "Guests, an instruction, and an hour. They are your people, nobody out here is asked to be anywhere, and the table is reset around whoever stayed rather than filled to a plan.",
+      },
+    ],
+  },
+};
+
+/**
+ * ACAPULCO's voice, said in the tones a host is shown.
+ *
+ * THE FOUNDER'S LIST, TRANSCRIBED EXACTLY. Nothing here was chosen by an agent
+ * and nothing was substituted, which matters more than usual for this room:
+ * the first attempt at Acapulco (docs/voices-draft/) failed on affinity, the
+ * prescribed fix was tried, it failed differently, and the note written at the
+ * time is the rule this list is kept under — "searching for a tag set that
+ * passes the test is optimising to a number rather than tagging what the voice
+ * says, which is the exact failure this project exists to escape."
+ *
+ * Every tag points at a line in the voice above:
+ *
+ *   all_at_once      "Loud, warm, unembarrassed." "Short sentences that pile
+ *                    up rather than trail." Shared with NEW ORLEANS, which is
+ *                    loud at everybody; this room is loud at you.
+ *   across_the_room  "Sounds like someone talking over music they have no
+ *                    intention of turning down."
+ *   toasts_everything  "Champagne opened loudly, out of the good glasses, on
+ *                    the wall." The glass goes up for the fact that the glass
+ *                    is there. DRAFT TONE — see below.
+ *   nothing_by_halves  "dinner moved to the pool. Then the pool moved."
+ *   bigger_every_telling  The humour mechanism entire: say the outrageous
+ *                    thing as logistics, then say it bigger. DRAFT TONE.
+ *   makes_an_entrance  "somebody's in the water instead of dressing", and the
+ *                    table relaid around whoever refused to leave it. Arrival
+ *                    is continuous here rather than announced.
+ *   swears_fondly    "unembarrassed", and "the good glasses anyway".
+ *   no_dead_air      "Comma splices allowed." The sentences pile up because
+ *                    nobody is waiting for a gap.
+ *   leans_in         "the friend who hands you a drink you didn't ask for and
+ *                    were about to want" — the address note, made a tone.
+ *
+ * Formality, address and humour are NOT tagged: plain, second person, absurd
+ * are stated outright above and derived by `statedVoiceFacets`. That triple is
+ * unique in the library — LAS VEGAS is formal/second_person/absurd and BIG SUR
+ * is plain/second_person/deadpan, and this room is neither.
+ *
+ * ── TWO OF THESE NINE ARE DRAFT TONES, AND CLAIMING THEM DOES NOT ────
+ * ── PROMOTE THEM. THE CLAIM IS FOUR FILES, NOT ONE. ──────────────────
+ *
+ * `toasts_everything` and `bigger_every_telling` both carry `draft: true` in
+ * src/lib/voice.ts. The founder's brief named the first and expected claiming
+ * it here to be the promotion; the second was not noticed at all. Neither is
+ * true, and the reason is worth writing down once because it is rule 16 in its
+ * natural habitat — a draft tone is a tile a host can be shown that resolves
+ * to nothing, so the guards against it are deliberately spread out:
+ *
+ *   1. src/lib/voice.ts — the `draft: true` flag has to be cleared, or
+ *      voice.test.ts fails with "still marked draft but a destination now
+ *      claims them".
+ *   2. src/lib/quiz.ts — every NON-draft tone must be on the page, or the
+ *      same file fails with "these tones ship and are not on the page". A
+ *      shipped tone missing from the quiz is a destination nobody can reach.
+ *   3. design/tone-icons/ — every shipped tone must have a mark cut, or the
+ *      tile renders blank. NEITHER OF THESE TWO HAS ONE. There is a
+ *      `toasts.svg`, but it belongs to the separate shipped tone `toasts`
+ *      ("Someone always stands up to say something"), which is a different
+ *      claim and a different drawing. `bigger_every_telling` has no art at
+ *      all. The binding between a tone and its art is a FILENAME, so the
+ *      near-miss is exactly the rename hazard voice.test.ts was written for.
+ *   4. src/app/apply/tone-marks.tsx — regenerated from that directory by
+ *      `npm run build:tone-marks`.
+ *
+ * None of those four is this file. So this list states what the room claims,
+ * and the promotion is a separate piece of work with a design deliverable in
+ * it. It is in the handover note as founder-owed.
+ */
+export const ACAPULCO_1959_TONES: readonly ToneWeight[] = [
+  { code: "all_at_once", weight: 1 },
+  { code: "across_the_room", weight: 1 },
+  { code: "toasts_everything", weight: 0.9 },
+  { code: "nothing_by_halves", weight: 0.85 },
+  { code: "bigger_every_telling", weight: 0.8 },
+  { code: "makes_an_entrance", weight: 0.7 },
+  { code: "swears_fondly", weight: 0.6 },
+  { code: "no_dead_air", weight: 0.5 },
+  { code: "leans_in", weight: 0.4 },
+];
+
+/* ── ACAPULCO IS AUTHORED AND IS NOT IN `DESTINATIONS`. READ THIS ─────
+ *
+ * The two consts above are complete and reviewable and they are deliberately
+ * NOT keyed into `DESTINATIONS` or `DESTINATION_TONES` below. This is a
+ * refusal stated where the next person is standing, not an omission.
+ *
+ * WIRING IT IN WAS TRIED AND MEASURED. With the founder's nine tones exactly
+ * as written, `npm test` goes from 341 pass / 0 fail to 339 / 2:
+ *
+ *   "every tone is claimed by at least one destination" — fails on the two
+ *   draft tones, for the four-file reason written out above.
+ *
+ *   "no two destinations resolve to nearly the same voice" — fails with
+ *   LAS VEGAS and ACAPULCO at 0.852 against a ceiling of 0.65.
+ *
+ * That second number is the whole problem and it is not an authoring slip.
+ * Five of the nine tones are Las Vegas's own — `across_the_room`,
+ * `nothing_by_halves`, `makes_an_entrance`, `no_dead_air`, and the
+ * theatricality the other four carry between them. Dropping the two draft
+ * tones to make the first failure go away moves the second to 0.846, which is
+ * the tell: THE COLLISION IS THE ROOM'S LOUDNESS, NOT ITS TAG LIST. Acapulco
+ * and Las Vegas are the only two houses in the library that are loud, and the
+ * fifty-one tones have one vocabulary for loud.
+ *
+ * This is the same wall docs/voices-draft/VERIFICATION.md hit from the other
+ * side. That version was tagged warm and landed on HAVANA at 0.682; re-tagged
+ * toward theatricality as prescribed, it landed on LAS VEGAS at 0.864. This
+ * version is tagged loud from the start and lands on Las Vegas at 0.852. Three
+ * tag sets, two directions, one occupied corner.
+ *
+ * WHY AN AGENT DOES NOT RESOLVE IT. Both available fixes are the founder's:
+ *
+ *   Re-tag until the number passes. Refused, in the words already written
+ *   into VERIFICATION.md — optimising to a number rather than tagging what the
+ *   voice says is the retro-tagging failure this project exists to escape. It
+ *   is also the reason this file holds her list verbatim.
+ *
+ *   Refit the ceiling. 0.65 was set against THIRTEEN destinations, and
+ *   src/lib/selection/types.ts already says in writing that the sibling
+ *   threshold "is a property of how densely the catalogue covers the voice
+ *   space, not a constant of nature". Eighteen rooms in the same 26-facet
+ *   space raises every pairwise affinity mechanically. That is a defensible
+ *   ruling and it is not an agent's to make, because loosening the number
+ *   loosens it for every pair at once.
+ *
+ * A third answer exists and is worse than both: separating the two rooms with
+ * new tones for KINDS of loud. That grows the vocabulary a host reads, which
+ * is the one thing in this system that is not free.
+ *
+ * ONE COST OF LEAVING IT UNWIRED, SAID PLAINLY: `npm run check:voice-output`
+ * resolves its slug through `DESTINATIONS`, so it cannot be pointed at this
+ * room until the two lines below are added. The refusals above WERE run
+ * against a temporarily wired build and every one of them fires — `nightlife`,
+ * `paradise`, `tropical`, `chic`, `perfect`, `schedule` and `guests` are each
+ * caught twice, as a displaced term and as a never-rule term, and the drafted
+ * `rejected` lines match their own shapes at 100 per cent. The one refusal the
+ * checker cannot see is the exclamation point, because that layer is lexical
+ * and has no punctuation pass; it is caught only by shape proximity against
+ * the rejected line that carries it, which is why that line is in the list.
+ *
+ * TO LAND IT, once the founder has ruled, the diff is two lines — add
+ * `"acapulco-1959": ACAPULCO_1959,` to `DESTINATIONS` and
+ * `"acapulco-1959": ACAPULCO_1959_TONES,` to `DESTINATION_TONES`. Everything
+ * else is done. The `world` row for `acapulco-1959` is already seeded draft,
+ * and the gesture still needs its migration.
+ *
+ * ── 2026-08-27: THE CEILING WAS REFIT. THE AFFINITY BLOCKER IS GONE ──
+ *
+ * The ruling this block asked for was made, and it was made by MEASURING the
+ * thing the number claims to detect rather than by loosening it. The full
+ * argument is in `voiceCeiling()` in src/lib/voice.ts and the numbers are in
+ * `npm run check:voices -- --duplicates`. What it means HERE, and it is the
+ * shorter half of what this block predicted:
+ *
+ *   LAS VEGAS / ACAPULCO at 0.852 NOW PASSES, against a monitor ceiling of
+ *   0.92 calibrated to the empty band between the authored field's maximum
+ *   (0.893) and the measured floor of a same-triple reproduction (0.955).
+ *   This block's own diagnosis was right and is now checkable: the collision
+ *   is the room's LOUDNESS, and the two rooms share four of six tone codes
+ *   (0.667) against a hand guard of 0.80, which is the instrument that would
+ *   have caught an echo and does not fire here.
+ *
+ * SO WIRING THIS ROOM NOW COSTS ONE FAILING TEST RATHER THAN TWO — measured,
+ * 341 pass / 0 fail becomes 340 / 1 — and the one that remains is the
+ * four-file draft-tone job written out above. `toasts_everything` and
+ * `bigger_every_telling` still have no mark cut in design/tone-icons, and an
+ * agent drawing one to clear a test would be shipping a host a picture nobody
+ * chose. THIS ROOM IS NOW BLOCKED ON ART AND ON NOTHING ELSE. It is the
+ * cheapest of the five to land and the only one that clears the tone cap, the
+ * affinity ceiling, the hand guard and the stated-triple test as written.
+ */
+
+/**
+ * AMALFI COAST, 1953.
+ *
+ * ── WHAT IS HERS AND WHAT IS MINE ────────────────────────────────────
+ *
+ * The founder supplied, VERBATIM and not to be improved: the thirteen tone
+ * codes, the whole `voice` stance block (speaker, selfReference, audience,
+ * address, cadence, punctuation and the lexicon's refusals), the gesture
+ * invariant, the deliverables sheet quoted below, and the matching claims.
+ *
+ * DRAFTED BY AN AGENT, and marked as such at every site: the `premise`, the
+ * `tagline`, `AMALFI_LOOK`, the `formulae`, the `banned` list, the `rejected`
+ * examples, the `always`/`never` rules, the exemplars, and every WEIGHT in
+ * `AMALFI_1953_TONES`. She gave thirteen codes and no numbers. Rule 8: this is
+ * a draft and the signature is hers.
+ *
+ * ── HER DELIVERABLES SHEET, PRESERVED WHOLE ──────────────────────────
+ *
+ * The register lives here more exactly than in anything derived from it, and
+ * the schema has a home for only about half of it, so it is kept entire:
+ *
+ *   "The table: lemons in terracotta, bougainvillea where it falls. Striped
+ *   umbrellas, navy and white, older than anyone will admit. What to wear:
+ *   linen trousers, the striped tee, a silk scarf for the drive, sandals that
+ *   have done this before. What there is: the fish, sliced thin, lemon on it.
+ *   Tomatoes and mozzarella and oil. Bread you will be told to finish. Wine
+ *   cold enough to sweat the pitcher, prosecco if there's news, and at the
+ *   end — nobody asked — the lemon liqueur made before, in glasses too small
+ *   to refuse. What's playing: Carosone, Buscaglione, Prima. Somebody will
+ *   sing along badly by the second bottle. This is correct."
+ *
+ * ── THE GESTURE, WHICH IS THE INVARIANT ──────────────────────────────
+ *
+ * SOMEBODY REFILLS YOUR PLATE WITHOUT ASKING, MID-SENTENCE. Every `always`
+ * rule below is downstream of it, and it is why `feeds_you_first` is the tone
+ * at full weight. NOTE FOR THE FOUNDER, because two documents disagree and
+ * rule 14 says keep both: `docs/atmosphere-idea-bank-v1.md` records the
+ * gesture as the TOMBOLIERE ("Amalfi: tomboliere locked as gesture per founder
+ * 'ok on the tombola' — applause demoted to standing act"). The plate refill
+ * is the newer instruction. Both are written into this voice — the refill as
+ * the invariant, the calling of the game as a notice and a game_rule — and
+ * which one is THE gesture of record is hers to say.
+ *
+ * ── THE ENDING CELL. A REVERSAL, PRESERVED PER RULE 14 ───────────────
+ *
+ * Her matching-claims sheet said "How it ends: It stops cleanly" = `clean_stop`.
+ * The committed matrix said `amalfi-1953.ending = dissolves`. FOUNDER RULED
+ * 2026-08-27 FOR THE MATRIX — her words: "right ending dissolves better." The
+ * cell is unchanged and the claims sheet is the thing that was overridden.
+ *
+ * This is written here because a future reader holding her sheet beside the row
+ * will otherwise read the row as stale and "fix" it. It also BINDS THIS VOICE:
+ * the room thins out, it does not close. Nothing below may name an hour the
+ * party is over, empty the room at once, or write a clean last line. The last
+ * hour is in the kitchen with whoever is still standing in it, and the
+ * `never` rule about it is there so the next writer cannot undo the ruling by
+ * accident.
+ *
+ * ── THE THREE COASTS, AND HOW THIS ONE IS NOT THE OTHER TWO ──────────
+ *
+ * `docs/decor-sources.md` names the problem in the object catalogue — "28 of
+ * 80 rows serve both Portofino and Cote d'Azur" — and a third Italian-adjacent
+ * coast is the fastest way to make it worse. Four walls, each of them already
+ * drawn by somebody else and none of them invented here:
+ *
+ *   THE LEMON DOSE. FULL here — bowls, the mantel, the prize, one going home
+ *   in a pocket. SPARSE at Portofino, one small bowl. So a lemon may be a
+ *   line in this house and may not be one up the coast.
+ *
+ *   THE VESSEL REGISTER. Majolica and painted ceramic here; stoneware at
+ *   Portofino; mismatched saucers and plain cupboard glass at Cote d'Azur.
+ *   The small glasses at the end of this evening are painted, and that is a
+ *   fact about which room it is.
+ *
+ *   THE PHYSICS OF EVIDENCE. Portofino's is COUNTING AND HANDWRITING — the
+ *   boats, the order written out. Cote d'Azur's is ACCUMULATION — what has
+ *   piled up by seven proves the afternoon. This room's is PLAY: the marked
+ *   cartella, the number called, the prize won and unwrapped in front of
+ *   everybody.
+ *
+ *   THE VOICE, which is the wall that matters most and the one the other two
+ *   documents cannot draw. Portofino is `between_us` — closed, a table that
+ *   has already met. Cote d'Azur is `means_the_other_thing` — the polite
+ *   version with the true one underneath. THIS HOUSE MEANS EXACTLY WHAT IT
+ *   SAYS AT FULL VOLUME AND SAYS IT FIRST. `marvels_out_loud` carries
+ *   knowingness at -0.7, which is the numeric far end of both neighbours, and
+ *   the founder's own instruction — NO DRY WIT, the humour is delight — is
+ *   the same wall said in words. A single arch aside in this room and it has
+ *   become the terrace.
+ *
+ * And the word she refuses outright, which is the one that would collapse all
+ * three at once: MEDITERRANEAN. It is in the lexicon's displaced list rather
+ * than only in `banned`, because `banned` is not what
+ * `npm run check:voice-output` reads.
+ *
+ * ── THE THREE RULES A PREMISE IS WRITTEN UNDER (CLAUDE.md 25) ────────
+ *
+ *   BOOKABLE AT BACKYARD SIZE. There is no cliff, no boat, no villa and no
+ *   staircase down to a bay in the premise below. A long table, umbrellas, a
+ *   kitchen and a garden in August honour every line of it. The vertical coast
+ *   is in the decor brief, not in the sentence a host reads.
+ *   NO PROPER NOUN. Not one, including the name of the coast. The songs are
+ *   named nowhere on the page; her sheet names three players and a guest would
+ *   say those at a table, but a premise that names them has begun writing the
+ *   postcard, so they live in the lexicon gloss instead.
+ *   NO LABOUR THE HOST DOES NOT HAVE. Everything is out before anybody sits
+ *   down, the liqueur was made weeks ago by somebody who is now sitting down,
+ *   and the plates move because the people at the table move them. Nobody
+ *   carries a tray in this house. Acapulco's line is the test and it passes it.
+ *
+ * ── WHAT THE SCHEMA COULD NOT HOLD ───────────────────────────────────
+ *
+ * `Destination` has no field for the deliverables sheet, for the gesture, or
+ * for a matching claim. The sheet and the gesture are preserved above; the
+ * matching claims are reported to the founder rather than written here,
+ * because `world_facet` is a database table this module does not write and
+ * `scripts/seed-destinations.mjs` writes `voice_tone` tags and nothing else.
+ */
+const AMALFI_LOOK: Theme = {
+  key: "amalfi-1953",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  // PROVISIONAL — DRAFTED, NOT FOUNDER-SIGNED. Structure reused from
+  // PORTOFINO_LOOK so the diff against its neighbour is only the numbers.
+  //
+  // Read against the two coasts it must not become: Portofino is cool and grey
+  // because its season is over, and Cote d'Azur is bleached linen and brass in
+  // four o'clock light. This one is the loudest plate of the three on purpose —
+  // whitewash and lemon, majolica blue rather than sea blue, terracotta, and a
+  // bougainvillea magenta doing the work `oxblood` does elsewhere. Her sheet
+  // gives the colours in words ("lemons in terracotta, bougainvillea where it
+  // falls", "striped umbrellas, navy and white") and the hex is the agent's
+  // reading of them, which is exactly the part a founder should overrule.
+  palette: {
+    ground: "#F6EFE0",
+    ground2: "#EBE0CB",
+    ink: "#231F1A",
+    inkSoft: "#554E44",
+    inkFaint: "#8C8478",
+    rule: "#D5C7AC",
+    aqua: "#1D4E8C",
+    oxblood: "#B32E5A",
+    gold: "#D9A21B",
+    night: "#141C2B",
+    night2: "#0E1420",
+    nightInk: "#F4EAD6",
+    nightSoft: "#ADA491",
+    nightAqua: "#6E9FD8",
+    nightOxblood: "#E0668C",
+    bone: "#FBF6EA",
+  },
+  paletteDark: {
+    ground: "#0E1420",
+    ground2: "#141C2B",
+    ink: "#F4EAD6",
+    inkSoft: "#ADA491",
+    inkFaint: "#7B7566",
+    rule: "#28324A",
+    aqua: "#6E9FD8",
+    oxblood: "#E0668C",
+    gold: "#E8B93C",
+  },
+};
+
+export const AMALFI_1953: Destination = {
+  key: "amalfi-1953",
+  name: "AMALFI COAST, 1953",
+  // DRAFTED. Two sentences, the house shape. The second one is the gesture
+  // invariant said as plainly as it can be said. An alternative is in the
+  // handover report.
+  tagline: "Everything on the table at once. Your plate fills while you are talking.",
+  // DRAFTED — she gave no premise. Written under CLAUDE.md rule 25; the three
+  // tests are worked through in the block above. A second option is in the
+  // handover report and neither is signed.
+  premise:
+    "A long table under striped umbrellas, laid for more people than were " +
+    "asked, and everything on it before anybody sits down. The fish sliced " +
+    "thin with lemon on it, tomatoes, bread you will be told to finish. Your " +
+    "plate is filled again while you are still talking. The game is called " +
+    "after dark, the small glasses come out at the end and nobody asked for " +
+    "them, and it thins out into the kitchen rather than ending.",
+  look: AMALFI_LOOK,
+  voiceVersion: 1,
+  voice: {
+    // HERS.
+    speaker: "The table, mid-meal.",
+    // HERS.
+    selfReference: ["the table", "everybody"],
+    // HERS.
+    audience: "everyone seated, addressed as already family",
+    address: {
+      // DRAFTED: the mode is the type's name for what she described.
+      mode: "second_person",
+      // HERS, and the last clause is the whole stance.
+      note:
+        "Second person, imperative-leaning — sit, eat, finish, take more. " +
+        "COMMANDS AS AFFECTION. An instruction here is not an instruction; it " +
+        "is how this house says it is glad you came, and the moment it is " +
+        "softened into a request the affection goes with it.",
+    },
+
+    // DRAFTED, from her speaker line and her sheet.
+    register:
+      "Something said across a table with a serving spoon still in one hand, " +
+      "to somebody who has been coming for years.",
+    // DRAFTED. `plain` and not `familiar`: familiar/second_person/warm is
+    // CATSKILLS, and this house is the one that SAYS THE THING — sit, eat,
+    // finish — rather than the one with its own private language.
+    formality: "plain",
+    // HERS, verbatim in substance.
+    cadence:
+      "Short imperatives; generous run-ons when a story starts. NO DRY WIT — " +
+      "the humour is delight, laughing first, marvelling out loud.",
+    // DRAFTED. The widest `maxWords` in the library, and it is the run-on she
+    // asked for: Cote d'Azur's 22 is a sentence that BUILDS to something, and
+    // this is a sentence that simply keeps going because the story is not
+    // finished. The typical stays short because most lines here are four words
+    // long and mean sit down.
+    sentence: { typicalWords: 9, maxWords: 26 },
+    // HERS, and the second sentence is the agent's reading of "earned".
+    //
+    // THE ONLY HOUSE IN THE LIBRARY THAT MAY WRITE AN EXCLAMATION POINT. Every
+    // other voice bans it outright, so this is a real permission and not an
+    // oversight — but no exemplar below spends it, because she wrote no line
+    // that earns one and an agent inventing the first one would be inventing
+    // the rule rather than following it.
+    punctuation:
+      "Warm and unfussy. Exclamation earned, not scattered — at most one in a " +
+      "piece, and never in a line that would survive without it. No " +
+      "quotation marks around a word being nudged, no ellipses, no dash held " +
+      "open for effect.",
+    // DRAFTED. The clock hour is permitted because her matching claims name
+    // lunch AND dinner and a host has to know which; what is refused is the
+    // hour the party is over, which the ending ruling forbids.
+    orthography:
+      "Hours in words where an hour is needed at all: one o'clock, five, " +
+      "after dark. An hour may be given for when to come and never for when " +
+      "it is over. Headings in full caps; nothing else capitalised for " +
+      "emphasis. The songs and the people keep their own names and their own " +
+      "spellings, and nothing else on the page is spelled to sound like " +
+      "anywhere.",
+
+    humour: {
+      // DRAFTED: `warm` is the type's name for what she described.
+      mode: "warm",
+      // HERS in substance.
+      mechanism:
+        "Delight, out loud, before anybody else. Laughing before the end of " +
+        "the sentence, saying a thing is beautiful and meaning it, and a " +
+        "story that is bigger than it was last year with nobody correcting " +
+        "it. There is no dry aside in this house and no line that means the " +
+        "other thing.",
+    },
+
+    // HER REFUSALS ARE THE SPINE OF THIS LIST. She named nine words the house
+    // will not say — menu, cuisine, authentic, rustic, artisanal,
+    // Mediterranean, reservation, portion, guests — and five it says instead:
+    // what there is, the kitchen, plates, more, everybody. Each refusal is
+    // carried in an `insteadOf` rather than only in `banned`, because
+    // `scripts/check-voice-output.mjs` reads `insteadOf` and does not read
+    // `banned`. A refusal parked in `banned` alone is a rule nothing enforces.
+    lexicon: [
+      {
+        term: "what there is",
+        gloss:
+          "the food, named as what it is. This house has no word for food as a category and no word for it as a style — there is fish, there are tomatoes, there is bread",
+        insteadOf: ["menu", "cuisine", "rustic", "artisanal", "the courses", "our selection"],
+      },
+      {
+        term: "the kitchen",
+        gloss:
+          "where the food came from and where the last hour goes. It is a room with people in it, not a department",
+        insteadOf: ["the chef", "the caterer", "the staff", "the service", "back of house"],
+      },
+      {
+        term: "plates",
+        gloss:
+          "painted, mismatched, refilled without being asked. What arrives is a plate, never a measured amount of anything",
+        insteadOf: ["portion", "portions", "servings", "a plated course", "small plates"],
+      },
+      {
+        term: "more",
+        gloss:
+          "the answer to almost everything, and usually not a question. More arrives mid-sentence",
+        insteadOf: ["seconds", "a top-up", "another helping", "would you like"],
+      },
+      {
+        term: "everybody",
+        gloss:
+          "who is here. Nobody at this table is a category of person and nobody is counted at the door",
+        insteadOf: ["guests", "the guests", "attendees", "the party", "invitees"],
+      },
+      {
+        term: "come and eat",
+        gloss:
+          "the reply convention, which is not a reply. Nobody confirms and nobody is on a list",
+        insteadOf: ["reservation", "RSVP", "please confirm", "a table booked", "the guest list"],
+      },
+      {
+        term: "this coast",
+        gloss:
+          "how the room says where it is, on the rare occasion it must. Never the sea, never the region, never the country — a coast with a category name on it has become a shelf in a shop",
+        insteadOf: ["Mediterranean", "the Med", "the Riviera", "Italian", "continental"],
+      },
+      {
+        term: "made before",
+        gloss:
+          "when the liqueur, the sauce and the sweet thing were made. Weeks ago, by somebody who is sitting down now. This is the house's whole account of effort and it is the reason nobody is standing up",
+        insteadOf: ["prepared", "homemade", "house-made", "freshly made", "made to order"],
+      },
+      {
+        term: "the small glasses",
+        gloss:
+          "what the lemon liqueur made before comes out in at the end. Too small to refuse, which is the point, and nobody asked for them",
+        insteadOf: ["digestif", "the nightcap", "after-dinner drinks", "limoncello"],
+      },
+      {
+        term: "the game",
+        gloss:
+          "tombola, called after dark by whoever has the voice for it, who is playing as well. Beans for markers, five prizes, the unwrapping paces the night",
+        insteadOf: ["entertainment", "activities", "the programme", "games and prizes"],
+      },
+      {
+        term: "finish it",
+        gloss:
+          "said about bread, and it is not a request. The nearest thing this house has to a rule",
+        insteadOf: ["help yourself", "please enjoy", "tuck in", "at your leisure"],
+      },
+      {
+        term: "the second bottle",
+        gloss:
+          "when somebody starts singing along badly. Not an hour and not a stage of the evening — a landmark, and everybody knows where it is",
+        insteadOf: ["later in the evening", "as the night goes on", "the after-dinner"],
+      },
+    ],
+
+    // DRAFTED, every one of them from a line in her sheet or her tones.
+    formulae: [
+      "{Imperative}. {Imperative}. {Imperative}.",
+      "Eat first. {The thing that can wait} will keep.",
+      "{Food} is already on the table. All of it, at once.",
+      "More {food} arrives while you are still talking.",
+      "{Made thing} was made {weeks ago}, by somebody who is sitting down now.",
+      "Nobody asked for {the thing that comes at the end}.",
+      "{Somebody} will {do the badly done thing} by the second bottle. This is correct.",
+      "{The story}, and it is bigger than it was last year.",
+    ],
+
+    // DRAFTED: her nine refusals first, then the costume bans this room needs,
+    // then the house-wide tail TAHITI carries.
+    banned: [
+      "menu",
+      "cuisine",
+      "authentic",
+      "rustic",
+      "artisanal",
+      "Mediterranean",
+      "reservation",
+      "portion",
+      "guests",
+      "dolce vita",
+      "la famiglia",
+      "mamma",
+      "nonna",
+      "ciao",
+      "bella",
+      "amore",
+      "trattoria",
+      "al fresco",
+      "family-style",
+      "sharing plates",
+      "sun-drenched",
+      "lemon-scented",
+      "limoncello",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    // DRAFTED.
+    signOffs: [
+      "The table.",
+      "Come and eat.",
+      "There is more.",
+      "Everybody is already here.",
+    ],
+
+    // DRAFTED, and the first one is the gesture.
+    always: [
+      "Feed them before anything else. The plate arrives before the conversation does and nobody is asked whether they want it.",
+      "Say it as an instruction and mean it as affection. Sit, eat, finish, take more.",
+      "Put everything out at once. There are no courses here and nothing is held back for later.",
+      "Name what was made in advance and who made it. That is this house's entire account of effort, and it is why nobody is on their feet.",
+      "Let the story be bigger than it was last year. Nobody corrects it and everybody has heard it.",
+      "Say the beautiful thing out loud, first, and without arranging it.",
+      "Let it thin out. The last hour is in the kitchen and nothing announces the end.",
+    ],
+
+    // DRAFTED. Each one names the failure it prevents, and the words inside
+    // them are quoted so `check:voice-output` can find them.
+    never: [
+      "Never a menu, never a cuisine, never a portion. There is what there is, there are plates, and there is more.",
+      "Never Mediterranean, never rustic, never artisanal. Three words that turn a coast into a shelf in a shop, and she refuses all three by name.",
+      "Never a reservation and never a guest list. Everybody who comes is already family and nobody is counted at the door.",
+      "Never staff. Nobody carries a tray in this house; the plates move because the people at the table move them, and the moment a line implies somebody serving, the evening has been handed to people who do not exist.",
+      "Never the postcard — no dolce vita, no ciao, no bella, no mamma in the kitchen. The songs keep their own names and nothing else on the page is spelled to sound like anywhere.",
+      "Never dry wit. The humour here is delight, and a house that lands an arch aside has become the terrace up the coast.",
+      "Never scatter an exclamation point. This is the one house that may write one, which is exactly why it writes one at a time and only where the line has earned it.",
+      "Never end it cleanly. Nothing here stops; it thins out. A line that names the hour the party is over, or empties the room at once, has written a different room — the row says dissolves and the founder ruled for it.",
+      "Never name the feeling — no magic, no romance, no unforgettable, no memories.",
+      "Never use italics.",
+    ],
+
+    // DRAFTED, on the shape the library already uses.
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the steps, the parking, the dark stretch of path, a hospital, and above all what is in the food — this is a house that fills a plate without asking, so an allergy is written plainly, early, and with a clock hour if one is genuinely needed.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, a cancellation, a way off a list. Written straight and made easy, and never with a second invitation attached.",
+    ],
+
+    // DRAFTED. No exemplar spends the one permitted exclamation point; see the
+    // note on `punctuation`.
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Come at five. There is no hour after that.",
+        note: "The orthography rule made into a line: an hour for when to come, none for when it is over.",
+      },
+      {
+        piece: "invitation",
+        text: "Everything is on the table before anybody sits down. Sit down.",
+      },
+      {
+        piece: "invitation",
+        text: "Bring nobody a thing. It was all made weeks ago.",
+      },
+      {
+        piece: "invitation",
+        text: "There is more than anybody will eat. That is the plan and it has never changed.",
+      },
+      {
+        piece: "menu_item",
+        text: "The fish, sliced thin, lemon on it.",
+        note: "Hers, off the deliverables sheet, and it is already the line.",
+      },
+      { piece: "menu_item", text: "Tomatoes and mozzarella and oil." },
+      { piece: "menu_item", text: "Bread you will be told to finish." },
+      {
+        piece: "menu_item",
+        text: "Wine cold enough to sweat the pitcher, and prosecco if there is news.",
+      },
+      {
+        piece: "menu_item",
+        text: "The lemon liqueur made before, in glasses too small to refuse. Nobody asked for it.",
+      },
+      {
+        piece: "notice",
+        text: "Your plate will be filled while you are talking. Keep talking.",
+        note: "The gesture invariant, written as the only notice this house really needs.",
+      },
+      {
+        piece: "notice",
+        text: "Nobody is counted at the door. Whoever comes was already coming.",
+      },
+      {
+        piece: "notice",
+        text: "The last hour is in the kitchen. It is the best hour and nothing announces it.",
+      },
+      {
+        piece: "house_note",
+        text: "The lemons in the bowl are for taking. Take one on the way down.",
+      },
+      {
+        piece: "house_note",
+        text: "The umbrellas are older than anybody will admit. Do not fight the one that leans.",
+      },
+      {
+        piece: "place_card",
+        text: "Names are on the table and nobody stays where they were put.",
+      },
+      {
+        piece: "place_card",
+        text: "Rosa — beside the kitchen door, because she gets up eleven times.",
+      },
+      {
+        piece: "game_rule",
+        text: "The numbers are called after dark. Beans for markers, and whoever is calling is playing too.",
+      },
+      {
+        piece: "game_rule",
+        text: "Five prizes, opened one at a time in front of everybody. The last one is worth having.",
+      },
+      {
+        piece: "bulletin",
+        text: "Sunday. The tomatoes were better than last year and somebody said so out loud, twice.",
+      },
+      {
+        piece: "bulletin",
+        text: "The singing started at the second bottle, which is early. This is correct.",
+      },
+      { piece: "heading", text: "WHAT THERE IS" },
+      { piece: "heading", text: "AFTER DARK, THE GAME" },
+      { piece: "sign_off", text: "The table." },
+      { piece: "sign_off", text: "Come and eat." },
+    ],
+
+    // DRAFTED, and derived from her refusals one at a time — these are what
+    // `npm run check:voice-output` matches a candidate line against, so each
+    // one carries a refused word on purpose.
+    rejected: [
+      {
+        text: "Authentic Amalfi cuisine, served family-style.",
+        why: "Two refused words in four, and then the food is handed to somebody serving it. The house says what there is and the plates move themselves.",
+      },
+      {
+        text: "A Mediterranean feast under the stars.",
+        why: "The one word she refuses outright, and it is refused because it makes three different coasts into one shelf in a shop.",
+      },
+      {
+        text: "Tonight's menu: crudo, then caprese, then a lemon tart.",
+        why: "A menu, and courses in a house where everything is on the table before anybody sits down.",
+      },
+      {
+        text: "Reservations at eight. Please confirm your party.",
+        why: "A reservation and a counted party. Nobody is on a list here and nobody is asked to confirm that they are family.",
+      },
+      {
+        text: "Our team will serve each course and keep your glass full.",
+        why: "Staff, in a house that has none. Somebody refills your plate mid-sentence and that somebody is sitting at the table.",
+      },
+      {
+        text: "Generous rustic portions and artisanal breads for up to eighty guests.",
+        why: "Four refused words in ten — rustic, portions, artisanal, guests — and a headcount, which is the one number this room does not keep.",
+      },
+      {
+        text: "Dinner is served at eight and the evening concludes at eleven.",
+        why: "A clean stop, in the room whose row says it dissolves and whose founder ruled for that. Nothing here concludes; it thins out into the kitchen.",
+      },
+      {
+        text: "A hidden gem on the Italian coast, still unspoilt.",
+        why: "Sells a place to somebody who is not there, and flatters them for knowing it. This room is a table, and the coast is not the offer.",
+      },
+    ],
+  },
+};
+
+/**
+ * AMALFI's voice, said in the tones a host is shown.
+ *
+ * THE CODES ARE HERS — thirteen of them, given without weights. THE WEIGHTS
+ * BELOW ARE DRAFTED and are the part to argue with.
+ *
+ * ── THIRTEEN, WHERE THE HOUSE RANGE IS SIX TO NINE ───────────────────
+ *
+ * Not cut, because cutting one is a founder's decision and not an agent's
+ * (rule 8) and because she may have meant the length. What the count DOES:
+ *
+ *   IT IS OVER A HARD CAP NOBODY MENTIONED. `src/lib/voice.test.ts` — "a
+ *   destination's tones are real, weighted legally, and few" — fails above TEN:
+ *   "the vocabulary is doing the work of a paragraph, and a host cannot make
+ *   that many claims". So thirteen is not a soft preference against the six-to-
+ *   nine range, it is a RED TEST, and that is the first thing she has to rule
+ *   on. Three would have to go, or the cap moves.
+ *
+ *   IT SPENDS THE ALLOCATION'S OVERLAP BUDGET. Four tones in VOLUME is more
+ *   than any other house claims in one group, and two of them — `all_at_once`
+ *   and `interrupts` — are NEW ORLEANS'. The overlap rule permits sharing one
+ *   group provided two others differ; this shares one group heavily and differs
+ *   on ceremony, kindness and knowing, so it holds. It would not hold twice.
+ *
+ *   IF SHE WANTS TEN, the three the agent would put to her first are
+ *   `interrupts` (0.5, and it is New Orleans' word for the same behaviour
+ *   `finishes_your_sentences` describes warmly), `toasts` (0.4, see below) and
+ *   `shows_you_things` (0.5, which is Acapulco's coined tone). Cutting those
+ *   three leaves ten and costs the room nothing it says elsewhere. NOT DONE
+ *   HERE.
+ *
+ * ── A PREDICTION THIS BLOCK MADE AND THE MEASUREMENT THAT BEAT IT ────
+ *
+ * Rule 14, on the same day rather than in six months. This paragraph first
+ * said: THIRTEEN TONES RAISE AFFINITY WITH EVERY LOUD, WARM ROOM, because a
+ * cosine over 26 facets is closer to everything when more of the space is
+ * filled — so the count was the risk and a trim was the remedy.
+ *
+ * COUNTING BEAT IT (rule 24). Leave-one-out over all thirteen, and every
+ * combination cut down to eight, moves the worst pair by at most four points
+ * and SEVERAL CUTS MAKE IT WORSE: dropping `all_at_once` takes it from 0.817 to
+ * 0.845, and the ten-tone trim recommended two paragraphs up takes it to 0.839.
+ * The count is not the mechanism. One facet is: `warmth` alone supplies 0.448
+ * of the 0.817 against HAVANA, because seven of her thirteen tones carry a
+ * positive warmth weight and they add. Trimming the list does not thin the
+ * warmth unless the trim removes warm tones, which is a content decision and
+ * not an arithmetic one.
+ *
+ * ── ONE CODE TO CHECK, AND IT IS NOT A TYPO CORRECTION ───────────────
+ *
+ * She wrote `toasts`, which is NEW YORK's tone: formality_formal 0.7,
+ * theatricality 0.6, earnestness 0.5 — a room where somebody STANDS UP AND
+ * PERFORMS a toast. There is also `toasts_everything` — "any excuse at all, and
+ * the glass goes up" — at earnestness 0.9, warmth 0.8, theatricality 0.35,
+ * which is the reading her sheet supports and which ACAPULCO claims. Her word
+ * is used verbatim and held at 0.4 so the formal pull is faint. IF SHE MEANT
+ * `toasts_everything`, changing it is one line — but it is her line to change.
+ *
+ * ── THE WEIGHTS, EACH AGAINST ITS NEIGHBOURHOOD ──────────────────────
+ *
+ *   feeds_you_first 1        THE GESTURE. "Your plate will be filled while you
+ *                            are talking." The only room that claims it, and
+ *                            the reason this house exists.
+ *   eat_before_you_speak 0.9 "Eat first. Whatever it is will keep." Her sheet
+ *                            puts the food before the conversation on every
+ *                            line, and this is the room's pace tone — it is
+ *                            unhurried WITHOUT being slow, which is how a
+ *                            five-hour table is not Tahiti.
+ *   marvels_out_loud 0.9     "Somebody said so out loud, twice." Knowingness
+ *                            -0.7, which is the numeric far end from PORTOFINO
+ *                            (`between_us`) and COTE D'AZUR
+ *                            (`means_the_other_thing`). The three-coast wall,
+ *                            in one number, which is why it is nearly at the
+ *                            top and not decorating the bottom.
+ *   all_at_once 0.8          Held BELOW New Orleans' 1 and Acapulco's 1 on the
+ *                            meaning: New Orleans is four conversations none of
+ *                            them finished and Acapulco shouts across a
+ *                            terrace, where this is one long table talking over
+ *                            itself with everybody still in it.
+ *   the_same_stories 0.7     "Bigger than it was last year." Her matching claim
+ *                            asks for a ritual repeated next year, and this is
+ *                            that in voice. Knowingness 0.35 against CATSKILLS'
+ *                            `in_jokes` at 1 — an in-joke you must already get,
+ *                            against a story everybody has heard and wants
+ *                            again.
+ *   first_names 0.7          "Addressed as already family", from her audience
+ *                            line.
+ *   laughs_first 0.7         Matched to HAVANA's 0.7 deliberately: the two
+ *                            rooms laugh the same way and part on everything
+ *                            else, and pretending otherwise with a number would
+ *                            be tuning rather than reading.
+ *   rises_to_greet 0.6       The matrix row says arrival = ceremony, and this
+ *                            is the only warm room that stands up. Held at 0.6
+ *                            rather than NEW YORK's 0.7 because the standing up
+ *                            here is a hug and not a receiving line.
+ *   bigger_every_telling 0.6 "The story gets worse each time and everybody
+ *                            allows it."
+ *   interrupts 0.5           Below New Orleans' 0.7. Same behaviour, and here
+ *                            it is affection rather than pace.
+ *   finishes_your_sentences 0.5  Its warm twin, and the reason `interrupts`
+ *                            does not have to carry the whole idea.
+ *   shows_you_things 0.5     ACAPULCO's coined tone, held below whatever that
+ *                            room gives it: there, a host turns you toward the
+ *                            divers; here, somebody turns your face toward a
+ *                            dish and a view and a person, in the same
+ *                            sentence.
+ *   toasts 0.4               Faint on purpose. See the note above — the glass
+ *                            goes up here constantly and nobody stands on
+ *                            ceremony doing it, and a heavier weight would pull
+ *                            this room toward NEW YORK and LAS VEGAS.
+ *
+ * Formality, address and humour are NOT tagged: plain, second person, warm are
+ * stated outright and derived by `statedVoiceFacets`. The triple is unique —
+ * CATSKILLS holds familiar/second_person/warm and ACAPULCO holds
+ * plain/second_person/absurd, so `plain` is what keeps this out of Catskills'
+ * seat and `warm` is what keeps it out of Acapulco's.
+ *
+ * ── NOT WIRED. THREE THINGS ARE THE FOUNDER'S TO RULE ────────────────
+ *
+ * `AMALFI_1953` and `AMALFI_1953_TONES` are DEFINED AND NOT REGISTERED in
+ * `DESTINATIONS` or `DESTINATION_TONES`. The same handling ACAPULCO has, for
+ * the same reason and by the same argument: an agent may draft a room and may
+ * not admit one (rule 8, rule 13). Wiring it as drafted turns three tests red,
+ * and turning a test green by making a founder's decision on her behalf is the
+ * worse of the two failures.
+ *
+ * The three, each measured rather than predicted:
+ *
+ *   1. THIRTEEN TONES AGAINST A CAP OF TEN. See above. Hers to cut, or hers to
+ *      move the cap.
+ *
+ *   2. SEVEN OF HER THIRTEEN ARE `draft: true` — `feeds_you_first`,
+ *      `eat_before_you_speak`, `the_same_stories`, `marvels_out_loud`,
+ *      `shows_you_things`, `finishes_your_sentences`, `bigger_every_telling`.
+ *      They were coined for OAXACA and ACAPULCO and no host has ever been shown
+ *      one. The test says it in the right words: "these are still marked draft
+ *      but a destination now claims them — clear the flag so the assertion
+ *      above covers them". Clearing a draft flag PUTS A NEW TILE IN THE QUIZ,
+ *      which is a member-facing act and squarely rule 13. Note the shape of the
+ *      trap, which is rule 16's: leaving them draft and wiring the room anyway
+ *      would let a host tap nothing that reaches this house, while the room
+ *      itself scores as though she had.
+ *
+ *   3. VOICE AFFINITY 0.817 WITH HAVANA, against a ceiling of 0.65. Not a
+ *      three-coast failure — PORTOFINO is 0.116 and COTE D'AZUR 0.055, the two
+ *      lowest numbers in the field after Westhampton, so the wall the brief
+ *      asked for holds by a distance. ACAPULCO is 0.477. The collision is with
+ *      the other warm, loud, plain-spoken room, and the two rooms are also at
+ *      structural distance 3 — at the gate, zero margin, per `check:matrix`.
+ *
+ *      NO AGENT-REACHABLE LEVER FIXES IT, and this was searched rather than
+ *      assumed. Every leave-one-out: best 0.773. Every cut to ten, nine or
+ *      eight: best 0.797. Every formality in the type: best 0.758, at
+ *      `ceremonial`, which is untrue to a house that says sit and eat. Raising
+ *      the whole ceremony axis and stripping the warmth echo: 0.764. The floor
+ *      reachable from her thirteen codes is above the ceiling, so the ruling is
+ *      a real one and not a tuning job.
+ *
+ *      THE TWO HONEST ANSWERS, neither an agent's. Give the room a claim HAVANA
+ *      does not make — Havana is `no_speeches` at 0.6 where this house raises a
+ *      glass, and that opposition is the only one inside her own list, but it
+ *      is worth 0.025 at full stretch. Or rule on the ceiling itself: 0.65 was
+ *      set against TWELVE rooms whose own worst pair is 0.580
+ *      (nantucket/portofino), and ACAPULCO breached it at 0.846 the same week.
+ *      Two of two new warm-and-loud rooms breaching is a statement about how
+ *      full that corner of the catalogue is, not two coincidences.
+ *
+ * TO LAND IT once she has ruled, the diff is two lines — add
+ * `"amalfi-1953": AMALFI_1953,` to `DESTINATIONS` and
+ * `"amalfi-1953": AMALFI_1953_TONES,` to `DESTINATION_TONES`.
+ *
+ * `npm run check:voice-output` resolves its slug through `DESTINATIONS`, so it
+ * cannot be pointed at this room until those lines exist. The refusals above
+ * WERE run against a temporarily wired build and every one of her nine fires:
+ * `menu`, `cuisine`, `portion`, `rustic`, `artisanal`, `Mediterranean`,
+ * `reservation` and `guests` as displaced terms, `authentic` as a house-wide
+ * refusal, and `Mediterranean`/`rustic`/`artisanal` a second time as never-rule
+ * terms. A line implying staff is caught by shape proximity rather than
+ * lexically, which is why that refusal is in `rejected` and not only in
+ * `never`. NOTE FOR WHOEVER MAINTAINS THAT SCRIPT: it reads `insteadOf` and
+ * `never` and does NOT read `voice.banned`, so a word parked in `banned` alone
+ * is a refusal nothing enforces. That is why every one of her nine appears in a
+ * lexicon entry as well.
+ */
+export const AMALFI_1953_TONES: readonly ToneWeight[] = [
+  { code: "feeds_you_first", weight: 1 },
+  { code: "eat_before_you_speak", weight: 0.9 },
+  { code: "marvels_out_loud", weight: 0.9 },
+  { code: "all_at_once", weight: 0.8 },
+  { code: "the_same_stories", weight: 0.7 },
+  { code: "first_names", weight: 0.7 },
+  { code: "laughs_first", weight: 0.7 },
+  { code: "rises_to_greet", weight: 0.6 },
+  { code: "bigger_every_telling", weight: 0.6 },
+  { code: "interrupts", weight: 0.5 },
+  { code: "finishes_your_sentences", weight: 0.5 },
+  { code: "shows_you_things", weight: 0.5 },
+  { code: "toasts", weight: 0.4 },
+];
+
+/* ── AMALFI IS AUTHORED AND IS NOT IN `DESTINATIONS`. READ THIS ───────
+ *
+ * THIS PARAGRAPH WAS MISSING. Acapulco, Aspen and Palm Springs each carry a
+ * block saying why they are not keyed in; Amalfi was left out of
+ * `DESTINATIONS` with the refusal stated nowhere, so a reader arriving at the
+ * two complete consts above had to infer it from an absence — which is
+ * CLAUDE.md rule 3's failure and rule 16's, in the file that argues both.
+ * Written now rather than left for whoever notices next.
+ *
+ * The two consts above are complete and reviewable and they are deliberately
+ * NOT keyed into `DESTINATIONS` or `DESTINATION_TONES` below. Rule 8 — an
+ * agent produces a draft; activation is hers.
+ *
+ * WIRING IT IN WAS MEASURED, 2026-08-27, after the ceiling recalibration. With
+ * her thirteen tones exactly as written, `npm test` goes from 343 pass / 0 fail
+ * to 341 / 2:
+ *
+ *   "a destination's tones are real, weighted legally, and few" — THIRTEEN
+ *   TONES against a documented maximum of ten. She gave thirteen and no
+ *   numbers; the weights are the agent's and the codes are hers.
+ *
+ *   "every tone is claimed by at least one destination" — SEVEN of the
+ *   thirteen still carry `draft: true` in src/lib/voice.ts:
+ *   `feeds_you_first`, `eat_before_you_speak`, `marvels_out_loud`,
+ *   `the_same_stories`, `bigger_every_telling`, `finishes_your_sentences`,
+ *   `shows_you_things`. Promotion is the four-file job written out in the
+ *   ACAPULCO block, and the third file is a cut SVG that does not exist for
+ *   any of the seven. This room owes the largest art bill in the library.
+ *
+ * AND NOT ON AFFINITY, WHICH IS WHAT CHANGED. AMALFI/HAVANA at 0.817 was a
+ * breach under the old flat 0.80 and passes under the recalibrated monitor
+ * ceiling of 0.92. The two rooms share exactly ONE tone code — `laughs_first`
+ * — which is 0.143 of the smaller hand against a guard of 0.80, so the
+ * instrument that detects a copied room does not fire either: this is a kinship — two warm houses at
+ * structural distance 3 — and the numbers now say so instead of refusing it.
+ * The stated triple (plain/second_person/warm) is unique.
+ *
+ * TO LAND IT, once the founder has ruled on the tone count: add
+ * `"amalfi-1953": AMALFI_1953,` to `DESTINATIONS` and
+ * `"amalfi-1953": AMALFI_1953_TONES,` to `DESTINATION_TONES`, plus the seven
+ * promotions. THE THREE CUTS RECOMMENDED AND NOT MADE, argued from register
+ * rather than from the measurement, per her instruction that none be cut:
+ *
+ *   `toasts` (0.4) — the lowest weight, and this room's ceremony is carried by
+ *   the PLATE, not the glass. The liqueur at the end arrives because nobody
+ *   asked, which is the opposite of a raised glass.
+ *   `shows_you_things` (0.5) — Acapulco's signature move, elbow and all. This
+ *   room's gesture travels toward the guest; that one turns the guest toward
+ *   something. Keeping both blurs the border her own gesture note draws.
+ *   `finishes_your_sentences` (0.5) — `all_at_once` (0.8) and `interrupts`
+ *   (0.5) already hold the overlapping-volume claim. This is the third way of
+ *   saying one thing, which is exactly what the cap exists to stop.
+ *
+ * Those three would also cut the art bill from seven marks to five.
+ */
+
+/**
+ * ASPEN, 1994.
+ *
+ * ── WHAT IS HERS AND WHAT IS MINE ────────────────────────────────────
+ *
+ * The founder supplied, VERBATIM and not to be improved: the twelve tone
+ * codes, the claimed pair that defines the room, the list of REFUSED tiles and
+ * the reason, the whole `voice` stance block (speaker, selfReference,
+ * audience, address, cadence, humour, punctuation and the lexicon's
+ * refusals with their replacements), the gesture invariant, the deliverables
+ * sheet quoted below, the matching claims, the taste-direction flag, her
+ * borders, and her own rule-25 working.
+ *
+ * DRAFTED BY AN AGENT, and marked as such at every site: the `premise` (she
+ * gave none — two options were written, one is below and the other is in the
+ * handover report), the `tagline`, `ASPEN_1994_LOOK`, the `register`,
+ * `orthography`, `sentence`, the `formulae`, the `banned` list, the
+ * `rejected` examples, the `always`/`never` rules, the exemplars, and every
+ * WEIGHT in `ASPEN_1994_TONES`. She gave twelve codes and no numbers.
+ * CLAUDE.md rule 8: this is a draft and the signature is hers.
+ *
+ * ── THE CLAIMED PAIR ─────────────────────────────────────────────────
+ *
+ * `the_same_stories` — the recitable movie, the beloved repeats — and
+ * `comfortable_silence` — the couch stretch. Her words. They are the top two
+ * weights below and everything else is subordinate to them.
+ *
+ * ── THE REFUSAL. THIS IS A BORDER, NOT A PREFERENCE ──────────────────
+ *
+ * REFUSED TILES: `makes_an_entrance`, `bigger_every_telling`,
+ * `impeccably_polite`, `dressed_up`, `seating_plan`, `understated`,
+ * `low_voices`. Her reason, verbatim: "the St. Moritz hand stays refused."
+ *
+ * It is written here rather than left implicit because the failure mode is
+ * specific and predictable: a later agent reads ASPEN, 1994, thinks ski
+ * resort, and adds `dressed_up` — and the room stops being the border it was
+ * admitted to hold. St. Moritz 1984 is formality; this room is sweatpants.
+ * The seven tiles above are the mechanism of that separation and removing any
+ * of them is a founder's act, not an improvement to a list.
+ *
+ * ── HER DELIVERABLES SHEET, PRESERVED WHOLE ──────────────────────────
+ *
+ * Quoted into `exemplars` where the schema has a home for it, and kept entire
+ * here because the register lives in it more exactly than in anything derived
+ * from it:
+ *
+ *   "The walls: crossed skis over the mantel, snowshoes hung like they mean
+ *   it, the sled by the door nobody's used in years. Plaid blankets in a stack
+ *   that will not stay stacked.
+ *   What to wear: leggings, wool socks, the big sweatshirt — whoever's it was,
+ *   it's yours now.
+ *   What there is: whatever gets made while dancing — one big pot, garlic
+ *   bread, the box of good chocolate that's suddenly gone. Box wine promoted
+ *   to glasses, cocoa if it snows.
+ *   What's playing: the '94 radio — Whitney, TLC, Ace of Base — until the
+ *   movie starts. The movie is one half of you can recite. This is correct."
+ *
+ * ── HER MATCHING CLAIMS, WHICH HAVE NO SCHEMA HOME HERE ──────────────
+ *
+ * Occasions: girls' weekend, birthday, getaway, holiday, no reason at all.
+ * Environment: the mountains, a rented house, my home.
+ * Meal: dinner, a late supper.
+ * Group fun: crowd into the kitchen, dance without being asked twice, sing
+ * badly on purpose, get genuinely competitive.
+ * RUINS IT: a costume rule, a schedule that runs the day, being photographed
+ * all night, more people than we know.
+ * Wants more of: permission to stay up, an inside joke made real, a ritual
+ * repeated next year.
+ *
+ * Three of those four ruins-it clauses are enforced in `never` below. The
+ * fourth — more people than we know — is enforced in `audience`, which is why
+ * that field says the room is CLOSED rather than merely small.
+ *
+ * ── THE GESTURE (THE INVARIANT) ──────────────────────────────────────
+ *
+ * THE BLANKET MIGRATION: everyone ends up under the same two blankets,
+ * regardless of how many the house owns. Hers. It is the tagline, it is a
+ * formula, it is an exemplar, and it is the last line of the premise, because
+ * an invariant that appears once is a detail and an invariant that appears
+ * four times is the room.
+ *
+ * ── TASTE DIRECTION: "AMERICANA BACKYARD", FLAGGED BY HER AS A STRETCH
+ *
+ * Recorded exactly as she flagged it. It is the NEAREST of the eleven
+ * available taste directions and it is not a clean fit — a backyard in
+ * Americana is outdoors, daylight and summer, and this room is indoors, dark
+ * by five and winter. It is written down as a KNOWN STRETCH so that nobody
+ * later reads the tag as evidence of anything, and it is noted for the
+ * vocabulary's next revision in docs/proposals.md, 2026-08-27.
+ *
+ * Nothing in the catalogue is tagged in `taste_direction` yet (proposals.md,
+ * 2026-08-23), so this costs nothing today. It costs something the day the
+ * tagging pass runs, which is the day to read this paragraph.
+ *
+ * ── HER BORDERS ──────────────────────────────────────────────────────
+ *
+ * ST. MORITZ 1984 — formality against sweatpants, enforced in the seven
+ * refused tiles above and in the `never` rule that names them.
+ *
+ * CATSKILLS 1963 — summer porch against winter indoors. AND: the '94
+ * soundtrack is a MATRIX ASSET NO OTHER ROOM MAY CLAIM. Her ruling, and it is
+ * the only exclusive of its kind written down for this room.
+ *
+ * OAXACA 1954 — established prior: nothing kitchen-ancestral in this condo.
+ * The pot here was made this afternoon by whoever was in the kitchen, and
+ * there is no grandmother in it.
+ *
+ * ── HER OWN RULE-25 WORKING, KEPT ────────────────────────────────────
+ *
+ * 1. BOOKABLE SIZE. A living room anywhere in winter, no slopes required.
+ *    "The day" is whatever came before — there is no skiing in this
+ *    destination and there never was.
+ * 2. NO PROPER NOUN A GUEST WOULD NOT SAY. Whitney and the bands survive
+ *    because she would say them out loud in this kitchen. Resort names do not
+ *    appear, and neither does a mountain.
+ * 3. NO STAFF OR LABOUR. One pot, made while dancing. Whoever's closest hands
+ *    it over.
+ *
+ * ── THE THREE MATRIX CELLS HER MATERIAL DISAGREES WITH ───────────────
+ *
+ * MEASURED, NOT RESOLVED. `data/destination-matrix.json` was not touched.
+ * The committed row is `absorbed · posted · overlapping · plain · cooked ·
+ * clean_stop · afternoon · crowd · nothing`, and her material disagrees three
+ * times: she says the night DISSOLVES where the row says `clean_stop`; she
+ * says dinner and a late supper where the row says `afternoon`; and she puts
+ * "a schedule that runs the day" under RUINS IT, which sits oddly against
+ * `posted`.
+ *
+ * Every flip was run through a byte-identical copy of `scripts/audit-matrix.mjs`
+ * against a scratch copy of the matrix outside the repo, and the full numbers
+ * are in the handover report. The short form, because it decides whether this
+ * room can hold the borders it was admitted for:
+ *
+ *   ending = dissolves      Aspen/CATSKILLS tightens 4 -> 3, exactly the gate.
+ *                           Aspen/OAXACA goes 2 -> 1, so the declared twin
+ *                           narrows to the same distance as Havana/New
+ *                           Orleans. No undeclared pair falls below the gate.
+ *                           The cheapest of the three flips.
+ *
+ *   starts = evening        Aspen/ST. MORITZ tightens 4 -> 3, exactly the
+ *                           gate — and it is not free. Aspen lands at 2
+ *                           against BOTH New Orleans and Havana, undeclared,
+ *                           and that DESTROYS THE HAVANA/NEW ORLEANS TWIN,
+ *                           which is the precedent instance of the twin rule.
+ *                           Aspen would then sit below the gate against three
+ *                           rooms at once: a crowded corner, not a pair.
+ *
+ *   schedule != posted      Three candidate levels, three different outcomes.
+ *                           `standing` is the only one that breaks nothing;
+ *                           `anchored` and `unplanned` each open two
+ *                           undeclared sub-gate pairs. `standing` still costs
+ *                           Aspen/OAXACA 2 -> 1.
+ *
+ *   ending + schedule=standing together puts Aspen and Oaxaca at DISTANCE 0 —
+ *   one room written twice, which the twin rule forbids by name. (The audit
+ *   does not print that violation: its zero-distance check reads `t.d` on a
+ *   declared twin where the JSON writes `distance`, so the check is inert.
+ *   Reported; not fixed here, because the matrix and its audit are not this
+ *   room's territory.)
+ *
+ * NOTHING WAS CHANGED. Rule 7: the numbers above come from the committed
+ * script and the founder rules on the cells.
+ */
+const ASPEN_1994_LOOK: Theme = {
+  key: "aspen-1994",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  // PROVISIONAL — DRAFTED BY AN AGENT AND NOT FOUNDER-SIGNED.
+  //
+  // Wool, lamplight and the blue outside the window at five o'clock. The
+  // oxblood is the red in a plaid blanket rather than a lacquer; the aqua is
+  // cold window-light and is the only cold thing in the set, because the room
+  // is warm and the outside is the reason it reads that way. Deliberately NOT
+  // Catskills' canvas-and-pine, which is the same family of comfort in the
+  // opposite season, and deliberately not St. Moritz's register at all.
+  //
+  // A palette is a founder-signed surface (rule 13). These values are a
+  // starting position for that conversation, not a result.
+  palette: {
+    ground: "#F2EADA",
+    ground2: "#E3D6C0",
+    ink: "#221D19",
+    inkSoft: "#544A40",
+    inkFaint: "#8A7E70",
+    rule: "#CFC0A6",
+    aqua: "#33607A",
+    oxblood: "#A6402F",
+    gold: "#C99433",
+    night: "#171C21",
+    night2: "#0F1317",
+    nightInk: "#F1E7D6",
+    nightSoft: "#ADA08E",
+    nightAqua: "#79AECA",
+    nightOxblood: "#E08256",
+    bone: "#F8F3E7",
+  },
+  paletteDark: {
+    ground: "#0F1317",
+    ground2: "#171C21",
+    ink: "#F1E7D6",
+    inkSoft: "#ADA08E",
+    inkFaint: "#7C7466",
+    rule: "#2B333A",
+    aqua: "#79AECA",
+    oxblood: "#E08256",
+    gold: "#DCAA45",
+  },
+};
+
+export const ASPEN_1994: Destination = {
+  key: "aspen-1994",
+  name: "ASPEN, 1994",
+  // DRAFTED. The gesture invariant, said as plainly as it can be said, after
+  // the one fact about the evening everybody in the room already knows. An
+  // alternative is in the handover report and neither is signed.
+  tagline: "Half of you can recite the movie. Everybody ends up under the same two blankets.",
+  // DRAFTED — she gave no premise. OPTION A of two; option B is in the
+  // handover report, and CLAUDE.md rule 14 says the loser is kept rather than
+  // deleted, so it is preserved there rather than dropped.
+  //
+  // Written under rule 25 and checked against all three of its tests, plus
+  // the thrown-ness rule in docs/destination-contrasts.md, which the previous
+  // Aspen draft failed and was rewritten for:
+  //
+  //   BOOKABLE SIZE — every line survives in a one-bedroom in Queens in
+  //   February. There is no mountain, no slope, no lift and no view. "Dark by
+  //   five" is the only weather claim and it is true of any northern winter.
+  //   Her own working: a living room anywhere in winter, no slopes required.
+  //
+  //   NO PROPER NOUN — none at all in the premise. The bands are hers and are
+  //   allowed, and they live in the exemplars and the orthography rule
+  //   instead, where they are somebody naming a song rather than the page
+  //   dating itself.
+  //
+  //   NO STAFF — one pot, made while dancing. The chocolate was bought, the
+  //   blankets were pulled out, the pot was made; all three are the host's own
+  //   hands and all three happened before anybody sat down.
+  //
+  //   THROWN, NOT OCCURRING — the first sentence is the host doing something
+  //   in advance on purpose. Without it this premise is a description of
+  //   weather and a couch, which is the exact failure the earlier draft made.
+  premise:
+    "The blankets come out of the closet before anybody arrives and the good " +
+    "chocolate was bought for tonight. It's dark by five and nobody is going " +
+    "anywhere.\n\n" +
+    "Dinner is one pot, made while everybody dances in the kitchen and gets " +
+    "in the way. Garlic bread. Box wine, promoted to glasses. Cocoa if it " +
+    "snows.\n\n" +
+    "Then the movie, and half of you can recite it, and the half that can " +
+    "does. However many blankets this house owns, everybody ends up under the " +
+    "same two.\n\n" +
+    "Somebody says one more episode. Somebody's asleep. Nobody goes to bed " +
+    "until the last one does, and whoever said they were up early is up early " +
+    "anyway.",
+  look: ASPEN_1994_LOOK,
+  voiceVersion: 1,
+  voice: {
+    // HERS.
+    speaker: "The house at night — the kitchen, then the couch.",
+    // HERS.
+    selfReference: ["the house", "in here"],
+    // HERS, and the second clause is the border, not a description of size.
+    // "More people than we know" is on her ruins-it list by name, so this
+    // field is where that veto is enforced: the room is CLOSED. A piece
+    // written to a wider audience than this one has broken the destination
+    // and not merely widened it.
+    audience:
+      "the group and only the group — this room is closed, and more people " +
+      "than we know ruins it",
+    address: {
+      // DRAFTED: the mode is the type's name for what she described.
+      mode: "second_person",
+      // HERS.
+      note:
+        "Second person, familiar, conspiratorial — the friend patting the " +
+        "cushion next to her. Never used to persuade and never used to " +
+        "instruct; it is used to make room.",
+    },
+
+    // DRAFTED, from her speaker line.
+    register:
+      "Something called from the kitchen over the music, to people who are " +
+      "already inside and already have a drink.",
+    // HERS in substance: "nothing formal survives the doorway". `familiar` is
+    // the type's word for it — this is the house with its own private
+    // language, which is exactly what `familiar` names.
+    //
+    // FOUNDER-PENDING, AND IT IS A REGISTRATION BLOCKER. familiar +
+    // second_person + warm is CATSKILLS's stated triple exactly, and
+    // voice.test.ts asserts every triple is distinct. See the block below
+    // `ASPEN_1994_TONES`, and docs/needs-a-human.md item 11, which recorded
+    // this collision before this room was drafted.
+    formality: "familiar",
+    // HERS.
+    cadence:
+      "Short, warm, interruptible; sentences that sound called from the " +
+      "kitchen over music.",
+    // DRAFTED. The shortest typical in the library and a low ceiling with it,
+    // because "interruptible" is a length claim as much as a rhythm one: a
+    // sentence nobody can talk over is a sentence this room would not finish.
+    sentence: { typicalWords: 8, maxWords: 16 },
+    // HERS, and the last sentence is the agent's reading of "casual".
+    punctuation:
+      "Casual; contractions everywhere; nothing formal survives the doorway. " +
+      "Dashes and fragments are fine, because this is talk. No exclamation " +
+      "points — the room is already loud and the mark would be the page " +
+      "trying to be.",
+    // DRAFTED.
+    orthography:
+      "Hours the way somebody says them out loud: after dinner, one more, " +
+      "late, in the morning. Songs and bands keep their own spelling, because " +
+      "they are names a person says in this kitchen — the '94 radio is on the " +
+      "page and the year is nowhere else. No resort name, no mountain, no " +
+      "lift, no place at all. Headings in full caps; nothing else capitalised " +
+      "for emphasis.",
+
+    humour: {
+      // DRAFTED FROM HER WORDS, AND FOUNDER-PENDING. She wrote "teasing and " +
+      // "the bit". `warm` is the closest value in the enum and it is the same
+      // coercion docs/needs-a-human.md item 11 already recorded for this room
+      // ("self-deprecating bravado — none; coerced to warm"). It is not a
+      // clean fit: the enum's own comment says the mode is THE MECHANISM AND
+      // NOT THE TEMPERATURE, and the mechanism here is a bit carried past the
+      // point of sense by consensus, which is nearer `absurd` than `warm`. The
+      // agent did not make that swap, because swapping it would also make the
+      // triple collision above disappear, and a value chosen because it fixes
+      // a test is the retro-tagging failure this project exists to escape.
+      mode: "warm",
+      // HERS, with the mechanism spelled out.
+      mechanism:
+        "Teasing and the bit. Somebody starts doing the voice and does not " +
+        "stop; the movie gets said along with; everybody is the joke in turn " +
+        "and nobody minds, because being teased here is the proof of being one " +
+        "of us. The bit is never explained and never dropped.",
+    },
+
+    // HERS — every `term` and every refusal in `insteadOf` is her list. The
+    // glosses are the agent's.
+    lexicon: [
+      {
+        term: "the couch",
+        gloss: "where the evening ends up. Big enough for more people than should fit, which is the point",
+        insteadOf: ["cozy", "cosy", "the lounge", "the den", "the seating"],
+      },
+      {
+        term: "the good blanket",
+        gloss: "the one everybody wants. There are others and nobody wants those",
+        insteadOf: ["luxe", "the throw", "the cashmere"],
+      },
+      {
+        term: "whoever's closest",
+        gloss:
+          "who does the thing — the lamp, the door, the next bowl. Nobody is asked and nobody is waited on",
+        insteadOf: ["the host", "somebody will bring it", "service", "served"],
+      },
+      {
+        term: "one more episode",
+        gloss: "the only unit of time this house keeps. It is never the last one",
+        insteadOf: ["schedule", "itinerary", "the agenda", "what's next"],
+      },
+      {
+        term: "the song",
+        gloss: "whatever is on, loud, that everybody already knows the words to",
+        insteadOf: ["vibes", "the playlist", "the soundtrack", "the mood"],
+      },
+      {
+        term: "warm",
+        gloss:
+          "the whole feeling of the room, said in one plain word. The house has exactly one word for this and this is it",
+        insteadOf: ["cozy", "cosy", "chalet", "après", "apres", "girls' night"],
+      },
+      {
+        term: "in here",
+        gloss: "this room, as against everywhere else. The house's own name for itself",
+        insteadOf: ["the chalet", "the lodge", "the cabin", "the property"],
+      },
+      {
+        term: "the big sweatshirt",
+        gloss: "whoever's it was, it's yours now. The dress code, stated as an object rather than a rule",
+        insteadOf: ["loungewear", "the dress code", "what to wear"],
+      },
+    ],
+
+    // DRAFTED. Frames she already wrote twice between them are the ones kept.
+    formulae: [
+      "{Whoever's closest} does {the small thing}. Nobody is asked.",
+      "Half of you can {recite it}. The half that can, does.",
+      "However many {things} this house owns, everybody ends up under the same two.",
+      "Somebody says one more {episode, song, hand}.",
+      "It's {what got made while dancing}. Take a bowl.",
+      "Nobody's going anywhere.",
+      "Whoever said they were {up early} is {up early} anyway.",
+      "{The thing everybody already knows}. This is correct.",
+    ],
+
+    // DRAFTED. Her six refusals first, then the words the seven refused tiles
+    // would smuggle back in, then the house-wide list every room carries.
+    banned: [
+      "cozy",
+      "cosy",
+      "chalet",
+      "après",
+      "apres",
+      "apres-ski",
+      "luxe",
+      "girls' night",
+      "girls trip",
+      "vibes",
+      "dress code",
+      "black tie",
+      "seating plan",
+      "makes an entrance",
+      "the slopes",
+      "the mountain",
+      "lodge",
+      "hygge",
+      "pamper",
+      "wellness",
+      "itinerary",
+      "schedule",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    // DRAFTED.
+    signOffs: [
+      "Nobody's going anywhere.",
+      "The couch, whenever you're ready.",
+      "Same two blankets.",
+      "Door's open. It's warm in here.",
+    ],
+
+    // DRAFTED, from her stance block.
+    always: [
+      "Contract everything. Nothing formal survives the doorway.",
+      "Let whoever's closest do it. Nobody in this house is served and nobody is asked what they would like.",
+      "Say the bit. Do the voice. The joke is on all of us in turn, and that is how this house says you belong.",
+      "Keep the room closed. Write to these people and to nobody else — the audience line is a border, not a size.",
+      "Let a line be interrupted. Half a sentence called from the kitchen is the register, and a finished paragraph is somebody else's house.",
+    ],
+
+    // DRAFTED. Every rule here is one of her refusals or one of her ruins-it
+    // clauses, and none is an agent's taste.
+    never: [
+      "Never an exclamation point. The room is already loud.",
+      "Never cozy, never chalet, never luxe, never girls' night, never vibes. Say the couch, the good blanket, whoever's closest, one more episode, the song, warm.",
+      "Never dress the room up. No dress code, no seating plan, no entrance to make, no low voices, nobody impeccably polite — THE ST. MORITZ HAND STAYS REFUSED, and a later hand that adds dressed_up because this looks like a ski room has undone a border rather than improved a list.",
+      "Never a schedule, never an itinerary. A day that runs to a plan is on her ruins-it list by name, and the only unit of time this house keeps is one more episode.",
+      "Never a costume rule. Also on that list, and the reason the dress instruction here is an object — the big sweatshirt — rather than a rule.",
+      "Never photograph the night. Being photographed all night is on that list too, so no line invites a camera and none records one.",
+      "Never widen the room. More people than we know is the fourth thing on that list, and a line written to a crowd has broken this destination.",
+      "Never a mountain, a slope, a lift or a resort. There is no skiing in this destination and there never was; the skis are on the wall and the sled has not moved in years.",
+      "Never imply anybody is carrying a tray. One pot, made while dancing, and whoever's closest hands it over.",
+      "Never explain the bit, the in-joke, or why that movie.",
+      "Never name the feeling. Warm is the one word this house has for it and it is a fact about the room, not a promise about the reader.",
+      "Never use italics.",
+    ],
+
+    // DRAFTED.
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or be safe: the road, ice, who is driving, a hospital, an allergy, a medication, what is in the pot. Fact first, fewest words, and a clock hour if one is genuinely needed.",
+      "Anything about money.",
+      "Any message that lets somebody go — a decline, an early night, a way off a list. Written straight and made easy, because a house that will not let you leave is not warm.",
+    ],
+
+    // Every exemplar marked HER SHEET is quoted from the deliverables sheet
+    // above, unaltered. The rest are drafted to the same frames.
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Nobody's going anywhere. Come when you get here.",
+      },
+      {
+        piece: "invitation",
+        text: "Leggings, wool socks, the big sweatshirt — whoever's it was, it's yours now.",
+        note: "HER SHEET, verbatim. The dress instruction as an object rather than a rule, which is what keeps a costume rule off the page.",
+      },
+      {
+        piece: "invitation",
+        text: "Bring nothing. There's a pot on and the blankets are already out.",
+      },
+      {
+        piece: "invitation",
+        text: "It's dark by five and the good chocolate is already in the house.",
+      },
+      {
+        piece: "menu_item",
+        text: "One big pot, made while everybody's dancing. Garlic bread.",
+        note: "HER SHEET. The whole of rule 25's third test in one line: made in advance, by the people in the room, and nobody serves it.",
+      },
+      {
+        piece: "menu_item",
+        text: "The box of good chocolate that's suddenly gone.",
+        note: "HER SHEET, verbatim.",
+      },
+      { piece: "menu_item", text: "Box wine, promoted to glasses." },
+      { piece: "menu_item", text: "Cocoa if it snows." },
+      {
+        piece: "notice",
+        text: "What's playing: the '94 radio — Whitney, TLC, Ace of Base — until the movie starts.",
+        note: "HER SHEET, verbatim. The three names are the only proper nouns this destination may write, because they are names somebody says out loud in this kitchen. HER RULING: the '94 soundtrack is a matrix asset no other room may claim.",
+      },
+      {
+        piece: "notice",
+        text: "The movie is the one half of you can recite. This is correct.",
+        note: "HER SHEET, verbatim, including the ruling at the end of it.",
+      },
+      {
+        piece: "notice",
+        text: "However many blankets this house owns, everybody ends up under the same two.",
+        note: "The gesture invariant.",
+      },
+      {
+        piece: "house_note",
+        text: "The walls: crossed skis over the mantel, snowshoes hung like they mean it, the sled by the door nobody's used in years.",
+        note: "HER SHEET, verbatim. Note what it is not: equipment on a wall, not a slope in the copy.",
+      },
+      {
+        piece: "house_note",
+        text: "Plaid blankets in a stack that will not stay stacked.",
+        note: "HER SHEET, verbatim.",
+      },
+      {
+        piece: "house_note",
+        text: "The couch is the good one. Whoever's closest gets the lamp.",
+      },
+      {
+        piece: "place_card",
+        text: "Nobody's assigned anywhere. Somebody pats the cushion.",
+        note: "The refused tile `seating_plan`, said as the room's own practice rather than as a rule about seating.",
+      },
+      { piece: "place_card", text: "Squid — the corner of the couch, as always." },
+      {
+        piece: "game_rule",
+        text: "Everybody does somebody's voice. Whoever gets guessed first picks the next episode.",
+      },
+      {
+        piece: "game_rule",
+        text: "Say the next line before it happens. Miss it and you're on garlic bread.",
+      },
+      {
+        piece: "bulletin",
+        text: "Snowed. Cocoa's on. Nobody's leaving.",
+      },
+      {
+        piece: "bulletin",
+        text: "Two of us were up at seven. Nobody asked them to be.",
+      },
+      { piece: "heading", text: "WHAT THERE IS" },
+      { piece: "heading", text: "WHAT'S PLAYING" },
+      { piece: "heading", text: "ONE MORE EPISODE" },
+      { piece: "sign_off", text: "Nobody's going anywhere." },
+      { piece: "sign_off", text: "Same two blankets." },
+    ],
+
+    // DRAFTED. Every one is derived from a refusal she wrote, and the `why`
+    // names which refusal. These are the near edge of the voice and they are
+    // what `npm run check:voice-output` reads.
+    rejected: [
+      {
+        text: "A cozy night in, just the girls.",
+        why: "Two refusals in six words. Cozy is a word for selling a candle; the house says warm, the couch, the good blanket. And girls' night is a label put on the room from outside it — in here it is these people, who have names.",
+      },
+      {
+        text: "Après-ski by the fire, with something hot in your hands.",
+        why: "Après is the hour after a thing nobody here did. There is no skiing in this destination and there never was — the skis are crossed over the mantel and the sled has not moved in years.",
+      },
+      {
+        text: "A chalet weekend: think plaid, think luxe.",
+        why: "Chalet and luxe, and then a dress instruction. It sells a location, which rule 25 forbids outright, and it dresses a room whose entire claim is the big sweatshirt.",
+      },
+      {
+        text: "Girls' night vibes all weekend long.",
+        why: "Two banned words and not one fact. Vibes is what a page writes when it has nothing; the facts here are one pot, the same two blankets, and the movie half of you can recite.",
+      },
+      {
+        text: "Dinner will be served at eight, followed by cocktails in the lounge.",
+        why: "Somebody is carrying a tray in that sentence and nobody here is. Whoever's closest hands it over, the pot was made while everybody danced, and nothing in this house has a lounge.",
+      },
+      {
+        text: "Saturday's schedule: brunch at ten, spa at two, dinner at seven.",
+        why: "A schedule that runs the day, which is on her ruins-it list by name. The only unit of time this house keeps is one more episode.",
+      },
+    ],
+  },
+};
+
+/**
+ * ASPEN's voice, said in the tones a host is shown.
+ *
+ * TWELVE CODES ARE HERS, VERBATIM AND IN HER ORDER. EVERY WEIGHT IS THE
+ * AGENT'S. She gave no numbers, and the rule used to produce them is stated so
+ * it can be argued with rather than guessed at:
+ *
+ *   THE CLAIMED PAIR TAKES THE TOP TWO. `the_same_stories` and
+ *   `comfortable_silence` are, in her words, the pair that defines the room —
+ *   the recitable movie and the couch stretch.
+ *
+ *   THE REMAINING TEN KEEP HER LISTED ORDER, DESCENDING. Her list was
+ *   in_jokes · nicknames · does_the_voice · teasing · laughs_first ·
+ *   finishes_your_sentences · swears_fondly · no_dead_air · closes_the_bar ·
+ *   up_early_anyway, and that is the order below. It is a weak signal and it
+ *   is an honest one; the alternative was an agent ranking her room by ear.
+ *
+ * NO TILE WAS CUT, which she asked for by name. Twelve is two more than
+ * voice.test.ts allows a destination, and that is reported rather than solved
+ * by dropping the two she would miss least.
+ *
+ * ── THE TEN-TONE CAP, AND WHAT CUTTING ACTUALLY DOES ─────────────────
+ *
+ * The cap is HARD: `tones.length <= 10` fails outright, it is not a range.
+ * Twelve therefore needs TWO cuts to be registerable at all, and the choice is
+ * hers. What an agent can do is measure, so that the choice is made against
+ * numbers rather than against a hunch. Every subset was enumerated.
+ *
+ * FIRST, THE THING THAT MUST BE SAID BEFORE ANY CUT IS PROPOSED: CUTTING DOES
+ * NOT FIX THE AFFINITY, AND FIVE OF THE TWELVE POSSIBLE SINGLE CUTS MAKE IT
+ * WORSE. Dropping `finishes_your_sentences` moves Aspen/Catskills from 0.893
+ * to 0.926; `no_dead_air` to 0.912; `laughs_first` to 0.911; `closes_the_bar`
+ * to 0.898; `does_the_voice` moves it not at all. Those five are the tiles
+ * that make this room UNLIKE Catskills, so removing one removes a difference,
+ * and the cosine goes up. A cut list chosen for tidiness would land on exactly
+ * those, because they are the ones that look least essential.
+ *
+ * AND NO CUT REACHES THE CEILING. Exhaustively, over all 66 ten-tone subsets
+ * the floor is 0.787; over all 220 nine-tone subsets it is 0.713. Both are
+ * above 0.65, and the best nine-tone subsets all require dropping
+ * `the_same_stories` — half of her claimed pair. So the cap and the ceiling
+ * are TWO SEPARATE PROBLEMS and the cut only answers the first one.
+ *
+ * WITH THAT SAID, THE TWO AN AGENT WOULD PUT TO HER, ARGUED ON REGISTER AND
+ * NOT ON THE NUMBER:
+ *
+ *   `nicknames` — Catskills owns this one at full weight and it is that
+ *   room's signature: "Everybody gets a name in the first hour. You do not
+ *   choose yours." A camp ASSIGNS a name; this house INHERITED one years ago
+ *   and nobody remembers who started it. The tile cannot tell those apart, so
+ *   Aspen spends a claim here and gets Catskills' meaning back. `in_jokes`
+ *   already carries the private-language fact for this room.
+ *
+ *   `swears_fondly` — the faintest of the twelve and the one nearest to
+ *   restating something the voice already states outright. It is carried
+ *   entirely by "nothing formal survives the doorway", which is
+ *   `formality: familiar`, said once and exactly.
+ *
+ * That pair lands at 0.851 — worse than the best available drop-2 and better
+ * than most, which is the honest shape of a cut chosen for the right reason.
+ * The best drop-2 in the whole space is `in_jokes` + `nicknames` at 0.787, and
+ * it is NOT recommended: in-jokes are the room.
+ *
+ * A THIRD CUT IS NOT REQUIRED BY ANYTHING and is listed only so she is not
+ * asked twice: `up_early_anyway` is the next faintest, and it is the one tile
+ * that says the morning exists, which the premise's last line depends on.
+ *
+ * ── EACH TAG POINTS AT A LINE ABOVE ──────────────────────────────────
+ *
+ *   the_same_stories  "The movie is the one half of you can recite. This is
+ *                     correct." Shared with AMALFI at 0.7, and the two mean
+ *                     different things by it: that house tells them louder
+ *                     every year, this one says them along, word for word,
+ *                     with the screen.
+ *   comfortable_silence "Somebody's asleep." Shared with BIG SUR, TAHITI,
+ *                     NANTUCKET and DOLOMITES, which are quiet for four other
+ *                     reasons; this is the only one that is quiet WITH THE
+ *                     TELEVISION ON.
+ *   in_jokes          "Never explain the bit, the in-joke, or why that
+ *                     movie."
+ *   nicknames         "Squid — the corner of the couch, as always."
+ *   does_the_voice    "Everybody does somebody's voice." The bit, which is
+ *                     the room's whole humour mechanism.
+ *   teasing           "Everybody is the joke in turn and nobody minds."
+ *   laughs_first      The cadence: the line lands because the person saying
+ *                     it has already gone.
+ *   finishes_your_sentences "Short, warm, interruptible." It is the sentence
+ *                     length as much as the manner.
+ *   swears_fondly     "Nothing formal survives the doorway."
+ *   no_dead_air       "Called from the kitchen over music."
+ *   closes_the_bar    "Nobody goes to bed until the last one does."
+ *   up_early_anyway   "Whoever said they were up early is up early anyway."
+ *
+ * ── THE AFFINITY CONSEQUENCE, WHICH SHE ASKED FOR RATHER THAN A CUT ──
+ *
+ * TWO NUMBERS, AND THE SECOND IS THE SERIOUS ONE.
+ *
+ * 1. THE TWELVE CANCEL EACH OTHER ON TWO AXES, BY CONSTRUCTION. `no_dead_air`,
+ *    `closes_the_bar`, `finishes_your_sentences` and `laughs_first` push
+ *    `volume` up; `comfortable_silence` pushes it down. `the_same_stories` and
+ *    `comfortable_silence` push `cadence_unhurried` up; `closes_the_bar` and
+ *    `up_early_anyway` push it down. Resolved with the weights below the room
+ *    is loud (+1.51 / -0.54, net 0.97) AND slow (+1.43 / -0.42, net 1.01) at
+ *    the same time, which is a true description of a night that dances in the
+ *    kitchen and then stops moving for three hours.
+ *
+ *    The third axis is the one worth watching: `theatricality` comes out at
+ *    +0.77 / -0.76, NET 0.01. `does_the_voice` says the room performs;
+ *    `the_same_stories` and `comfortable_silence` say it does not. They cancel
+ *    to nothing, so in voice space this house makes NO CLAIM about performing
+ *    — and a host who taps `does_the_voice` gets almost no lift toward this
+ *    room from it. That is a consequence of her twelve, not of the numbers:
+ *    every weighting tried lands theatricality within a hair of zero.
+ *
+ * 2. ASPEN AND CATSKILLS RESOLVE TO NEARLY THE SAME VOICE. 0.893 against a
+ *    ceiling of 0.65. This is measured, it is not a weighting artefact, and it
+ *    is the second registration blocker.
+ *
+ *    Four of Catskills' six tones — `in_jokes`, `nicknames`, `teasing`,
+ *    `swears_fondly` — are inside her twelve. The two houses are the
+ *    library's only two OWN-PRIVATE-LANGUAGE rooms: everybody has a name,
+ *    nobody explains anything, everybody is teased and nobody is outside it.
+ *    The vocabulary has one word-set for that, so the two rooms land on top of
+ *    each other in it.
+ *
+ *    THE WEIGHTS CANNOT FIX IT, and the search was run rather than assumed.
+ *    Over the whole weight space with every tile in [0.2, 1] the minimum
+ *    reachable is 0.560 — and only by putting `the_same_stories` at 0.30 and
+ *    `comfortable_silence` at 0.25, which demotes the exact pair she said
+ *    defines the room. Constrained honestly, so that her claimed pair
+ *    outranks every other tile, the minimum is 0.744. STILL OVER. There is no
+ *    weighting that is both faithful to her material and inside the ceiling.
+ *
+ *    AND THE MECHANISM IS `warmth`, WHICH ACCUMULATES. Warmth is a positive,
+ *    unsigned contribution on seven of this room's tiles and on four of
+ *    Catskills', cosine adds them, and the sum is 39 PER CENT OF THE WHOLE DOT
+ *    PRODUCT — warmth alone supplies 0.352 of the 0.893. Knowingness supplies
+ *    another 0.193. Two houses that are both fond and both private cannot come
+ *    apart on a metric that adds fondness to fondness, whatever else they do
+ *    differently.
+ *
+ *    THIS IS THE FOURTH ROOM TO HIT THE SAME WALL, AND THE FOUR AGREE.
+ *    ACAPULCO/LAS VEGAS 0.852, OAXACA/HAVANA 0.848, AMALFI/HAVANA 0.817, and
+ *    now ASPEN/CATSKILLS 0.893. Every one is a structurally clear pair, and
+ *    the twelve existing rooms' own worst pair is 0.580. The Amalfi agent
+ *    reached the warmth-accumulates finding by exhaustive search; the 39 per
+ *    cent above is this room arriving at it independently. That is evidence
+ *    about the CEILING and the catalogue's density, not about any of the four
+ *    authors — src/lib/selection/types.ts already says in writing that the
+ *    sibling threshold "is a property of how densely the catalogue covers the
+ *    voice space, not a constant of nature", and 0.65 was set against thirteen
+ *    destinations.
+ *
+ *    IT IS ALSO THE BORDER SHE NAMED. Catskills is summer porch against winter
+ *    indoors, and the structural matrix agrees with her — the rows sit at
+ *    distance 4, comfortably clear. It is only in VOICE space that the two
+ *    rooms collapse, which is precisely the case the seam was built for: the
+ *    structure separates them and the voice cannot. Recording that is worth
+ *    more than a number that passes.
+ */
+export const ASPEN_1994_TONES: readonly ToneWeight[] = [
+  { code: "the_same_stories", weight: 1 },
+  { code: "comfortable_silence", weight: 0.9 },
+  { code: "in_jokes", weight: 0.8 },
+  { code: "nicknames", weight: 0.75 },
+  { code: "does_the_voice", weight: 0.7 },
+  { code: "teasing", weight: 0.65 },
+  { code: "laughs_first", weight: 0.6 },
+  { code: "finishes_your_sentences", weight: 0.55 },
+  { code: "swears_fondly", weight: 0.5 },
+  { code: "no_dead_air", weight: 0.45 },
+  { code: "closes_the_bar", weight: 0.4 },
+  { code: "up_early_anyway", weight: 0.35 },
+];
+
+/* ── ASPEN IS AUTHORED AND IS NOT IN `DESTINATIONS`. READ THIS ────────
+ *
+ * The two consts above are complete and reviewable and they are deliberately
+ * NOT keyed into `DESTINATIONS` or `DESTINATION_TONES` below. Same handling as
+ * ACAPULCO and AMALFI: a refusal stated where the next person is standing, not
+ * an omission. Rule 8 — an agent produces a draft; activation is hers.
+ *
+ * WIRING IT IN WAS TRIED AND MEASURED. With her twelve tones exactly as
+ * written, `npm test` goes from 341 pass / 0 fail to 338 / 3 — THREE FAILING
+ * TESTS CARRYING FOUR DISTINCT BLOCKERS, because the last two share a test and
+ * only the first of the two gets to fire. No two of the four have the same
+ * answer:
+ *
+ *   "a destination's tones are real, weighted legally, and few" — fails on
+ *   TWELVE TONES against a documented maximum of ten. The assertion's own
+ *   reason is that the vocabulary should not do the work of a paragraph and a
+ *   host cannot make that many claims. She gave twelve and asked explicitly
+ *   that none be cut, so the two facts are placed side by side rather than one
+ *   being quietly resolved into the other.
+ *
+ *   "every tone is claimed by at least one destination" — fails because four
+ *   of her twelve are still flagged `draft: true` in src/lib/voice.ts:
+ *   `the_same_stories`, `finishes_your_sentences`, `closes_the_bar`,
+ *   `up_early_anyway`. Checked one by one against `TONES`; the other eight —
+ *   `comfortable_silence`, `in_jokes`, `nicknames`, `does_the_voice`,
+ *   `teasing`, `laughs_first`, `swears_fondly`, `no_dead_air` — are SHIPPED,
+ *   which is worth stating because `does_the_voice` and `no_dead_air` were
+ *   both guessed at as drafts and both are not.
+ *
+ *   The flag means "coined for a room that is not authored yet", and clearing
+ *   it is the correct act the day this room lands — but it is not a one-line
+ *   act. Promotion is a FOUR-FILE JOB: the flag in src/lib/voice.ts, a cut
+ *   SVG in design/tone-icons, the regenerated src/app/apply/tone-marks.tsx
+ *   (`npm run build:tone-marks`), and the quiz surface that then shows the
+ *   tile. src/lib/voice.ts is not this room's territory, three of the four are
+ *   also claimed by rooms other agents drafted this week, and a promoted tone
+ *   with no mark renders to a host as a blank tile — which is CLAUDE.md rule
+ *   16's exact failure and the reason this is not done in passing.
+ *
+ *   "no two destinations resolve to nearly the same voice" — fails with
+ *   ASPEN and CATSKILLS at 0.893 against 0.65. The full argument, the weight
+ *   search and the reason it is not an authoring slip are in the block above
+ *   `ASPEN_1994_TONES`.
+ *
+ *   the stated-triple half of that same test — fails because familiar +
+ *   second_person + warm is CATSKILLS's triple exactly. Her material states
+ *   all three: "nothing formal survives the doorway", "second person,
+ *   familiar, conspiratorial", "teasing and the bit". The enum has no value
+ *   for the bit, which is docs/needs-a-human.md item 11, filed before this
+ *   room was drafted and still open.
+ *
+ * WHY AN AGENT DOES NOT RESOLVE ANY OF THE FOUR. Every available fix is a
+ * founder's:
+ *
+ *   Cut two tones. She said not to, in the brief, by name.
+ *   Re-weight until the affinity passes. Measured impossible while staying
+ *     faithful — 0.744 is the honest floor — and optimising to a number rather
+ *     than tagging what the voice says is the retro-tagging failure this
+ *     project exists to escape.
+ *   Restate the triple. Moving `warm` to `absurd` would clear the collision
+ *     AND is arguable on the enum's own terms, which is exactly why an agent
+ *     must not do it: a value that happens to fix a test is not evidence.
+ *   Grow the humour enum, or refit the 0.65 ceiling for eighteen rooms. Both
+ *     are rulings that change every pair at once.
+ *
+ * ONE COST OF LEAVING IT UNWIRED, SAID PLAINLY: `npm run check:voice-output`
+ * resolves its slug through `DESTINATIONS`, so it cannot be pointed at this
+ * room until the two lines below are added. The refusals above WERE run
+ * against a temporarily wired copy and every one of her six fires: `cozy`,
+ * `chalet`, `luxe`, `girls' night` and `vibes` are caught TWICE — once as a
+ * displaced lexicon term and again as a never-rule term — and `après` once,
+ * as a displaced term only, because the never-rule extractor's character class
+ * stops at the accent. The refused-tile vocabulary fires too (`seating plan`,
+ * `the seating`, `the lodge`), as do `served` and `schedule` and the
+ * house-wide list (`curated`, `experience`, `unforgettable`). The drafted
+ * `rejected` lines match their own shapes at 100 per cent.
+ *
+ * TWO THINGS THE CHECKER CANNOT SEE, said so nobody reads a green run as a
+ * clean voice: the exclamation point, because that layer is lexical and has no
+ * punctuation pass; and `the mountain` / `the slopes`, which are in `banned`
+ * but reach no lexicon entry and no short never-clause, so only the words
+ * around them are caught. `banned` itself is not read by this tool at all.
+ *
+ * TO LAND IT, once the founder has ruled on all four, the diff here is two
+ * lines — add `"aspen-1994": ASPEN_1994,` to `DESTINATIONS` and
+ * `"aspen-1994": ASPEN_1994_TONES,` to `DESTINATION_TONES` — plus clearing the
+ * four `draft` flags in src/lib/voice.ts. Nothing else in this file is owed.
+ *
+ * ── 2026-08-27: THE CEILING WAS REFIT. FOUR BLOCKERS BECAME THREE ────
+ *
+ * One of the four above is answered and it is the affinity one. The monitor
+ * ceiling was recalibrated from 0.80 to 0.92 against a measured duplicate
+ * population (`voiceCeiling()` in src/lib/voice.ts;
+ * `npm run check:voices -- --duplicates`), so ASPEN/CATSKILLS at 0.893 NOW
+ * PASSES the ceiling. The 0.744 weight-search floor recorded above is no
+ * longer load-bearing and the paragraph is kept per rule 14 because it is the
+ * evidence that the tag list was never the problem.
+ *
+ * IT DID NOT UNBLOCK THE ROOM, AND THE REASON IS THE INTERESTING PART. The
+ * recalibration added a third instrument — `TONE_HAND_OVERLAP_MAX`, shared
+ * codes over the smaller hand — because the cosine was measured unable to tell
+ * a copied room from a kindred one. Aspen and Catskills share FOUR OF SIX of
+ * Catskills' codes (`in_jokes`, `nicknames`, `teasing`, `swears_fondly`), which
+ * is 0.667 and the joint highest in the library, and the guard sits at 0.80. So
+ * the hand guard does not fire either.
+ *
+ * WHAT IS LEFT HOLDING THIS ROOM OUT IS THE STATED TRIPLE, and after the refit
+ * it is the ONLY thing standing between this pair and admission. Measured:
+ * wiring Aspen alone takes 341 / 0 to 338 / 3, and the third failure's message
+ * is now exactly "aspen-1994 and catskills state the same formality, address
+ * and humour (familiar/second_person/warm)" — the affinity clause no longer
+ * fires at all.
+ *
+ * SAID PLAINLY FOR THE FOUNDER, BECAUSE IT CHANGES WHAT THAT RULING COSTS: the
+ * triple is now the load-bearing separation for this pair, not a second opinion
+ * on it. Breaking it — moving `warm` to `absurd`, or growing the humour enum
+ * per docs/needs-a-human.md item 11 — would admit the pair OUTRIGHT, at 0.893
+ * affinity and 0.667 hand overlap, with nothing else objecting. That may be
+ * right; her Aspen brief and her Catskills brief describe two genuinely
+ * different evenings. But it is a bigger decision after the refit than before
+ * it, and an agent still may not make it, for the reason stated above and
+ * unchanged: a value chosen because it fixes a test is not evidence.
+ */
+
+
+/**
+ * PALM SPRINGS, 1965.
+ *
+ * ── WHAT IS HERS AND WHAT IS MINE ────────────────────────────────────
+ *
+ * The founder supplied, VERBATIM and not to be improved: the `tagline`, the
+ * `premise`, the twelve tone codes, the whole `voice` stance block (speaker,
+ * selfReference, audience, address, cadence, the sentence numbers, punctuation,
+ * humour and the lexicon's refusals), the example gesture and its two rulings,
+ * the deliverables sheet quoted below, the matching claims, the border list and
+ * the rule-25 working.
+ *
+ * DRAFTED BY AN AGENT, and marked as such at every site: `PALM_SPRINGS_LOOK`,
+ * `orthography`, the lexicon glosses, the `formulae`, the `banned` list, the
+ * `signOffs`, the `always`/`never` rules, the `breaksCharacterFor` list, the
+ * `exemplars`, the `rejected` lines, and every WEIGHT in
+ * `PALM_SPRINGS_1965_TONES`. She gave twelve codes and no numbers. Rule 8:
+ * this is a draft and the signature is hers.
+ *
+ * ── HER ACCOUNT OF THE HAND, KEPT BECAUSE IT IS THE ARGUMENT ─────────
+ *
+ * "This is the catalogue's wit room. `straight_to_gossip` and
+ * `means_the_other_thing` are the spine — everything worth saying is said
+ * sideways, immediately. `makes_an_entrance` finally has its home (Acapulco
+ * refused it; Aspen refused it; here it is the point). `no_speeches` because
+ * the toast is beneath this room — the compliment arrives as a dry aside."
+ *
+ * THE HAND IS LOAD-BEARING IN A WAY THE MEASUREMENT LATER CONFIRMED. See the
+ * affinity block above `PALM_SPRINGS_1965_TONES`: dropping `makes_an_entrance`
+ * puts this room into a ceiling breach against WESTHAMPTON that the twelve
+ * tones as she wrote them do not have. Her sentence about it turned out to be
+ * a measurement.
+ *
+ * ── HER REFUSALS ARE BORDERS, NOT PREFERENCES ────────────────────────
+ *
+ * Refused by name, and the refusal is stated in `never` below so that a later
+ * agent adding one of them is REFUSING A BORDER rather than improving a list:
+ *
+ *   unhurried, lingers, comfortable_silence, never_performs, never_impressed
+ *     — THE ENTIRE ACAPULCO HAND. Not a tone-by-tone dislike: the whole
+ *       temperament of a room where nobody is checking is the opposite claim
+ *       to a room that starts exactly at six.
+ *   sentimental, marvels_out_loud, feeds_you_first
+ *     — Amalfi's warmth is not this room's temperature.
+ *   the_same_stories
+ *     — the stories here are new tonight. That IS the gossip, and a room whose
+ *       spine is `straight_to_gossip` cannot also be the room that retells.
+ *
+ * ── HER DELIVERABLES SHEET, PRESERVED WHOLE ──────────────────────────
+ *
+ * The schema has a home for perhaps half of this, so it is kept entire and the
+ * halves that fit are quoted where they fit:
+ *
+ *   "The setting: clean lines, low bowls, nothing fussy — citrus in a dish
+ *   because it's sculpture here. The lighting matters more than the flowers:
+ *   pool glow, candles in glass, everything at dusk level. What to wear:
+ *   committed. The caftan, the sharp trousers, the earrings that mean it. This
+ *   is not a shorts party. What there is: drinks first, food that doesn't
+ *   interrupt them — devilled eggs, cold shrimp, olives, things on picks. One
+ *   tray that looks expensive. Nothing requires a fork or your full attention.
+ *   What's playing: cool and instrumental at talking volume — bossa nova,
+ *   vibes-and-piano jazz, the Latin end of lounge. When it gets later, it gets
+ *   slightly louder. This is correct."
+ *
+ * ── HER MATCHING CLAIMS, RECORDED HERE BECAUSE NOTHING IN THIS ───────
+ * ── MODULE HOLDS THEM ────────────────────────────────────────────────
+ *
+ *   occasions        birthday, anniversary, girls' weekend, bridal, no reason
+ *                    at all
+ *   taste direction  desert modern
+ *   environment      poolside, a garden, my home, a hotel
+ *   meal             standing drinks, a late supper
+ *   group fun        commit to an outfit, split into corners and talk properly,
+ *                    talk a stranger into something, get genuinely competitive
+ *   ruins it         anything like a kids' party, novelty props and balloons,
+ *                    forced participation
+ *   wants more of    a table worth photographing, an inside joke made real,
+ *                    one moment they retell for years
+ *
+ * NOTE ON `taste direction`: "desert modern" is not one of the eleven declared
+ * directions, on the same board where ASPEN's founder-flagged gap was recorded
+ * (docs/proposals.md, 2026-08-27). Recorded, not resolved, and not silently
+ * mapped onto a neighbour — mapping it to `americana_backyard` would be the
+ * exact stretch that row exists to refuse.
+ *
+ * ── HER BORDERS, AND WHAT HOLDS EACH ONE ─────────────────────────────
+ *
+ * ACAPULCO 1959 — tried versus didn't-notice, dry versus wet, six-sharp versus
+ * no-clock. Measured at 0.284 (below): the border holds in the metric as firmly
+ * as in the prose, and it holds for the reason she gives.
+ *
+ * BUT ONE HALF OF HER STATEMENT OF IT IS FALSE AGAINST THIS FILE, AND IT IS
+ * RECORDED RATHER THAN QUIETLY CORRECTED. She wrote that the tile hands are
+ * "entirely non-overlapping" and that "Acapulco refused" `makes_an_entrance`.
+ * `ACAPULCO_1959_TONES` above claims `makes_an_entrance` at 0.7 AND
+ * `across_the_room` at 1. Both codes are in this room's twelve, so the hands
+ * share TWO of nine and twelve, not none. ASPEN's half of her sentence is
+ * correct — `ASPEN_1994_TONES` claims neither.
+ *
+ * This changes nothing about the border and it is not an argument for a re-tag:
+ * the two rooms still measure 0.284, because two shared codes out of twenty-one
+ * do not make a temperament. It matters because her hand was written from a
+ * belief about another room's hand that the file does not support, and because
+ * "makes_an_entrance finally has its home" is the sentence the whole weighting
+ * of this hand rests on. If she meant that Acapulco should not have claimed it,
+ * that is a note on ACAPULCO and it is hers to make; an agent does not edit
+ * another room's founder-verbatim tone list to make this room's story true.
+ *
+ * WESTHAMPTON 1976 — styled-and-admits-it versus styled-not-caring. This is the
+ * border the whole verification exercise was aimed at, because the two hands
+ * share four codes: `deadpan`, `dry_aside`, `exact_word`, `nothing_sacred`.
+ * Measured at 0.476. The prose border and the number agree, and the reason they
+ * agree is written out above `PALM_SPRINGS_1965_TONES`.
+ *
+ * HAVANA 1957 — wit-at-the-patio versus spectacle-at-the-club. PALM SPRINGS
+ * CLAIMS NO MUSIC-FORWARD AND NO DANCE-FORWARD TERMS, which is the border said
+ * as a constraint on this file rather than as a comparison. Nothing in the
+ * lexicon, the formulae or the exemplars below names a band, a floor, a song or
+ * dancing; the deliverables sheet puts music at talking volume and that is the
+ * loudest this room's music is ever allowed to be. Measured at 0.017.
+ *
+ * ── HER RULE-25 WORKING, KEPT VERBATIM IN SUBSTANCE ──────────────────
+ *
+ *   1. BOOKABLE AT ITS MOST BOOKABLE SIZE. A backyard or an apartment at dusk,
+ *      anywhere warm-ish. THE POOL LEANS, NEVER REQUIRES — the lights are the
+ *      mechanism and everyone has lights. This is why the example gesture is
+ *      written as "pool, patio, string lights, whatever there is" and not as a
+ *      pool: the room is a switch, not a body of water.
+ *   2. NO PROPER NOUN A GUEST WOULD NOT SAY AT THE TABLE. Gin, the patio and
+ *      six o'clock all pass. No resort names and no celebrity names — which for
+ *      this room and this year is the whole discipline, because the postcard
+ *      version of it is entirely made of them.
+ *   3. NO LABOUR OR STAFF THE HOST DOES NOT HAVE. Drinks are self-made, or one
+ *      friend plays bartender BECAUSE THEY ENJOY THE ROLE, which is a guest
+ *      doing a bit and not a person being paid. Food is cold and done in
+ *      advance. Acapulco's structural sentence applies unchanged: there is no
+ *      staff in this voice.
+ *
+ * ── THE GESTURE, AND THE FIRST ROOM THAT SAYS IT HAS NO INVARIANT ────
+ *
+ * HER EXAMPLE, in her words: "the lights go on at dusk — pool, patio, string
+ * lights, whatever there is — and that is the starting gun. Nothing is
+ * announced; the switch is the announcement."
+ *
+ * TWO FOUNDER RULINGS ATTACH TO IT AND BOTH MATTER MORE THAN THE EXAMPLE DOES:
+ *
+ *   "the gesture covers only evening - this has to be the case."
+ *   "palm springs doesnt have one gesture, this is an example gesture."
+ *
+ * So the lights are NOT recorded here as this room's gesture. db/031 line 19
+ * states the concept it would have to satisfy — "A gesture is INVARIANT per
+ * destination — THE ONE THING THAT ALWAYS HAPPENS — and the bank is only what
+ * SELECTION CHOOSES AMONG" — and every other authored room has exactly one:
+ * Tahiti's conch, Amalfi's plate refilled mid-sentence, Aspen's blanket
+ * migration, Oaxaca's somebody sent to stir, Acapulco's reset of the table.
+ * PALM SPRINGS IS THE FIRST ROOM ASSERTING THAT IT HAS NONE.
+ *
+ * WHAT IS EXPRESSIBLE TODAY, so that nobody reads this as blocked: `world
+ * .gesture` and `world.gesture_note` are NULLABLE — db/031 lines 129-130 add
+ * them with no NOT NULL — so a room with no invariant gesture needs no schema
+ * change. Nothing is owed to the database unless reading (b) below is chosen.
+ *
+ * TWO READINGS, AND THEY LEAD DIFFERENT PLACES. This is hers to pick:
+ *
+ *   (a) THE ROOM GENUINELY HAS NO INVARIANT. `world.gesture` stays null and the
+ *       lights become a `bank_item` HOST ACT — poolable, chosen among, which is
+ *       exactly what db/031 says the bank is for. No migration is owed. The
+ *       evidence for it is her own sentence and the fact that the example is
+ *       written as "whatever there is", which is a description of a class and
+ *       not of an act.
+ *   (b) THE INVARIANT IS MORE ABSTRACT AND THE LIGHTS INSTANTIATE IT — the room
+ *       announces itself by switching on rather than by speaking. The evidence
+ *       for it is the sentence she wrote immediately after the example: "the
+ *       switch is the announcement", which is a claim about the room and not
+ *       about lamps, and which is the same claim `no_speeches` makes in the
+ *       tone hand. Under (b) a migration IS owed, in the shape of db/034,
+ *       setting `gesture` and `gesture_note` on the `palm-springs-1965` world
+ *       row. It is NOT written here, because `Destination` has no gesture field
+ *       and because choosing between (a) and (b) is an authoring decision.
+ *
+ * WHAT A NULL GESTURE COSTS, said here so it is visible on the day she rules
+ * rather than discovered afterwards: the gesture is a room's most recognisable
+ * single fact, and this is already the room predicted to sit closest to
+ * WESTHAMPTON in voice. A room with no invariant has one less thing making it
+ * itself. That is not an argument against her ruling. It is the consequence.
+ *
+ * ── TWO CELLS IN THE COMMITTED MATRIX, ONE AGREEING AND ONE NOT ──────
+ *
+ * `ending = clean_stop` AGREES with her material. She wrote "It stops cleanly",
+ * and the committed row says `clean_stop`. THIS IS THE FIRST SPEC IN THIS WEEK
+ * OF ROOMS THAT AGREES WITH ITS OWN CELL, and it is worth saying out loud
+ * because every other note of this kind in the file is a conflict.
+ *
+ * `starts = afternoon` CONFLICTS, and then the founder made the conflict
+ * structural. Her premise says "The heat breaks at dusk and the party starts
+ * exactly then." Her later ruling says "palm springs can be day or night."
+ * `starts` IS SINGLE-VALUED — its levels are morning, afternoon, evening, late,
+ * and a row holds exactly one, so A ROOM THAT IS LEGITIMATELY EITHER CANNOT SAY
+ * SO. (`late` is applicant-side only by founder ruling on db/037; no row holds
+ * it. So the choice is afternoon versus evening and nothing else.)
+ *
+ * THE FLIP WAS MEASURED AND THE CELL WAS NOT TOUCHED. Method: a byte-identical
+ * copy of the committed `scripts/audit-matrix.mjs` taken from HEAD and verified
+ * by MD5 (6a895b0ab2f42af0eec705a47ab5e81b), run in a scratch tree outside the
+ * repo, against a scratch copy of the matrix. Flipping this room's `starts` to
+ * `evening` moves fifteen of its seventeen pairs — only DOLOMITES and CATSKILLS
+ * hold, because they are the two `morning` rooms — and it costs:
+ *
+ *   palm-springs-1965 / st-moritz-1984   3 -> 2   FAILING, differ only on
+ *                                                 schedule, ending
+ *   palm-springs-1965 / acapulco-1959    3 -> 2   FAILING, differ only on
+ *                                                 ending, spectacle
+ *   plus TWO TWIN-RULE VIOLATIONS from the same script: st-moritz-1984 and
+ *   acapulco-1959 each end up below the gate against two rooms, which is
+ *   CLAUDE.md rule 4's crowded corner, so neither may twin with either.
+ *
+ * It gains: palm-springs-1965 / aspen-1994 3 -> 4, and it drops
+ * palm-springs-1965 / new-orleans 4 -> 3 onto the gate. Mean distance 4.93 ->
+ * 4.90. Undeclared failures 0 -> 2.
+ *
+ * SO `afternoon` IS THE SAFER CELL BY THE COMMITTED SCRIPT'S OWN NUMBERS, AND
+ * IT IS STILL NOT AN AGENT'S CALL. Her ruling that the room is day OR night
+ * means the cell is a lossy encoding of the room either way; `afternoon` is
+ * merely the lossy encoding that does not break the gate. Rule 3 applies at
+ * full force here: her premise's dusk is positive evidence about the EVENING
+ * HALF of a room she has since said has two halves, and reading `evening` out
+ * of it would be reading a cell out of an answer that meant something else.
+ *
+ * `palm-springs-1965.schedule` SITS IN `founderPending` as provisional
+ * `anchored`. HER MATERIAL SETTLES IT AND IT WAS NOT CHANGED. "The party starts
+ * exactly then", "six o'clock", "when it gets later it gets slightly louder"
+ * and "it stops cleanly" describe a night with a start, a shape and an end and
+ * no posted order of events, which is `anchored` exactly. Recorded as evidence
+ * for the founder's pass, not applied.
+ *
+ * ── THE VOCABULARY IS SHORT THREE WORDS THIS WEEK ────────────────────
+ *
+ * Recorded here and on the proposals ledger, because three rooms in one week
+ * wanting expressiveness the vocabulary lacks is evidence about the vocabulary
+ * and not about the rooms:
+ *
+ *   `starts` cannot say "day or night" — Palm Springs, above. AMALFI hit the
+ *     same wall from the other side: its spec claims both lunch and dinner and
+ *     `starts: evening` can honour one of them.
+ *   `humour` has no value for "the bit" — ASPEN, docs/needs-a-human.md item 11.
+ *   `gesture` assumes exactly one per room — Palm Springs, above.
+ *
+ * All three are founder territory. A multi-valued or `either` level on `starts`
+ * is a matrix change; a new `HumourMode` is a token change that every voice
+ * would be re-read against; a null gesture is already legal and only needs
+ * ruling on. None of them is done here.
+ */
+const PALM_SPRINGS_LOOK: Theme = {
+  key: "palm-springs-1965",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  // PROVISIONAL AND FOUNDER-PENDING. DRAFTED BY AN AGENT.
+  //
+  // Not Havana's borrowed plate — this room has no near neighbour to borrow
+  // from, which is itself the argument for drafting rather than copying: the
+  // nearest rooms in voice are COTE D'AZUR and WESTHAMPTON and both are
+  // Atlantic-or-Mediterranean daylight, which is the wrong light entirely. So
+  // these are drafted to her own words and to nothing else: bleached stucco,
+  // the pool lit from below, sun-killed terracotta, brass on a low table, and
+  // a night that is dry indigo rather than warm plaster-dark. "The lighting
+  // matters more than the flowers" is the sheet's own sentence and it is the
+  // instruction this plate is written under.
+  //
+  // A destination differentiates on palette and on voice (see the note at the
+  // top of this file), so these values are a claim and not a placeholder — and
+  // an agent's claim about a look is exactly the kind the founder cuts. The
+  // world row for `palm-springs-1965` is DRAFT, so it cannot reach a member
+  // today. Do not read these hexes as ratified.
+  palette: {
+    ground: "#EFE7DA",
+    ground2: "#E2D5C2",
+    ink: "#221F1C",
+    inkSoft: "#57514A",
+    inkFaint: "#8C8478",
+    rule: "#CBBCA6",
+    aqua: "#1F7F92",
+    oxblood: "#C1553A",
+    gold: "#C08F35",
+    night: "#101A24",
+    night2: "#0A1119",
+    nightInk: "#EBE3D6",
+    nightSoft: "#A79E90",
+    nightAqua: "#63C0CE",
+    nightOxblood: "#E4855F",
+    bone: "#F5F1E7",
+  },
+  paletteDark: {
+    ground: "#0A1119",
+    ground2: "#101A24",
+    ink: "#EBE3D6",
+    inkSoft: "#A79E90",
+    inkFaint: "#7A7266",
+    rule: "#243441",
+    aqua: "#63C0CE",
+    oxblood: "#E4855F",
+    gold: "#D9A94A",
+  },
+};
+
+export const PALM_SPRINGS_1965: Destination = {
+  key: "palm-springs-1965",
+  name: "PALM SPRINGS, 1965",
+  // HERS, verbatim.
+  tagline: "The pool is lit. So is everyone.",
+  // HERS, verbatim. Note that it is DUSK-SHAPED and that her later ruling made
+  // the room day OR night; the premise is not amended, because amending a
+  // founder-verbatim premise to fit a ruling she made about a different field
+  // is precisely the read-a-cell-out-of-the-wrong-answer failure of rule 3.
+  // What the ruling changes is that nothing DRAFTED below may make daytime
+  // impossible. See the note on `exemplars`.
+  premise:
+    "Palm Springs, October 1965. The heat breaks at dusk and the party starts " +
+    "exactly then — ice cracking into glasses, the pool glowing from below, " +
+    "everyone sharper-dressed than a backyard requires. The drinks are cold, " +
+    "strong, and correctly made; the good line gets repeated across the patio " +
+    "within the minute. This is the party where everybody shows up polished — " +
+    "where the gossip is excellent, the outfits were committed to, and nobody " +
+    "pretends they didn't try.",
+  look: PALM_SPRINGS_LOOK,
+  voiceVersion: 1,
+  voice: {
+    // HERS.
+    speaker: "The patio at dusk, drink in hand.",
+    // HERS.
+    selfReference: ["out here", "the patio"],
+    // HERS.
+    audience: "everyone who dressed for it",
+    address: {
+      mode: "second_person",
+      // HERS.
+      note:
+        "Second person, quick, complicit — the friend who steers you by the " +
+        "elbow toward the better conversation.",
+    },
+
+    // DRAFTED, out of her tagline and her humour note and nothing else.
+    register: "The good line, said once, to the person it was meant for.",
+    // DRAFTED. Argument, because this is the one stated facet she did not
+    // write: `cordial` is "a well-written note between people who know each
+    // other", and this room is `impeccably_polite` and `dressed_up` without
+    // being ceremonial — `no_speeches` rules out ceremonial outright and
+    // `formal` would make a hotel notice board of a patio. The alternatives
+    // were measured (see the affinity block below) and none of them moves the
+    // room's neighbours; the choice is made on register, not on a number.
+    formality: "cordial",
+    // HERS.
+    cadence:
+      "Fast, clipped, epigrammatic; the sentence lands and moves on.",
+    // HER NUMBERS. This room speaks in LINES, and sixteen words is the point at
+    // which a line has become a remark.
+    sentence: { typicalWords: 8, maxWords: 16 },
+    // HERS.
+    punctuation:
+      "Periods like ice cubes. No exclamation points — this room raises an " +
+      "eyebrow, not its voice.",
+    // DRAFTED, and each clause is a consequence of something she wrote rather
+    // than an addition. Hours in words because "six o'clock" is her example of
+    // a proper noun that passes. No decade named as a number because the year
+    // is the register the voice is written in and never a thing the voice says
+    // — the postcard version of this room is made entirely of period labels.
+    orthography:
+      "Hours in words: six o'clock, half past eight. Headings in full caps; " +
+      "nothing else is capitalised for emphasis. Contractions are welcome — " +
+      "this voice is quick, and a contraction is a beat saved. The decade is " +
+      "never named, in words or in numbers.",
+
+    humour: {
+      mode: "dry",
+      // HERS.
+      mechanism:
+        "The dry line delivered straight; wit as currency; nobody is spared " +
+        "and nobody minds — nothing off limits with perfect manners.",
+    },
+
+    // HER REFUSALS, EXACTLY. Every `insteadOf` list below is the set she wrote
+    // and has not been extended, because `insteadOf` is a HARD BAN in
+    // scripts/check-voice-output.mjs and an agent does not get to add
+    // enforcement she did not author. The terms and glosses are drafted from
+    // the six words she put in their place: drinks, the pool, sharp, cold, the
+    // good gin, six o'clock.
+    lexicon: [
+      {
+        term: "drinks",
+        gloss:
+          "the thing in your hand and the reason for the hour. Never a category with a name on it",
+        insteadOf: ["cocktail party"],
+      },
+      {
+        term: "the pool",
+        gloss:
+          "lit from below, and the room's light source before it is anything else. It leans and never requires: a patio, a garden or a set of string lights does the same job",
+      },
+      {
+        term: "sharp",
+        gloss:
+          "of a line, of a trouser, of a person. The room's one adjective of approval, and it is never applied to the decade",
+        insteadOf: ["mid-century", "mod", "swanky", "classy"],
+      },
+      {
+        term: "cold",
+        gloss:
+          "of the drink, correctly made. The only temperature this room states out loud",
+      },
+      {
+        term: "the good gin",
+        gloss:
+          "the bottle somebody brought out rather than the bottle on the tray. Objects here are specific and never nostalgic",
+        insteadOf: ["retro", "vintage", "kitsch"],
+      },
+      {
+        term: "six o'clock",
+        gloss:
+          "when the heat breaks and the thing starts. The room's one clock hour, and it is a starting gun rather than a schedule",
+      },
+      {
+        term: "the patio",
+        gloss:
+          "wherever the party is standing. Also the backyard, the terrace, the room with the doors open",
+      },
+      {
+        term: "the good line",
+        gloss:
+          "the unit of currency. It gets repeated across the patio within the minute, and repeating it is how this room pays a compliment",
+      },
+      {
+        term: "committed",
+        gloss:
+          "of an outfit. Her word, and the room's whole posture: everybody tried and nobody is pretending otherwise",
+      },
+    ],
+
+    // DRAFTED.
+    formulae: [
+      "{Flat statement}. {The sharper second half}.",
+      "{The polite form} of {the unkind observation}.",
+      "{Drink}, {temperature}, {the one specific}.",
+      "Six o'clock. {What that is enough to tell you}.",
+      "{Somebody} said {the thing}. {The room's one-word verdict}.",
+      "{Arrangement}. Nobody will be making a speech about it.",
+      "{The compliment}, delivered sideways and not returned to.",
+    ],
+
+    // HER REFUSALS, plus the house-wide list every other destination carries.
+    banned: [
+      "mid-century",
+      "retro",
+      "mod",
+      "vintage",
+      "kitsch",
+      "swanky",
+      "classy",
+      "cocktail party",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "amazing",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    // DRAFTED.
+    signOffs: [
+      "Six o'clock. The patio.",
+      "Out here, then.",
+      "Wear the thing.",
+      "The lights go on at six.",
+    ],
+
+    // DRAFTED, from her voice notes.
+    always: [
+      "Say it in a line. If it needs a second sentence it was not the line.",
+      "Pay the compliment sideways. The toast is beneath this room.",
+      "Name the exact thing: the gin, the hour, the trousers, the pool.",
+      "Talk to one person while the patio listens.",
+      "Let the joke be at somebody. Perfect manners are what make it allowed.",
+      "Assume the reader already tried. Nobody here is being encouraged.",
+    ],
+
+    // DRAFTED, except where her own words are quoted.
+    //
+    // WRITTEN IN A SHAPE THE CHECKER CAN READ, WHICH IS NOT A STYLE CHOICE.
+    // scripts/check-voice-output.mjs extracts never-rule terms with
+    // /\b(?:no|never)\s+(…)(?=[,.]|\s+and\b|\s+no\b|$)/, so it takes ONLY the
+    // first item after each "never" and a comma list loses everything after it.
+    // Measured: "Never mid-century, retro, mod, vintage, kitsch, swanky or
+    // classy" yields exactly ONE term, and "Never a cocktail party" yields
+    // "a cocktail party", which never matches a line saying "the cocktail
+    // party". So every refused word gets its own "never" and the article is
+    // dropped where the ban is on the word itself. The meaning is unchanged.
+    // The enforcement is not — this rewrite takes the catch rate on her eight
+    // refused words from one to eight.
+    never: [
+      "Never an exclamation point. This room raises an eyebrow, not its voice.",
+      "Never mid-century. Never retro, never mod, never vintage, never kitsch, never swanky, never classy. The room does not describe its own decade.",
+      "Never cocktail party. It never names the genre it is in; there are drinks, there is six o'clock, there is the patio.",
+      "Never a speech, and never a line shaped like the start of one.",
+      "Never served. Nobody out here is served — drinks are self-made, or a friend plays bartender because they enjoy the role.",
+      "Never a we that means host and staff.",
+      "Never sentimental. Sentiment is Amalfi's temperature, and here the fond thing arrives sideways or it does not arrive.",
+      "Never unhurried, never lingering, never comfortable in a silence. That is the whole Acapulco hand and it is a border, not a preference.",
+      "Never the story everyone has heard. The stories here are new tonight, which is what makes them gossip.",
+      "Never music-forward, never dance-forward, never dancing, never a band. Those are Havana's, and this room's music is at talking volume.",
+      "Never explain the line. It landed or it did not.",
+      "Never use italics.",
+    ],
+
+    // DRAFTED, on the pattern every other destination keeps.
+    breaksCharacterFor: [
+      "Anything somebody must act on to arrive or to be safe: the road, the gate, the water, a doctor, what is in the food or the glass. Fact first, fewest words, no line.",
+      "Anything about money.",
+      "Any message that gives someone a way out — a decline, an early night, a way off a list. Written straight and made easy.",
+    ],
+
+    // DRAFTED. TWO CONSTRAINTS WERE APPLIED TO THIS LIST AND BOTH ARE WORTH
+    // STATING. First, her Havana border: nothing here names a band, a floor, a
+    // song or dancing. Second, her day-or-night ruling: no line below makes
+    // daytime impossible, and the three that are unavoidably dusk-shaped are
+    // marked. Her premise and her example gesture are dusk-shaped and stay
+    // that way — they are hers — but a drafted line that only works after dark
+    // would have quietly narrowed a room she has said is either.
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Six o'clock, the patio. Wear the thing you have been saving.",
+      },
+      {
+        piece: "invitation",
+        text: "Drinks are cold and correctly made. Come sharp.",
+      },
+      {
+        piece: "invitation",
+        text: "You are expected, and so is the outfit.",
+        note: "The room's whole posture in eight words: everybody tried, and saying so is the joke and the welcome at once.",
+      },
+      {
+        piece: "invitation",
+        text: "The good gin is out. That is the entire programme.",
+      },
+      { piece: "menu_item", text: "Devilled eggs. Nothing requires a fork." },
+      {
+        piece: "menu_item",
+        text: "Cold shrimp, and more lime than is strictly polite.",
+      },
+      {
+        piece: "menu_item",
+        text: "Olives, things on picks, one tray that looks expensive.",
+        note: "Her deliverables sheet, three clauses of it, unaltered.",
+      },
+      {
+        piece: "menu_item",
+        text: "Gin, very cold, correctly made. Ice cracking into the glass.",
+      },
+      {
+        piece: "notice",
+        text: "The good line gets repeated across the patio within the minute.",
+      },
+      {
+        piece: "notice",
+        text: "Nobody is making a speech. The compliment is already out there somewhere.",
+      },
+      {
+        piece: "notice",
+        text: "Nothing is announced. The switch is the announcement.",
+        note: "Her sentence. It is the closest this file gets to recording the example gesture as a line, and it is deliberately written so it survives reading (a) — a switch is a class of act.",
+      },
+      { piece: "notice", text: "It stops cleanly. Nobody has to be sent home." },
+      {
+        piece: "house_note",
+        text: "The lights go on when the heat breaks. Until then, the shade end.",
+        note: "DUSK-SHAPED. Fine as a house note for the evening half; not to be reached for on a daytime version of this room.",
+      },
+      {
+        piece: "house_note",
+        text: "Everything is on the low table. Nobody is going to bring you anything.",
+      },
+      {
+        piece: "place_card",
+        text: "Vivian — beside the one she has been quoting.",
+      },
+      {
+        piece: "place_card",
+        text: "Teddy — as far from the ice bucket as the table allows.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everyone repeats the best line they have heard tonight. Nobody may claim their own.",
+      },
+      {
+        piece: "bulletin",
+        text: "Saturday. Two people committed to the same colour and neither will move.",
+      },
+      { piece: "heading", text: "DRINKS, AND WHO SAID WHAT" },
+      { piece: "heading", text: "WHAT TO WEAR, SINCE YOU ASKED" },
+      { piece: "sign_off", text: "Six o'clock. The patio." },
+      { piece: "sign_off", text: "Wear the thing." },
+    ],
+
+    // DRAFTED, and every one derived from a refusal SHE wrote rather than from
+    // a sin invented for the occasion. These are what
+    // scripts/check-voice-output.mjs matches shape proximity against, so they
+    // are load-bearing: a refusal with no line beside it catches nothing.
+    rejected: [
+      {
+        text: "A mid-century evening by the pool, exactly as you would imagine it.",
+        why: "Names the decade and then asks the reader to picture a postcard. The room does not describe its own period; it is written in it.",
+      },
+      {
+        text: "Retro glamour, a vintage bar cart, and the best gin in the desert.",
+        why: "Retro and vintage make the objects nostalgic. The gin here is the good gin because somebody brought it out tonight, not because it is old.",
+      },
+      {
+        text: "The cocktail party to end all cocktail parties.",
+        why: "It never names the genre it is in. There are drinks, there is six o'clock, there is the patio.",
+      },
+      {
+        text: "The pool is lit and so is everyone!",
+        why: "Her own tagline with the eyebrow replaced by a shout. The mark is the room performing volume instead of having it; drop it and the line is hers again.",
+      },
+      {
+        text: "Drinks will be served from six on the terrace.",
+        why: "Served. Nobody out here is served — drinks are self-made or a friend plays bartender because they enjoy the role. It is also passive where this room is quick.",
+      },
+      {
+        text: "Bring the people you love most. We have missed you all so much.",
+        why: "Warm where this room is dry. Sentiment is Amalfi's temperature; here the fond thing arrives sideways, as an aside, or it does not arrive.",
+      },
+      {
+        text: "Come as you are, it's very relaxed, honestly just a backyard thing.",
+        why: "Excuses the effort. Everybody tried and nobody pretends they did not, which is the one thing this room refuses to take back.",
+      },
+    ],
+  },
+};
+
+/**
+ * PALM SPRINGS's voice, said in the tones a host is shown.
+ *
+ * HER TWELVE CODES, TRANSCRIBED EXACTLY AND IN HER ORDER OF ARGUMENT. The
+ * WEIGHTS are an agent's, because she gave codes and no numbers, and they are
+ * the only part of this list open to revision. Every tag points at a line in
+ * the voice above:
+ *
+ *   straight_to_gossip  "the good line gets repeated across the patio within
+ *                       the minute". Her spine, first half.
+ *   means_the_other_thing  "the polite form of the unkind observation". Her
+ *                       spine, second half: everything worth saying is said
+ *                       sideways, immediately.
+ *   dry_aside           "the compliment, delivered sideways and not returned
+ *                       to". The toast is beneath this room, so the aside is
+ *                       where the kind thing goes.
+ *   deadpan             "nobody is spared and nobody minds". The line lands
+ *                       straight or it is not the line.
+ *   makes_an_entrance   HER SENTENCE: "finally has its home — here it is the
+ *                       point." "everyone sharper-dressed than a backyard
+ *                       requires."
+ *   dressed_up          "the outfits were committed to". "This is not a shorts
+ *                       party."
+ *   exact_word          "cold, strong, and correctly made". "sharp" is the
+ *                       room's one adjective of approval and it is exact.
+ *   no_speeches         HER REASON: "the toast is beneath this room."
+ *   nothing_sacred      "nobody is spared", held against `impeccably_polite`
+ *                       — that pair IS the room.
+ *   impeccably_polite   "nothing off limits with perfect manners". The manners
+ *                       are what make the cruelty allowed.
+ *   fluent_in_everyone  "the gossip is excellent" — the room arrives already
+ *                       knowing. DRAFT TONE, see below.
+ *   across_the_room     "the good line gets repeated ACROSS THE PATIO". Faint
+ *                       on purpose, and see the note on it below: the line
+ *                       travels, the voice does not rise.
+ *
+ * Formality, address and humour are NOT tagged here: cordial, second person,
+ * dry are stated outright above and derived by `statedVoiceFacets`. That triple
+ * is unique in the library, and one near-miss is worth recording — `arch` is
+ * an entirely arguable reading of a room whose spine is `means_the_other_thing`
+ * (the facet's own description is "says one thing and means the other"), and it
+ * is UNAVAILABLE, because COTE D'AZUR is already cordial/second_person/arch and
+ * the stated-triple half of the affinity test would fail on the duplicate. Her
+ * humour note says "the dry line delivered straight", so `dry` is what her
+ * words support and the collision only confirms it. It is written down because
+ * an agent choosing between two defensible enum values must not do it silently.
+ *
+ * ── ONE OF THE TWELVE IS A DRAFT TONE, AND CLAIMING IT DOES NOT ──────
+ * ── PROMOTE IT. THE CLAIM IS FOUR FILES, NOT ONE. ────────────────────
+ *
+ * Checked one by one against `TONES` in src/lib/voice.ts. ELEVEN ARE SHIPPED:
+ * `straight_to_gossip`, `means_the_other_thing`, `dry_aside`, `deadpan`,
+ * `makes_an_entrance`, `dressed_up`, `exact_word`, `no_speeches`,
+ * `nothing_sacred`, `impeccably_polite`, `across_the_room`. That is worth
+ * stating because `straight_to_gossip`, `means_the_other_thing` and
+ * `impeccably_polite` all read like coinages and none of them is one.
+ *
+ * `fluent_in_everyone` carries `draft: true`. Promotion is the same FOUR-FILE
+ * job ACAPULCO and ASPEN both documented: the flag in src/lib/voice.ts, a cut
+ * SVG in design/tone-icons, the regenerated src/app/apply/tone-marks.tsx (`npm
+ * run build:tone-marks`), and the quiz surface that then shows the tile. None
+ * of those four is this file, src/lib/voice.ts is not this room's territory,
+ * and a promoted tone with no mark renders to a host as a blank tile — rule
+ * 16's exact failure.
+ *
+ * ── THE TEN-TONE CAP, AND WHY THE TWO CUTS ARE NOT OFFERED AS A FIX ──
+ *
+ * She gave TWELVE. `voice.test.ts` fails above ten, with its own reason: the
+ * vocabulary should not do the work of a paragraph and a host cannot make that
+ * many claims. She asked that none be cut. The two facts are placed side by
+ * side rather than one being quietly resolved into the other, and NOTHING WAS
+ * CUT.
+ *
+ * IF SHE RULES THAT TWO MUST GO, the argument from register — not from the
+ * number — is for `across_the_room` and `fluent_in_everyone`:
+ *
+ *   `across_the_room` is the only tone in the hand that contradicts something
+ *   she wrote elsewhere in the same brief. Its facets are volume +0.9 and
+ *   theatricality +0.5; her punctuation rule is "this room raises an eyebrow,
+ *   not its voice." What she is describing is a line TRAVELLING — repeated,
+ *   quoted, carried to the next group — and the tone as defined is a person
+ *   SHOUTING. The room's own copy of that idea is already in
+ *   `straight_to_gossip` and in the exemplar about the line getting repeated.
+ *
+ *   `fluent_in_everyone` is the room's weakest separate claim rather than its
+ *   weakest idea. Its label is "they know everybody's story before you finish
+ *   it", which describes what the guests ARRIVE KNOWING; this room's spine is
+ *   what gets SAID once they are there, and knowingness is already carried at
+ *   full strength by the two spine tones. It also edges toward CLAUDE.md rule
+ *   1 — a property of her people rather than of the evening — and it is the
+ *   one draft tone, so cutting it is the only cut that also removes a
+ *   four-file promotion from the critical path.
+ *
+ * DO NOT READ THAT AS A FIX. The measurement is in the block below and it is
+ * ASPEN's finding again: cutting can make affinity WORSE, and three of the
+ * eight candidate cuts create a ceiling breach that her twelve tones do not
+ * have. `makes_an_entrance` — the tone she singled out — is the single most
+ * load-bearing separator in the hand.
+ *
+ * ── THE MEASUREMENT, AND THE PREDICTION IT WAS BUILT TO TEST ─────────
+ *
+ * THE PREDICTION: every ceiling breach so far is in the WARM corner
+ * (acapulco/las-vegas 0.852, oaxaca/havana 0.848, amalfi/havana 0.817,
+ * aspen/catskills 0.893), and `voiceAffinity` is cosine over tone facets. If a
+ * DRY room breached too — this room shares four codes with WESTHAMPTON,
+ * `deadpan`, `dry_aside`, `exact_word` and `nothing_sacred`, four of
+ * Westhampton's nine — then the metric collapses ANY shared temperament and
+ * not warmth specifically.
+ *
+ * IT DID NOT BREACH. Measured against HEAD's `voiceAffinity` with the hand and
+ * the stated triple exactly as written above:
+ *
+ *   cote-dazur       0.609       the closest room in the library
+ *   westhampton-1976 0.476       her named border
+ *   portofino        0.473
+ *   aspen-1994       0.415
+ *   catskills        0.398
+ *   acapulco-1959    0.284       her named border
+ *   havana           0.017       her named border
+ *   amalfi-1953     -0.004
+ *   tahiti          -0.020
+ *
+ * So THE PREDICTION FAILS AND RULE 26 SURVIVES: sharing four of nine tones with
+ * Westhampton produces 0.476, against a ceiling of 0.65 and against an existing
+ * worst pair of 0.580 (nantucket/portofino). The dry corner is not full. Four
+ * shared CODES are not four shared FACETS, which is the whole finding.
+ *
+ * WHY, IN THE FACETS, BECAUSE THE MECHANISM IS THE USEFUL PART. The largest
+ * single contributor to the Westhampton score is not one of the four shared
+ * tones at all — it is `knowingness`, contributing 0.156 of the 0.476, a third
+ * of the entire number, and Palm Springs gets it from `straight_to_gossip`,
+ * `means_the_other_thing` and `fluent_in_everyone` while Westhampton gets it
+ * from `explains_nothing`. The four shared tones contribute far less:
+ * humour_deadpan 0.081, humour_dry 0.059 (the stated facet, not a tone),
+ * cadence_clipped 0.037, precision 0.021, irreverence 0.016.
+ *
+ * And the axis that HOLDS the two rooms apart is `theatricality`. Westhampton
+ * sits at -3.13 — five of its nine tones push negative and nothing pushes back.
+ * Palm Springs sits at -0.12, because `makes_an_entrance` (+1) and `dressed_up`
+ * (+0.3) very nearly cancel `deadpan` (-0.5), `dry_aside` (-0.6) and
+ * `no_speeches` (-0.6). A room at the origin on an axis cannot collide with a
+ * room at the extreme of it, whatever else they share.
+ *
+ * THAT IS THE GENERAL RESULT, and it is worth more than this room's number:
+ * COSINE COLLAPSES ROOMS THAT ARE EXTREME IN THE SAME DIRECTION, NOT ROOMS
+ * THAT SHARE VOCABULARY. Every breached pair so far is two rooms leaning the
+ * same way on warmth and volume together. This hand leans two ways at once —
+ * dressed and deadpan, entrance-making and speechless — and a MIXED HAND IS
+ * ITS OWN SEPARATOR. Rule 26's remedy still stands; this is evidence for the
+ * diagnosis it rests on rather than against it.
+ *
+ * THE CUT MEASUREMENT, run the same way. Top pair after each cut:
+ *
+ *   twelve, as she gave them            cote-dazur 0.609   westhampton 0.476
+ *   cut across_the_room + fluent…       cote-dazur 0.600   westhampton 0.544
+ *   cut fluent… + impeccably_polite     cote-dazur 0.585   westhampton 0.477
+ *   cut nothing_sacred + across…        cote-dazur 0.606   westhampton 0.543
+ *   cut dressed_up + impeccably_polite  cote-dazur 0.616   westhampton 0.527
+ *   cut impeccably_polite + across…     cote-dazur 0.640   westhampton 0.548
+ *   cut deadpan + across_the_room       cote-dazur 0.661   BREACH
+ *   cut makes_an_entrance + across…     westhampton 0.685  BREACH
+ *   cut exact_word + across_the_room    cote-dazur 0.699   BREACH
+ *
+ * Three of the eight breach. Her twelve do not. The proposed cut
+ * (`across_the_room` + `fluent_in_everyone`) is the safest measured pair and it
+ * still moves Westhampton from 0.476 to 0.544 — TIGHTENING the border she named
+ * while relieving nothing. Cutting is a cost that buys a passing test, not a
+ * better room, and "makes_an_entrance finally has its home" turns out to have
+ * been a measurement she made by ear.
+ */
+export const PALM_SPRINGS_1965_TONES: readonly ToneWeight[] = [
+  { code: "straight_to_gossip", weight: 1 },
+  { code: "means_the_other_thing", weight: 1 },
+  { code: "dry_aside", weight: 0.9 },
+  { code: "deadpan", weight: 0.85 },
+  { code: "makes_an_entrance", weight: 0.8 },
+  { code: "dressed_up", weight: 0.8 },
+  { code: "exact_word", weight: 0.7 },
+  { code: "no_speeches", weight: 0.65 },
+  { code: "nothing_sacred", weight: 0.6 },
+  { code: "impeccably_polite", weight: 0.55 },
+  { code: "fluent_in_everyone", weight: 0.45 },
+  { code: "across_the_room", weight: 0.4 },
+];
+
+/* ── PALM SPRINGS IS AUTHORED AND IS NOT IN `DESTINATIONS`. READ THIS ─
+ *
+ * The two consts above are complete and reviewable and they are deliberately
+ * NOT keyed into `DESTINATIONS` or `DESTINATION_TONES` below. Same handling as
+ * ACAPULCO, AMALFI and ASPEN: a refusal stated where the next person is
+ * standing, not an omission. Rule 8 — an agent produces a draft; activation is
+ * hers. `npm test` stays at 341 pass / 0 fail with this file as written.
+ *
+ * WIRING IT IN WAS MEASURED, AND THIS ROOM IS THE CHEAPEST OF THE FOUR TO LAND.
+ * With her twelve tones exactly as written it carries TWO blockers, not four:
+ *
+ *   "a destination's tones are real, weighted legally, and few" — fails on
+ *   TWELVE TONES against a documented maximum of ten. She gave twelve and asked
+ *   that none be cut. The two proposed cuts and the argument for them are
+ *   above, together with the measurement showing that cutting is not a fix.
+ *
+ *   "every tone is claimed by at least one destination" — fails on the single
+ *   draft tone `fluent_in_everyone`, for the four-file reason above.
+ *
+ * AND, UNUSUALLY FOR THIS WEEK, NOT ON AFFINITY. "no two destinations resolve
+ * to nearly the same voice" PASSES: the room's closest neighbour is COTE
+ * D'AZUR at 0.609 against a ceiling of 0.65, and its stated triple
+ * (cordial/second_person/dry) is unique. It is the highest pair in the library
+ * — the existing worst is nantucket/portofino at 0.580 — so it passes with
+ * about four hundredths of margin and it is fair to call that tight rather than
+ * comfortable. If the founder ever lowers the ceiling, this is the first pair
+ * that goes.
+ *
+ * ONE COST OF LEAVING IT UNWIRED, SAID PLAINLY: `npm run check:voice-output`
+ * resolves its slug through `DESTINATIONS`, so it cannot be pointed at this
+ * room until the two lines below are added. The refusals above WERE run against
+ * a temporarily wired copy. WHAT IT CATCHES AND WHAT IT CANNOT SEE is recorded
+ * in the report for this room and matches what ACAPULCO and ASPEN both found:
+ * the tool reads `insteadOf` and the never-rules, it does NOT read
+ * `voice.banned`, and it has NO PUNCTUATION PASS — so the exclamation-point
+ * rule, which is the one refusal she stated in bold, is unenforceable there and
+ * is caught only by shape proximity against the rejected line carrying it.
+ * That line is in `rejected` for exactly this reason.
+ *
+ * TO LAND IT, once the founder has ruled on the tone count and the draft tone,
+ * the diff here is two lines — add `"palm-springs-1965": PALM_SPRINGS_1965,` to
+ * `DESTINATIONS` and `"palm-springs-1965": PALM_SPRINGS_1965_TONES,` to
+ * `DESTINATION_TONES` — plus clearing the one `draft` flag in src/lib/voice.ts
+ * and cutting its mark. The `world` row for `palm-springs-1965` is already
+ * seeded draft. NO GESTURE MIGRATION IS OWED UNLESS SHE PICKS READING (b)
+ * above; under reading (a) `world.gesture` stays null, which is legal today.
+ *
+ * ── 2026-08-27: THE CEILING WAS REFIT, AND THIS BLOCK'S WARNING IS ───
+ * ── SUPERSEDED IN THE OPPOSITE DIRECTION ────────────────────────────
+ *
+ * KEPT PER RULE 14: the paragraph above says this room passes with "about four
+ * hundredths of margin" and that "if the founder ever lowers the ceiling, this
+ * is the first pair that goes". Both halves are now wrong, and the way they are
+ * wrong is worth reading, because the sentence was written against a flat
+ * reading of a number that was already a split.
+ *
+ * COTE D'AZUR / PALM SPRINGS sits at structural distance 5, so it has always
+ * been a MONITOR-tier pair and was never held to 0.65 at all. The recalibration
+ * moved monitor from 0.80 to 0.92, so 0.609 now carries 0.311 of margin rather
+ * than 0.041, and the pair is not close to anything. What the strict tier did
+ * do is TIGHTEN, from 0.65 to 0.58 — the observed maximum of the wired field —
+ * and this pair is not in that tier.
+ *
+ * SO THE ROOM'S TWO BLOCKERS ARE UNCHANGED AND BOTH SURVIVE THE REFIT: twelve
+ * tones against a cap of ten, and the single draft tone `fluent_in_everyone`,
+ * which has no mark cut in design/tone-icons. Measured: wiring it alone takes
+ * 341 pass / 0 fail to 339 / 2, and neither failure is an affinity failure.
+ */
+
+/**
+ * OAXACA, 1954.
+ *
+ * ── WHAT IS HERS AND WHAT IS MINE ────────────────────────────────────
+ *
+ * The founder supplied, VERBATIM and not to be improved: the thirteen tone
+ * codes, the list of REFUSED tiles and her reason for refusing them, the whole
+ * `voice` stance block (speaker, selfReference, audience, address, cadence,
+ * humour, punctuation and the lexicon's refusals with their replacements), the
+ * gesture invariant, her borders, and — from
+ * `docs/voices-draft/oaxaca-1954.md`, which she wrote and which says "the prose
+ * below is untouched" — the `tagline`, the `premise`, the `formality`, the
+ * mechanism sentence, the reply convention and the lexicon terms.
+ *
+ * DRAFTED BY AN AGENT, and marked as such at every site: `OAXACA_1954_LOOK`,
+ * the `register`, `sentence`, `orthography`, the lexicon GLOSSES, the
+ * `formulae`, the `banned` list, the `signOffs`, the `always`/`never` rules,
+ * `breaksCharacterFor`, the exemplars, the `rejected` examples, and every
+ * WEIGHT in `OAXACA_1954_TONES`. She gave thirteen codes and no numbers.
+ * CLAUDE.md rule 8: this is a draft and the signature is hers.
+ *
+ * ── THREE PLACES HER TWO DOCUMENTS DISAGREE. REPORTED, NOT RESOLVED ──
+ *
+ * `docs/voices-draft/oaxaca-1954.md` is the older document and the newer voice
+ * spec supersedes it on tags. Both are kept (rule 14) and the differences are
+ * named here rather than silently reconciled, because a later reader holding
+ * the draft file beside this const will otherwise read one of them as stale and
+ * "fix" it in the wrong direction.
+ *
+ *   1. THE TONE LIST IS ENTIRELY DIFFERENT, and this is the whole point of the
+ *      newer spec. The draft file proposed seven — `lingers`, `good_natured`,
+ *      `nicknames`, `in_jokes`, `sentimental`, `teasing`, `compliments_plainly`
+ *      — four of them Catskills' own, which is why that version measured 0.876
+ *      against Catskills and never landed. The newer thirteen keep exactly one
+ *      of those seven (`sentimental`) and REFUSE two of them by name (`teasing`,
+ *      `in_jokes`). Her list below is the one that governs.
+ *
+ *   2. THE HUMOUR MODE. The draft file says "Fond", and
+ *      `docs/voices-draft/VERIFICATION.md` mapped that to `warm` — recording at
+ *      the time that neither "delighted" nor "fond" exists in the enum and that
+ *      the mapping was "a loss the founder should see". THAT MAPPING IS
+ *      SUPERSEDED HERE and the old reasoning is kept per rule 14. Her newer
+ *      spec says the humour is "warm, dry, about time-depth", and gives the
+ *      line: "your grandmother would have started Wednesday."
+ *
+ *      `HumourMode` in tokens.ts says in its own doc comment that it is "the
+ *      mechanism, not the temperature". Her two words are one of each. The
+ *      temperature is warm and it belongs in `mechanism` beside the mode; the
+ *      MECHANISM is dry — an understatement that measures you against a longer
+ *      clock, which is what that line does and is not what a fond joke does. So
+ *      `dry`, with the warmth written into the mechanism field.
+ *
+ *      SAID PLAINLY BECAUSE THE ORDER OF REASONS MATTERS AND AN AGENT MUST NOT
+ *      BE TRUSTED ON IT: `warm` would collide outright with AMALFI COAST, 1953,
+ *      which is already plain/second_person/warm, and the stated-triple
+ *      assertion in voice.test.ts would fail. That is a CONSEQUENCE of reading
+ *      the enum's own definition, not the reason for the reading, and the
+ *      founder should overrule it if she meant `warm` — in which case the
+ *      collision with Amalfi is hers to break, on one room or the other.
+ *
+ *   3. `rises_to_greet` AGAINST HER OWN PREMISE. Her tone list claims it
+ *      ("Stands up when someone new arrives"); her premise says "nobody greets
+ *      you, you are seated". Both are hers. The reading taken below — and it is
+ *      a reading, so it is weighted low rather than resolved — is that the
+ *      table rises for a COUSIN coming through the door and does not make a
+ *      greeting ceremony out of a guest, which is the same fact as "you are
+ *      seated". If she meant the tile literally against an arriving guest, the
+ *      premise sentence is the one that has to move, and that sentence carries
+ *      the matrix cell `arrival = absorbed`.
+ *
+ * ── HER REFUSAL. THIS IS A BORDER, NOT A PREFERENCE ──────────────────
+ *
+ * REFUSED TILES: `talks_fast`, `no_dead_air`, `makes_an_entrance`, `teasing`,
+ * `in_jokes`, `closes_the_bar`, `never_impressed`. Her reason, verbatim:
+ * "everything nocturnal and performed stays out; the Havana border is enforced
+ * by fully non-overlapping hands."
+ *
+ * The refusal is the mechanism of the Havana separation and it is measurable:
+ * HAVANA_TONES and OAXACA_1954_TONES share NOT ONE CODE. That is what "fully
+ * non-overlapping hands" means and it is the strongest form of border any pair
+ * in this library has. It is written here because the failure mode is
+ * predictable — a later agent reads OAXACA, 1954, thinks warm Latin table, and
+ * adds `lingers` or `good_natured` from Havana's hand, and the border that was
+ * built by subtraction quietly stops existing.
+ *
+ * ── THE DELIVERABLES SHEET — SAID PLAINLY: THERE ISN'T ONE ───────────
+ *
+ * ASPEN and AMALFI each carry a founder deliverables sheet ("The walls… What to
+ * wear… What there is… What's playing…"), quoted whole in their blocks. THIS
+ * ROOM HAS NOT BEEN SENT ONE. `docs/voices-draft/oaxaca-1954.md` carries a
+ * TAGLINE, a PREMISE, a stance block, a LEXICON and a CELL-EVIDENCE MAP, and no
+ * walls/wear/there-is/playing sheet in any form.
+ *
+ * It is recorded as absent rather than assembled from the premise, because
+ * CLAUDE.md rule 3 is the whole reason this project exists: a sheet drafted by
+ * an agent and filed under her name is retro-tagging with a byline on it, and
+ * the next reader would have no way to tell it from Aspen's, which is real. It
+ * is founder-owed and is in the report.
+ *
+ * WHAT SHE DID SEND THAT HAS NO SCHEMA HOME, preserved whole here on the same
+ * terms the other two rooms' sheets are preserved on — the cell-evidence map
+ * from her draft file, which is the closest thing this room has and is a
+ * different kind of document (it says which SENTENCE carries which matrix
+ * cell, so correcting a listed sentence moves a cell):
+ *
+ *   arrival   = absorbed     "nobody greets you, you are seated"
+ *   schedule  = standing     "the whole schedule, and nobody has ever written
+ *                            it down"; "the house does not schedule; it
+ *                            remembers"
+ *   volume    = overlapping  "three generations talking at once"
+ *   dress     = plain        formality; nothing changes for Sunday
+ *   food      = cooked       "the mole has been going since yesterday"
+ *   ending    = dissolves    "Sunday does not end, it recedes"
+ *   starts    = afternoon    "starts around two and is still the afternoon at
+ *                            six"
+ *   size      = crowd        "a table that grows chairs"
+ *   spectacle = nothing      "nothing is performed… the food is the only thing
+ *                            presented"
+ *   audience  = semi         the reply convention
+ *
+ * ── THE GESTURE (THE INVARIANT) ──────────────────────────────────────
+ *
+ * SOMEBODY IS SENT TO STIR THE POT — mid-conversation, without discussion, and
+ * they go. Hers. CLAUDE.md rule 27: it is the ONE, and it is in the tagline's
+ * neighbourhood, in a formula, in an exemplar and in the `always` rules,
+ * because an invariant that appears once is a detail.
+ *
+ * It is also the wall against AMALFI, and the two gestures are exact opposites
+ * in who moves: Amalfi's is SOMEBODY REFILLS YOUR PLATE WITHOUT ASKING —
+ * abundance travelling toward the guest, mid-sentence. This one sends a person
+ * AWAY from the table, mid-sentence, toward the work. One room adopts you by
+ * feeding you; this one inherits you by putting you to work. Her framing of the
+ * same border: INHERITANCE VS ADOPTION.
+ *
+ * ── HER BORDERS ──────────────────────────────────────────────────────
+ *
+ * HAVANA 1957 — the known breach, and the one to watch first. The prior
+ * measurement was 0.848 against a strict number, recorded in docs/proposals.md
+ * as kinship rather than defect on the ground that structural distance is 3.
+ * Enforced here by the fully non-overlapping hands described above; the
+ * measured number for the tag list below is in the report and is quoted from
+ * `npm run check:voices`, never from a scratch run (rule 7).
+ *
+ * AMALFI 1953 — inheritance against adoption. The gestures oppose, as above.
+ * Structural distance 4, and it is the pair the `ending` cell would move.
+ *
+ * ACAPULCO 1959 — the coast this kitchen finds slightly scandalous. Her
+ * ruling, and it is an EXCLUSION RULE rather than a mood: every time-tile
+ * Acapulco claims, this room refuses. Acapulco's hand is loud, nocturnal and
+ * continuous — `no_dead_air`, `makes_an_entrance`, `all_at_once`,
+ * `across_the_room` — and not one of them appears below. Structural distance 6,
+ * the widest gap this room has to any authored neighbour.
+ *
+ * ASPEN 1994 — NOT one of her named borders and the one that matters most
+ * mechanically, because it is a DECLARED TWIN at structural distance 2, which
+ * puts the pair in the STRICT tier where voice is the only separator. Her two
+ * hands overlap on exactly two codes, `the_same_stories` and
+ * `comfortable_silence` — and those two are Aspen's own CLAIMED PAIR, its top
+ * two weights. The draft file's separation argument is hers and still holds in
+ * words ("Aspen is fast, adrenal… Oaxaca is unhurried, generational… If this
+ * voice speeds up, it has been written wrong"), and as of this file it is
+ * finally MEASURABLE rather than asserted. The number is in the report.
+ *
+ * ── THE ENDING CELL. MEASURED, NOT CHANGED ───────────────────────────
+ *
+ * Her sheet says "It stops cleanly" = `clean_stop`. The committed matrix says
+ * `oaxaca-1954.ending = dissolves`. `data/destination-matrix.json` WAS NOT
+ * TOUCHED; the flip was measured against a scratch copy outside the repo using
+ * a copy of `scripts/audit-matrix.mjs` verified byte-identical in OUTPUT to the
+ * committed HEAD version, and the full numbers are in the report.
+ *
+ * The short form, because it decides what this room's borders are made of:
+ *
+ *   THE HAVANA BORDER IS UNAFFECTED — 3 either way, because Havana ends
+ *   `until_morning` and neither `dissolves` nor `clean_stop` is that.
+ *
+ *   OAXACA/AMALFI WIDENS 4 -> 5, which is the flip's one clear gain and is
+ *   exactly what her gesture opposition wants said structurally.
+ *
+ *   AND IT IS NOT FREE, WHICH IS WHY THIS IS REPORTED RATHER THAN DONE. The
+ *   DECLARED TWIN Oaxaca/Aspen narrows 2 -> 1, leaving `schedule` as the single
+ *   remaining separator between them. Aspen's own block already records that
+ *   her Aspen material disputes that very cell — she puts "a schedule that runs
+ *   the day" under RUINS IT against a committed `posted` — and that
+ *   `ending + schedule` moved together puts the two rooms at DISTANCE 0, which
+ *   the twin rule forbids by name. So this flip does not break anything today
+ *   and it spends the entire margin of a pair whose other cell is already
+ *   under question. Three further pairs narrow (Dolomites 5 -> 4, Big Sur
+ *   4 -> 3, Palm Springs 4 -> 3) and three widen (Portofino, Côte d'Azur and
+ *   Nantucket, each 3 -> 4). FAILING stays 0 and no undeclared pair falls below
+ *   the gate.
+ *
+ * AND THE ARGUMENT AGAINST THE FLIP THAT IS NOT ARITHMETIC. Unlike Amalfi —
+ * where her claims sheet contradicted the MATRIX and she ruled for the matrix —
+ * here her sheet contradicts HER OWN VERBATIM PREMISE, which ends "nobody calls
+ * it an ending because Sunday does not end, it recedes", and which is the
+ * sentence her own cell-evidence map cites as the carrier of `ending =
+ * dissolves`. Two founder documents, one matrix cell, and the cell currently
+ * agrees with the prose. Rule 7 and rule 8: measured and reported, hers to
+ * rule.
+ *
+ * ── THE THREE RULES A PREMISE IS WRITTEN UNDER (CLAUDE.md 25) ────────
+ *
+ *   BOOKABLE AT BACKYARD SIZE. There is no villa, no hacienda and no market in
+ *   the premise. A courtyard is a backyard; a table that grows chairs is
+ *   chairs; a pot that started yesterday is a pot. Every line of it can be
+ *   honoured in Brooklyn in August, which is rule 10 from the other end.
+ *   NO PROPER NOUN. Not one, including the name of the place. `comida`,
+ *   `mole`, `mezcal` and `café de olla` are table words a guest says out loud
+ *   while eating, which is the test rule 25.2 states; they are not landmarks
+ *   and they are not brands.
+ *   NO LABOUR THE HOST DOES NOT HAVE. This is the room where that rule is
+ *   easiest to break and it is broken by exactly one word — a plate that is
+ *   SERVED. Everything here was made in advance, by somebody who is now
+ *   sitting at the table, and the one person who moves is sent to stir and
+ *   comes back. Acapulco's line is the house test — "things appear, nobody
+ *   serves them" — and the `never` rules below carry it.
+ *
+ * ── WHAT THE SCHEMA COULD NOT HOLD ───────────────────────────────────
+ *
+ * `Destination` has no field for the gesture, for the cell-evidence map or for
+ * a matching claim. The gesture and the map are preserved above. There is no
+ * matching-claims sheet for this room either; like the deliverables sheet, it
+ * is recorded as absent and is founder-owed.
+ */
+const OAXACA_1954_LOOK: Theme = {
+  key: "oaxaca-1954",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  // PROVISIONAL — DRAFTED BY AN AGENT AND NOT FOUNDER-SIGNED. A palette is a
+  // founder-signed surface (rule 13); these values are a starting position for
+  // that conversation and not a result. She sent no colours for this room.
+  //
+  // Read against the two rooms it must not become. AMALFI is whitewash and
+  // lemon in noon light — the loudest plate in the library. This one is a
+  // courtyard in the late afternoon: lime-washed wall gone warm, clay, and the
+  // dark brown-black of the pot, which is the room's one true colour and is
+  // where the ink comes from. The `aqua` slot is the only cool value and it is
+  // painted tile in shade rather than any water, because there is no water in
+  // this destination. `gold` is the marigold that is in every courtyard in
+  // every photograph of this place, held back to a token rather than a theme.
+  palette: {
+    ground: "#F1E6D3",
+    ground2: "#E4D2B7",
+    ink: "#2B1E16",
+    inkSoft: "#5A4535",
+    inkFaint: "#907A63",
+    rule: "#D2BC9A",
+    aqua: "#2C6A66",
+    oxblood: "#963226",
+    gold: "#C98A21",
+    night: "#1B1410",
+    night2: "#120D0A",
+    nightInk: "#F2E5CF",
+    nightSoft: "#B0997E",
+    nightAqua: "#69AAA4",
+    nightOxblood: "#D9694F",
+    bone: "#FAF3E6",
+  },
+  paletteDark: {
+    ground: "#120D0A",
+    ground2: "#1B1410",
+    ink: "#F2E5CF",
+    inkSoft: "#B0997E",
+    inkFaint: "#806D59",
+    rule: "#33261D",
+    aqua: "#69AAA4",
+    oxblood: "#D9694F",
+    gold: "#DFA83E",
+  },
+};
+
+export const OAXACA_1954: Destination = {
+  key: "oaxaca-1954",
+  name: "OAXACA, 1954",
+  // HERS, verbatim, from docs/voices-draft/oaxaca-1954.md.
+  tagline: "Sunday since yesterday.",
+  // HERS, verbatim. Her draft file says "the prose below is untouched" and it
+  // has not been touched here either — not for length, not for the em-dash, not
+  // for the colon. It is the carrier of eight of the nine matrix cells listed
+  // above, so editing a clause here silently edits the matrix.
+  premise:
+    "The mole has been going since yesterday and everyone knows it — that is " +
+    "the whole schedule, and nobody has ever written it down. The courtyard " +
+    "door stands open from noon; nobody greets you, you are seated, and a " +
+    "plate arrives before your name does. The comida starts around two and is " +
+    "still the afternoon at six: three generations talking at once down a " +
+    "table that grows chairs as cousins of cousins come through the door. " +
+    "Nothing is performed and nothing is announced — the food is the only " +
+    "thing presented, and it is presented like an argument won years ago. At " +
+    "dusk it dissolves into the courtyard, chairs pulled to the wall, café de " +
+    "olla, the same stories retold with the same corrections, and nobody calls " +
+    "it an ending because Sunday does not end, it recedes.",
+  look: OAXACA_1954_LOOK,
+  voiceVersion: 1,
+  voice: {
+    // HERS. The newer spec is more exact than the draft file's "the house
+    // itself" and supersedes it: it is the KITCHEN, and the authority is the
+    // point rather than a flourish.
+    speaker:
+      "The kitchen — the oldest voice in the house, and it has authority.",
+    // HERS.
+    selfReference: ["this kitchen", "this house"],
+    // HERS.
+    audience: "everyone at the table, addressed as the generation being fed",
+    address: {
+      mode: "second_person",
+      // HERS.
+      note:
+        "Second person, gently imperative — eat, sit, wait, it's almost ready " +
+        "— with the patience of someone who started days ago. You are not " +
+        "asked; you are included.",
+    },
+
+    // DRAFTED. The one line of the stance block she did not send, written as a
+    // document rather than a mood, on the pattern every other room follows.
+    register:
+      "A kitchen answering a question nobody asked, while stirring. Sounds " +
+      "like someone who has already been up for hours and is not tired of it.",
+    // HERS, from the draft file.
+    formality: "plain",
+    // HERS.
+    cadence:
+      "Unhurried, declarative; the long way round when a story starts; " +
+      "silences allowed to sit.",
+    // DRAFTED. She gave no numbers. The ceiling is high rather than low
+    // because "the long way round, with the detours" is a claimed tone and a
+    // clipped maximum would forbid the one rhythm she named; the typical is
+    // long for the same reason. This is the only room in the library whose
+    // maximum is above thirty.
+    sentence: { typicalWords: 16, maxWords: 34 },
+    // HERS, both clauses.
+    punctuation:
+      "Calm; no exclamation; the room has nothing to prove.",
+    // DRAFTED, and a consequence rather than an addition: a room whose whole
+    // schedule is that nobody wrote the schedule down cannot print a clock
+    // hour as an instruction. "Around two" is how this house says a time, and
+    // "since yesterday" is the only other tense it needs.
+    orthography:
+      "No all-caps and no title case on anything that is not a name. Hours are " +
+      "approximate and are never an instruction: around two, from noon, since " +
+      "yesterday. Dishes are named in lower case and are never capitalised into " +
+      "menu items.",
+
+    humour: {
+      mode: "dry",
+      // HERS, including the line. See the humour-mode note above for why the
+      // mode beside it is `dry` and not `warm`.
+      mechanism:
+        "Warm, dry, about time-depth. The joke is always the length of the " +
+        "clock and never the person: your grandmother would have started " +
+        "Wednesday. Nothing is at anybody's expense, and nothing is arch — a " +
+        "knowing aside is Côte d'Azur's move and this kitchen does not make it.",
+    },
+
+    // HER WORDS AND HER REFUSALS. Every `insteadOf` list is exactly the set she
+    // wrote and has not been extended, because `insteadOf` is a HARD BAN in
+    // scripts/check-voice-output.mjs and an agent does not get to add
+    // enforcement she did not author. The GLOSSES are drafted. The first four
+    // terms are her named replacements; the rest are the lexicon from her draft
+    // file, carried over unchanged.
+    lexicon: [
+      {
+        term: "the mole",
+        gloss:
+          "the thing that has been going since yesterday. It is the schedule, the centre of the table and the reason there is a party, and it is never described with an adjective",
+        insteadOf: ["cuisine", "spicy"],
+      },
+      {
+        term: "the pot",
+        gloss:
+          "what somebody is sent to stir. The room's one piece of equipment and its one errand",
+        insteadOf: ["artisanal"],
+      },
+      {
+        term: "how it's done",
+        gloss:
+          "the answer to any question about method. Not a written thing and not a claim about anybody else's way — this is simply how it is done in this house",
+        insteadOf: ["recipe", "authentic", "traditional"],
+      },
+      {
+        term: "since before",
+        gloss:
+          "the house's tense. Since before you were born, since before this table was this long. It is how age is stated, and it is stated flatly",
+      },
+      {
+        term: "from scratch",
+        gloss:
+          "the only claim this kitchen makes about its own work, and it makes it as a fact about time rather than as a boast about quality",
+      },
+      {
+        term: "the comida",
+        gloss:
+          "the meal that starts around two and is still the afternoon at six. Not lunch, not dinner, and never an event with a name on it",
+        insteadOf: ["fiesta"],
+      },
+      {
+        term: "the courtyard",
+        gloss:
+          "where the door stands open from noon and where the chairs go against the wall at dusk. The whole room, said in one word",
+      },
+      {
+        term: "the long table",
+        gloss:
+          "the one that grows chairs. Length is the only measurement this house takes",
+      },
+      {
+        term: "more chairs",
+        gloss:
+          "what arriving costs. Nobody is counted and nobody is turned away; a chair is found",
+      },
+      {
+        term: "mezcal in clay",
+        gloss:
+          "how it is poured and the only thing said about it. The vessel is the fact",
+      },
+      {
+        term: "café de olla",
+        gloss:
+          "the dusk drink, and the marker that the afternoon has become the evening without anybody announcing it",
+      },
+      {
+        term: "the pot that never empties",
+        gloss:
+          "abundance said as a fact about the pot rather than as a promise to a guest. Nobody is offered more; there is more",
+      },
+      {
+        term: "dusk against the wall",
+        gloss:
+          "the ending that is not one. Chairs pulled back, the table done with, nobody leaving",
+      },
+    ],
+
+    // DRAFTED.
+    formulae: [
+      "{The dish} has been going since {yesterday}. {That is the whole schedule}.",
+      "Eat first. {Whatever it is} will keep.",
+      "Sit. {The plain reason}.",
+      "Somebody goes to stir {the pot}. {The sentence carries on without them}.",
+      "{Your grandmother} would have started {a day earlier}.",
+      "It is how it's done in this house. {Nothing further}.",
+      "{Fact} — {the same fact, one generation further back}.",
+      "There are more chairs. {There have always been more chairs}.",
+    ],
+
+    // HER REFUSALS, plus the house-wide list every other destination carries.
+    // Note what is NOT here: mole, tamales, tortillas and mezcal. Her ruling —
+    // the dishes may always be named, they are table words, and they may never
+    // be adjectived. A ban is a word check and cannot express "only without an
+    // adjective", so the rule lives in `never` where a writer reads it.
+    banned: [
+      "authentic",
+      "traditional",
+      "artisanal",
+      "cuisine",
+      "fiesta",
+      "recipe",
+      "spicy",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    // DRAFTED.
+    signOffs: [
+      "It is almost ready.",
+      "Sunday, as always.",
+      "The door is open from noon.",
+      "Come and eat.",
+    ],
+
+    // DRAFTED, from her stance block.
+    always: [
+      "Say it as an instruction and mean it kindly: eat, sit, wait.",
+      "Put the time-depth in. Since yesterday, since before, how it has always been done here.",
+      "Send somebody to stir the pot, mid-sentence, without discussing it.",
+      "Take the long way round when a story starts, and allow the correction.",
+      "Let a silence sit. Nothing has to fill it.",
+      "Name the dish plainly and move on.",
+      "State abundance as a fact about the pot, never as an offer to a person.",
+    ],
+
+    // DRAFTED, except where her own refusals are quoted.
+    never: [
+      "Never authentic, never traditional. This kitchen makes no claim about anybody else's way of doing it; it says how it's done here.",
+      "Never artisanal, never cuisine. The pot is a pot and the food is food.",
+      "Never fiesta. It is the comida, and it is a Sunday rather than an occasion.",
+      "Never recipe as a written thing. Nobody has ever written it down — that is the premise, and a recipe contradicts it.",
+      "Never spicy as a headline. Heat is an ingredient and it is not the point.",
+      "The dishes may always be named — mole, tamales, tortillas, mezcal are table words. They may never be adjectived.",
+      "Never anything nocturnal or performed. That is the Havana border and it is held by subtraction: no late hour, no floor show, no entrance.",
+      "Never a joke at a person. The humour is about the length of the clock and nothing else.",
+      "Never an arch aside. Knowingness is the coast's move; this kitchen means what it says.",
+      "Never an exclamation point. The room has nothing to prove.",
+      "Never a clock hour as an instruction. Around two, from noon, and that is as exact as this house gets.",
+      "Never a we that means host and staff. Whoever cooked is sitting down; the only person who moves is the one sent to stir.",
+      "Never announce anything. Nothing is announced here, which is the sentence her own premise turns on.",
+      "Never use italics.",
+    ],
+
+    // DRAFTED, on the pattern every other destination keeps.
+    breaksCharacterFor: [
+      "Anything somebody must act on to arrive or to be safe: the address, the door, a doctor, and what is in the food — allergens are said plainly and completely, in this room more than any other, because the whole party is one pot.",
+      "Anything about money.",
+      "Any message that lets someone go: a decline, a departure, a way off a list. Written straight and made easy.",
+    ],
+
+    // DRAFTED. The lines marked below are hers.
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Sunday. The door is open from noon and the mole has been going since yesterday.",
+      },
+      {
+        piece: "invitation",
+        text: "Come around two. It will still be going at six.",
+      },
+      {
+        piece: "invitation",
+        text: "Nobody is invited. The door is open and Sunday is known.",
+        note: "HERS, verbatim — the reply convention from her draft file, which is also the evidence for audience = semi.",
+      },
+      {
+        piece: "invitation",
+        text: "Bring nothing. There are more chairs.",
+      },
+      {
+        piece: "menu_item",
+        text: "The mole, which was started yesterday.",
+      },
+      {
+        piece: "menu_item",
+        text: "Tortillas, made this morning, still warm if you come early enough.",
+      },
+      {
+        piece: "menu_item",
+        text: "Tamales, because there were always tamales.",
+      },
+      {
+        piece: "menu_item",
+        text: "Mezcal in clay, poured small.",
+      },
+      {
+        piece: "menu_item",
+        text: "Café de olla at dusk, when the chairs go against the wall.",
+      },
+      {
+        piece: "notice",
+        text: "Nothing is announced, because nothing needs to be — the hour is in everybody's bones.",
+        note: "HERS, verbatim — the mechanism line from her draft file. The house does not schedule; it remembers.",
+      },
+      {
+        piece: "notice",
+        text: "Somebody will be sent to stir the pot. It will be whoever is talking.",
+        note: "The gesture, and the only errand this room gives anybody.",
+      },
+      {
+        piece: "notice",
+        text: "Your grandmother would have started Wednesday.",
+        note: "HERS, verbatim — the humour mechanism entire. Dry, warm, and about the length of the clock rather than about anybody at the table.",
+      },
+      {
+        piece: "notice",
+        text: "The table grows chairs. It has never once been long enough on purpose.",
+      },
+      {
+        piece: "house_note",
+        text: "Eat first. Whatever it is will keep.",
+      },
+      {
+        piece: "house_note",
+        text: "The kitchen is through there and you are welcome in it, but you will be handed something to do.",
+      },
+      {
+        piece: "place_card",
+        text: "Nobody is seated by a list. You are seated.",
+      },
+      {
+        piece: "place_card",
+        text: "Tía Reme, in the chair she has had since before this table was this long.",
+      },
+      {
+        piece: "game_rule",
+        text: "The story is told the long way. Anybody may correct the year, and somebody always does.",
+      },
+      {
+        piece: "bulletin",
+        text: "Sunday. The mole went on yesterday afternoon and the courtyard door has been open since noon.",
+      },
+      { piece: "heading", text: "The comida, and what it goes on being" },
+      { piece: "heading", text: "Dusk, chairs against the wall" },
+      { piece: "sign_off", text: "It is almost ready." },
+      { piece: "sign_off", text: "Come and eat." },
+    ],
+
+    // DRAFTED, and every one of them derived from a refusal SHE wrote rather
+    // than from a sin invented for the occasion. These are what
+    // scripts/check-voice-output.mjs matches shape proximity against, so they
+    // are load-bearing: a refusal with no line beside it catches nothing.
+    rejected: [
+      {
+        text: "Authentic Oaxacan cuisine, made the traditional way.",
+        why: "Three refusals in seven words. This kitchen makes no claim about anybody else's way of doing it, the pot is not cuisine, and the only thing it will say about method is how it's done in this house.",
+      },
+      {
+        text: "A fiesta in the courtyard, with an artisanal mezcal tasting at six.",
+        why: "Fiesta names the Sunday as an occasion, artisanal sells the pouring, and a tasting at six is a clock hour used as an instruction in a room whose entire premise is that nobody wrote the schedule down.",
+      },
+      {
+        text: "Our family recipe for rich, spicy mole — passed down for generations.",
+        why: "Nobody has ever written it down, which is the premise; spicy makes heat the headline when it is an ingredient; and rich is the adjective her ruling forbids on the dish. The time-depth is right and is the only part that survives.",
+      },
+      {
+        text: "Dinner is served at eight. Please be seated.",
+        why: "Served, an hour, and an instruction. Nothing is served in this house — the plate arrives, from a pot somebody who is now sitting down started yesterday — and the comida starts around two.",
+      },
+      {
+        text: "The night goes on and on, and nobody wants it to end!",
+        why: "Nocturnal, performed, and printed loud. That is the Havana border in one line, and this room's ending is chairs against a wall at dusk with a coffee, not a night that refuses to stop.",
+      },
+      {
+        text: "Marisol still cannot make the tortillas and we let her try every year.",
+        why: "Aimed at a person. The humour here is about the length of the clock and never at somebody sitting at the table; teasing is a tile this room refuses by name.",
+      },
+      {
+        text: "You will want to hear the story about the mezcal, if you know what I mean.",
+        why: "An arch aside, which assumes the reader is already inside the joke. That is the coast's move. This kitchen tells the story the long way, to everybody, and lets itself be corrected.",
+      },
+    ],
+  },
+};
+
+/**
+ * OAXACA's voice, said in the tones a host is shown.
+ *
+ * THE FOUNDER'S THIRTEEN, TRANSCRIBED EXACTLY AND IN HER ORDER OF MEANING.
+ * Nothing here was chosen by an agent and nothing was substituted. THE WEIGHTS
+ * ARE MINE — she gave codes and no numbers — and they are weighted on the
+ * meaning against the room's own sentences, never tuned until a measurement
+ * passes, which is the rule written into the coined-tone block in
+ * src/lib/voice.ts and the rule docs/voices-draft/VERIFICATION.md refused by
+ * name.
+ *
+ * Every tag points at a line in the voice above:
+ *
+ *   feeds_you_first       "a plate arrives before your name does." The premise
+ *                         sentence, and the reason this is the top weight.
+ *                         DRAFT TONE — see below.
+ *   eat_before_you_speak  the address entire: "eat, sit, wait, it's almost
+ *                         ready." DRAFT TONE.
+ *   unhurried             "Unhurried, declarative", her cadence's first word.
+ *   the_same_stories      "the same stories retold with the same corrections."
+ *                         DRAFT TONE.
+ *   long_way_round        "the long way round when a story starts."
+ *   corrects_gently       "with the same corrections", and the corrections are
+ *                         part of the telling rather than a challenge to it.
+ *   one_tells_it          "three generations talking at once" is the room, and
+ *                         a story inside it still has one teller.
+ *   comfortable_silence   "silences allowed to sit."
+ *   asks_properly         the patience of someone who started days ago, turned
+ *                         on the person rather than on the pot.
+ *   sentimental           the one tone that survives from her older draft list.
+ *   toasts_everything     "mezcal in clay." Any excuse and the glass goes up.
+ *                         DRAFT TONE.
+ *   rises_to_greet        "cousins of cousins come through the door" — the
+ *                         table stands for them. Weighted lowest of the
+ *                         ceremony pair because of the premise conflict
+ *                         recorded above.
+ *   shows_you_things      the kitchen showing you how it's done, which is the
+ *                         only thing it will explain. Held low: this room
+ *                         SHOWS at the stove and never takes your elbow, which
+ *                         is Acapulco's version of the same tone at nearly
+ *                         double the weight. DRAFT TONE.
+ *
+ * Formality, address and humour are NOT tagged: plain, second person, dry are
+ * stated outright above and derived by `statedVoiceFacets`.
+ *
+ * ── HER BORDER, MEASURED THE ONLY WAY IT CAN BE ──────────────────────
+ *
+ * "the Havana border is enforced by fully non-overlapping hands." That is a
+ * checkable claim and it holds: HAVANA_TONES and this list share not one code.
+ * The same is true against ACAPULCO_1959_TONES, which is her second exclusion
+ * rule. It is NOT true against ASPEN_1994_TONES, which shares
+ * `the_same_stories` and `comfortable_silence` — and that pair is a declared
+ * twin in the strict tier, so it is the pair to watch rather than Havana.
+ *
+ * ── FIVE OF THESE THIRTEEN ARE DRAFT TONES, AND CLAIMING THEM DOES ───
+ * ── NOT PROMOTE THEM. THE CLAIM IS FOUR FILES, NOT ONE. ──────────────
+ *
+ * `feeds_you_first`, `eat_before_you_speak`, `the_same_stories`,
+ * `toasts_everything` and `shows_you_things` all carry `draft: true` in
+ * src/lib/voice.ts. Promotion is the same four-file job written out in the
+ * ACAPULCO block: clear the flag in voice.ts, put the tile on the page in
+ * quiz.ts, CUT AN SVG into design/tone-icons/, and regenerate
+ * src/app/apply/tone-marks.tsx. None of those four is this file, and the third
+ * is a design deliverable an agent must not fake — a mark drawn to make a test
+ * pass ships to a host as a picture nobody chose.
+ */
+export const OAXACA_1954_TONES: readonly ToneWeight[] = [
+  { code: "feeds_you_first", weight: 1 },
+  { code: "eat_before_you_speak", weight: 0.95 },
+  { code: "unhurried", weight: 0.9 },
+  { code: "the_same_stories", weight: 0.85 },
+  { code: "long_way_round", weight: 0.8 },
+  { code: "corrects_gently", weight: 0.75 },
+  { code: "one_tells_it", weight: 0.7 },
+  { code: "comfortable_silence", weight: 0.6 },
+  { code: "asks_properly", weight: 0.55 },
+  { code: "sentimental", weight: 0.5 },
+  { code: "toasts_everything", weight: 0.45 },
+  { code: "rises_to_greet", weight: 0.4 },
+  { code: "shows_you_things", weight: 0.3 },
+];
+
+/* ── OAXACA IS AUTHORED AND IS NOT IN `DESTINATIONS`. READ THIS ───────
+ *
+ * The two consts above are complete and reviewable and they are deliberately
+ * NOT keyed into `DESTINATIONS` or `DESTINATION_TONES` below. Same handling as
+ * ACAPULCO, AMALFI, ASPEN and PALM SPRINGS: a refusal stated where the next
+ * person is standing, not an omission. Rule 8 — an agent produces a draft;
+ * activation is hers.
+ *
+ * WIRING IT IN WAS MEASURED, 2026-08-27. With her thirteen tones exactly as
+ * written, `npm test` goes from 343 pass / 0 fail to 341 / 2:
+ *
+ *   "a destination's tones are real, weighted legally, and few" — THIRTEEN
+ *   TONES against a documented maximum of ten. The cap is now EVIDENCE and not
+ *   only a constraint: ST. MORITZ 1984 was authored by the founder at exactly
+ *   ten, deliberately and stated as such, so ten is a size she has shown is
+ *   livable rather than a number an old assertion happens to hold.
+ *
+ *   "every tone is claimed by at least one destination" — FIVE of the thirteen
+ *   carry `draft: true` in src/lib/voice.ts: `feeds_you_first`,
+ *   `eat_before_you_speak`, `the_same_stories`, `toasts_everything`,
+ *   `shows_you_things`. Checked one by one against `TONES`; the other eight —
+ *   `unhurried`, `long_way_round`, `corrects_gently`, `one_tells_it`,
+ *   `comfortable_silence`, `asks_properly`, `sentimental`, `rises_to_greet` —
+ *   are SHIPPED and have marks cut. Promotion is the four-file job written out
+ *   in the ACAPULCO block; the third file is an SVG in design/tone-icons and
+ *   none of the five has one.
+ *
+ * AND NOT ON AFFINITY, WHICH IS THE HEADLINE FOR THIS ROOM. Her border held,
+ * and it held by a mechanism that can be checked rather than argued:
+ *
+ *   HAVANA / OAXACA is 0.730. The number this room has carried since the first
+ *   draft was 0.848, and `docs/voices-draft/VERIFICATION.md` recorded 0.760 for
+ *   the seven-tone version before that. HER INSTRUCTION IS WHAT MOVED IT —
+ *   "everything nocturnal and performed stays out; the Havana border is
+ *   enforced by fully non-overlapping hands." Structural distance is 3, so this
+ *   is a monitor-tier pair, and 0.730 against 0.92 is kinship with room to
+ *   spare. Two warm houses; one pours rum in a nightclub and one serves mole at
+ *   a family table, which is CLAUDE.md rule 26's own sentence about this exact
+ *   pair.
+ *
+ *   BUT THE HANDS ARE NOT FULLY NON-OVERLAPPING, AND SHE SHOULD BE TOLD RATHER
+ *   THAN HAVE IT QUIETLY WORK ANYWAY. Counted rather than assumed (rule 24, and
+ *   the first draft of this block asserted the opposite before anybody ran the
+ *   number): the two rooms share exactly ONE code, `asks_properly`, which is
+ *   0.143 of Havana's seven-tone hand. Nine of her ten refusals hold perfectly
+ *   and the border does its job — the pair drops 0.118 against the previous
+ *   tagging and clears its tier easily. One tile is the exception, and it is
+ *   the exception to a rule SHE stated in absolute terms, so it is hers to
+ *   ratify or to cut. See the recommended cuts at the end of this block.
+ *
+ *   CATSKILLS / OAXACA is 0.480, down from the 0.876 that killed the first
+ *   draft. Four of that draft's seven tones were Catskills' own; none of these
+ *   thirteen is.
+ *
+ *   ASPEN / OAXACA is 0.517 — and this is the pair to actually watch, because
+ *   it is a DECLARED TWIN at structural distance 2 and therefore the STRICT
+ *   tier, where voice is the only separator. Against a recalibrated strict
+ *   ceiling of 0.58 that is 0.063 of margin, the tightest in the tier. THE TWIN
+ *   CLAIM IS NOW MEASURED RATHER THAN PROMISED: `data/destination-matrix.json`
+ *   still records it as "UNVERIFIED — neither voice is written, so the affinity
+ *   condition cannot be measured", and as of this file both voices exist and
+ *   the condition is satisfied. The matrix row is not this file's territory and
+ *   was not touched; updating that status line is founder-owed and is in the
+ *   report.
+ *
+ *   ACAPULCO / OAXACA is 0.101, the widest gap this room has to any warm
+ *   neighbour, and it is her second exclusion rule working exactly as she wrote
+ *   it. Her rule is about TIME tiles specifically — "every time-tile they
+ *   claim, this room refuses" — and it holds without exception: Acapulco's
+ *   `no_dead_air`, `makes_an_entrance`, `all_at_once` and `across_the_room` are
+ *   none of them here. The one code the two hands do share is
+ *   `toasts_everything`, which is a ceremony tile and not a time tile, so it is
+ *   inside her rule rather than a breach of it. Hand overlap 0.111.
+ *
+ * The stated triple (plain/second_person/dry) is unique — see the humour-mode
+ * note in the block above `OAXACA_1954`, which records the superseded mapping
+ * and why `warm` would have collided with Amalfi.
+ *
+ * TO LAND IT, once the founder has ruled on the tone count: add
+ * `"oaxaca-1954": OAXACA_1954,` to `DESTINATIONS` and
+ * `"oaxaca-1954": OAXACA_1954_TONES,` to `DESTINATION_TONES`, plus the five
+ * promotions. The `world` row for `oaxaca-1954` is already seeded draft, and
+ * the gesture — somebody sent to stir the pot — still needs its migration.
+ *
+ * THE THREE CUTS RECOMMENDED AND NOT MADE, argued from register rather than
+ * from any measurement, because she asked that none be cut and rule 8 says the
+ * ruling is hers:
+ *
+ *   `shows_you_things` (0.30) — the lowest weight, and the one tone that
+ *   argues with the room's own stance. "Takes your elbow and turns you toward
+ *   something" is a host introducing a newcomer to a place; this kitchen's
+ *   audience is "the generation being fed" and its whole manner is that you
+ *   already belong and nothing needs explaining. It is also Acapulco's move at
+ *   nearly double the weight, and Acapulco is the room she calls slightly
+ *   scandalous.
+ *
+ *   `rises_to_greet` (0.40) — the only tone of the thirteen that contradicts a
+ *   sentence she wrote. Her premise says "nobody greets you, you are seated",
+ *   and that clause is the carrier of the matrix cell `arrival = absorbed`.
+ *   The reading taken above — the table rises for a cousin, not for a guest —
+ *   is a reading, and if it is wrong this is the tile to lose rather than the
+ *   sentence.
+ *
+ *   `toasts_everything` (0.45) — "any excuse at all, and the glass goes up" is
+ *   a room that MARKS things. This one announces nothing, and Sunday is not an
+ *   occasion; the mezcal is poured in clay and never raised. It is also
+ *   Acapulco's tone at 0.9 and St. Moritz's at 0.65, which are the two rooms
+ *   whose register this one is defined against.
+ *
+ * AND A FOURTH CANDIDATE THAT MAY OUTRANK ALL THREE, offered separately
+ * because it comes from her own border rather than from register: `asks_properly`
+ * (0.55) IS THE ONE CODE THIS HAND SHARES WITH HAVANA, and it is therefore the
+ * single tile standing between her instruction and its literal truth. The
+ * kindness axis is already carried at full weight by `feeds_you_first` and
+ * `eat_before_you_speak`, and this room's care is shown by FEEDING rather than
+ * by asking — "eat first, whatever it is will keep" is very nearly the opposite
+ * of stopping to ask how you are and waiting for the answer. Cutting it makes
+ * "fully non-overlapping hands" a fact instead of an intention.
+ *
+ * Any three of the four brings the room to the cap. Cutting `shows_you_things`
+ * and `toasts_everything` also drops the art bill from five marks to three.
+ */
+
+/**
+ * ST. MORITZ, 1984.
+ *
+ * ── WHAT IS HERS AND WHAT IS MINE ────────────────────────────────────
+ *
+ * The founder supplied, VERBATIM and not to be improved: the `tagline`, the
+ * `premise`, the ten tone codes and their order, the list of REFUSED tiles with
+ * her reason for each group, the whole `voice` stance block (speaker,
+ * selfReference, audience, address, cadence, humour, punctuation and the
+ * lexicon's refusals with the seven words she put in their place), the
+ * signature gesture, the deliverables sheet quoted below, the matching claims,
+ * the border list, and the rule-25 working.
+ *
+ * DRAFTED BY AN AGENT, and marked as such at every site: `ST_MORITZ_1984_LOOK`,
+ * the `register`, the `formality`, the `sentence` numbers, the `orthography`,
+ * the lexicon GLOSSES (her terms, my definitions), the `formulae`, the `banned`
+ * list, the `signOffs`, the `always`/`never` rules, the `breaksCharacterFor`
+ * list, the `exemplars`, the `rejected` lines, and every WEIGHT in
+ * `ST_MORITZ_1984_TONES`. She gave ten codes and no numbers. Rule 8: this is a
+ * draft and the signature is hers.
+ *
+ * ── HER ACCOUNT OF THE HAND ──────────────────────────────────────────
+ *
+ * She authored this hand AT THE TEN-CAP DELIBERATELY. That is worth saying
+ * first because it is the opposite of every other room this week: ACAPULCO gave
+ * thirteen, AMALFI thirteen, ASPEN twelve, PALM SPRINGS twelve, OAXACA
+ * thirteen, and each of those blocks above carries a paragraph about a cap the
+ * founder overran without being told about it. This one is exactly ten. NO CUTS
+ * ARE NEEDED AND NONE ARE PROPOSED, and an agent must not read the absence of a
+ * cut-argument here as an oversight — there is nothing to argue about.
+ *
+ * The hand is UNIFORMLY WARM AND OUTWARD: `laughs_first`, `says_it_out_loud`,
+ * `compliments_plainly`, `toasts_everything`, `rises_to_greet`. Held against
+ * that, and this is the part that makes it a room rather than a mood, are four
+ * tones of FORM: `dressed_up`, `makes_an_entrance`, `impeccably_polite`,
+ * `rises_to_greet` again. Warmth with manners on. The tenth,
+ * `fluent_in_everyone`, is the circulation — her sentence about the audience is
+ * "this party's genius is circulation; you will be introduced", and the tone
+ * that carries it is the one that arrives already knowing everybody's story.
+ *
+ * ── HER REFUSALS ARE BORDERS, NOT PREFERENCES ────────────────────────
+ *
+ * Refused by name, in three groups, each with her reason. Every one is stated
+ * in `never` below so that a later agent adding one of them is REFUSING A
+ * BORDER rather than improving a list:
+ *
+ *   low_voices, understated, comfortable_silence
+ *     — HER REASON: "no solemnity survives here." Not a dislike of quiet: a
+ *       claim that this room has no register in which the important thing is
+ *       said under the breath.
+ *   deadpan, means_the_other_thing, straight_to_gossip
+ *     — HER REASON: "Palm Springs' sideways wit; this room is warm and direct."
+ *       PALM SPRINGS, 1965 above is built on exactly those three, two of them
+ *       at weight 1. The two rooms are adjacent in the catalogue and opposite
+ *       in the mouth.
+ *   teasing, in_jokes
+ *     — HER REASON: "Aspen's closed circle; this party is open-armed." A joke
+ *       that needs the history excludes the person being introduced, and being
+ *       introduced is what this party is for.
+ *
+ * ── HER DELIVERABLES SHEET, PRESERVED WHOLE ──────────────────────────
+ *
+ * The schema has a home for perhaps half of it, so it is kept entire here and
+ * the halves that fit are quoted where they fit — the invitation in the product
+ * note on `docs/proposals.md`, the setting in `ST_MORITZ_1984_LOOK`, the dress
+ * and the food and the music in `exemplars`:
+ *
+ *   "The invitation: a ski pass — her name as the passholder, your date as the
+ *   season, punched like it's been worn. Sets the dress code before a word of
+ *   it is written.
+ *   The setting: the party begins outdoors if it possibly can — terrace,
+ *   garden, stoop — blankets and the drinks tray in the cold. Inside waits lit:
+ *   candles, gold light, mirrors doing work.
+ *   What to wear: glossy and warm at once — the fur collar, the good coat worn
+ *   open, sunglasses until sundown, jewelry that catches light. Committed to,
+ *   and complimented out loud.
+ *   What there is: champagne first and mostly — the cold does the chilling.
+ *   Then things that eat standing: smoked fish, cheese doing its best work,
+ *   chocolate, something hot in small cups when the light goes. A late supper
+ *   only if the night earns one.
+ *   What's playing: nothing outside — the cold and the talk are enough. Inside,
+ *   once the light goes: disco and what it turned into by '84 — glossy,
+ *   European, synthesizers with fur on. Loud enough to dance to by ten. This is
+ *   correct."
+ *
+ * ── HER MATCHING CLAIMS, RECORDED HERE BECAUSE NOTHING IN THIS ───────
+ * ── MODULE HOLDS THEM ────────────────────────────────────────────────
+ *
+ *   occasions        birthday, girls' weekend, holiday, anniversary, bridal,
+ *                    no reason at all
+ *   taste direction  deco hotel
+ *   environment      the mountains, a garden, my home, a rented house
+ *   meal             standing drinks, a late supper
+ *   group fun        commit to an outfit, dance without being asked twice,
+ *                    talk a stranger into something, end up somewhere unplanned
+ *   ruins it         novelty props and balloons, kids' party, a schedule that
+ *                    runs the day, forced participation
+ *   wants more of    a table worth photographing, one moment they retell for
+ *                    years, permission to stay up
+ *
+ * NOTE ON `taste direction`: "deco hotel" IS one of the eleven declared
+ * directions, and that is worth stating because it is the first of this week's
+ * six rooms whose direction did not need a proposals row. ASPEN's winter living
+ * room and PALM SPRINGS' desert modern both went to the ledger unmapped
+ * (docs/proposals.md, 2026-08-27). This one fits, and the fit is not a stretch:
+ * "candles, gold light, mirrors doing work" is a deco hotel lobby described
+ * without naming one.
+ *
+ * NOTE ON `environment`: she names "a rented house", which is not a quiz option
+ * today — it was retired, and the case for restoring it is BLOCKED ON A
+ * CONTRADICTION on the proposals ledger (2026-08-23). Recorded, not resolved.
+ *
+ * ── HER BORDERS, AND WHAT HOLDS EACH ONE ─────────────────────────────
+ *
+ * Measured in her stated order. Numbers below `ST_MORITZ_1984_TONES`.
+ *
+ * PALM SPRINGS 1965 — her words: afternoon-golden versus dusk-deadpan;
+ * warm-direct versus gossip-sideways; snow versus pool. This is the border she
+ * put first and it is the one the refusal list is built out of: three of the
+ * eight tiles she refuses by name are three of Palm Springs' twelve, two of
+ * them at weight 1.
+ *
+ * ASPEN 1994 — her words: same mountains, closed sweatpants circle versus open
+ * dressed party; disjoint hands. The hands ARE disjoint — checked code by code
+ * against `ASPEN_1994_TONES` above, not assumed — and ASPEN's own block records
+ * her earlier ruling on the same border from the other side: "the St. Moritz
+ * hand stays refused."
+ *
+ * ACAPULCO 1959 — her words, and she named this one as THE PAIR TO VERIFY:
+ * "two golden rooms: wet, salted, clockless versus polished, deliberate,
+ * dressed." It is also the DECLARED TWIN of this room in
+ * `data/destination-matrix.json` at structural distance 2, which is the strict
+ * tier — so this pair is the reason the voice ceiling exists at all, and it is
+ * the one number in this block that had to come out right rather than merely
+ * come out. The measurement and its contributing facets are below.
+ *
+ * ── HER RULE-25 WORKING, KEPT ────────────────────────────────────────
+ *
+ *   1. BOOKABLE AT ITS MOST BOOKABLE SIZE. "A winter or autumn cocktail party
+ *      anywhere with an outdoors and an early sunset." THE SEASON IS CLAIMED,
+ *      NOT APOLOGISED FOR — which is the interesting half, because it is the
+ *      first room in the library to make its constraint the pitch rather than
+ *      the excuse. A terrace, a garden or a stoop all satisfy it; a mountain
+ *      does not appear in the requirement anywhere.
+ *   2. NO PROPER NOUN A GUEST WOULD NOT SAY AT THE TABLE. "The light, the snow
+ *      and eight o'clock are the coordinates." No resort, no peak, no country.
+ *      The refused lexicon is the discipline written down: `alpine` and
+ *      `chalet` are the two postcard words this room would otherwise reach for
+ *      and both are banned.
+ *   3. NO LABOUR OR STAFF THE HOST DOES NOT HAVE. "Champagne and standing food,
+ *      all made ahead." The cold does the chilling, which is the room's own
+ *      joke about not owning an ice bucket. ACAPULCO's structural sentence
+ *      applies unchanged: there is no staff in this voice.
+ *
+ * ── THE GESTURE. THIS ROOM HAS ONE. ──────────────────────────────────
+ *
+ * HER SIGNATURE, in her words: "champagne opened outside, in the cold, while
+ * it's still light — THE POP IS THE PARTY STARTING."
+ *
+ * It satisfies db/031 line 19's condition without argument — "a gesture is
+ * INVARIANT per destination, the one thing that always happens" — and it is
+ * worth putting next to the room immediately before it in this file. PALM
+ * SPRINGS offered lights-at-dusk and the founder threw it out, because a switch
+ * being flipped is a utility wearing the costume of a ritual (CLAUDE.md rule
+ * 27). This is not that. It is an ACT somebody performs, it is audible, it is
+ * witnessed, it happens once, and it is the room's most recognisable single
+ * fact. It also carries the room's whole thesis in one motion: the party is
+ * outdoors, it is cold, and it is starting while it is still light.
+ *
+ * A MIGRATION IS OWED AND IS NOT WRITTEN HERE. `Destination` has NO `gesture`
+ * field — see `src/lib/tokens.ts` — so this file cannot hold it, and the
+ * gesture is recorded in this header rather than dropped. What is owed is a
+ * db/034-SHAPED MIGRATION against the `st-moritz-1984` world row, setting
+ * `world.gesture` and `world.gesture_note` (added NULLABLE by db/031 lines
+ * 129-130, so no schema change is needed — only the update). It is not written
+ * here because migrations are not this file's territory and because rule 22
+ * says so directly: migrations own schema, seeders own content.
+ *
+ * PER RULE 27's SECOND HALF, the twenty are separate and already have a home:
+ * `bank_kind = 'host_act'` rows in `docs/atmosphere-idea-bank-v1.md`. The pop
+ * being simultaneously the signature and a bank host act is not duplication to
+ * resolve.
+ *
+ * ── THREE CELLS IN THE COMMITTED MATRIX, TWO AGREEING AND ONE NOT ────
+ *
+ * `ending = until_morning` AGREES with her material. She wrote "It goes until
+ * morning" and the committed row says `until_morning`. Said out loud because
+ * the agreements are rarer than the conflicts in this week's rooms and a reader
+ * scanning for the conflict should not have to infer the agreement.
+ *
+ * `schedule = posted` AGREES, AND IT NEARLY DID NOT — checked because her
+ * "ruins it" list contains "a schedule that runs the day", which reads at first
+ * glance like a refusal of the cell. It is not. The matrix defines `posted` as
+ * "THE INVITATION NAMES THE HOURS" (`facetNotes.schedule`), and hers does: the
+ * ski pass carries the date, the party starts while it is still light, and the
+ * music is "loud enough to dance to by ten". What she refuses is a PROGRAMME —
+ * an order of events people are marched through — and the facet does not ask
+ * about that. Recorded because the near-miss is the useful part: an agent
+ * reading her ruins-it list against the level NAMES rather than against the
+ * level DEFINITIONS would have reported a conflict that is not there.
+ *
+ * `starts` CONFLICTS. She says "In the afternoon." The committed row says
+ * `evening`. Her premise is unambiguous about which she means — "the party
+ * starts while it's still light — ON PURPOSE" — so this is not the Palm Springs
+ * case of a room that is legitimately either. It is a room that starts in the
+ * afternoon and moves indoors at sundown, encoded as a room that starts in the
+ * evening.
+ *
+ * THE FLIP WAS MEASURED AND THE CELL WAS NOT TOUCHED. Method identical to PALM
+ * SPRINGS' above (CLAUDE.md rule 7): a byte-identical copy of the committed
+ * `scripts/audit-matrix.mjs` taken from HEAD and verified by MD5
+ * (6a895b0ab2f42af0eec705a47ab5e81b), run in a scratch tree outside the repo
+ * against a scratch copy of `data/destination-matrix.json`, itself verified
+ * identical to HEAD. The repo copy of the matrix was not written to.
+ *
+ * FIFTEEN OF THIS ROOM'S SEVENTEEN PAIRS MOVE. Only DOLOMITES and CATSKILLS
+ * hold, for the same reason they held under Palm Springs' flip: they are the
+ * two `morning` rooms, and `afternoon` differs from `morning` exactly as
+ * `evening` did.
+ *
+ *   IT COSTS ONE UNDECLARED FAILURE:
+ *     palm-springs-1965 / st-moritz-1984   3 -> 2   FAILING, differ only on
+ *                                                   schedule, ending
+ *
+ *   IT DISSOLVES A DECLARED TWIN, SILENTLY:
+ *     st-moritz-1984 / acapulco-1959       2 -> 3   rises above the gate, and
+ *                                                   the audit simply stops
+ *                                                   listing it
+ *
+ * THAT SECOND LINE IS THE FINDING, and it is a defect in the instrument rather
+ * than in the cell. `scripts/audit-matrix.mjs` checks that no UNDECLARED pair
+ * sits below the gate and that no room is declared twice; it does not check
+ * that a DECLARED twin is still below the gate. So a flip that takes a declared
+ * pair above the gate produces a `twinRule.declared` entry describing a
+ * relationship that no longer exists, and the report goes quiet about it — the
+ * pair drops off the DECLARED TWINS list and appears in ZERO MARGIN with no
+ * note that it used to be a twin. Every downstream reader of `twinRule` then
+ * believes a tiebreak is in force between two rooms the matrix now routes apart
+ * on its own. It is CLAUDE.md rule 23 exactly: a mechanism that invites
+ * misreading is a defect even when it works. NOT FIXED HERE — the audit script
+ * is another agent's file this session, and it is on the proposals ledger.
+ *
+ *   IT COSTS NO TWIN VIOLATIONS. This is the difference from the flip measured
+ *   from the other side. Palm Springs' flip to `evening` produced TWO undeclared
+ *   failures and TWO rule-4 crowded corners, because it dropped BOTH
+ *   palm-springs/st-moritz AND palm-springs/acapulco to 2, leaving st-moritz
+ *   and acapulco each below the gate against two rooms. This flip moves the
+ *   SAME PAIR from the other end and moves nothing else down: after it,
+ *   st-moritz sits below the gate against palm-springs alone (one partner) and
+ *   acapulco sits below the gate against nobody at all. One partner each is a
+ *   pair, not a corner, so rule 4 is satisfied and the script prints no
+ *   violation.
+ *
+ *   WHAT IT GAINS: st-moritz-1984 / aspen-1994 4 -> 3 and
+ *   st-moritz-1984 / acapulco-1959 2 -> 3 both come up onto the gate;
+ *   nantucket 6 -> 7 and tahiti 5 -> 6 open further. Mean distance 4.93 ->
+ *   4.95, which is the only headline number that IMPROVES under either flip
+ *   (Palm Springs' went 4.93 -> 4.90). Undeclared failures 0 -> 1.
+ *
+ * SO THE TWO FLIPS COLLIDE ON ONE PAIR AND THE ANSWER IS NOT SYMMETRIC. Palm
+ * Springs' `starts` and St. Moritz's `starts` are currently `afternoon` and
+ * `evening`; her material asks for `evening`-then-`afternoon` and
+ * `afternoon`-then-`afternoon` respectively. Both rooms at `afternoon` is the
+ * failing configuration, and it fails whichever of them moved. THAT IS A CELL
+ * DECISION ABOUT TWO ROOMS AT ONCE AND IT IS HERS, not an agent's, and it is
+ * probably not a `starts` decision at all — `schedule` and `ending` are the two
+ * facets the pair would still differ on, and the honest reading is that these
+ * two rooms are underdetermined by nine facets rather than that either cell is
+ * wrong. Rule 26 from one step out: before concluding a cell is wrong, check
+ * the axis can say what the two rooms differ on. A dressed champagne party that
+ * runs to morning and a dry patio party that stops cleanly differ on more than
+ * two facets in life.
+ *
+ * REPORTED, NOT APPLIED. `data/destination-matrix.json` is untouched.
+ *
+ * ── THE PRODUCT NOTE ─────────────────────────────────────────────────
+ *
+ * Her ruling on the ski-pass invitation — that it authors as a product-pool row
+ * in `arrival_welcome`, per-guest by construction, pre-party print by nature,
+ * and faces the publish queue like everything printed — is RECORDED ON
+ * `docs/proposals.md` AND NOT BUILT. No row is created here. Rule 13: pool
+ * content stocks itself, and this is still authoring rather than stock.
+ */
+const ST_MORITZ_1984_LOOK: Theme = {
+  key: "st-moritz-1984",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  // PROVISIONAL AND FOUNDER-PENDING. DRAFTED BY AN AGENT, AND THIS ONE IS
+  // THINNER EVIDENCE THAN PALM SPRINGS' WAS.
+  //
+  // She gave a LIGHT BRIEF and not a plate: "golden hour, snow-light, gold
+  // light and mirrors." Four phrases, three of which are about light and none
+  // of which is a colour. Everything below is an agent reading them, and the
+  // reading is stated so it can be disagreed with rather than inherited:
+  //
+  //   SNOW-LIGHT is not white. Light off snow in the last hour is warm on the
+  //   faces and blue in the shadows at the same time, which is why the room can
+  //   hold sunglasses and good jewelry in one sentence. So the ground is a warm
+  //   bone that has been standing in cold air, and the rule and the faint ink
+  //   go blue rather than grey.
+  //   GOLDEN HOUR is the low sun, not the metal. `gold` here is the sun on a
+  //   fur collar — an apricot, not a brass.
+  //   GOLD LIGHT AND MIRRORS is the INSIDE half, and it is the night palette
+  //   rather than a second daytime one: candlelight doubled in glass, so the
+  //   night ground is a deep cold blue and everything on it is warm.
+  //   The `aqua` slot carries the shadow on snow, which is the only genuinely
+  //   cold colour in the room.
+  //
+  // The deliverables sheet's own sentence is the instruction this plate is
+  // written under: "Inside waits lit: candles, gold light, mirrors doing work."
+  //
+  // A destination differentiates on palette and on voice (see the note at the
+  // top of this file), so these values are a claim and not a placeholder — and
+  // an agent's claim about a look drafted from four phrases is exactly the kind
+  // the founder cuts. The world row for `st-moritz-1984` is DRAFT, so it cannot
+  // reach a member today. Do not read these hexes as ratified.
+  palette: {
+    ground: "#F2ECE0",
+    ground2: "#E3DACA",
+    ink: "#1C2029",
+    inkSoft: "#4E5563",
+    inkFaint: "#8A909C",
+    rule: "#C8C6BE",
+    aqua: "#3E6E86",
+    oxblood: "#B24A44",
+    gold: "#D19A45",
+    night: "#131A26",
+    night2: "#0B1019",
+    nightInk: "#F3E9D6",
+    nightSoft: "#ADA593",
+    nightAqua: "#7FB4C8",
+    nightOxblood: "#E08A6B",
+    bone: "#FAF6EC",
+  },
+  paletteDark: {
+    ground: "#0B1019",
+    ground2: "#131A26",
+    ink: "#F3E9D6",
+    inkSoft: "#ADA593",
+    inkFaint: "#7A7F8C",
+    rule: "#26313F",
+    aqua: "#7FB4C8",
+    oxblood: "#E08A6B",
+    gold: "#E3B85C",
+  },
+};
+
+export const ST_MORITZ_1984: Destination = {
+  key: "st-moritz-1984",
+  name: "ST. MORITZ, 1984",
+  // HERS, verbatim.
+  tagline: "Champagne in the snow, sunglasses on.",
+  // HERS, verbatim. Note that it settles the `starts` conflict in her favour
+  // and against the committed cell — "the party starts while it's still light —
+  // on purpose" is positive evidence about the hour under rule 3, and the cell
+  // was still not touched. See the header.
+  premise:
+    "St. Moritz, January 1984. The party starts while it's still light — on " +
+    "purpose. Champagne outside in the cold, sunglasses and good jewelry at " +
+    "the same time, everyone flushed and golden and talking to everyone. The " +
+    "light off the snow does half the work; the fur collars do the rest. When " +
+    "the sun drops, the party moves inside all at once, glowing, and gets its " +
+    "second wind. This is the party that catches the golden hour — where " +
+    "everybody looks lit from within, and the photographs from tonight will " +
+    "be the good ones for years.",
+  look: ST_MORITZ_1984_LOOK,
+  voiceVersion: 1,
+  voice: {
+    // HERS. Two speakers in sequence, which is unique in the library: every
+    // other room speaks from one place. Kept as she wrote it, because the
+    // sequence IS the room — the party moves inside all at once and the voice
+    // moves with it.
+    speaker: "The terrace in the last of the light, then the room after dark.",
+    // HERS, and the pair is the same fact said in two words.
+    selfReference: ["out here", "in here"],
+    // HERS.
+    audience:
+      "everyone — this party's genius is circulation; you will be introduced",
+    address: {
+      mode: "second_person",
+      // HERS.
+      note:
+        "Second person, warm and quick — the friend introducing you to " +
+        "someone you'll love.",
+    },
+
+    // DRAFTED, out of her deliverables sheet's first line and nothing else. The
+    // ski pass is the room's own document: a thing punched, worn, and handed
+    // over, which sets the dress code before a word of it is written.
+    register:
+      "A ski pass filled in by hand and punched, handed over at the door by " +
+      "somebody already holding two glasses.",
+    // DRAFTED. Argument, because this is the one stated facet she did not
+    // write. `cordial` is "a well-written note between people who know each
+    // other", and that is the room: `impeccably_polite` and `rises_to_greet`
+    // rule out `familiar`, while `formal` and `ceremonial` would make a hotel
+    // notice board of a terrace where the compliment lands unhedged. `plain`
+    // loses the manners, which are half the hand.
+    //
+    // THE TRIPLE IS UNIQUE AND WAS CHECKED RATHER THAN ASSUMED:
+    // cordial/second_person/warm is claimed by no room, wired or unwired.
+    // second_person/warm alone is claimed by CATSKILLS and ASPEN (both
+    // familiar) and by AMALFI (plain), so the formality is the axis carrying
+    // the distinction and choosing `familiar` here would have collided with two
+    // rooms at once.
+    formality: "cordial",
+    // HERS.
+    cadence: "Bright, short, generous; compliments land unhedged.",
+    // DRAFTED. "Bright, short" is hers and these are the numbers that make it
+    // checkable. Nine words is a compliment paid whole; nineteen is the outer
+    // edge of a sentence that is still generous rather than explanatory.
+    sentence: { typicalWords: 9, maxWords: 19 },
+    // HERS, verbatim, including the licence — this is the only room in the
+    // library that permits an exclamation point, and it permits exactly two
+    // occasions rather than a quantity.
+    punctuation:
+      "Lively but never shrill; exclamation earned at the door and at the " +
+      "toast.",
+    // DRAFTED, and each clause is a consequence of something she wrote. Hours
+    // in words because "eight o'clock" is one of her three coordinates. The
+    // year is never named, in words or numbers, because the decade is the
+    // register the voice is written in and never a thing the voice says — and
+    // for this room and this year the postcard version is made entirely of
+    // period labels.
+    orthography:
+      "Hours in words: four o'clock, eight o'clock, half past ten. Headings " +
+      "in full caps; nothing else is capitalised for emphasis. Contractions " +
+      "are welcome — this voice is quick and warm, and a contraction is both. " +
+      "The decade is never named, in words or in numbers. No temperatures and " +
+      "no degrees: the cold is a fact about the champagne, not a measurement.",
+
+    humour: {
+      mode: "warm",
+      // HERS.
+      mechanism:
+        "Delighted and out loud — this room laughs at volume.",
+    },
+
+    // HER REFUSALS, EXACTLY, AND HER SEVEN REPLACEMENTS. Every `insteadOf` list
+    // below is drawn from the eight words she refused and has not been
+    // extended, because `insteadOf` is a HARD BAN in
+    // scripts/check-voice-output.mjs and an agent does not get to add
+    // enforcement she did not author. The TERMS are her seven — golden, the
+    // light, champagne, the snow, everyone, gorgeous, later — and the GLOSSES
+    // are drafted.
+    //
+    // The mapping of her eight refusals onto her seven terms is an agent's and
+    // is stated so it can be argued with: `chalet` is placed under "the snow"
+    // rather than under a venue term because CLAUDE.md rule 2 forbids the voice
+    // owning a building at all, and "the light" carries no refusal because she
+    // offered no word that was trying to do its job badly.
+    lexicon: [
+      {
+        term: "golden",
+        gloss:
+          "of the hour, of the light, and of how people look in it. The room's one adjective of approval, and it is about light rather than about money",
+        insteadOf: ["glam"],
+      },
+      {
+        term: "the light",
+        gloss:
+          "the thing the party is timed to. It does half the work — her sentence — and it is the only reason the hour is what it is",
+      },
+      {
+        term: "champagne",
+        gloss:
+          "what is in the glass, said as a fact and never as a flourish. It is opened outside, in the cold, and the cold does the chilling",
+        insteadOf: ["luxury"],
+      },
+      {
+        term: "the snow",
+        gloss:
+          "what the light is coming off. A fact about the ground, never a mountain and never a building — a terrace, a garden or a stoop in cold air does the same job",
+        insteadOf: ["alpine", "chalet"],
+      },
+      {
+        term: "everyone",
+        gloss:
+          "the room's actual subject. Everyone is talking to everyone, and the word is load-bearing: a party that circulates cannot describe itself as a selection",
+        insteadOf: ["exclusive", "elite"],
+      },
+      {
+        term: "gorgeous",
+        gloss:
+          "said to a person, to their face, without a joke around it. The compliment lands unhedged or it has not landed",
+        insteadOf: ["chic"],
+      },
+      {
+        term: "later",
+        gloss:
+          "the second half, once the light goes and the party is inside. The room's word for the hour after, and it is a promise rather than a schedule",
+        insteadOf: ["apres", "après"],
+      },
+      {
+        term: "the good coat",
+        gloss:
+          "worn open, indoors, on purpose. Objects here are specific and are worn rather than owned — the fur collar, the sunglasses until sundown, the jewelry that catches light",
+      },
+      {
+        term: "eight o'clock",
+        gloss:
+          "one of her three coordinates, with the light and the snow. It is when the room has moved inside and got its second wind, and it is a promise about the night rather than a start time",
+      },
+    ],
+
+    // DRAFTED.
+    formulae: [
+      "{The warm fact}. {The second, warmer one}.",
+      "{Hour}. {What is already true by then}.",
+      "{Name}, {what they are gorgeous at}.",
+      "Come out. {What is happening out here}.",
+      "{The compliment}, said straight and not taken back.",
+      "{What there is}, and there is a lot of it.",
+      "Inside once the light goes. {What happens then}.",
+    ],
+
+    // HER REFUSALS, plus the house-wide list every other destination carries.
+    // "après" is listed in both its accented and unaccented spellings because
+    // the check is literal and both spellings occur in the wild.
+    banned: [
+      "luxury",
+      "exclusive",
+      "elite",
+      "chic",
+      "alpine",
+      "chalet",
+      "apres",
+      "après",
+      "glam",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "amazing",
+      "guys",
+      "hosted by",
+      "join us",
+    ],
+
+    // DRAFTED.
+    signOffs: [
+      "Out here, then. Four o'clock.",
+      "Bring the coat. Wear it open.",
+      "The cold does the chilling.",
+      "Inside once the light goes.",
+    ],
+
+    // DRAFTED, from her voice notes.
+    always: [
+      "Say the warm thing out loud and do not wrap it in anything.",
+      "Introduce people. Name the two things they have in common and get out of the way.",
+      "Name the light and the hour. They are the coordinates and they are free.",
+      "Start outside if there is any outside at all, and say the cold is the point.",
+      "Two exclamation points a night: one at the door, one at the toast. Everything else is bright without one.",
+      "Assume the reader committed to the outfit, and say so.",
+    ],
+
+    // DRAFTED, except where her own words are quoted.
+    //
+    // WRITTEN IN A SHAPE THE CHECKER CAN READ, WHICH IS NOT A STYLE CHOICE.
+    // scripts/check-voice-output.mjs extracts never-rule terms with
+    // /\b(?:no|never)\s+(…)(?=[,.]|\s+and\b|\s+no\b|$)/, so it takes ONLY the
+    // first item after each "never" and a comma list loses everything after it.
+    // Measured on PALM SPRINGS above: "Never mid-century, retro, mod, vintage,
+    // kitsch, swanky or classy" yields exactly ONE term, and its catch rate on
+    // her eight refused words went from one to eight when each refusal got its
+    // own clause. So every refused word here gets its own "never" and the
+    // article is dropped where the ban is on the word itself. The meaning is
+    // unchanged; the enforcement is not.
+    never: [
+      "Never luxury. Champagne is the concrete thing that word gestures at, and this room names the thing.",
+      "Never exclusive. This party's genius is circulation, and a room that circulates cannot describe itself as a selection.",
+      "Never elite. Same refusal, said about the people instead of the door.",
+      "Never chic. Say gorgeous, to the person's face.",
+      "Never alpine. The snow is a fact; the adjective is a brochure.",
+      "Never chalet. The room is anywhere with an outdoors and an early sunset, so it never owns a building.",
+      "Never apres. The word for the hour after is later.",
+      "Never après. The same word with its accent on, because the never-rule channel is spelling-literal and matches only what it is given. Measured: the unaccented clause above catches `apres` and does NOT catch `après`.",
+      "Never glam. Golden is the word, and it is about the light.",
+      "Never solemn. Her refusal, verbatim: no solemnity survives here.",
+      "Never hushed. The important part is not said under the breath in this room.",
+      "Never understated. Everybody committed, and saying so is the welcome.",
+      "Never deadpan. The sideways line is Palm Springs' and this room is warm and direct.",
+      "Never sideways. The compliment lands unhedged or it has not landed.",
+      "Never gossip. Palm Springs trades in it; here the good thing is said to the person's face.",
+      "Never teasing. Aspen's circle is closed and this party is open-armed.",
+      "Never served. Champagne is opened outside by whoever is holding it, and the food was made this morning.",
+      "Never a we that means host and staff.",
+      "Never shrill. Lively is the ceiling on the writing, however loud the room is.",
+      "Never use italics.",
+    ],
+
+    // DRAFTED, on the pattern every other destination keeps.
+    breaksCharacterFor: [
+      "Anything somebody must act on to arrive or to be safe: the road, the ice, the cold, a doctor, what is in the food or the glass. Fact first, fewest words, no line.",
+      "Anything about money.",
+      "Any message that gives someone a way out — a decline, an early night, a way off a list. Written straight and made easy.",
+    ],
+
+    // DRAFTED. TWO CONSTRAINTS WERE APPLIED AND BOTH ARE WORTH STATING. First,
+    // her rule-25 working: no line below requires a mountain, a resort or a
+    // building — the coordinates are the light, the snow and eight o'clock, and
+    // a stoop in cold air satisfies every one of them. Second, her staff rule:
+    // nothing here is passed, poured or offered by anybody.
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Four o'clock, out here, while it is still light. Wear the coat you love!",
+        note: "The one exclamation point at the door, which is her rule. It is the only invitation line in the library carrying one.",
+      },
+      {
+        piece: "invitation",
+        text: "Champagne outside in the cold. Sunglasses until the sun goes.",
+      },
+      {
+        piece: "invitation",
+        text: "You will be introduced to at least four people. That is the whole plan.",
+        note: "Her audience note said as a promise: this party's genius is circulation.",
+      },
+      {
+        piece: "invitation",
+        text: "It starts while it is still light, on purpose. Come out early and stay late.",
+      },
+      {
+        piece: "menu_item",
+        text: "Champagne first and mostly. The cold does the chilling.",
+        note: "Her deliverables sheet, two clauses of it, unaltered.",
+      },
+      {
+        piece: "menu_item",
+        text: "Smoked fish, and cheese doing its best work. Everything eats standing.",
+      },
+      {
+        piece: "menu_item",
+        text: "Something hot in small cups, once the light goes.",
+      },
+      {
+        piece: "menu_item",
+        text: "Chocolate, late, if the night earns a late supper.",
+      },
+      {
+        piece: "notice",
+        text: "The first bottle goes off outside. That is the party starting.",
+        note: "Her signature gesture as a line. It is the closest this file gets to recording it, since `Destination` has no gesture field.",
+      },
+      {
+        piece: "notice",
+        text: "Everyone is talking to everyone. Join whichever one is loudest.",
+      },
+      {
+        piece: "notice",
+        text: "We all go in together when the light goes, and it gets its second wind.",
+      },
+      {
+        piece: "house_note",
+        text: "Blankets and the tray are out here. Nobody is bringing you anything.",
+        note: "The staff rule and the setting line at once: the tray is a place, not a person.",
+      },
+      {
+        piece: "house_note",
+        text: "Inside is lit and waiting: candles, gold light, the mirrors doing work.",
+      },
+      {
+        piece: "house_note",
+        text: "Loud enough to dance to by ten. This is correct.",
+        note: "Her sentence, unaltered, including the verdict at the end of it.",
+      },
+      {
+        piece: "place_card",
+        text: "Margaux — beside the one who will make her laugh first.",
+      },
+      {
+        piece: "place_card",
+        text: "Bruno — opposite the person he has been meaning to meet for a year.",
+      },
+      {
+        piece: "game_rule",
+        text: "Everyone pays one compliment out loud, to a face, before the light goes.",
+      },
+      {
+        piece: "bulletin",
+        text: "Saturday. Three coats worn open in the cold and not one word about it.",
+      },
+      { piece: "heading", text: "OUT HERE, WHILE IT IS STILL LIGHT" },
+      { piece: "heading", text: "WHAT THERE IS, AND WHAT TO WEAR" },
+      {
+        piece: "sign_off",
+        text: "To all of you — every single one!",
+        note: "The second and last exclamation point, at the toast, which is her rule.",
+      },
+      { piece: "sign_off", text: "Out here, then. Four o'clock." },
+    ],
+
+    // DRAFTED, and every one derived from a refusal SHE wrote rather than from
+    // a sin invented for the occasion. These are what
+    // scripts/check-voice-output.mjs matches shape proximity against, so they
+    // are load-bearing: a refusal with no line beside it catches nothing.
+    rejected: [
+      {
+        text: "A luxury winter evening, with champagne on the terrace.",
+        why: "Luxury is a price talking. This room names the champagne, the cold and the light, and never the tier they are supposed to imply.",
+      },
+      {
+        text: "An exclusive gathering of the people who matter most to her.",
+        why: "Exclusive is the opposite claim to the one this party makes. Its genius is circulation and you will be introduced, so the door cannot be the point.",
+      },
+      {
+        text: "Apres-ski, upgraded.",
+        why: "Apres names an hour by naming a sport nobody at this party did. The room's word for the hour after is later, and it is a promise rather than a category.",
+      },
+      {
+        text: "Chalet drinks at six, dinner inside at eight.",
+        why: "Chalet buys a building. The room is a terrace, a garden or a stoop with an early sunset, and rule 2 says the venue never touches the destination.",
+      },
+      {
+        text: "Effortlessly chic, from the coat down.",
+        why: "Chic is said about a person behind their back and effortless takes the effort back. Everybody committed, and gorgeous is said to a face.",
+      },
+      {
+        text: "Champagne will be passed on the terrace from four o'clock.",
+        why: "Passed. Somebody is carrying a tray, and there is no staff in this voice — the bottle is opened outside by whoever is holding it.",
+      },
+      {
+        text: "We will gather quietly as the light goes, and take a moment together.",
+        why: "Quietly, and a moment. No solemnity survives here — her words — and the light going is when this room gets LOUDER and moves inside.",
+      },
+    ],
+  },
+};
+
+/**
+ * ST. MORITZ's voice, said in the tones a host is shown.
+ *
+ * HER TEN CODES, TRANSCRIBED EXACTLY AND IN HER ORDER. The WEIGHTS are an
+ * agent's, because she gave codes and no numbers, and they are the only part of
+ * this list open to revision.
+ *
+ * THE ORDER IS HERS AND THE WEIGHTS ARE NOT MONOTONIC IN IT, which is a
+ * departure from every other room in this file and is deliberate. PALM SPRINGS
+ * above reads as a descending list because her order of argument happened to be
+ * descending. Hers here is not: `laughs_first`, `says_it_out_loud` and
+ * `compliments_plainly` arrive sixth, seventh and eighth and are three of the
+ * four heaviest tones in the room, because "everybody looks lit from within" is
+ * the premise's own claim and the warm tones are what carry it. Re-sorting the
+ * list to look tidy would have silently reordered a founder's argument, so it
+ * is left in her order with the weights where the text puts them.
+ *
+ * Every tag points at a line in the voice above:
+ *
+ *   dressed_up          "sunglasses and good jewelry at the same time"; "the
+ *                       fur collars do the rest". Her deliverables sheet:
+ *                       "committed to, and complimented out loud."
+ *   makes_an_entrance   "the party moves inside all at once, glowing." The
+ *                       entrance in this room is COLLECTIVE, which is the
+ *                       reading that separates it from Palm Springs — see the
+ *                       facet note below.
+ *   rises_to_greet      her audience line: "you will be introduced." Somebody
+ *                       stands up every time, because somebody arrives every
+ *                       few minutes.
+ *   impeccably_polite   the manners that make the warmth land rather than
+ *                       crowd. It is also the tone doing the most separating
+ *                       work in the measurement below.
+ *   fluent_in_everyone  "this party's genius is circulation." The room arrives
+ *                       already knowing, and introduces on that knowledge.
+ *                       DRAFT TONE, see below.
+ *   laughs_first        HER HUMOUR NOTE: "delighted and out loud — this room
+ *                       laughs at volume."
+ *   says_it_out_loud    "compliments land unhedged." The loving thing said
+ *                       sober, in daylight, which is the room's hardest claim.
+ *   compliments_plainly "gorgeous", said to a face, with nothing around it.
+ *   toasts_everything   her punctuation rule names the toast as one of the two
+ *                       occasions an exclamation point is earned, so the toast
+ *                       is a structural fact about this room and not a mood.
+ *                       DRAFT TONE, see below.
+ *   closes_the_bar      "gets its second wind"; `ending = until_morning` in the
+ *                       committed matrix. DRAFT TONE, see below.
+ *
+ * Formality, address and humour are NOT tagged here: cordial, second person,
+ * warm are stated outright above and derived by `statedVoiceFacets`. The triple
+ * is unique — see the argument at `formality`.
+ *
+ * ── THREE OF THE TEN ARE DRAFT TONES, AND CLAIMING THEM DOES NOT ─────
+ * ── PROMOTE THEM. THE CLAIM IS FOUR FILES, NOT ONE. ──────────────────
+ *
+ * Checked one by one against `TONES` in src/lib/voice.ts rather than assumed.
+ * SEVEN ARE SHIPPED: `dressed_up`, `makes_an_entrance`, `rises_to_greet`,
+ * `impeccably_polite`, `laughs_first`, `says_it_out_loud`,
+ * `compliments_plainly`.
+ *
+ * THREE CARRY `draft: true`: `fluent_in_everyone`, `toasts_everything` and
+ * `closes_the_bar`. Two of those three were proposed as ST. MORITZ NATIVES on
+ * 2026-08-22 (docs/proposals.md: "`never_impressed`, `fluent_in_everyone`,
+ * `closes_the_bar` — St. Moritz natives"), so this is the room they were coined
+ * for and this is the room whose arrival is supposed to clear their flags.
+ * `toasts_everything` came in the same week as ACAPULCO's third native.
+ *
+ * THAT IS THE MOST DRAFT TONES ANY ROOM IN THIS FILE CLAIMS — Palm Springs
+ * claims one, Acapulco two — and it is the reason this room cannot be wired
+ * today. Promotion is the same FOUR-FILE job ACAPULCO, ASPEN and PALM SPRINGS
+ * each documented: the flag in src/lib/voice.ts, a cut SVG in
+ * design/tone-icons/, the regenerated src/app/apply/tone-marks.tsx (`npm run
+ * build:tone-marks`), and the quiz surface that then shows the tile. THE ART IS
+ * THE BINDING CONSTRAINT AND IT IS MISSING FOR ALL THREE: design/tone-icons/
+ * holds 51 SVGs and none of them is `fluent_in_everyone.svg`,
+ * `toasts_everything.svg` or `closes_the_bar.svg`. Note that `toasts.svg` DOES
+ * exist and is a different tone — `toasts` is shipped, `toasts_everything` is
+ * the draft — so a later agent must not wire the existing file to the new code.
+ * None of those four files is this file, src/lib/voice.ts is not this room's
+ * territory, and a promoted tone with no mark renders to a host as a blank
+ * tile, which is CLAUDE.md rule 16's exact failure.
+ *
+ * ── THE TEN-TONE CAP IS NOT AN ISSUE HERE, AND THAT IS NEWS ──────────
+ *
+ * `voice.test.ts` fails above ten. SHE GAVE EXACTLY TEN, AT THE CAP, ON
+ * PURPOSE. No cut is needed, none is proposed, and no cut-measurement appears
+ * below because there is nothing to measure. This is the first room of the six
+ * written this week that does not need that paragraph.
+ *
+ * ── THE MEASUREMENT ──────────────────────────────────────────────────
+ *
+ * ── THE MEASUREMENT, IN HER STATED ORDER ────────────────────────────
+ *
+ * All numbers from `npm run check:voices`, which is the only place a voice
+ * affinity may be quoted from (CLAUDE.md rule 7, and the script's own opening
+ * paragraph). Measured against the ceiling as the sibling session recalibrated
+ * it this session: STRICT 0.58 at declared twins and structural distance <= 2,
+ * MONITOR 0.92 at distance >= 3, plus a new TONE-HAND OVERLAP guard at 0.8 of
+ * the smaller room's codes at any distance. It is NOT the flat 0.65 that
+ * ACAPULCO, AMALFI, ASPEN and PALM SPRINGS above were measured against, and
+ * every number in those four blocks predates the split.
+ *
+ * HER FIRST BORDER — PALM SPRINGS 1965, at 0.201. Structural distance 3,
+ * monitor tier. Her prose says afternoon-golden versus dusk-deadpan,
+ * warm-direct versus gossip-sideways, snow versus pool, and the metric agrees
+ * emphatically: this is the fourth-lowest of this room's seventeen pairs. THE
+ * MECHANISM IS WORTH READING, because the largest single term in it is
+ * NEGATIVE — `earnestness`, contributing -0.088, with Palm Springs at -0.76 and
+ * this room at +2.12. The two rooms do not merely fail to overlap on the axis;
+ * they sit on opposite sides of its origin and actively push the score DOWN.
+ * `knowingness` is the largest positive term at +0.067 (Palm Springs 1.91, this
+ * room 0.63) and the two shared formality facets carry the rest. Her refusal
+ * list did this: taking `deadpan`, `means_the_other_thing` and
+ * `straight_to_gossip` off the table removed exactly the tones Palm Springs is
+ * built out of.
+ *
+ * HER SECOND BORDER — ACAPULCO 1959, at 0.426, AND THIS IS THE ONE THAT HAD TO
+ * COME OUT RIGHT. Structural distance 2, STRICT TIER, ceiling 0.58 — so it
+ * passes with 0.154 of margin, and it is the only one of this room's pairs held
+ * to the strict number. It is also the DECLARED TWIN in
+ * `data/destination-matrix.json`, whose second condition is precisely that the
+ * two rooms be separable in voice, and which has been recorded as UNMEASURABLE
+ * since it was declared — `docs/voices-draft/VERIFICATION.md` section 6 says so
+ * in as many words ("acapulco-1959 / st-moritz-1984 — cannot be measured"). It
+ * is measurable now, and it holds. That is the single most load-bearing number
+ * in this block.
+ *
+ * THE CONTRIBUTING FACETS FOR THAT PAIR, since she named it as the pair to
+ * verify and a bare number would not answer her question:
+ *
+ *   facet                   acapulco   st-moritz   share of 0.426
+ *   volume                      2.69        1.29        0.144
+ *   theatricality               2.54        1.33        0.140
+ *   warmth                      0.96        2.83        0.113
+ *   irreverence                 1.65       -1.16       -0.079
+ *   address_second_person       1.00        1.00        0.041
+ *   earnestness                 0.33        2.12        0.029
+ *   formality_ceremonial        0.21        1.70        0.015
+ *   humour_warm                 0.32        1.00        0.013
+ *   knowingness                 0.36        0.63        0.009
+ *
+ * READ IT AS HER SENTENCE AND IT IS HER SENTENCE. "Two golden rooms" is the top
+ * three lines: both loud, both theatrical, both warm, and those three carry
+ * 0.397 of the 0.426 between them — nearly the whole number. "Wet, salted,
+ * clockless versus polished, deliberate, dressed" is line four: IRREVERENCE IS
+ * THE AXIS THAT HOLDS THEM APART, at +1.65 against -1.16, and because the signs
+ * are opposite it SUBTRACTS 0.079 rather than adding anything. Acapulco gets
+ * its irreverence from a hand that does not care; this room gets its negative
+ * from `impeccably_polite` (-0.9) and `rises_to_greet` (-0.5), the two tones
+ * that are pure manners. Take either of them out of her ten and the border she
+ * named starts closing.
+ *
+ * THE OTHER HALF OF THE SAME MECHANISM: the two rooms are golden in the same
+ * direction but at DIFFERENT INTENSITIES, and cosine is scale-free within a
+ * facet only when the pattern matches. Acapulco leads with volume and
+ * theatricality and is barely earnest (0.33); this room leads with warmth and
+ * earnestness (2.83, 2.12) and is moderate on volume (1.29). The two profiles
+ * point at different corners of the same warm quadrant, which is what 0.426
+ * means.
+ *
+ * HER THIRD BORDER — ASPEN 1994, at 0.554. Structural distance 4, monitor tier.
+ * The hands ARE disjoint, code for code, exactly as she said. The affinity is
+ * nevertheless the third-highest this room has, and the reason is one facet:
+ * `warmth` alone contributes 0.343 of the 0.554, Aspen at 2.40 against this
+ * room at 2.83. TWO DISJOINT HANDS CAN AGREE COMPLETELY ON A FACET, which is
+ * the finding this pair adds to the file — disjointness of CODES is not
+ * disjointness of TEMPERAMENT, and an author who checks only the code lists has
+ * not checked anything. What separates them is `irreverence` again (-0.052,
+ * Aspen +0.90 against -1.16), which is "closed sweatpants circle versus open
+ * dressed party" said in a number.
+ *
+ * ── THE ROOM SHE DID NOT NAME IS CLOSER THAN ANY SHE DID ─────────────
+ *
+ * AMALFI 1953, at 0.721. It is this room's nearest neighbour in the whole
+ * library and it is 0.167 above ACAPULCO, the pair she asked about. Structural
+ * distance 4, monitor tier, ceiling 0.92 — SO IT PASSES, and it would have
+ * BREACHED under the flat 0.58 the file was measured against until this
+ * session. The mechanism is `warmth` 0.358 (Amalfi 3.63, this room 2.83) and
+ * `earnestness` 0.188 (2.56 against 2.12): two rooms that both say the loving
+ * thing out loud and mean it. Volume adds 0.071 and the shared second person
+ * adds 0.035; nothing subtracts.
+ *
+ * THIS IS RULE 26 AGAIN AND IT IS THE PREDICTION THE ROOM WAS BUILT TO TEST.
+ * The brief for this room said so in advance: the hand is uniformly warm and
+ * outward, and that is the shape that HAS breached — against Havana, Amalfi and
+ * Acapulco. It half-happened. The room did NOT collide with Acapulco or Havana
+ * (0.426 and 0.584) because its four tones of FORM — `dressed_up`,
+ * `makes_an_entrance`, `impeccably_polite`, `rises_to_greet` — pull formality
+ * and ceremony positive and irreverence hard negative, and neither of those
+ * rooms does that. It came closest to AMALFI, which is the one warm room that
+ * is also earnest and also polite. A MIXED HAND IS ITS OWN SEPARATOR, which is
+ * Palm Springs' general result above, and this room is the case that shows the
+ * mix has to be mixed IN THE RIGHT PLACE: warm-plus-loud did not save it from
+ * Amalfi, warm-plus-mannered saved it from everything else.
+ *
+ * NOTHING WAS RE-TAGGED TO PRODUCE ANY OF THESE NUMBERS.
+ * `docs/voices-draft/VERIFICATION.md` forbids it and the founder's own ruling
+ * quoted there is "the fix is re-tagging toward each room's distinguishing
+ * axis, not loosening anything" — which is a licence to re-tag toward the
+ * truth, never toward the ceiling. Her ten codes are transcribed as given and
+ * were not tuned. The WEIGHTS were set from the text before anything was
+ * measured and were not moved afterwards.
+ *
+ * THE FULL DISTRIBUTION, closest first, so the next person does not have to
+ * re-run to see the shape:
+ *
+ *   amalfi-1953        0.721   monitor, dist 4
+ *   havana             0.584   monitor, dist 3
+ *   aspen-1994         0.554   monitor, dist 4   her border
+ *   catskills          0.534   monitor, dist 6
+ *   oaxaca-1954        0.515   monitor, dist 5
+ *   new-york           0.496   monitor, dist 4
+ *   las-vegas          0.439   monitor, dist 3
+ *   acapulco-1959      0.426   STRICT,  dist 2   her border, declared twin
+ *   palm-springs-1965  0.201   monitor, dist 3   her border
+ *   nantucket          0.186   monitor, dist 6
+ *   dolomites          0.176   monitor, dist 6
+ *   new-orleans        0.162   monitor, dist 3
+ *   tahiti             0.103   monitor, dist 5
+ *   cote-dazur         0.089   monitor, dist 6
+ *   portofino          0.069   monitor, dist 6
+ *   big-sur            0.015   monitor, dist 7
+ *   westhampton-1976  -0.201   monitor, dist 3
+ *
+ * WESTHAMPTON AT -0.201 IS THE ONLY NEGATIVE PAIR THIS ROOM HAS and it is worth
+ * one line, because the proposals ledger predicted the opposite: "St. Moritz/
+ * Westhampton was the monitor-tier worry precisely because both were
+ * dry-knowing" (docs/proposals.md, in the parked Westhampton re-founding
+ * analysis). THAT PREDICTION IS WRONG ABOUT THIS ROOM, and the prediction was
+ * made before the room had a voice. This room is not dry-knowing at all; it is
+ * warm-mannered, and the two rooms are now the furthest-apart pair either of
+ * them has. The worry is discharged, and it is discharged by the founder's tone
+ * list rather than by the Eothen re-founding that was proposed to fix it.
+ *
+ * THE SECOND NUMBER IS `unknown` FOR EVERY PAIR OF THIS ROOM, and that is
+ * reported rather than glossed. `scripts/deliverables.mjs` reads
+ * `docs/dishes.md` and `docs/drinks.md`, which cover the twelve wired rooms and
+ * no others, so this room has ZERO measurable claims against an evidence floor
+ * of twelve. Under rule 26's own trap, `unknown` must never read as
+ * `disjoint`: the AMALFI pair at 0.721 is tone-close and UNMEASURABLE, not
+ * tone-close and disjoint, and it is therefore NOT admitted on the second
+ * number. It passes on the monitor ceiling alone.
+ *
+ * THE TONE-HAND OVERLAP GUARD PASSES EVERYWHERE. This room's largest shared
+ * hand is with OAXACA — `rises_to_greet` and `toasts_everything`, two codes
+ * over a smaller hand of ten, 0.2 — against a guard of 0.8.
+ */
+export const ST_MORITZ_1984_TONES: readonly ToneWeight[] = [
+  { code: "dressed_up", weight: 1 },
+  { code: "makes_an_entrance", weight: 0.8 },
+  { code: "rises_to_greet", weight: 0.75 },
+  { code: "impeccably_polite", weight: 0.85 },
+  { code: "fluent_in_everyone", weight: 0.7 },
+  { code: "laughs_first", weight: 0.95 },
+  { code: "says_it_out_loud", weight: 0.9 },
+  { code: "compliments_plainly", weight: 0.9 },
+  { code: "toasts_everything", weight: 0.65 },
+  { code: "closes_the_bar", weight: 0.6 },
+];
+
+/* ── ST. MORITZ IS AUTHORED AND IS NOT IN `DESTINATIONS`. READ THIS ──
+ *
+ * The two consts above are complete and reviewable and they are deliberately
+ * NOT keyed into `DESTINATIONS` or `DESTINATION_TONES` below. Same handling as
+ * ACAPULCO, AMALFI, ASPEN, PALM SPRINGS and OAXACA: a refusal stated where the
+ * next person is standing, not an omission. Rule 8 — an agent produces a draft;
+ * activation is hers.
+ *
+ * WIRING IT IN WAS MEASURED RATHER THAN REASONED ABOUT. The two lines were
+ * added to a temporary copy, `npm test` was run, and the lines were removed
+ * again. THE RESULT, EXACTLY: 425 tests, 342 pass, ONE FAIL. Unwired the same
+ * suite is 425 / 343 pass / 0 fail.
+ *
+ * IT CARRIES EXACTLY ONE BLOCKER, WHICH IS FEWER THAN ANY OTHER ROOM THIS WEEK:
+ *
+ *   "every tone is claimed by at least one destination" — FAILS, with
+ *   `fluent_in_everyone, closes_the_bar, toasts_everything`: "these are still
+ *   marked draft but a destination now claims them — clear the flag so the
+ *   assertion above covers them." Three draft tones, and the four-file
+ *   promotion job is written out above `ST_MORITZ_1984_TONES`. THE MISSING ART
+ *   IS THE REAL CONSTRAINT: design/tone-icons/ has no `fluent_in_everyone.svg`,
+ *   no `toasts_everything.svg` and no `closes_the_bar.svg`, and a mark drawn by
+ *   an agent to make a test pass ships to a host as a picture nobody chose.
+ *
+ * AND IT PASSES EVERYTHING ELSE, INCLUDING THE THREE THAT COST THE OTHER ROOMS:
+ *
+ *   "a destination's tones are real, weighted legally, and few" — PASSES. She
+ *   gave EXACTLY TEN against a documented maximum of ten. Every other room this
+ *   week failed this one.
+ *
+ *   "no two destinations resolve to nearly the same voice" — PASSES, on both
+ *   halves. The affinity block above has the numbers; the closest pair is
+ *   AMALFI at 0.721 against a monitor ceiling of 0.92, and the strict-tier pair
+ *   that matters — the declared twin ACAPULCO — is 0.426 against 0.58. The
+ *   stated triple `cordial/second_person/warm` is unique across all eighteen
+ *   authored voices, wired and unwired.
+ *
+ *   "a destination does not say the same thing twice" — PASSES. No tone in the
+ *   hand resolves to a single stated facet.
+ *
+ *   "every tone group has destinations at both ends" — PASSES, and this room
+ *   adds rather than costs: it is a second positive claimant on `ceremony` and
+ *   `kindness` where the field was thin.
+ *
+ * SO THE DIFF TO LAND IT IS TWO LINES PLUS A DESIGN DELIVERABLE:
+ *
+ *   "st-moritz-1984": ST_MORITZ_1984,        -> DESTINATIONS
+ *   "st-moritz-1984": ST_MORITZ_1984_TONES,  -> DESTINATION_TONES
+ *
+ * and, before those two lines can go in, three `draft: true` flags cleared in
+ * src/lib/voice.ts, three SVGs cut into design/tone-icons/, `npm run
+ * build:tone-marks` re-run, and the three tiles put on the quiz surface. The
+ * `world` row for `st-moritz-1984` is already seeded draft, so nothing reaches
+ * a member either way. A db/034-SHAPED MIGRATION IS ALSO OWED for the gesture —
+ * see the header — and unlike PALM SPRINGS' case it is owed unconditionally,
+ * because this room HAS a signature and `Destination` has nowhere to put it.
+ *
+ * ONE COST OF LEAVING IT UNWIRED, SAID PLAINLY: `npm run check:voice-output`
+ * resolves its slug through `DESTINATIONS`, so it cannot be pointed at this
+ * room until the two lines are added. The refusals above WERE run against the
+ * temporarily wired copy, and what the tool caught and what it cannot see is in
+ * the report for this room. Short form, and it is the fourth consecutive room
+ * to find the same three things: all EIGHT of her refused words fire on the
+ * DISPLACED TERMS channel and eight of nine on the NEVER-RULE channel, because
+ * every refusal was written as its OWN "never" clause per the finding on the
+ * proposals ledger; the tool does NOT read `voice.banned` at all, so `amazing`,
+ * `memories`, `iconic`, `vibe` and `guys` pass clean out of this room's own
+ * banned list; and it has NO PUNCTUATION PASS, so her exclamation-point rule —
+ * the one licence she granted in bold — is unenforceable there and a line with
+ * three exclamation marks in it returns "No banned shapes found."
+ *
+ * THE NEW ONE, FOUND HERE: THE NEVER-RULE CHANNEL IS SPELLING-LITERAL AND DOES
+ * NOT NORMALISE DIACRITICS. "Never apres" catches `apres` and does not catch
+ * `après`. It is fixed above the only way this file can fix it — a second
+ * clause carrying the accented spelling — and the `insteadOf` channel already
+ * caught both, which is why the word fired at all on the first run and why the
+ * gap would have been invisible to anyone reading only the summary line.
+ */
+
+/* ── SIX ROOMS ARE AUTHORED AND NONE OF THEM IS BELOW. THE ROLL CALL ──
+ *
+ * ONE PLACE THAT ANSWERS "WHY IS X NOT IN THE CATALOGUE" (rule 21: two
+ * surfaces must not each hold their own answer). Each room's own block holds
+ * its argument; this holds the list, and it is here because this is where a
+ * reader stands when they notice a name missing from `DESTINATIONS`.
+ *
+ * As measured 2026-08-27 against a green tree of 343 pass / 0 fail. Each row is
+ * that room wired ALONE — the counts do not add, because the rooms share draft
+ * tones and only the first failure in a shared assertion gets to fire.
+ *
+ *   room                wired alone   the blockers, in the order they fire
+ *   ACAPULCO 1959       342 / 1       2 draft tones (art)
+ *   AMALFI 1953         341 / 2       13 tones > cap · 7 draft tones (art)
+ *   ASPEN 1994          340 / 3       12 tones > cap · 4 draft tones (art) ·
+ *                                     stated triple = CATSKILLS exactly
+ *   PALM SPRINGS 1965   341 / 2       12 tones > cap · 1 draft tone (art)
+ *   OAXACA 1954         341 / 2       13 tones > cap · 5 draft tones (art)
+ *   ST. MORITZ 1984     (that room's own block)
+ *
+ * WHAT IS NO LONGER ON ANY OF THESE ROWS: VOICE AFFINITY. It was the blocker
+ * on four of the five for the whole week, and after the recalibration in
+ * src/lib/voice.ts NOT ONE PAIR IN THE ENTIRE AUTHORED FIELD BREACHES EITHER
+ * TIER, and not one breaches the hand guard. `npm run check:voices`: 153 pairs,
+ * strict tier 0 breach, monitor tier 0 breach, hand guard 0 breach. The
+ * ceilings were not loosened to get there — counted over the 420 committed
+ * duplicate constructions, the new pair of instruments refuses ALL 420 where
+ * the old flat 0.80 refused 379.
+ *
+ * WHO CLEARS WHAT, because "blocked" without an owner is how a thing sits for a
+ * month:
+ *
+ *   THE TONE CAP is the founder's, and it is now a ruling made against
+ *   evidence rather than against an assertion: she authored ST. MORITZ 1984 at
+ *   exactly ten, deliberately and said so, which is the first demonstration
+ *   that ten is a livable size for a room of this kind. Four rooms sit above
+ *   it. Recommended cuts, with a register argument for each and NONE MADE, are
+ *   at the end of each room's block. An agent does not cut a founder's tone.
+ *
+ *   THE DRAFT TONES are a DESIGN deliverable and they are the real bill. Eleven
+ *   marks are owed across the five rooms and design/tone-icons/HANDOFF.md is
+ *   the spec they have to be cut to — a 46-unit optical box, stroke-width
+ *   1.5/scale, five literal hexes, one object from the dinner-table world. An
+ *   agent drawing one to clear a test would be shipping a host a picture nobody
+ *   chose, which is the tile-that-means-nothing failure the draft flag exists
+ *   to prevent (rule 16). NOT FAKED, and named instead.
+ *
+ *   THE STATED TRIPLE is the founder's and it is Aspen's alone. Changing a
+ *   room's humour or formality because it fixes a test is not evidence, and
+ *   after the recalibration that triple is the ONLY thing separating Aspen from
+ *   Catskills — see the note at the end of Aspen's block for what breaking it
+ *   would now cost.
+ *
+ * THE CHEAPEST TWO, SAID PLAINLY BECAUSE IT IS THE USEFUL FACT IN THIS BLOCK:
+ *
+ *   ACAPULCO 1959 is TWO SVGs from being in the catalogue. It clears the cap,
+ *   both ceilings, the hand guard and the stated-triple test as written, and
+ *   `toasts_everything` and `bigger_every_telling` are all that is left.
+ *
+ *   PALM SPRINGS 1965 is ONE TONE from being blocked on the cap alone — its
+ *   single draft tone is `fluent_in_everyone` at the second-lowest weight in
+ *   its hand. If that is one of the two she cuts to reach ten, the room lands
+ *   with NO art owed at all and the diff is two lines.
+ */
+
+/**
  * Every destination that exists, by slug — the same slug as `world.slug`.
  *
  * A plain object rather than a Map so it survives being imported by a script,

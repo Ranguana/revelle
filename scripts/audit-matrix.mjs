@@ -22,25 +22,34 @@
  * because a failing pair is an authoring decision and not a broken build.
  */
 import { readFileSync } from "node:fs";
+// THE DISTANCE IS NOT COMPUTED HERE ANY MORE. It used to be, and that was right
+// while this was the only surface that quoted one. `npm run check:voices` and
+// src/lib/voice.test.ts now both print or gate on the same number, and three
+// copies of a Hamming loop is CLAUDE.md rule 21's exact defect — the failure
+// being that all three look right and two of them mean something slightly
+// different. src/lib/matrix.ts owns it; this script is a consumer.
+import {
+  MATRIX_FACETS,
+  MATRIX_KEYS,
+  matrixCellErrors,
+  matrixDistance,
+  differingFacets,
+  pairKey,
+} from "../src/lib/matrix.ts";
 
 const M = JSON.parse(readFileSync(new URL("../data/destination-matrix.json", import.meta.url), "utf8"));
-const FACETS = Object.keys(M.facets);
-const keys = Object.keys(M.rows);
+const FACETS = MATRIX_FACETS;
+const keys = MATRIX_KEYS;
 const arg = process.argv[2];
 
 // Every cell must be a declared level. A typo is otherwise a silent extra
 // distance, which flatters every pair it touches.
-let bad = 0;
-for (const [k, row] of Object.entries(M.rows)) {
-  if (row.length !== FACETS.length) { console.error(`${k}: ${row.length} cells, expected ${FACETS.length}`); bad++; continue; }
-  row.forEach((v, i) => {
-    if (!M.facets[FACETS[i]].includes(v)) { console.error(`${k}.${FACETS[i]} = "${v}" is not a declared level`); bad++; }
-  });
-}
-if (bad) { console.error(`\n${bad} invalid cell(s) — fix before trusting any distance below.`); process.exit(1); }
+const cellErrors = matrixCellErrors();
+for (const e of cellErrors) console.error(e);
+if (cellErrors.length) { console.error(`\n${cellErrors.length} invalid cell(s) — fix before trusting any distance below.`); process.exit(1); }
 
-const dist = (a, b) => M.rows[a].reduce((n, v, i) => n + (v !== M.rows[b][i] ? 1 : 0), 0);
-const differing = (a, b) => FACETS.filter((_, i) => M.rows[a][i] !== M.rows[b][i]);
+const dist = (a, b) => matrixDistance(a, b);
+const differing = (a, b) => differingFacets(a, b);
 
 const pairs = [];
 for (let i = 0; i < keys.length; i++)
@@ -51,7 +60,7 @@ pairs.sort((x, y) => x.d - y.d);
 // THE TWIN RULE. A declared pair may sit below the gate; an undeclared one may
 // not. Enforced here rather than trusted, because "we agreed that pair is fine"
 // is exactly the kind of thing that stops being written down.
-const twinKey = (a, b) => [a, b].sort().join(" / ");
+const twinKey = pairKey;
 const declared = new Map((M.twinRule?.declared ?? []).map((t) => [twinKey(...t.pair), t]));
 const twinOf = {};
 for (const t of M.twinRule?.declared ?? []) {

@@ -4,6 +4,7 @@ import { test } from "node:test";
 
 import { DESTINATIONS, DESTINATION_TONES } from "./destinations.ts";
 import { QUIZ_STEPS, type MultiField } from "./quiz.ts";
+import { matrixDistance, isDeclaredTwin } from "./matrix.ts";
 import {
   TONES,
   TONE_GROUPS,
@@ -12,9 +13,15 @@ import {
   statedVoiceFacets,
   toneProfile,
   voiceAffinity,
+  voiceCeiling,
+  toneHandOverlap,
+  VOICE_CEILING_STRICT,
+  VOICE_CEILING_MONITOR,
+  TONE_HAND_OVERLAP_MAX,
   type Tone,
   type VoiceFacetCode,
 } from "./voice.ts";
+import { duplicatesOf } from "./voice-duplicates.ts";
 
 /**
  * The voice vocabulary, checked against itself and against the one destination
@@ -538,30 +545,119 @@ test("every tone group has destinations at both ends", () => {
  * No two destinations are the same house wearing two palettes.
  *
  * The Havana/Westhampton assertion above is this test for one pair. Run across
- * all seventy-eight, it is the one that fails when a fourteenth destination is
- * written by reaching for the tones an author happens to like.
+ * every pair, it is the one that fails when a fourteenth destination is written
+ * by reaching for the tones an author happens to like.
  *
- * The ceiling is 0.65 rather than something tighter because real destinations
- * DO overlap — four of them are slow, three are warm — and the allocation
- * permits sharing on one group provided two others differ. At the time of
- * writing the closest pair is Nantucket and Portofino at 0.58: two quiet houses
- * that part on ceremony, on knowingness and on who they are written for.
+ * ── THE ARGUMENT THAT WAS HERE, KEPT PER RULE 14 ─────────────────────
+ *
+ * Verbatim, because it is still true and is not what changed:
+ *
+ *   "The ceiling is 0.65 rather than something tighter because real
+ *   destinations DO overlap — four of them are slow, three are warm — and the
+ *   allocation permits sharing on one group provided two others differ. At the
+ *   time of writing the closest pair is Nantucket and Portofino at 0.58: two
+ *   quiet houses that part on ceremony, on knowingness and on who they are
+ *   written for."
+ *
+ * WHAT BEAT IT: not the number, the APPLICATION of it. This test held every
+ * pair to 0.65 regardless of structural distance, and the doctrine has said a
+ * split for as long as it has been written down — strict 0.65 where the
+ * structural matrix cannot route two rooms apart, monitor 0.80 where it can.
+ * `data/destination-matrix.json` quotes "the strict cap of 0.65, which applies
+ * here BECAUSE the pair sits at structural distance 1"; `docs/proposals.md`
+ * rules Oaxaca/Havana at 0.846 "against a MONITOR ceiling of 0.80" and calls it
+ * kinship rather than defect, on the express ground that "structural distance
+ * is 3, so routing is unaffected". Two tiers, both in prose, neither in code —
+ * so the flat assertion here was enforcing the tiebreak tier against pairs no
+ * tiebreak is ever reached for. `voiceCeiling()` in ./voice.ts holds the split
+ * and the full argument for where the boundary sits.
+ *
+ * WHAT THE SPLIT MOVES, COUNTED (rule 24). Measured against the twelve wired
+ * rooms by `npm run check:voices --wired`: NOTHING. The wired field's worst
+ * pair is Nantucket/Portofino at 0.580 and its two strict-tier pairs are the
+ * declared twins at 0.401 and 0.172, so no pair in the shipped catalogue
+ * changes verdict and this test stays green for the same reason it was green
+ * before. The split is not a loosening that buys today's catalogue anything.
+ * It is the doctrine written down where it is enforced, so that the rooms
+ * waiting on it are judged by the rule that was actually ruled.
+ *
+ * AND THE FAILURE MESSAGE WAS ASSERTING SOMETHING FALSE. It said "One of them
+ * is not authored, it is echoed" of any breach at all. That diagnosis is
+ * correct for a strict-tier pair and it is a slander at the monitor tier: the
+ * three rooms that have breached this ceiling — Acapulco, Amalfi, Aspen — are
+ * each authored from a founder's own verbatim tone list, and what they share
+ * with the room they collide with is a temperament, not a text. A test that
+ * names the wrong cause sends the next person to re-tag a room that is
+ * correctly tagged, which is the exact failure `docs/voices-draft/
+ * VERIFICATION.md` refused by name.
+ *
+ * ── AND THE TWO NUMBERS THEMSELVES MOVED, 2026-08-27 ─────────────────
+ *
+ * KEPT PER RULE 14: strict was 0.65 and monitor was 0.80. Neither was ever
+ * measured. Strict sat 0.07 above the maximum of its own field and fired zero
+ * times in the life of the project; monitor fired on every new room and on
+ * nothing else. The full argument, the distribution and the four duplicate
+ * populations that beat them are in `voiceCeiling()` in ./voice.ts, and every
+ * number in it is reproducible from `npm run check:voices` and
+ * `npm run check:voices -- --duplicates`.
+ *
+ * WHAT THIS TEST GAINED AS A RESULT, because widening a ceiling without
+ * widening what is refused would be a relaxation wearing a calibration's
+ * clothes: the hand-overlap assertion below, and the duplicate regression
+ * beneath it. Counted (rule 24), over the 420 committed constructions: the old
+ * flat 0.80 caught 379 of them; the new monitor ceiling alone catches 239, and
+ * the ceiling together with the hand guard catches 420 — every one. MORE IS
+ * REFUSED THAN BEFORE, and the rooms the old number held out are admitted.
  */
 test("no two destinations resolve to nearly the same voice", () => {
-  let worst = { a: "", b: "", score: -1 };
+  // EVERY breach, not the worst one. The old assertion printed a single pair,
+  // which is how a second and third collision stayed invisible behind the
+  // first: fixing the top pair simply revealed the next, one run at a time.
+  const breaches: {
+    a: string;
+    b: string;
+    score: number;
+    tier: string;
+    limit: number;
+    why: string;
+  }[] = [];
   for (let i = 0; i < DESTINATION_KEYS.length; i++) {
     for (let j = i + 1; j < DESTINATION_KEYS.length; j++) {
       const a = DESTINATION_KEYS[i];
       const b = DESTINATION_KEYS[j];
       const score = voiceAffinity(RESOLVED.get(a)!, RESOLVED.get(b)!);
-      if (score > worst.score) worst = { a, b, score };
+      // The tier comes from the matrix, not from a second copy of the row set
+      // living in this file. src/lib/matrix.ts is the one owner and
+      // scripts/audit-matrix.mjs is the other consumer (rule 21).
+      const ceiling = voiceCeiling(matrixDistance(a, b), isDeclaredTwin(a, b));
+      if (score >= ceiling.limit)
+        breaches.push({ a, b, score, tier: ceiling.tier, limit: ceiling.limit, why: ceiling.why });
     }
   }
-  assert.ok(
-    worst.score < 0.65,
-    `${worst.a} and ${worst.b} resolve to nearly the same voice (${worst.score.toFixed(
-      3
-    )}). One of them is not authored, it is echoed`
+  assert.equal(
+    breaches.length,
+    0,
+    breaches
+      .map(
+        (b) =>
+          `${b.a} and ${b.b} are at ${b.score.toFixed(3)} against the ${b.tier} ` +
+          `ceiling of ${b.limit} (${b.why}). ` +
+          (b.tier === "strict"
+            ? "STRICT TIER: the structural matrix cannot route these two apart, so " +
+              "voice is the only thing that can, and it cannot. One of them is not " +
+              "authored, it is echoed — or the pair is one room written twice."
+            : "MONITOR TIER: these two are routed apart structurally, so this is not " +
+              "a routing failure and re-tagging is not automatically the fix. Read it " +
+              "as a question — are these two rooms the same temperament said twice " +
+              "(echo, and it is an authoring defect), or two different evenings thrown " +
+              "by the same kind of people (kinship, which is real and is recorded as " +
+              "such for Oaxaca/Havana in docs/proposals.md)? Run " +
+              "`npm run check:voices -- --facets " + b.a + " " + b.b + "` before deciding.")
+      )
+      .join("\n") +
+      `\n\nThe whole distribution is \`npm run check:voices\`. Ceilings: strict ` +
+      `${VOICE_CEILING_STRICT} at declared twins and structural distance <= 2, ` +
+      `monitor ${VOICE_CEILING_MONITOR} beyond.`
   );
 
   // And the stated facets alone must not repeat: two houses that are both
@@ -577,6 +673,107 @@ test("no two destinations resolve to nearly the same voice", () => {
     );
     triples.set(triple, key);
   }
+});
+
+/**
+ * NO ROOM WEARS ANOTHER ROOM'S TONE HAND.
+ *
+ * The instrument the ceiling above cannot be. `voiceAffinity` is a cosine over
+ * facet weights, and the three facets a voice states outright are very nearly
+ * invisible to it — a one-hot disagreement contributes zero to the dot product
+ * rather than a negative — so a copyist who restates one stated facet drops a
+ * clone from 0.955 to as low as 0.844, straight into the range where real
+ * authored rooms live. No choice of threshold separates those two populations,
+ * which is measured rather than argued: `npm run check:voices -- --duplicates`.
+ *
+ * This is exact where that is blurry. An echo, in this system's own terms, IS a
+ * copied list of codes, so the list of codes is the thing to compare. Weights
+ * are ignored deliberately: re-weighting a copied hand is the cheapest possible
+ * evasion of a weighted measure, and the jittered constructions still score
+ * 1.000 here while scoring 0.998 on the cosine.
+ *
+ * The threshold is the middle of a measured empty band — the authored field
+ * tops out at 0.667 (two pairs, each four tones of six) and every construction
+ * lands at 1.000. It is FLAT across both tiers, unlike the ceiling, because
+ * copying a hand is an authoring defect whatever the structural matrix says
+ * about routing.
+ */
+test("no destination wears another destination's tone hand", () => {
+  const copied: string[] = [];
+  for (let i = 0; i < DESTINATION_KEYS.length; i++)
+    for (let j = i + 1; j < DESTINATION_KEYS.length; j++) {
+      const a = DESTINATION_KEYS[i];
+      const b = DESTINATION_KEYS[j];
+      const overlap = toneHandOverlap(DESTINATION_TONES[a], DESTINATION_TONES[b]);
+      if (overlap > TONE_HAND_OVERLAP_MAX)
+        copied.push(
+          `${a} and ${b} share ${(overlap * 100).toFixed(0)}% of the smaller ` +
+            `room's tone codes against a guard of ${TONE_HAND_OVERLAP_MAX}`
+        );
+    }
+  assert.deepEqual(
+    copied,
+    [],
+    `a tone hand has been reused rather than authored. This is not the voice ` +
+      `ceiling and re-weighting will not fix it — the codes themselves are the ` +
+      `same list:\n${copied.join("\n")}`
+  );
+});
+
+/**
+ * THE GUARD, WATCHED GOING RED. Rule 21: a guard nobody has seen fire is a
+ * guard nobody has checked, and "the assertion did not fail" is not evidence
+ * that it can.
+ *
+ * Every room in the catalogue is copied by `src/lib/voice-duplicates.ts` — the
+ * same generator `npm run check:voices -- --duplicates` reports from, so the
+ * report and this assertion cannot drift into two different populations — and
+ * every copy is run past the instruments the way the two tests above run real
+ * rooms past them. The claim under test is narrow and is the whole point of the
+ * recalibration: WIDENING THE CEILING DID NOT ADMIT A COPIED ROOM, because
+ * something else catches every copy the ceiling now lets through.
+ *
+ * It also asserts the shape of the finding, not only its conclusion: the
+ * cosine alone must FAIL to catch some copies. If that assertion ever goes
+ * green the other way — if the ceiling starts catching all 384 — then the
+ * populations have moved and the ceiling was recalibrated against a field that
+ * no longer exists, which is a thing a later reader needs told rather than
+ * left to notice.
+ */
+test("a copied room is refused, and the ceiling alone is not what refuses it", () => {
+  let built = 0;
+  let ceilingCaught = 0;
+  const escaped: string[] = [];
+
+  for (const key of DESTINATION_KEYS) {
+    const original = RESOLVED.get(key)!;
+    for (const copy of duplicatesOf(key, DESTINATIONS[key].voice, DESTINATION_TONES[key])) {
+      built++;
+      const score = voiceAffinity(original, copy.profile);
+      const hand = toneHandOverlap(DESTINATION_TONES[key], copy.tones);
+      if (score >= VOICE_CEILING_MONITOR) ceilingCaught++;
+      if (score < VOICE_CEILING_MONITOR && hand <= TONE_HAND_OVERLAP_MAX)
+        escaped.push(
+          `a copy of ${key} with ${copy.changes} stated facet(s) restated, ` +
+            `${copy.drop} tone(s) dropped and weights nudged by ${copy.jitter} ` +
+            `scores ${score.toFixed(3)} and shares ${hand.toFixed(3)} of the hand`
+        );
+    }
+  }
+
+  assert.ok(built > 100, `only ${built} copies were built; the generator is not running`);
+  assert.deepEqual(
+    escaped,
+    [],
+    `these copies pass every instrument, so a room could be echoed into the ` +
+      `catalogue without anything going red:\n${escaped.join("\n")}`
+  );
+  assert.ok(
+    ceilingCaught < built,
+    `the monitor ceiling caught all ${built} copies. That is not the field the ` +
+      `ceiling was calibrated against — re-run npm run check:voices -- --duplicates ` +
+      `and re-derive it before trusting the number.`
+  );
 });
 
 /**

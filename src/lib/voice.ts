@@ -1285,3 +1285,260 @@ export function destinationVoiceProfile(
 ): VoiceProfile {
   return { ...taggedToneProfile(tones), ...profileOf(statedVoiceFacets(voice)) };
 }
+
+/* ── THE CEILING, AND WHY IT IS TWO NUMBERS ────────────────────────────
+ *
+ * WHAT WAS THERE BEFORE, PRESERVED PER RULE 14. `src/lib/voice.test.ts`
+ * asserted one number — 0.65 — across every pair in the catalogue, with this
+ * argument: "real destinations DO overlap — four of them are slow, three are
+ * warm — and the allocation permits sharing on one group provided two others
+ * differ." That argument is still correct and is not what changed. What changed
+ * is that the flat application of it was never what the doctrine said, and the
+ * doctrine had simply never been written into code.
+ *
+ * WHAT BEAT IT. Three facts, each measured rather than argued:
+ *
+ *   1. The doctrine is already a SPLIT and is already quoted as one. The
+ *      Portofino/Cote d'Azur twin case in `data/destination-matrix.json` says
+ *      "the strict cap of 0.65, WHICH APPLIES HERE BECAUSE THE PAIR SITS AT
+ *      STRUCTURAL DISTANCE 1". `docs/proposals.md` records Oaxaca/Havana at
+ *      0.846 "against a MONITOR CEILING OF 0.80" and rules the pair kinship
+ *      rather than defect, explicitly because "structural distance is 3, so
+ *      routing is unaffected". Both tiers were live in prose and neither was
+ *      in the test, so the test enforced the strict tier against pairs the
+ *      doctrine never pointed it at.
+ *
+ *   2. THE TWO NUMBERS ARE NOT THE SAME CLAIM. 0.65 is a FITNESS CONDITION on
+ *      the twin rule: two rooms the structural matrix cannot separate must be
+ *      separable by the other instrument, so the tiebreak needs something to
+ *      work with. 0.80 is an ECHO DETECTOR: two rooms the matrix separates
+ *      cleanly are routed apart whatever their voices do, and the only thing
+ *      left to worry about is an author reaching for tones they happen to like.
+ *      Those failure modes have different costs and there is no reason they
+ *      should share a threshold.
+ *
+ *   3. Applied flat, the strict tier now fails rooms it is not protecting.
+ *      Las Vegas/Acapulco sits at structural distance 3 — the pair parts on
+ *      arrival, schedule and size — so no tiebreak between them is ever
+ *      reached, and 0.65 was gating a decision the engine does not make.
+ *
+ * WHERE THE BOUNDARY GOES. Strict for declared twins and for any pair at
+ * structural distance <= 2; monitor for distance >= 3. That is the gate, said
+ * from the other side: the gate is 3, so distance <= 2 is exactly the set of
+ * pairs the matrix cannot route apart, which is exactly the set where voice has
+ * to do the work alone. Declared twins are a subset of that set and are named
+ * anyway, because the twin rule states the condition in its own words and a
+ * reader should find it here too.
+ *
+ * AN UNROWED PAIR IS STRICT. A room with no matrix row has not been shown to be
+ * structurally distant from anything, and reading "no row" as "far away" would
+ * let a room skip the harder tier by being unfinished.
+ *
+ * ── THE NUMBERS THEMSELVES, RECALIBRATED 2026-08-27 ────────────────────
+ *
+ * The split above is unchanged and is not what moved. WHAT MOVED IS BOTH
+ * NUMBERS, from round figures to measurements, and one instrument was added
+ * because the measurement showed the cosine cannot do the job the monitor tier
+ * was named for. THIS IS A CALIBRATION AND NOT A RELAXATION, and the difference
+ * is not rhetoric — it is that every number below is now reproducible from
+ * `npm run check:voices` and `npm run check:voices -- --duplicates`, and that
+ * the set of things REFUSED got larger rather than smaller.
+ *
+ * WHAT WAS THERE, PRESERVED PER RULE 14:
+ *
+ *   STRICT 0.65. Never measured. A round number sitting 0.07 above the observed
+ *   maximum of the field it governs (the twelve wired rooms top out at 0.580,
+ *   Nantucket/Portofino). A ceiling above the maximum of its own field cannot
+ *   bind under any authoring, and this one never has: the strict tier held
+ *   exactly two pairs in the entire catalogue — the declared twins at 0.401 and
+ *   0.172 — and fired zero times in the life of the project.
+ *
+ *   MONITOR 0.80. Also never measured, and worse: it fired on everything. Every
+ *   breach ever recorded in this repo is a monitor-tier pair — 0.893
+ *   aspen/catskills, 0.852 acapulco/las-vegas, 0.848 (now 0.730)
+ *   oaxaca/havana, 0.817 amalfi/havana — four rooms authored from four
+ *   founder-verbatim tone lists, each held out of the catalogue by a number
+ *   nobody had ever checked against the thing it claims to detect.
+ *
+ * WHAT BEAT THEM. Not an argument — four measurements, all committed:
+ *
+ *   1. THE FIELD. `npm run check:voices` prints the whole distribution. Wired
+ *      twelve: min -0.578, median 0.276, mean 0.201, sd 0.258, p90 0.522, max
+ *      0.580. All seventeen authored: min -0.578, median 0.283, mean 0.255, sd
+ *      0.272, p90 0.568, max 0.893. This is a broad, high-variance field, not a
+ *      tight one, and 0.80 sits at mean + 2.0 sd of it — an ordinary outlier
+ *      bar, applied as if it were a duplicate bar.
+ *
+ *   2. WHY THE FIELD IS BROAD, WHICH IS THE MECHANISM AND IS NOT A DEFECT TO
+ *      FIX HERE. Nineteen of the twenty-six facets are ONE-HOT categoricals
+ *      (formality, address, humour, cadence). A one-hot DISAGREEMENT
+ *      contributes ZERO to the dot product, not a negative — so those nineteen
+ *      axes can only ever add agreement and never subtract on difference. The
+ *      seven bipolar manner axes carry 0.579 of the catalogue's total squared
+ *      norm and accumulate without bound, because a destination profile is a
+ *      SUM over tones rather than a normalised vector: warmth reaches 3.63 at
+ *      Amalfi and 3.52 at Oaxaca, theatricality 3.00 at Las Vegas and -3.13 at
+ *      Westhampton, against a declared per-facet range of -1..1.
+ *      `voiceAffinity` is therefore, in practice, a cosine in a roughly
+ *      seven-dimensional signed manner space with
+ *      a categorical rounding error attached, and two warm rooms score 0.8 by
+ *      arithmetic. The consequence that matters here: THE THREE STATED FACETS
+ *      ARE VERY NEARLY INVISIBLE TO THIS NUMBER.
+ *
+ *   3. WHAT A DUPLICATE ACTUALLY SCORES, BUILT AND MEASURED RATHER THAN
+ *      IMAGINED (`--duplicates`; 420 constructions over all eighteen authored
+ *      rooms, each room's own hand replayed with 0-2 tones dropped and weights
+ *      jittered by 0, 0.1 and 0.2):
+ *
+ *        same tone hand, SAME stated triple    n=105  min 0.955  med 0.995
+ *        same hand, ONE stated facet changed   n=105  min 0.844  med 0.946
+ *        same hand, TWO changed                n=105  min 0.711  med 0.901
+ *        same hand, ALL THREE changed          n=105  min 0.589  med 0.857
+ *
+ *      Read the first row against the authored field's maximum of 0.893: there
+ *      is a 0.062-wide EMPTY BAND between the highest pair anybody has written
+ *      and the lowest same-triple reproduction. Read the other three rows and
+ *      the populations OVERLAP the authored field completely. That is the whole
+ *      finding, and it is rule 26 arriving from the other direction: A SINGLE
+ *      COSINE CANNOT SEPARATE AN ECHO FROM A KINSHIP once the author has
+ *      changed even one stated facet, and no choice of threshold makes it able
+ *      to. 0.80 did not do it either — a two-facet-changed clone at 0.711
+ *      passed the old ceiling as comfortably as it passes the new one.
+ *
+ *   4. WHAT DOES SEPARATE THEM, MEASURED THE SAME WAY. The tone HAND — the set
+ *      of codes, ignoring weights — is exact where the cosine is blurry,
+ *      because copying a list is what an echo IS. Authored field: max 0.667
+ *      (Acapulco/Las Vegas and Aspen/Catskills, both four of six), median
+ *      0.167, and 65 of 153 pairs share not one code. Every clone construction
+ *      above: 1.000, at every strength. A second empty band, 0.333 wide.
+ *
+ * THE NUMBERS THAT CAME OUT OF THAT:
+ *
+ *   STRICT 0.58 — DOWN from 0.65, and it is the TOP OF THE WIRED FIELD'S OWN
+ *   RANGE rather than a round number above it: p95 0.565, maximum 0.580, and
+ *   that maximum has a name — Nantucket/Portofino, two quiet houses that part
+ *   on ceremony. Said as a sentence: A DECLARED TWIN MAY BE NO CLOSER IN VOICE
+ *   THAN THE CLOSEST PAIR THE SHIPPED CATALOGUE ALREADY CONTAINS. The four
+ *   strict-tier pairs today measure 0.517 (Aspen/Oaxaca), 0.426
+ *   (Acapulco/St. Moritz), 0.401 (Portofino/Cote d'Azur) and 0.172
+ *   (Havana/New Orleans), so the tightest margin is 0.063 and the number sits
+ *   on live work rather than hovering above the field. It refits as the library
+ *   grows, which `src/lib/selection/types.ts` has said in writing all along:
+ *   "the right number is a property of how densely the catalogue covers the
+ *   voice space, not a constant of nature." `check:voices --wired` prints p95
+ *   and the maximum, so the refit is a one-line read.
+ *
+ *   MONITOR 0.92 — UP from 0.80, and it is the midpoint of the one empty band a
+ *   cosine can honestly police: 0.893 authored maximum to 0.955 same-triple
+ *   duplicate floor, midpoint 0.924. It refuses every reproduction that keeps
+ *   the stated triple and admits every pair anybody has authored. IT DOES NOT,
+ *   AND CANNOT, REFUSE A CLONE THAT CHANGES A STATED FACET — that is measured,
+ *   it is stated here rather than hidden, and it is why the third number below
+ *   exists.
+ *
+ *   TONE_HAND_OVERLAP_MAX 0.80 — NEW, and it is the guard the widening owes.
+ *   Rule 26: two numbers that each mean something beat one that means neither.
+ *   The deliverables overlap in `scripts/deliverables.mjs` is that rule's own
+ *   second number and it asks a different question — are these two rooms the
+ *   same EXPERIENCE — which is `unknown` for every unwired room today and must
+ *   never read as `disjoint`. This one asks the authoring question: WAS THIS
+ *   HAND COPIED. It sits in the middle of the second empty band, flat across
+ *   both tiers because copying a list is a defect at any structural distance,
+ *   and it is the assertion that fires on all four clone populations where the
+ *   cosine fires on one.
+ *
+ * WHAT THE THREE REFUSE, TOGETHER, SAID PLAINLY SO IT CAN BE CHECKED:
+ *
+ *   a pair sharing more than 80 per cent of the smaller room's tone codes;
+ *   a pair at 0.92 or above in voice affinity;
+ *   a twin or a distance <= 2 pair at 0.58 or above;
+ *   and, on the assertion that lives in voice.test.ts, any two rooms stating
+ *   the same formality, address and humour — which is the exact fact the cosine
+ *   is blind to, and which is currently the load-bearing refusal for
+ *   Aspen/Catskills.
+ *
+ * The regression that proves it is "a copied room is refused by at least one
+ * instrument at every distance from its original" in src/lib/voice.test.ts. It
+ * builds the clones rather than describing them, per rule 21's requirement that
+ * a guard be watched going red before it is believed.
+ */
+
+/**
+ * Twins and structurally close pairs. The tiebreak must have something to work
+ * with. The observed maximum of the wired field; refit as the library grows.
+ */
+export const VOICE_CEILING_STRICT = 0.58;
+
+/**
+ * Structurally distant pairs. An echo detector for the ONE echo a cosine can
+ * see — a reproduction that also keeps the stated triple, whose measured floor
+ * is 0.955 against an authored maximum of 0.893.
+ */
+export const VOICE_CEILING_MONITOR = 0.92;
+
+/**
+ * The most of one room's tone hand another room may repeat.
+ *
+ * Shared codes over the SMALLER hand, so a thirteen-tone room cannot hide a
+ * six-tone room inside itself by being larger. Weights are ignored on purpose:
+ * an echo is a copied list, and re-weighting a copied list is the cheapest
+ * possible way to evade a weighted measure — the jittered constructions in
+ * `--duplicates` still score 0.998 on the cosine and 1.000 here.
+ */
+export const TONE_HAND_OVERLAP_MAX = 0.8;
+
+/** How much of the smaller of two tone hands the two hands share, 0..1. */
+export function toneHandOverlap(
+  a: readonly ToneWeight[],
+  b: readonly ToneWeight[]
+): number {
+  const codesA = new Set(a.map((t) => t.code));
+  const codesB = new Set(b.map((t) => t.code));
+  const smaller = Math.min(codesA.size, codesB.size);
+  if (smaller === 0) return 0;
+  let shared = 0;
+  for (const code of codesA) if (codesB.has(code)) shared++;
+  return shared / smaller;
+}
+
+export type VoiceCeiling = {
+  limit: number;
+  tier: "strict" | "monitor";
+  /** One clause naming why this pair is in this tier. For the failure message. */
+  why: string;
+};
+
+/**
+ * Which ceiling a pair is held to.
+ *
+ * `distance` is the room-vs-room Hamming distance from
+ * `src/lib/matrix.ts` — null when either room has no matrix row.
+ */
+export function voiceCeiling(
+  distance: number | null,
+  declaredTwin: boolean
+): VoiceCeiling {
+  if (declaredTwin)
+    return {
+      limit: VOICE_CEILING_STRICT,
+      tier: "strict",
+      why: "declared twin — the structural matrix cannot route these apart",
+    };
+  if (distance === null)
+    return {
+      limit: VOICE_CEILING_STRICT,
+      tier: "strict",
+      why: "no matrix row — structural distance unmeasured, so voice is on its own",
+    };
+  if (distance <= 2)
+    return {
+      limit: VOICE_CEILING_STRICT,
+      tier: "strict",
+      why: `structural distance ${distance}, below the gate — voice is the only separator`,
+    };
+  return {
+    limit: VOICE_CEILING_MONITOR,
+    tier: "monitor",
+    why: `structural distance ${distance}, at or above the gate — routing is already decided`,
+  };
+}

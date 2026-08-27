@@ -379,3 +379,79 @@ TABLES IT WILL ACTUALLY MEET."** The drinks `Also at:` line had only ever run
 against emptiness, where broken and correct are indistinguishable. An
 instrument's first real use is its first test unless you force an earlier one —
 so force one, on a build that holds the rows production holds.
+
+**25. THE THREE RULES A PREMISE IS WRITTEN UNDER.** Founder's, 2026-08-27,
+governing every room still unwritten:
+
+  1. **THE PREMISE SELLS THE REGISTER AT ITS MOST BOOKABLE SIZE.** A backyard
+     in August must be able to honour every line. A premise only a villa can
+     satisfy has sold a location, and this product does not sell locations —
+     rule 10, from the other end: Havana in a Brooklyn apartment is the pitch.
+  2. **NO PROPER NOUN A GUEST WOULD NOT SAY AT THE TABLE.** Place names,
+     brand names and landmarks are the postcard writing itself. What survives
+     is what somebody would actually name out loud while eating.
+  3. **NO LABOUR OR STAFF THE HOST DOES NOT HAVE.** Abundance is MADE IN
+     ADVANCE, never SERVED. The moment a line implies somebody carrying a tray,
+     it has described a restaurant and handed the evening to staff who do not
+     exist. Acapulco says it structurally — "there is no staff in this voice;
+     things appear, nobody serves them" — and that is the test for every room.
+
+Together they are rule 5's arithmetic made checkable: a row can clear distance
+3 against every other room and still describe a postcard, and these are the
+three ways the postcard gets in.
+
+**26. BEFORE CONCLUDING THE SPACE IS FULL, CHECK YOU ARE MEASURING THE
+DIMENSION THE THINGS DIFFER ON.** Three new rooms breached the voice ceiling
+and the tempting reading was pigeonhole arithmetic — eighteen rooms will not
+fit a vocabulary sized for twelve, so the space is crowded and something must
+give. That reading is wrong, and it is seductive precisely because it is
+arithmetic. THE VOCABULARY WAS NOT RUNNING OUT OF DISTANCE. `voiceAffinity` is
+cosine over tone facets, so it measures TEMPERAMENT and nothing else; four of
+the new rooms are TABLE ROOMS, and table rooms converge in tone space by
+nature. Havana and Oaxaca score 0.848 because both are warm, and differ
+completely in the dimension nobody was measuring: one pours rum in a nightclub,
+the other serves mole at a family table.
+
+The proof that the measure is not broken is that it SUCCEEDS where it was
+feared — Amalfi/Portofino 0.116 and Amalfi/Côte d'Azur 0.055, between rooms
+sharing coast, decade, lemons and half their decor. It separates what shares
+MATERIAL and collides what shares TEMPERAMENT, exactly as written.
+
+So the remedy is a second number, not a wider first one: TWO NUMBERS THAT EACH
+MEAN SOMETHING BEAT ONE THAT MEANS NEITHER. Tone-close AND deliverables-close
+is a genuine confusion risk. Tone-close AND deliverables-disjoint is two rooms
+that are neighbours in register and distinct in experience — admitted, and
+RECORDED as admitted on the second number so a later reader can see which
+verdicts rested on it.
+
+Its trap, which is rule 24 again: a pair can read as disjoint because NEITHER
+ROOM HAS ANYTHING. Absence is not distinctness. Any measure computed over a
+catalogue still being authored needs a minimum-evidence floor below which the
+answer is `unknown`, and `unknown` must never be allowed to read as `disjoint`.
+
+**27. EVERY ROOM HAS ONE SIGNATURE GESTURE, AND EVERY ROOM HAS TWENTY.**
+Founder ruling, made repeatedly and re-litigated every time because it lived
+only in conversation. BOTH, never either — and an agent offering the founder a
+choice between "one invariant" and "a pool" has misread this rule and wasted
+her turn.
+
+THE ONE is the signature: the thing that always happens, the room's most
+recognisable single fact. Tahiti's conch at dusk. Amalfi's plate refilled
+mid-sentence. Aspen's blanket migration. Oaxaca's somebody sent to stir.
+Acapulco's table relaid around whoever never left it. `db/031`'s "invariant per
+destination" is TRUE of this one and stays.
+
+THE TWENTY are what selection draws from — lesser acts the room can do on any
+given night. `bank_kind = 'host_act'` already holds them: 32 exist across
+eighteen rooms, one to four each, and roughly 360 are wanted. Tahiti's conch
+being simultaneously `world.gesture` AND a bank host act is not duplication to
+resolve; it is the signature also being in the pool, which is correct.
+
+A ROOM MISSING ITS SIGNATURE IS NOT A ROOM WITHOUT ONE — it is a room whose
+signature has not been found yet, and a weak one must be rejected rather than
+kept for tidiness. Palm Springs offered lights-at-dusk; a switch being flipped
+is a utility wearing the costume of a ritual, and the founder threw it out
+rather than let the field be filled. The hard case is a room whose character is
+a BEHAVIOUR — wit moving across a patio — because a behaviour cannot be staged
+as an act; that difficulty is a sign the signature is still unfound, never
+licence to skip it.
