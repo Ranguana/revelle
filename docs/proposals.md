@@ -1237,3 +1237,219 @@ anywhere".
   closest — 8 of 12 — and would clear the floor on four more lines from her
   sheet. Oaxaca, at 1, is nowhere near.
 
+
+---
+
+# 2026-08-27 — The games become rows, and two rooms contradict themselves
+
+**LANDED.** Founder, on being shown the count: *"fix the parser so the games
+become rows. lets not make a blanket rule that a room is gameless."* Both
+halves are done. Nothing here is a proposal awaiting a signature except the two
+rulings owed at the bottom, which are hers alone.
+
+## The defect, in one sentence
+
+`scripts/seed-bank.mjs` routed a bank row to `bank_kind` **by section heading
+only** — `GAMES:` and `GAMES/BOOKINGS:` became `game`, everything else did not.
+Only three rooms of eighteen ever wrote a `GAMES:` heading with content in it,
+so the seeder produced **three `game` rows in the whole catalogue** while
+twelve more rooms named a game inside a `GOODS:` line. A read-only audit
+counted 42 distinct games in the repo, 3 of them `game` rows, and 22 of the
+missing 39 already holding a bank row filed as `good` or `printed_card`.
+
+The header did not lie — it answered a different question than it appeared to
+(rule 23). `GAMES:` is a block she wrote when she had a game to list
+*separately*, and its absence was never a claim that the room had none.
+
+## The mechanism, and the two that were refused
+
+**A NAMED RULING TABLE KEYED BY SLUG** — `GAME_ROUTINGS` in
+`scripts/seed-bank.mjs`, twenty rows, each carrying the kind the document
+derives today (`was`), the kind the ruling gives it, and **the words in the
+clause that are the evidence**, quoted, so a reader can check the ruling
+against the document without trusting the file. It is the shape `PHASE_RULINGS`
+already uses in the same file and its argument transfers unchanged: derivation
+stays honest and a ruling sits beside it in the open, two authorities, never
+one pretending to be the other.
+
+- **A per-clause `(GAME)` marker in the document was refused by the document
+  itself.** Its provenance header says everything above the second `GOODS:`
+  line in each room is *"v1 as she blessed it, unaltered"*, and the phase
+  rulings say why that matters: a v1 edited to make a seeder come out right
+  destroys the only evidence of what the routing was derived from.
+- **Content matching was refused by rule 24, and one row proves it.** Vegas's
+  Celebrity deck reads *"~80 printed marquee-ticket slips + draw vessel +
+  fishbowl three-round rules"*: a matcher must hit "fishbowl" without hitting
+  "bowl", and "deck" reaches four playing-card decks that are goods and one
+  prompt deck that is a game. That is the hyphen incident waiting to happen.
+
+**A ruling table can match 20 of 20 or it can fail. It cannot quietly match
+nine.** Every entry must find its row and find it holding `was`, or the run
+stops.
+
+## The count, which is the part that matters (rule 24)
+
+| | before | after |
+|---|---|---|
+| `game` rows | 3 | **23** |
+| `good` | 292 | 276 |
+| `printed_card` | 29 | 25 |
+| `host_act` | 32 | 32 |
+| total rows | 356 | 356 |
+| rooms with a game row | 3 | **13 of 18** |
+| rows that changed kind | — | **exactly 20** |
+| rows LIVE / held in draft | 174 / 182 | **174 / 182, unchanged** |
+
+**THE AUDIT SAID 22 AND THIS RULING CONVERTS 20.** The difference is not
+rounded away: every candidate that was looked at and refused is in
+`GAME_ROUTINGS_DECLINED`, printed on every run with its reason, so the two
+missing rows can be read rather than guessed at. The likeliest of them is
+**Vegas's `Pick a Number as the host's game`** — the clause literally says
+"game", and it sits under `HOST ACTS:`, where the header genuinely does say who
+performs the thing. Its kit is already routed, so making the act a second game
+row would give one game two rows in one room. **One line in `GAME_ROUTINGS`
+overrules that if the intent was both.**
+
+## The object-versus-game split, decided
+
+**One clause yields ONE row of its own kind, plus the cards that ride with
+it.** The liar's-dice, Watten/briscola, scopa and Conquián rules cards are
+still their own `printed_card` rows; what changed is that the thing they ride
+with is a `game` rather than a `good`. This is `IS_A_KIT`'s argument one level
+up — *a kit is a good even when it contains printed matter* becomes *a game is
+a game even when it contains an object and a card*.
+
+**A clause is never split into two rows of different kinds by machine.** Where
+a clause names an object AND a distinct thing somebody else does with it, the
+activity is a missing authored line and is reported as one. New Orleans:
+*"tarot deck out (Marseille or Rider-Waite; host reads for whoever asks)"* —
+the deck is a good, **the reading is a game and has no row**, and pulling it
+out of the middle of the deck's sentence is the guess the seeder already
+refuses for a gesture that also names a kit. Big Sur's Thoth deck stays a good
+for the opposite and stronger reason: its clause says *"object only, no
+reader"* — positive evidence that it is **not** a game, which is rule 3 working
+in the direction nobody expects.
+
+**So the document must contain more than it does.** Twelve rooms now have a
+game row for the object on the shelf. The reading at New Orleans, the naming
+game Westhampton's sealed score is the residue of, and the games that live only
+as voice lines are **authoring, not parsing**.
+
+## A second defect the count found on the way
+
+`las-vegas-celebrity-1960-deck` has been filed in **`the_table_set` slot**
+since db/043, because `bank_item_default_slot()`'s table-dressing vocabulary
+contains `'bowl'` — for the bowls of lemons and the citrus bowls — and
+*fishbowl* contains *bowl*. A party game has been shipping as table dressing
+and nothing said anything, because the row looked entirely at home. It stops
+meeting the branch now, since that branch is gated on
+`kind in ('good','printed_card')` and a game never was one. **The vocabulary is
+not widened** — `'bowl'` is right for the bowls, and a word-boundary rule is a
+different change with its own argument.
+
+## db/048, and what it does not do
+
+`db/048-a-game-is-not-a-heading.sql` moves the same twenty rows in a database
+that already holds them, because the seeder cannot: `kind` is inside its
+`differs` comparison, so a plain deploy would report twenty differences forever
+and change nothing, and `--overwrite` would let the file beat the curator on
+every column of every row rather than on twenty kinds.
+
+**It keeps db/043's restraint, which was explicitly praised, in both forms
+available here.** A row moves only where its kind is *still exactly the value
+the old parser wrote* — a curator who has already reclassified one is not
+overruled and the disagreement is raised as a notice rather than settled by
+whoever ran the deploy. And the slot that follows the kind is moved only where
+the claim still carries the machine's own note.
+
+**Zero moved rows is the correct answer on a fresh database** (rule 22):
+`migrate` runs before every seeder, so `bank_item` is empty when db/048 runs
+and `seed-bank` inserts all twenty as games directly. There is deliberately no
+"must have moved rows" guard, because it would fail every fresh build.
+
+**NOT VERIFIED AGAINST A LIVE DATABASE.** `initdb` fails on this machine with
+`shmget … Cannot allocate memory` — the same failure a sibling reported, and it
+reproduces with the sandbox disabled, so it is the machine and not the harness.
+db/048 has been read and argued but never executed.
+
+## Checked, and it holds: the kill list
+
+`KILLED_GAMES` in the seeder checks every row against the kills recorded in the
+bank document and the three take-home sheets — keno, the weather-forecast act,
+the card that took the last trick, the belote sheet, the cochonnet, your card
+from the door, a Thoth tarot card, the Fischer–Spassky scoresheet, a single
+domino, costume briefs catalogue-wide. **No row carries any of them**, and a
+match is a failed run rather than a warning: a killed game reappearing as a
+routing win would look exactly like the fix working.
+
+**Full phrases, never keywords, and that is the whole care in the list.** *The
+belote sheet* was cut from Côte d'Azur and *belote rules card* is routed to
+`game` — one word apart, opposite decisions. A keyword check on "belote" would
+have refused a live routing and read as diligence while doing it.
+
+## "Let's not make a blanket rule that a room is gameless"
+
+`GAMES: none` produces **no row, no column and no negative claim.** Nothing in
+this catalogue records that a room *has* no game, and nothing may. The report
+now says so on every run, so that nobody later "completes" the mechanism by
+writing the fact down. A room that says none can receive a game the moment
+somebody names one — in a `GAMES:` block or in `GAME_ROUTINGS` — without
+touching the parser.
+
+Five rooms still have no game row: Westhampton, Portofino, Tahiti, Palm Springs
+and Acapulco. **That is an absence of authoring, not a property of the room.**
+
+## RULINGS OWED — two rooms contradict themselves
+
+Only the founder can settle these. The voice record and the bank record
+disagree and nothing has been changed in either direction.
+
+1. **TAHITI.** `docs/atmosphere-idea-bank-v1.md` says **"GAMES: none, on
+   purpose"**, while `src/lib/destinations.ts` carries a `piece: "game_rule"`
+   for the room: *"Everybody says what they would want on the last night.
+   Whoever names something already on the table cooks tomorrow."*
+2. **ACAPULCO.** **"GAMES: none — the band, the window, and the dancing are the
+   shelf"**, against its own voice line: *"Everybody names the last song.
+   Whoever names one already played goes in the water."*
+
+Either the bank line is stale and the room has a game, or the voice line is a
+turn of phrase rather than a game and the `game_rule` piece is the wrong
+container for it. Both readings are defensible from the files; neither is
+resolvable from them.
+
+## The seam nobody has crossed yet — reported, not touched
+
+**`src/lib/destinations.ts` carries 20 `piece: "game_rule"` entries, one in
+each of the eighteen rooms and two each at Amalfi and Aspen.** (The audit said
+21 across 17; the corrected count is 20 entries across 18 rooms — the
+twenty-first occurrence of the string is prose in a comment.) Each is a game
+written in the room's own voice; **none is a row in `bank_item` or in the
+`game` table.** That is where most of the catalogue's games live.
+
+Routing them is **not** a parser change. A voice line is a sentence; a `game`
+row needs rules, bounds, a host role and a runbook (db/010). It is authoring,
+in the game table's own seeder, and it is a decision about whether eighteen
+one-line rituals are eighteen games or eighteen sentences.
+
+### Three take-home dependencies still aimed at nothing
+
+**This fix satisfies none of them, and it is worth saying why rather than
+leaving it to be re-derived.**
+
+- Vegas's IOU — `from game yields_iou`
+- Oaxaca's Conquián tally and St. Moritz's backgammon column —
+  `from ambient_game yields_score_sheet`
+- St. Moritz's doubling cube — `from ambient_game yields_prize`
+
+Those slots are filled from the **`game` table**. A `bank_kind = 'game'` row
+fills one of the four **atmosphere** slots (db/043) and does not feed them. And
+they would still be aimed at nothing if all twenty were game-table rows,
+because `ingredient_supplies` is empty on every database the committed chain
+builds (db/044) — no pool has tagged its rows yet.
+
+### The `game` table is still Westhampton's alone
+
+All of its rows are scoped to `westhampton-1976`, so **seventeen rooms have no
+eligible game-table row.** This work does not change that and does not claim
+to: it moved rows inside the bank, which is the shelf, and left the shelf's
+sibling table exactly where it was.

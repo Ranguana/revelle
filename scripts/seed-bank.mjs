@@ -325,6 +325,129 @@
  * booked in docs/needs-a-human.md; it is a screen, and a screen is a person's
  * call.
  *
+ * ─────────────────────────────────────────────────────────────────────
+ * 11. A GAME IS NOT A HEADING — ROUTE BY CONTENT, WITH A NAMED RULING
+ *
+ * SECTION 3 ABOVE IS KEPT WHOLE AND IS STILL RIGHT ABOUT WHAT IT PROTECTED.
+ * It reads "ROUTE BY HEADER. THE DOCUMENT SAYS SO AT THE TOP AND IT IS RIGHT",
+ * and for GOODS / HOST ACTS / GESTURE / ROUTE TO … it is: those labels say who
+ * performs a thing and the label is the founder's own word for it.
+ *
+ * WHAT BEAT IT, counted rather than argued: only THREE rooms of eighteen ever
+ * wrote a `GAMES:` heading with content in them, and the parser produced
+ * exactly three `game` rows in the whole catalogue. Meanwhile the document
+ * names a game inside a `GOODS:` line in TWELVE rooms — the dice cups and the
+ * liar's-dice rules card at Vegas, the double-nine dominoes at Havana, the
+ * tombola kit at Amalfi, the Bingo kit and the gin deck at Catskills, the
+ * cribbage board at Nantucket, the backgammon board at St. Moritz. Every one
+ * of those was filed `good` or `printed_card` and no room but three had a game
+ * at all. The founder, on being shown the count: "fix the parser so the games
+ * become rows."
+ *
+ * The header did not lie. IT ANSWERED A DIFFERENT QUESTION THAN IT APPEARED TO
+ * (CLAUDE.md rule 23): `GAMES:` is a block she wrote when she had a game to
+ * list SEPARATELY, and its absence is not a claim that the room has none — the
+ * game was in the goods line, because that is where the object is.
+ *
+ * ── WHY A RULING TABLE AND NOT A MARKER, AND NOT A MATCHER ───────────
+ *
+ * Three mechanisms were available and the file already contains the argument
+ * that decides between them.
+ *
+ *   A PER-CLAUSE MARKER in the document — `(GAME)` beside `(GESTURE)` — is the
+ *     channel this document uses for everything said ABOUT an item, and it
+ *     would have been the obvious answer. IT IS REFUSED BY THE DOCUMENT
+ *     ITSELF. The provenance header says "everything above the second `GOODS:`
+ *     line in each room is v1 as she blessed it, unaltered", and the phase
+ *     rulings below say why that matters: "this is a v1 and is not edited to
+ *     make a seeder come out right — rewriting the record to move a tag would
+ *     destroy the only evidence of what the tag was derived FROM." Marking her
+ *     clauses would make the derivation unfalsifiable, because the document
+ *     would then say what the parser needed it to say.
+ *
+ *   CONTENT MATCHING — a vocabulary of game words, the way PRINTED_MATTER is a
+ *     vocabulary of printed things — is refused by CLAUDE.md rule 24 and by
+ *     one concrete row. Vegas's Celebrity deck is described as "~80 printed
+ *     marquee-ticket slips + draw vessel + fishbowl three-round rules": a
+ *     matcher looking for game words has to hit "fishbowl" without hitting
+ *     "bowl", and a matcher looking for "deck" hits four PLAYING-card decks
+ *     that are goods and one prompt deck that is a game. That is the hyphen
+ *     incident waiting to happen — 'take home' against `take-home`, 143 of 152
+ *     rows misfiled with every check green.
+ *
+ *   A RULING TABLE KEYED BY SLUG is what the file already does for the one
+ *     other case where a PERSON decided something the document does not say:
+ *     PHASE_RULINGS. Its argument transfers unchanged. "Derivation stays
+ *     honest, and a ruling sits beside it in the open, named, dated, and
+ *     printed on every run. Two authorities, never one pretending to be the
+ *     other." So GAME_ROUTINGS below is twenty named rows, each carrying the
+ *     kind the document DERIVES (`was`), the kind the ruling gives it, and the
+ *     words in the clause that are the evidence. A row that no longer exists
+ *     fails the run; a row whose derived kind has moved fails the run. It can
+ *     match 20 of 20 or it can fail. It cannot quietly match nine.
+ *
+ * ── THE OBJECT-VERSUS-GAME SPLIT, DECIDED ────────────────────────────
+ *
+ * Several clauses are more than one thing at once. "Leather dice cups + five
+ * dice each + liar's-dice rules card" is a physical object, a printed card and
+ * a game in one sentence. THE RULE, and it needs no new machinery because the
+ * file already had half of it:
+ *
+ *   ONE CLAUSE YIELDS ONE ROW OF ITS OWN KIND, PLUS THE CARDS THAT RIDE WITH
+ *   IT. A card is already pulled out as its own `printed_card` row by
+ *   `extractCards`, and that stays exactly as it was — the liar's-dice rules
+ *   card, the Watten/briscola card, the scopa card and the Conquián card are
+ *   cards, riding with a game. What CHANGES is the kind of the thing they ride
+ *   with: the cups-and-dice are not a good with a card, they are A GAME with a
+ *   card. This is IS_A_KIT's argument one level up — "a kit is a good even
+ *   when it contains printed matter" becomes "a game is a game even when it
+ *   contains an object and a card", and for the same reason: the boxed thing
+ *   ships as one line and filing it by its packaging misfiles the board, the
+ *   tokens, the beans and the five wrapped prizes with it.
+ *
+ * A CLAUSE IS NEVER SPLIT INTO TWO ROWS OF DIFFERENT KINDS HERE. Where a
+ * clause names an object AND a distinct activity somebody else performs on it,
+ * THE ACTIVITY IS A MISSING AUTHORED LINE AND IS REPORTED AS ONE. The founder's
+ * audit put it exactly: at New Orleans "the deck is a good, the reading is a
+ * game and has no row." Pulling the reading out of the middle of the deck's
+ * sentence is the same guess section 4 refuses for a gesture that also names a
+ * kit. So `new-orleans-tarot-deck-out` stays a good and the reading is booked
+ * as an absence, and `big-sur-thoth-tarot-deck-out` stays a good because its
+ * clause says "object only, no reader" in her own words — positive evidence
+ * that it is NOT a game, which is rule 3 working in the direction nobody
+ * expects.
+ *
+ * WHAT THE DOCUMENT MUST THEREFORE CONTAIN, said plainly because this decision
+ * changes it: for a game to exist as playable content rather than as a shipped
+ * object, SOMEBODY HAS TO WRITE THE LINE. Twelve rooms now have a `game` row
+ * for the object on the shelf. The reading at New Orleans, the naming game
+ * Westhampton's sealed score is the residue of, and the seventeen other games
+ * that live only in `src/lib/destinations.ts` as `piece: "game_rule"` are
+ * authoring, not parsing, and the report names them every run.
+ *
+ * ── "LET'S NOT MAKE A BLANKET RULE THAT A ROOM IS GAMELESS" ──────────
+ *
+ * The founder's second instruction, and the harder one. Two rooms declare
+ * `GAMES: none` — Tahiti "none, on purpose" and Acapulco "none — the band, the
+ * window, and the dancing are the shelf" — and BOTH CONTRADICT THEMSELVES
+ * ELSEWHERE: each carries a `piece: "game_rule"` in `src/lib/destinations.ts`,
+ * written in the room's own voice.
+ *
+ * So `none` produces NO ROW, NO COLUMN AND NO NEGATIVE CLAIM. It never has and
+ * it now says so: `readClause` returns `declined`, the run reports the line
+ * under its own heading, and nothing anywhere records that a room HAS no game.
+ * That is not a happy accident to be left unwritten — it is the mechanism, and
+ * the report states it on every run so that nobody later "completes" it by
+ * writing the fact down. A room whose document says none can receive a game
+ * the moment somebody names one, in a `GAMES:` block or in this table, without
+ * touching the parser.
+ *
+ * The two contradictions are RULINGS OWED. The voice record and the bank
+ * record disagree and only the founder can say which is right; this file
+ * reports them on every run, docs/proposals.md books them under 2026-08-27,
+ * and neither resolves them.
+ *
+ * ─────────────────────────────────────────────────────────────────────
  * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL unless
  * --dry-run.
  */
@@ -947,6 +1070,350 @@ const PHASE_RULINGS_DECLINED = [
     phase: "all",
     why: "An object on a surface, with no hour of its own.",
   },
+];
+
+/**
+ * THE GAMES THE HEADER COULD NOT SEE — section 11.
+ *
+ * Twenty rows, each a game the founder wrote inside a `GOODS:` line. Same
+ * shape and same guarantees as PHASE_RULINGS above, for the same reason: the
+ * document derives one thing, a person ruled another, and the two authorities
+ * sit side by side rather than one being quietly edited to look like the
+ * other.
+ *
+ *   `was`   the kind the document derives TODAY, asserted rather than assumed.
+ *           If a clause is reworded so that PRINTED_MATTER or IS_A_KIT reads
+ *           it differently, the premise of the ruling has changed and the run
+ *           FAILS instead of letting this table win an argument it was not
+ *           given. Exactly PHASE_RULINGS' `was`, and it has already earned its
+ *           keep once there.
+ *   `why`   the words IN THE CLAUSE that make it a game. Not a justification
+ *           written afterwards — a quotation, so a reader can check it against
+ *           the document without trusting this file.
+ *
+ * THE COUNT IS THE POINT (CLAUDE.md rule 24). A read-only audit found 22 rows
+ * misfiled by this defect. This table converts TWENTY, and the gap is reported
+ * by name every run rather than rounded away — see GAME_ROUTINGS_DECLINED,
+ * which holds every candidate that was looked at and refused, with the reason.
+ * A ruling table cannot match "most" of anything: every entry must find its
+ * row and find it holding `was`, or the run fails.
+ *
+ * NOTHING HERE IS A NEW ROW. Every slug already exists; the ruling moves its
+ * kind and touches nothing else. The rows that ride WITH these — the rules
+ * cards `extractCards` pulls out — are untouched and stay `printed_card`.
+ */
+const GAME_ROUTINGS = [
+  {
+    slug: "new-york-the-game-1938-prompt-slips",
+    was: "printed_card",
+    why:
+      '"The Game 1938 prompt slips". The Game IS the slips — there is no ' +
+      "board and no other object, and the slips rule in NEW CONTENT CLASSES " +
+      'names "all prompt decks" as game content that ships pre-generated. ' +
+      "Filed as printed matter it was a card explaining nothing.",
+  },
+  {
+    slug: "new-york-backgammon-owned-if-present",
+    was: "good",
+    why:
+      '"backgammon owned-if-present". A game the house does not ship. ' +
+      "`ships` is its own column and already says false; `kind` says WHAT " +
+      "IT IS, and what it is is backgammon.",
+  },
+  {
+    slug: "new-orleans-1956-charades-prompt-deck",
+    was: "printed_card",
+    why:
+      '"1956 charades prompt deck". A prompt deck under the slips rule: the ' +
+      "printed thing is the whole game, not a card that accompanies one.",
+  },
+  {
+    slug: "dolomites-northern-italian-pattern-card-deck",
+    was: "good",
+    why:
+      '"northern-Italian pattern card deck + Watten/briscola rules card". ' +
+      "The clause names what is played with it in the same breath, and the " +
+      "rules card rides with it as its own printed_card row. Deck plus " +
+      'provided content is the document\'s own definition of a game — ' +
+      '"opt-in objects with provided content", routing rule 3.',
+  },
+  {
+    slug: "havana-double-nine-dominoes-in-wooden-box",
+    was: "good",
+    why:
+      '"double-nine dominoes in wooden box". A boxed game. Nothing about ' +
+      "the box makes it furniture.",
+  },
+  {
+    slug: "las-vegas-leather-dice-cups-five-dice-each",
+    was: "good",
+    why:
+      '"leather dice cups + five dice each + liar\'s-dice rules card + era ' +
+      'stakes-suggestion card". The founder\'s own example. Both cards are ' +
+      "already separate printed_card rows riding with it; what is left is " +
+      "liar's dice.",
+  },
+  {
+    slug: "las-vegas-celebrity-1960-deck",
+    was: "good",
+    why:
+      '"Celebrity 1960 deck (~80 printed marquee-ticket slips + draw vessel ' +
+      '+ fishbowl three-round rules)". Slips, a vessel and three rounds of ' +
+      "rules. This is the row a word-matcher would have filed by the word " +
+      '"bowl"; it is here by name instead.',
+  },
+  {
+    slug: "las-vegas-pick-a-number-kit",
+    was: "good",
+    why:
+      '"Pick-a-Number kit (rules card + a wrapped prize — everyone wins ' +
+      'eventually; that\'s the game)". The clause ends with the words "that\'s ' +
+      'the game". IS_A_KIT kept it out of printed_card and was right to; a ' +
+      "kit is a good rather than a card, and this kit is a game.",
+  },
+  {
+    slug: "cote-dazur-belote-rules-card",
+    was: "printed_card",
+    why:
+      '"belote rules card", standing alone in the goods line with no deck ' +
+      "beside it. THE WEAKEST ROUTING IN THIS TABLE and it is marked so: " +
+      "unlike the Dolomites, Amalfi and Oaxaca cards, this one rides with " +
+      "nothing, so as printed_card it was a card about a game the bank does " +
+      "not hold. Routed because the card is the only belote the room ships, " +
+      "and the missing 32-card deck is reported as an authoring absence.",
+  },
+  {
+    slug: "cote-dazur-petanque-set",
+    was: "good",
+    why:
+      '"pétanque set (requires_outdoors, no indoor fallback)". A set of ' +
+      "boules is a game; the venue tag rides with it untouched.",
+  },
+  {
+    slug: "catskills-bingo-kit-with-corny-pre-written-call-card",
+    was: "good",
+    why:
+      '"Bingo kit with corny pre-written call card". The call card is ' +
+      "pre-written under the slips rule, which is the rule about GAMES with " +
+      "player-generated content. The kit is the game.",
+  },
+  {
+    slug: "catskills-gin-deck",
+    was: "good",
+    why: '"gin deck". A deck named for the game played with it.',
+  },
+  {
+    slug: "catskills-mah-jongg-owned-if-present",
+    was: "good",
+    why:
+      '"mah-jongg owned-if-present". Same as New York\'s backgammon: not ' +
+      "shipped, still a game.",
+  },
+  {
+    slug: "big-sur-noun-game-1971-slips",
+    was: "printed_card",
+    why:
+      '"noun-game 1971 slips (nouns can be things — the fog is a card)". The ' +
+      'room\'s heading says "game night legal" outright. The slips are the ' +
+      "game.",
+  },
+  {
+    slug: "nantucket-cribbage-board",
+    was: "good",
+    why:
+      '"cribbage board (ship cheap or owned)". The unresolved ship-or-own ' +
+      "either/or is untouched and still reported; it is a question about " +
+      "`ships`, not about what the object is.",
+  },
+  {
+    slug: "nantucket-chess-owned-if-present",
+    was: "good",
+    why:
+      '"chess owned-if-present (scene-card glance — it\'s on the front ' +
+      'page)". Glanced rather than shipped, and still chess.',
+  },
+  {
+    slug: "amalfi-1953-tombola-kit",
+    was: "good",
+    why:
+      '"TOMBOLA KIT — tombolone board, wooden tokens in cloth bag, printed ' +
+      "cartelle, Smorfia translation sheet, sack of dried beans as markers, " +
+      'FIVE wrapped prizes in ascending tiers". A board, tokens, cards, ' +
+      "markers and prizes. The room's gesture is somebody CALLING it.",
+  },
+  {
+    slug: "amalfi-1953-napoletane-pattern-40-card-deck",
+    was: "good",
+    why:
+      '"Napoletane-pattern 40-card deck + scopa rules card (early/side game, ' +
+      '2–4 players, while the table grows)". The clause says "game" and ' +
+      "gives the player count.",
+  },
+  {
+    slug: "oaxaca-1954-baraja-espanola-40-card-deck",
+    was: "good",
+    why:
+      '"Baraja española 40-card deck + Conquián rules card (matching games ' +
+      'as the easy option, same card)". The clause says "games".',
+  },
+  {
+    slug: "st-moritz-1984-backgammon-board",
+    was: "good",
+    why:
+      '"backgammon board (claimed fully — \'84 alpine is its decade)". ' +
+      "Claimed fully means it ships; New York's is the owned-if-present " +
+      "cousin. Both are backgammon.",
+  },
+];
+
+/**
+ * EVERY CANDIDATE THAT WAS LOOKED AT AND REFUSED, AND WHY.
+ *
+ * The other half of the ruling, exactly as PHASE_RULINGS_DECLINED is the other
+ * half of the phase ruling: a table of conversions with no record of what was
+ * considered and declined reads, six months out, as though nothing else was
+ * considered at all — and here it is also the honest form of the count. The
+ * audit said 22 and this file converts 20; these are the rows the difference
+ * could be hiding in, named, so the founder can overrule any of them in one
+ * line instead of re-deriving the question.
+ *
+ * `kind` is asserted the same way `was` is above. A decline that has silently
+ * become something else is a decline nobody can see is dead.
+ */
+const GAME_ROUTINGS_DECLINED = [
+  {
+    slug: "new-orleans-tarot-deck-out",
+    kind: "good",
+    why:
+      "THE AUDIT'S OWN WORDS: \"the deck is a good, the reading is a game " +
+      'and has no row." The clause is "tarot deck out (Marseille or ' +
+      'Rider-Waite; host reads for whoever asks)" — an object, plus a thing ' +
+      "the HOST does with it. Splitting the reading out of the middle of the " +
+      "deck's sentence is the guess section 4 refuses for gestures. The " +
+      "reading is an authoring absence and is reported as one.",
+  },
+  {
+    slug: "big-sur-thoth-tarot-deck-out",
+    kind: "good",
+    why:
+      '"Thoth tarot deck out (1969, object only, no reader — NOLA owns the ' +
+      'reading)". POSITIVE EVIDENCE THAT IT IS NOT A GAME, in her own words. ' +
+      "Rule 3 cuts this way as well as the other.",
+  },
+  {
+    slug: "las-vegas-pick-a-number-as-the-host-s-game",
+    kind: "host_act",
+    why:
+      "THE CLOSEST CALL, and the likeliest of the two rows between this " +
+      'table and the audit\'s 22. The clause literally says "Pick a Number as ' +
+      'the host\'s game" — but it sits under HOST ACTS, and the header there ' +
+      "is not guessing: it says who performs the thing, which is what " +
+      "`bank_kind` is for. The room's game row is the Pick-a-Number KIT, " +
+      "routed above; making the act a second game row would give one game two " +
+      "rows in one room. Overrule this in one line if the intent was both.",
+  },
+  {
+    slug: "las-vegas-liar-s-dice-rules-card",
+    kind: "printed_card",
+    why:
+      "Rides with the dice cups, which are now the game. A rules card is " +
+      "printed matter the house authors — that is the whole PRINTED_MATTER " +
+      "vocabulary and it was never wrong. Same for the three below.",
+  },
+  {
+    slug: "las-vegas-era-stakes-suggestion-card",
+    kind: "printed_card",
+    why:
+      'Rides with the dice cups. "Stakes lists" are named in the slips rule ' +
+      "as game CONTENT, which is what a card riding with a game is.",
+  },
+  {
+    slug: "dolomites-watten-briscola-rules-card",
+    kind: "printed_card",
+    why: "Rides with the northern-Italian deck, which is now the game.",
+  },
+  {
+    slug: "amalfi-1953-scopa-rules-card",
+    kind: "printed_card",
+    why: "Rides with the Napoletane deck, which is now the game.",
+  },
+  {
+    slug: "oaxaca-1954-conquian-rules-card",
+    kind: "printed_card",
+    why: "Rides with the Baraja española, which is now the game.",
+  },
+  {
+    slug: "catskills-printed-camp-name-ledger-pre-filled-ridiculously-blanks",
+    kind: "printed_card",
+    why:
+      "Pre-filled with blanks under the slips rule, which is why it looks " +
+      "like game content — but nobody plays a ledger. It is the room's " +
+      "running joke in printed form, and PRINTED_MATTER has it right.",
+  },
+  {
+    slug: "oaxaca-1954-the-conquian-tally",
+    kind: "good",
+    why:
+      "The SCORE of a game, not the game. An evening-supplied take-home " +
+      "watching `ambient_game yields_score_sheet` — routing it to `game` " +
+      "would file a piece of paper as the thing it records.",
+  },
+  {
+    slug: "st-moritz-1984-the-backgammon-column",
+    kind: "good",
+    why: "Same as the Conquián tally: the score sheet, not the board.",
+  },
+  {
+    slug: "aspen-1994-the-ballot",
+    kind: "good",
+    why:
+      "A take-home ballot for the story competition, which is ALREADY a " +
+      "`game` row from Aspen's own GAMES block. Its own clause asks whether " +
+      'adding ballots makes the competition "a game with rules, which is a ' +
+      'different bank class" — an open founder question, not a routing.',
+  },
+  {
+    slug: "aspen-1994-shot-ski",
+    kind: "good",
+    why:
+      "A drinking device on a wall, and a live FOUNDER CALL about whether it " +
+      "ships at all (ledger entry 8). Not a game, and not a row to move " +
+      "while its own question is open.",
+  },
+];
+
+/**
+ * KILLED GAMES — checked against every routing, on every run.
+ *
+ * The document and the three take-home sheets record kills explicitly, and a
+ * kill is a decision that something does NOT exist. A killed game reappearing
+ * as a routing win would be the worst possible failure of this table: it would
+ * look like the fix working.
+ *
+ * FULL PHRASES, NOT KEYWORDS, and that is the whole care in this list. "the
+ * belote sheet" was cut from Côte d'Azur and "belote rules card" is routed to
+ * `game` five entries above — one word apart and opposite decisions. A
+ * keyword check on "belote" would refuse a live routing and read as diligence
+ * while doing it.
+ *
+ * The check is catalogue-wide: any ROW whose name matches a kill is a hard
+ * failure, and a routed row matching one is the same failure with a louder
+ * message. Every phrase is printed on every run with what it matched, so
+ * "nothing matched" is a reading rather than a section that quietly did not
+ * appear.
+ */
+const KILLED_GAMES = [
+  { phrase: "keno", where: "Vegas — take-home sheet, cut with its bench" },
+  { phrase: "weather-forecast act", where: "Nantucket — KILLED, in the document" },
+  { phrase: "the card that took the last trick", where: "Dolomites — take-home sheet" },
+  { phrase: "belote sheet", where: "Côte d'Azur — take-home sheet" },
+  { phrase: "cochonnet", where: "Côte d'Azur — take-home sheet" },
+  { phrase: "your card from the door", where: "Amalfi — take-home sheet" },
+  { phrase: "thoth tarot card", where: "Big Sur — take-home sheet (the DECK survives, object only)" },
+  { phrase: "fischer–spassky scoresheet", where: "Nantucket — take-home sheet" },
+  { phrase: "fischer-spassky scoresheet", where: "Nantucket — the ASCII-hyphen spelling of the same kill" },
+  { phrase: "a single domino", where: "Havana — take-home sheet (the SET survives)" },
+  { phrase: "costume brief", where: "catalogue-wide, NEW CONTENT CLASSES" },
 ];
 
 /**
@@ -2044,6 +2511,85 @@ for (const declined of PHASE_RULINGS_DECLINED) {
   }
 }
 
+/* ── the game routings, applied in the same place and the same way ───── */
+
+// Section 11. After the slugs exist and before anything is reported or
+// written, so that the report, the dry run, the insert and the `differs`
+// comparison all see ONE kind per row. Same position as the phase rulings
+// above and for the identical reason.
+
+const routedToGame = [];
+for (const ruling of GAME_ROUTINGS) {
+  const row = allRows.find((candidate) => candidate.slug === ruling.slug);
+  if (!row) {
+    fail(
+      `the game routing for "${ruling.slug}" names a row this document no ` +
+        `longer produces. A ruling about a row that does not exist is a ` +
+        `ruling nobody can see is dead — reword it or remove it, but it does ` +
+        `not get to sit here looking applied.`
+    );
+  }
+  if (row.kind !== ruling.was) {
+    fail(
+      `the game routing for "${ruling.slug}" overrules a derived kind of ` +
+        `'${ruling.was}' and the document now derives '${row.kind}'. The ` +
+        `ruling's premise has changed: decide again with a person, rather ` +
+        `than letting the table win an argument it was not given.`
+    );
+  }
+  row.kind = "game";
+  routedToGame.push({ ...ruling, name: row.name, room: row.room });
+}
+
+for (const declined of GAME_ROUTINGS_DECLINED) {
+  const row = allRows.find((candidate) => candidate.slug === declined.slug);
+  if (!row) {
+    fail(
+      `the declined game routing for "${declined.slug}" names a row this ` +
+        `document no longer produces. The declines are the other half of the ` +
+        `ruling and go stale the same way the routings do — and here they are ` +
+        `also the honest form of the count.`
+    );
+  }
+  if (row.kind !== declined.kind) {
+    fail(
+      `"${declined.slug}" is recorded as LEFT AT kind '${declined.kind}' by ` +
+        `the game ruling and now reads '${row.kind}'. Something reclassified ` +
+        `a row the ruling declined to reclassify.`
+    );
+  }
+}
+
+// THE KILL CHECK. Catalogue-wide, and a routed row matching a kill is the same
+// failure with a louder message: a killed game reappearing as a routing win
+// would look exactly like the fix working.
+const killMatches = [];
+for (const killed of KILLED_GAMES) {
+  // The phrase whole, at word boundaries. Not a `includes`: "keno" is four
+  // letters and would sit inside a longer word one day, and a kill check that
+  // fails a run for a coincidence is a check somebody eventually deletes.
+  const whole = new RegExp(
+    `\\b${killed.phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+    "i"
+  );
+  const hits = allRows.filter((row) => whole.test(row.name));
+  killMatches.push({ ...killed, hits });
+  for (const hit of hits) {
+    const wasRouted = routedToGame.some((r) => r.slug === hit.slug);
+    fail(
+      `"${hit.slug}" carries the name of a KILLED item — "${killed.phrase}" ` +
+        `(${killed.where})` +
+        (wasRouted
+          ? `, and the game routing table just made it a game. A kill is a ` +
+            `decision that something does NOT exist, and resurrecting one as ` +
+            `a routing win is this table's worst failure because it looks ` +
+            `like the fix working.`
+          : `. A kill is a decision that something does NOT exist; a row ` +
+            `carrying its name is a decision being undone silently.`)
+    );
+  }
+}
+
 /* ── the report ─────────────────────────────────────────────────────── */
 
 const KINDS = ["good", "host_act", "game", "printed_card"];
@@ -2141,6 +2687,17 @@ function report() {
     for (const entry of declined) {
       console.log(`   ${entry.room} — ${entry.label}: ${entry.text}`);
     }
+    console.log(
+      `\n   A "none" LINE IS NOT A RULE THAT THE ROOM IS GAMELESS, and this\n` +
+        `   paragraph is here so that nobody later "completes" the mechanism by\n` +
+        `   writing the fact down. Founder, on the games fix: "lets not make a\n` +
+        `   blanket rule that a room is gameless." The line above produces NO\n` +
+        `   ROW, NO COLUMN AND NO NEGATIVE CLAIM — nothing anywhere records that\n` +
+        `   a room HAS no game, so a room that says none can receive one the\n` +
+        `   moment somebody names one, in a GAMES: block or in GAME_ROUTINGS,\n` +
+        `   without touching the parser. Absence of a game row means nobody has\n` +
+        `   written one; it never means the room refuses one.`
+    );
   }
 
   section("COULD NOT CLASSIFY — read this first");
@@ -2187,6 +2744,7 @@ function report() {
       `rides with.`
   );
 
+  reportGames(allRows);
   reportSupply(allRows);
   reportShared(allRows);
 
@@ -2271,6 +2829,123 @@ function report() {
   for (const row of holding) {
     console.log(`  held  ${row.slug} — ${row.name}`);
   }
+}
+
+/**
+ * THE GAMES — section 11, with the count in front of the argument.
+ *
+ * CLAUDE.md rule 24 in its literal form: after a routing step, count the rows
+ * it touched and put that number beside the number that was expected. The
+ * expectation here is the founder's read-only audit — 22 rows misfiled by the
+ * header-only router — and this file converts 20. The gap is printed, the
+ * declines are printed with it, and neither is rounded away.
+ */
+function reportGames(rows) {
+  section("GAMES — ROUTED BY CONTENT, NOT BY HEADING");
+
+  const games = rows.filter((row) => row.kind === "game");
+  const fromHeading = games.filter(
+    (row) => !routedToGame.some((r) => r.slug === row.slug)
+  );
+
+  console.log(
+    `   THE COUNT FIRST. ${games.length} game rows in the catalogue: ` +
+      `${fromHeading.length} from a GAMES:\n   heading, which is all the ` +
+      `parser has ever produced across eighteen rooms, and\n   ` +
+      `${routedToGame.length} routed here by ruling from a GOODS: line. The ` +
+      `founder's audit counted 22\n   rows misfiled by this defect. THIS ` +
+      `TABLE CONVERTS ${routedToGame.length} OF THOSE 22 and the ` +
+      `${22 - routedToGame.length}\n   it does not are not a rounding error ` +
+      `— every candidate looked at and\n   refused is listed below by name, ` +
+      `so the difference can be read rather than\n   guessed at. Overruling ` +
+      `any of them is one line in GAME_ROUTINGS.\n`
+  );
+
+  console.log(`   ROUTED (${routedToGame.length})`);
+  for (const ruling of routedToGame) {
+    console.log(`     ${ruling.slug}: ${ruling.was} -> game`);
+    console.log(`        ${ruling.why}`);
+  }
+
+  console.log(`\n   LOOKED AT AND LEFT ALONE (${GAME_ROUTINGS_DECLINED.length})`);
+  for (const declined of GAME_ROUTINGS_DECLINED) {
+    console.log(`     ${declined.slug}: stays ${declined.kind}`);
+    console.log(`        ${declined.why}`);
+  }
+
+  const byRoom = new Map();
+  for (const row of games) {
+    byRoom.set(row.room, (byRoom.get(row.room) ?? 0) + 1);
+  }
+  const gameless = rooms.filter((room) => !games.some((g) => g.key === room.key));
+  console.log(
+    `\n   ROOMS WITH A GAME ROW: ${byRoom.size} of ${rooms.length}. ` +
+      `Before this ruling, three.\n   ROOMS WITH NONE: ` +
+      (gameless.length === 0
+        ? "none."
+        : `${gameless.map((r) => r.heading).join(", ")}.`) +
+      `\n   THAT IS AN ABSENCE OF AUTHORING, NOT A CLAIM ABOUT THE ROOM. See ` +
+      `the\n   "declines a kind on purpose" note above: nothing in this ` +
+      `catalogue records\n   that a room HAS no game, and nothing may.`
+  );
+
+  console.log(`\n   THE KILL CHECK — ${KILLED_GAMES.length} killed items, checked against every row`);
+  for (const killed of killMatches) {
+    console.log(
+      `     "${killed.phrase}" — ${killed.hits.length === 0 ? "no row carries it" : "MATCHED"} ` +
+        `[${killed.where}]`
+    );
+  }
+  console.log(
+    `\n   Full phrases and not keywords, which is the whole care in that list:\n` +
+      `   "the belote sheet" was cut and "belote rules card" is routed to game,\n` +
+      `   one word apart and opposite decisions. A match is a FAILED RUN, not a\n` +
+      `   warning — a killed game reappearing as a routing win would look\n` +
+      `   exactly like the fix working.`
+  );
+
+  console.log(`\n   WHAT THIS DOES NOT REACH, and what it would take:`);
+  console.log(
+    `     · TWENTY \`piece: "game_rule"\` ENTRIES in src/lib/destinations.ts,\n` +
+      `       across all eighteen rooms — each a game written in the room's own\n` +
+      `       voice, none of them a row in bank_item or in the game table. That\n` +
+      `       is where most of the catalogue's games live. Routing them is not a\n` +
+      `       parser change: a voice line is a SENTENCE ("Everybody names the\n` +
+      `       song that gets them up"), and a game row needs rules, bounds, a\n` +
+      `       host role and a runbook (db/010). It is authoring, in the game\n` +
+      `       table's own seeder, and it is the founder's call whether it is\n` +
+      `       next.\n` +
+      `     · THE \`game\` TABLE IS STILL WESTHAMPTON'S ALONE. Its rows are\n` +
+      `       scoped to westhampton-1976 and this ruling does not change that:\n` +
+      `       bank_kind='game' rows fill the four ATMOSPHERE slots (db/043), not\n` +
+      `       the ambient_game slot the game pool fills. Seventeen rooms still\n` +
+      `       have no eligible game-table row.\n` +
+      `     · THREE TAKE-HOMES DECLARE DEPENDENCIES ON GAME SLOTS AND NONE OF\n` +
+      `       THEM IS SATISFIED BY THIS FIX. Vegas's IOU watches\n` +
+      `       "game yields_iou"; Oaxaca's Conquián tally and St. Moritz's\n` +
+      `       backgammon column watch "ambient_game yields_score_sheet"; St.\n` +
+      `       Moritz's doubling cube watches "ambient_game yields_prize". Those\n` +
+      `       slots are filled from the GAME TABLE, so a bank row of kind 'game'\n` +
+      `       does not feed them. They remain aimed at nothing, and they would\n` +
+      `       still be aimed at nothing if every one of the twenty above were a\n` +
+      `       game-table row, because ingredient_supplies is empty on every\n` +
+      `       database the committed chain builds (db/044).`
+  );
+
+  console.log(`\n   TWO ROOMS CONTRADICT THEMSELVES, AND ONLY THE FOUNDER CAN RULE:`);
+  console.log(
+    `     · TAHITI. This document says "GAMES: none, on purpose", and\n` +
+      `       src/lib/destinations.ts carries a game_rule for the room:\n` +
+      `       "Everybody says what they would want on the last night. Whoever\n` +
+      `       names something already on the table cooks tomorrow."\n` +
+      `     · ACAPULCO. "GAMES: none — the band, the window, and the dancing\n` +
+      `       are the shelf", against a voice line that reads "Everybody names\n` +
+      `       the last song. Whoever names one already played goes in the\n` +
+      `       water."\n` +
+      `   The voice record and the bank record disagree. NOTHING HERE RESOLVES\n` +
+      `   EITHER — no row is written, no "none" is enforced, and both are booked\n` +
+      `   as rulings owed in docs/proposals.md under 2026-08-27.`
+  );
 }
 
 /**

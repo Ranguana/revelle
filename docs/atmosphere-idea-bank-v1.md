@@ -97,6 +97,44 @@ together. Route by type:
    dishes; ~2–3 acts per package). **Only the signature gesture is
    invariant** per room.
 
+**A GAME IN A `GOODS:` LINE IS STILL A GAME — added 2026-08-27, and it is a
+correction to how rule 3 above was READ rather than to what it says.** Rule 3
+lists GAMES as one of the four things the bank holds. It was read as saying
+that a game arrives under a `GAMES:` heading, and only three rooms of eighteen
+ever wrote one with content in it — so `seed:bank` produced three `game` rows
+in the whole catalogue while twelve more rooms named a game inside a `GOODS:`
+line: the dice cups at Vegas, the dominoes at Havana, the tombola kit at
+Amalfi, the Bingo kit and the gin deck at Catskills, the cribbage board at
+Nantucket, the backgammon board at St. Moritz. Founder: *"fix the parser so the
+games become rows."*
+
+- **The routing is a NAMED RULING, not a marker in these clauses and not a
+  word-matcher.** `GAME_ROUTINGS` in `scripts/seed-bank.mjs` lists twenty rows
+  by slug, each carrying the kind this document derives, the kind the ruling
+  gives it, and the words in the clause that are the evidence. Nothing above
+  the second `GOODS:` line of any room was touched: the provenance header says
+  those clauses are hers unaltered, and a document edited to make a seeder come
+  out right destroys the evidence the routing was derived from.
+- **A clause yields ONE row of its own kind, plus the cards that ride with
+  it.** The liar's-dice, Watten/briscola, scopa and Conquián rules cards are
+  still their own `printed_card` rows; what changed is that the thing they ride
+  with is a `game` rather than a `good`. Where a clause names an object AND a
+  distinct thing somebody does with it — New Orleans' *"tarot deck out …; host
+  reads for whoever asks"* — **the deck is the good, the reading is a game, and
+  the reading needs a line somebody writes.** It is not split out by machine.
+- **`GAMES: none` IS NOT A RULE THAT THE ROOM IS GAMELESS.** Founder: *"lets
+  not make a blanket rule that a room is gameless."* The line produces no row,
+  no column and no negative claim, and nothing in this catalogue records that a
+  room HAS no game. A room that says none can receive one the moment somebody
+  names one. Two rooms that say none — Tahiti and Acapulco — carry a
+  `piece: "game_rule"` in `src/lib/destinations.ts` written in their own voice;
+  those contradictions are **rulings owed** and are booked in `docs/proposals.md`.
+- **A killed game may never come back as a routing win.** `KILLED_GAMES` in the
+  seeder checks every row against the kills recorded here and in the three
+  take-home sheets, by full phrase and never by keyword — *the belote sheet* was
+  cut and *belote rules card* is routed, one word apart and opposite decisions.
+  A match is a failed run.
+
 ## FORMAT NOTES — SAYING A ROW BELONGS TO TWO ROOMS
 Every clause in this document belongs to the room whose `##` heading it sits
 under. ONE clause may belong to a SECOND room, and there is exactly one way to
