@@ -3040,8 +3040,14 @@ export const CATSKILLS: Destination = {
 export const CATSKILLS_TONES: readonly ToneWeight[] = [
   { code: "nicknames", weight: 1 },
   { code: "in_jokes", weight: 0.9 },
-  { code: "teasing", weight: 0.8 },
-  { code: "sentimental", weight: 0.7 },
+  // LESS TEASING, MORE EARNEST — founder, 2026-08-27, ruling on this room
+  // against Aspen: "Aspen is raucous and catskills is quiet", "catskills less
+  // teasing, more earnest". Teasing was 0.8 and sits at 0.35; sentimental was
+  // 0.7 and leads the warm half at 0.9. The camp conceit keeps its teasing —
+  // she said less, not none — but the room's weight moves onto earnestness,
+  // which is what a quiet room does with the same affection.
+  { code: "teasing", weight: 0.35 },
+  { code: "sentimental", weight: 0.9 },
   { code: "one_conversation", weight: 0.5 },
   { code: "swears_fondly", weight: 0.4 },
 ];
@@ -6695,7 +6701,24 @@ export const ASPEN_1994: Destination = {
       // agent did not make that swap, because swapping it would also make the
       // triple collision above disappear, and a value chosen because it fixes
       // a test is the retro-tagging failure this project exists to escape.
-      mode: "warm",
+      //
+      // THE FOUNDER SUPPLIED THE EVIDENCE, 2026-08-27, unprompted and without
+      // reference to any test: "Aspen is raucous and catskills is quiet", then
+      // "neither is formal", then "catskills less teasing, more earnest". That
+      // is a ruling about the two ROOMS, not about the collision — and it lands
+      // exactly where the enum says the mode lives. `absurd` is the mechanism
+      // of a bit carried past the point of sense: does_the_voice, the movie
+      // said along with, everybody the joke in turn. `warm` is a temperature
+      // and this room's warmth is already carried by `formality: familiar` and
+      // by half its hand.
+      //
+      // The sequence is the point and is worth preserving: the swap was
+      // REFUSED while it would only have fixed a test, and made once a person
+      // gave a reason that had nothing to do with one. The triple collision
+      // with Catskills dissolves as a CONSEQUENCE rather than as the motive —
+      // `familiar/second_person/absurd` is unclaimed (Las Vegas is
+      // formal/second_person/absurd, Acapulco plain/second_person/absurd).
+      mode: "absurd",
       // HERS, with the mechanism spelled out.
       mechanism:
         "Teasing and the bit. Somebody starts doing the voice and does not " +
@@ -10174,6 +10197,12 @@ export const DESTINATIONS = {
   dolomites: DOLOMITES,
   "big-sur": BIG_SUR,
   tahiti: TAHITI,
+  // WIRED 2026-08-27. Its only blocker was two draft tones —
+  // `toasts_everything` and `bigger_every_telling`. The art is cut to
+  // HANDOFF.md's spec, both tones are promoted, and the room clears the
+  // ten-tone cap, both affinity tiers, the hand-overlap guard and the
+  // stated-triple test exactly as the founder authored it.
+  "acapulco-1959": ACAPULCO_1959,
 } as const satisfies Record<string, Destination>;
 
 export type DestinationKey = keyof typeof DESTINATIONS;
@@ -10200,4 +10229,5 @@ export const DESTINATION_TONES = {
   dolomites: DOLOMITES_TONES,
   "big-sur": BIG_SUR_TONES,
   tahiti: TAHITI_TONES,
+  "acapulco-1959": ACAPULCO_1959_TONES,
 } as const satisfies Record<DestinationKey, readonly ToneWeight[]>;

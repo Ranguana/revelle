@@ -986,7 +986,10 @@ export const TONES = [
     code: "bigger_every_telling",
     label: "The story gets worse each time and everybody allows it",
     group: "funny",
-    draft: true,
+    // PROMOTED 2026-08-27. Art cut to design/tone-icons/HANDOFF.md's
+    // spec, label added, and the tone therefore reaches the quiz — a
+    // destination may only claim a tone a host can tap, or it is scored
+    // on a tile she was never offered (rule 15).
     facets: [
       { code: "irreverence", weight: 0.8 },
       { code: "humour_warm", weight: 0.4 },
@@ -1111,7 +1114,10 @@ export const TONES = [
     code: "toasts_everything",
     label: "Any excuse at all, and the glass goes up",
     group: "ceremony",
-    draft: true,
+    // PROMOTED 2026-08-27. Art cut to design/tone-icons/HANDOFF.md's
+    // spec, label added, and the tone therefore reaches the quiz — a
+    // destination may only claim a tone a host can tap, or it is scored
+    // on a tile she was never offered (rule 15).
     facets: [
       { code: "earnestness", weight: 0.9 },
       { code: "warmth", weight: 0.8 },

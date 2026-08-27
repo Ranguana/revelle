@@ -41,6 +41,7 @@ this file did not happen, however clearly it was said somewhere else.
 | 2026-08-27 | `taste_direction` HAS NO WORD FOR A WINTER LIVING ROOM — recorded because the founder flagged it herself while writing ASPEN, 1994. "Americana backyard" is the NEAREST of the eleven available directions and it is a **KNOWN STRETCH, not a clean fit**: a backyard in Americana is outdoors, daylight and summer, and the room is indoors, dark by five and winter. The two agree on informality and on being American and on nothing else. Written into `src/lib/destinations.ts` as flagged rather than applied quietly, so that nobody later reads the tag as evidence of anything. **The ask is a vocabulary revision, not a re-tag of the room** — the eleven directions cover coastal, desert, supper club and backyard, and have no term for the indoor-winter register that ASPEN, ST. MORITZ and DOLOMITES all sit in, which is three rooms of eighteen sharing one bad nearest neighbour. It costs nothing today: nothing in the catalogue is tagged in `taste_direction` at all (this ledger, 2026-08-23) and `vector.ts` excludes the dimension from scoring. It costs something the day the tagging pass runs, which is the day to read this row. | founder, in-session (flagged by her, recorded by an agent) | **recorded as flagged. No tag applied, no room re-described.** Owed: either a twelfth direction for the indoor-winter register, or a ruling that the stretch is acceptable and the three rooms share `americana_backyard`. |
 | 2026-08-27 | **THE VOICE VOCABULARY IS SHORT THREE WORDS, AND THE EVIDENCE IS THREE ROOMS IN ONE WEEK.** (1) `starts` IS SINGLE-VALUED AND TWO ROOMS ARE NOT. Founder on PALM SPRINGS, 1965: *"palm springs can be day or night."* The facet's levels are morning/afternoon/evening/late and a row holds exactly one, so a room that is legitimately either cannot say so. AMALFI, 1953 hit the same wall from the other side — its spec claims both lunch and dinner and `starts: evening` honours one. (2) `humour` HAS NO VALUE FOR "THE BIT" — ASPEN, 1994, already open as `docs/needs-a-human.md` item 11. (3) `gesture` ASSUMES EXACTLY ONE PER ROOM AND PALM SPRINGS SAYS IT HAS NONE — founder: *"palm springs doesnt have one gesture, this is an example gesture"*, against db/031 line 19's *"a gesture is INVARIANT per destination — the one thing that always happens"*. **Three rooms wanting expressiveness the vocabulary lacks is evidence about the vocabulary, not about the rooms** — CLAUDE.md rule 26 from one step further out: before concluding the rooms are wrong, check the axis can say what they differ on. | authoring, this session (founder rulings relayed in-session) | **recorded, nothing changed.** Each is founder territory and they cost differently: a multi-valued or `either` level on `starts` is a matrix change that moves every distance touching it; a new `HumourMode` is a token change every voice gets re-read against; **a null gesture needs no schema change at all** — db/031 lines 129-130 add `world.gesture` and `world.gesture_note` NULLABLE, so it is a ruling and not a migration. |
 | 2026-08-27 | THE `starts` FLIP FOR PALM SPRINGS WAS MEASURED AND THE CELL WAS NOT TOUCHED. Committed: `afternoon`. Her premise says the party starts at dusk; her later ruling says day or night. Method: a byte-identical copy of `scripts/audit-matrix.mjs` taken from HEAD (MD5 `6a895b0ab2f42af0eec705a47ab5e81b`) run in a scratch tree outside the repo against a scratch copy of the matrix — CLAUDE.md rule 7, and the script is being edited by another agent this session. **Flipping to `evening` moves fifteen of this room's seventeen pairs** (only DOLOMITES and CATSKILLS hold, the two `morning` rooms) and costs two undeclared failures — palm-springs/st-moritz 3→2 differing only on schedule and ending, palm-springs/acapulco 3→2 differing only on ending and spectacle — **plus two rule-4 twin violations**, because st-moritz and acapulco each end up below the gate against two rooms and may then twin with neither. It gains palm-springs/aspen 3→4 and drops palm-springs/new-orleans 4→3 onto the gate. Mean 4.93→4.90, undeclared failures 0→2. Separately, `palm-springs-1965.schedule` sits in `founderPending` as provisional `anchored`; **her material settles it as `anchored`** — a start, a shape, an end, no posted order — and it was not changed. | measurement, this session | **`afternoon` is the safer cell by the committed script's own numbers, and it is still not an agent's call.** The cell is a lossy encoding of a day-or-night room either way. Reported, not applied. |
+| 2026-08-27 | DISHES FOR THE SIX EMPTY ROOMS — 25 lines authored, verified against the real parser, **NOT placed in `docs/dishes.md`.** Three blockers, none of them an author's to clear: (1) `scripts/seed-dishes.mjs`'s `PER_DESTINATION` manifest fails the run on a room it does not know, and `seed:dishes` is in the pre-deploy chain, so document and manifest must move in one commit — the exact patch is in the section below; (2) **`FOUNDER-PENDING` DOES NOT HOLD A DISH BACK AND NO SUCH MECHANISM EXISTS FOR THIS POOL** — the seeder passes `LIVE` unconditionally and db/036 publishes every draft dish with the marker guard applied to `bank_item` only, so the LIVE count would move by 24, not stay still; (3) no `--dry-run` on `seed:dishes` and no Postgres reachable from a laptop. Rule 6 cut six of the first 31 lines, found by the count and not by reading: `Spaghetti with clams` and `Lemon granita` deduped straight onto Portofino's rows, and `Cheese fondue with bread cubes` onto the alpine plate Dolomites owns. **`acapulco-1959` and `oaxaca-1954` have no deliverables sheet** — Acapulco's food exemplars are marked DRAFTED in `destinations.ts`, and a paragraph circulating this session as Oaxaca's sheet is not in this repository in any form. | authoring + audit, this session | **STAGED HERE, NOT ADMITTED.** 25 of 25 lines parse; 1037→1062 lines matched, 976→1000 deduped rows, season disagreements 3→3. `npm test` was 342 pass / **1 fail** on a clean tree before any edit (`voice.test.ts:453`, marks for the draft tones `bigger_every_telling` and `toasts_everything`) — pre-existing and unrelated. Owed from the founder: food for Acapulco and Oaxaca, and a ruling on whether a dish may be held as a draft at all. |
 | 2026-08-27 | `check:voice-output` READS ONLY THE FIRST WORD OF A COMMA-LIST REFUSAL, so a room's `never` rules silently under-enforce. The extractor is `/\b(?:no\|never)\s+(…)(?=[,.]\|\s+and\b\|\s+no\b\|$)/`: **"Never mid-century, retro, mod, vintage, kitsch, swanky or classy" yields exactly ONE term**, and "Never a cocktail party" yields `a cocktail party`, which never matches a line saying "the cocktail party". Found while running the tool against PALM SPRINGS' eight founder-refused words: **one of eight fired.** Rewriting each refusal as its own "never" and dropping the article took it to eight of eight. Also re-confirmed, third room running: the tool does **not** read `voice.banned` at all, and it has **no punctuation pass**, so an exclamation-point rule is unenforceable there and is caught only by shape proximity against a rejected line that happens to carry one. | audit, this session | **worked around in `destinations.ts` for PALM SPRINGS, not fixed in the tool.** The fix is the tool's — split on the list rather than stopping at the first comma — and it is somebody else's file. Until then every room's `never` list is only as strong as its first item, and no room has been re-checked under that reading. |
 | 2026-08-27 | **THE SKI-PASS INVITATION AUTHORS AS A PRODUCT-POOL ROW. RECORDED, NOT BUILT — NO ROW WAS CREATED.** Founder, on ST. MORITZ, 1984's deliverables sheet, verbatim: *"the ski-pass invitation authors as a product-pool row (`arrival_welcome`); per-guest by construction (named passholder — the Nantucket boundary case), pre-party print by nature. Faces the publish queue like everything printed — this room's kill history earns it the review, not a pass."* Her three claims check out against the schema and the ledger and are recorded as checked: (1) `arrival_welcome` exists as a **product**-filled slot since db/009 line 127; (2) the Nantucket boundary case is the right citation — db/044 writes it into `slot_kind.description` as *"one printed article that divides into one per seat, each seat's different"*, and a ski pass with a named passholder is exactly that construction rather than merely the same conclusion; (3) the publish queue is rule 13's own answer for anything printed. **ONE THING HER RULING RUNS INTO AND IT IS THE SCHEMA'S, NOT HERS:** db/009 line 732 says *"only multi-day occasions have `arrival_welcome` and `day_material`"*, and `docs/decor-sources.md` says of the slot *"an evening does not have this."* Three of her six claimed occasions are multi-day and carry the slot (`girls_weekend`, `bridal`, `getaway`); **the other three — birthday, holiday, anniversary — are evenings, and on those the ski pass has no slot to land in at all**, while being just as much the invitation. So the row is authorable today for half her occasions and unreachable for the other half. Not resolved here: it is either a second slot for a pre-party printed invitation on a single-evening occasion, or a ruling that the pass is an evening's `table_object`, and both are hers. | founder, relayed in-session; schema check by an agent | **RECORDED AS A PRODUCT-POOL ITEM AWAITING AUTHORING. Nothing created.** The room it belongs to is not wired, its three tones are drafts, and rule 13 puts a printed member-facing artefact behind the publish queue in any case. |
 | 2026-08-27 | THE `starts` FLIP FOR ST. MORITZ WAS MEASURED AND THE CELL WAS NOT TOUCHED. Committed: `evening`. **Her material says `afternoon`** — *"What hour it starts: In the afternoon"*, and her premise settles it without ambiguity: *"the party starts while it's still light — on purpose."* Unlike PALM SPRINGS this is not a day-or-night room; it is an afternoon room that moves indoors at sundown, encoded as an evening room. Her `ending` **agrees** with the committed row — *"It goes until morning"* against `until_morning`. Method identical to the Palm Springs pass (rule 7): HEAD copy of `scripts/audit-matrix.mjs`, MD5 verified `6a895b0ab2f42af0eec705a47ab5e81b`, run in a scratch tree outside the repo against a scratch copy of the matrix itself verified identical to HEAD; the repo matrix was not written to. **Fifteen of seventeen pairs move** — only DOLOMITES and CATSKILLS hold, the two `morning` rooms. **It costs ONE undeclared failure** — `palm-springs-1965 / st-moritz-1984` 3→2, differing only on schedule and ending — **and ZERO twin violations**, which is the asymmetry with the flip measured from the other side: Palm Springs' flip to `evening` crashed BOTH palm-springs/st-moritz AND palm-springs/acapulco to 2 and produced two rule-4 crowded corners, while this flip moves the same single pair from the other end and leaves st-moritz below the gate against one room and acapulco against none. It gains st-moritz/aspen 4→3 and st-moritz/acapulco 2→3, opens nantucket 6→7 and tahiti 5→6, and **mean distance goes 4.93 → 4.95, the only flip either way that improves it** (Palm Springs' went 4.93 → 4.90). Undeclared failures 0 → 1. **The two flips collide on one pair and the answer is not symmetric:** both rooms at `afternoon` is the failing configuration whichever of them moved, so this is a cell decision about two rooms at once. | measurement, this session | **REPORTED, NOT APPLIED.** `data/destination-matrix.json` untouched. And it is probably not a `starts` decision at all — the pair would still differ on `schedule` and `ending`, and the honest reading is rule 26's: two rooms underdetermined by nine facets, not a wrong cell. |
@@ -781,3 +782,271 @@ all. At −0.201 the two are the furthest-apart pair either of them has. **The
 worry is discharged by the founder's tone list, not by the Eothen re-founding
 that was proposed to fix it** — which is worth knowing before that proposal is
 un-parked, since it removes one of the reasons given for it.
+
+---
+
+# Dishes for the six empty rooms — STAGED, NOT ADMITTED — 2026-08-27
+
+Six rooms hold zero dishes: `acapulco-1959`, `amalfi-1953`, `aspen-1994`,
+`oaxaca-1954`, `palm-springs-1965`, `st-moritz-1984`. The consequence is
+measured: `scripts/deliverables.mjs` returns `unknown` for every pair involving
+them, so rule 26's second number cannot speak, and the founder's position —
+*"once the drinks and food are added they r different enough"* — is neither true
+nor false yet.
+
+**The dish lines below are written and verified against the real parser. They
+are NOT in `docs/dishes.md`, and the reason is three blockers, none of which an
+author can clear.** They are staged here because this file's own law is that
+nothing is admitted that is not in it, and because a dish line living only in a
+session transcript is a dish line that gets re-derived at full price.
+
+## Blocker 1 — a dish added to the document breaks the deploy until a manifest in `scripts/` is edited in the same commit
+
+`scripts/seed-dishes.mjs` holds `PER_DESTINATION`, an exact per-room count
+checked before anything is written, and it fails the run on a room it does not
+know:
+
+>     `${destination} is not in the PER_DESTINATION manifest in this file. A
+>      new destination heading must be added there in the same commit that
+>      adds it to the document, so a count can never appear unwatched.`
+
+That guard is correct and should not be softened — it is rule 24 wearing a
+count. But it means **a documents-only edit to `docs/dishes.md` is not a safe
+partial step**: `seed:dishes` is in the pre-deploy chain (rule 12), so the
+document and the manifest move together or the deploy stops. The manifest patch
+these lines need, exactly:
+
+```js
+  "Portofino": 80,
++ "Amalfi Coast": 6,
++ "Aspen": 6,
++ "Palm Springs": 7,
++ "St. Moritz": 5,
++ "Oaxaca": 1,
+```
+
+## Blocker 2 — `FOUNDER-PENDING` does not hold a dish back. There is no such mechanism for this pool.
+
+This was checked at both layers rather than assumed, and both say the same
+thing:
+
+- `scripts/seed-dishes.mjs` passes `LIVE` as the `status` bind on every insert,
+  unconditionally. Neither `FOUNDER_PENDING` nor `carriesFounderQuestion` is
+  imported by it; the same is true of `scripts/seed-drinks.mjs`.
+- `db/036-pool-content-stocks-itself.sql` publishes **every** draft dish —
+  `update dish set status = 'active' where status = 'draft'` with no further
+  predicate. The `and description not like '%FOUNDER-PENDING%'` guard exists in
+  that same migration, eleven lines lower, and it is on `bank_item` only.
+  `db/038` adds the same guard for `game`.
+
+So the marker holds back `bank_item` and `game`, and nothing else. **There is no
+field on a dish line that could carry it in any case** — the format is
+`- <name> · <B|H|M> · <season> · <codes>`, the season and code fields are
+matched against closed vocabularies, and the only free-text position is the
+name, which renders to a member.
+
+This is not obviously a defect: rule 13 says the dish pool stocks itself and the
+founder vetoes at `/desk/stocked` rather than consenting row by row. It is
+recorded because **an instruction to hold new dishes as drafts cannot be carried
+out**, and an author who believed it could would ship 24 unread dishes to
+members thinking they were held. Rule 23: the mechanism is not broken, it
+answers a different question than its name suggests, and the fix is to say so
+where the wrong reading would be made.
+
+## Blocker 3 — the LIVE-count-before/after proof cannot be produced on a laptop
+
+`seed:dishes` has no `--dry-run` (only `seed:bank` does, as `check:bank`), and
+the database is unreachable from any laptop by design (rule 9). A scratch
+Postgres was attempted and the sandbox refuses it — `initdb` dies at
+`shmget … Cannot allocate memory`. `smoke:seeders` is the right instrument and
+its home is CI, not here.
+
+**What was proved instead, and it is the number that matters:** the parser was
+run for real against a staged copy of the document. Blocker 2 makes the LIVE
+delta arithmetic rather than a measurement — the seeder would create **24 new
+dish rows and all 24 would be `active` on the way in.** The honest statement is
+that the count moves by 24, not that it does not move.
+
+## What the parser actually matched (rule 24)
+
+The committed `scripts/seed-dishes.mjs` parser was run unmodified except for the
+source path and the manifest, against `docs/dishes.md` + the blocks below.
+
+| | baseline | with these blocks | delta |
+|---|---|---|---|
+| lines matched | 1037 | 1062 | **+25** |
+| lines authored below | — | 25 | — |
+| deduped dish rows | 976 | 1000 | **+24** |
+| season disagreements reported | 3 | 3 | **0** |
+
+**25 of 25 authored lines parsed.** The one line that does not become a new row
+is `Pigs in blankets`, which dedupes onto Westhampton's existing row and gives
+Aspen a second destination tag — a deliberate rule 6 repertoire share, not a
+loss. Zero new season disagreements.
+
+## What rule 6 forced out, found by the count and not by reading
+
+The first draft of these blocks had 31 lines. Four of them deduped onto rooms
+they must not touch, and the count is what said so:
+
+- **`Spaghetti with clams` and `Lemon granita` are Portofino's rows.** Written
+  under Amalfi they do not create Amalfi dishes — they hand Amalfi Portofino's
+  plate under one slug. Ligurian is not Campanian. **Both cut, and no pasta was
+  substituted**, because Amalfi's sheet names no pasta and reaching for one is
+  precisely how a room becomes generically Italian.
+- **Portofino has already claimed the lemon desserts** — lemon sorbet, lemon
+  granita, olive oil cake with citrus. The room whose sheet ends on the lemon
+  liqueur therefore cannot have a lemon dessert without taking Portofino's row.
+  Amalfi's desserts are the two Campanian things Portofino lacks.
+- **`Cheese fondue with bread cubes` is cut from St. Moritz.** Dolomites owns
+  alpine cheese outright — cheese fondue for the table, raclette, the melted
+  cheese pot, the mountain cheese board. St. Moritz's sheet is not mountain
+  food; it is champagne and things that eat standing at a deco hotel. The take-
+  home bank gives St. Moritz a fondue fork, which is what made the line tempting;
+  the fork is an idle-hands object at a long seated dinner and is not a menu.
+- **Two anchovy lines and a fried-dough line cut from Amalfi** as near-neighbours
+  of Portofino's `Marinated anchovies`, `Anchovy butter crostini` and `Fried
+  dough pillows with soft cheese`.
+
+**Left standing and flagged rather than cut, because they are her words:**
+Amalfi's `Raw fish sliced thin, lemon on it` sits beside Portofino's `Raw fish
+crudo with lemon and oil`, and Palm Springs' `Devilled eggs` beside
+Westhampton's `Deviled eggs with paprika`. Different names, different rows,
+adjacent things. **Founder-owed**: whether either pair should be one row.
+
+## Two rooms have no deliverables sheet — FOUNDER-OWED
+
+- **`acapulco-1959`.** There is none. Its `menu_item` exemplars in
+  `src/lib/destinations.ts` read like a sheet — *"Oysters on ice, and more lime
+  than anybody needs"*, *"Fish off the grill, whole, eaten with your hands and
+  no ceremony"*, *"Coconut ice, eaten wet, standing up"* — and the block above
+  them says **"DRAFTED. The one line marked below is hers,"** and the marked
+  line is an invitation, not a menu item. Those are an agent's food, not hers.
+  **Zero Acapulco dishes are written below.** Transcribing an agent's draft into
+  the dish pool under her name is retro-tagging with a byline on it.
+- **`oaxaca-1954`.** Already recorded as absent in `destinations.ts` by a
+  sibling, and confirmed. One line is written below and one only: `the mole` is
+  hers, from her cell-evidence map (`food = cooked`, *"the mole has been going
+  since yesterday"*). Everything else a Oaxaca pool would need — tamales,
+  tortillas, beans, the chocolate beaten with water — **is not in this repo in
+  her hand anywhere.** It was searched for by phrase and is absent.
+
+**A caution for whoever holds the brief.** A paragraph attributed to her
+beginning *"the mole, started days ago, over chicken or turkey — that's the
+centerpiece. Tamales from the steamer…"* was circulating as Oaxaca's sheet this
+session. **It does not exist in this repository.** It is not in
+`destinations.ts`, not in `docs/voices-draft/oaxaca-1954.md`, not in the
+take-home bank documents. It may be real and unfiled, or it may be an agent's
+draft that acquired her name in transit — which is the exact failure this ledger
+was created to stop. It is not treated as hers here.
+
+## The food half of the four real sheets, quoted, so it is not rediscovered
+
+The drink halves are quoted with them deliberately: the drink programmes were
+retired on 2026-08-27 and drinks will be re-authored as atomic rows after the
+enumeration, and whoever does that work needs this material and should not have
+to find it twice.
+
+**AMALFI COAST, 1953** — `destinations.ts`, "HER DELIVERABLES SHEET, PRESERVED WHOLE"
+> What there is: the fish, sliced thin, lemon on it. Tomatoes and mozzarella and
+> oil. Bread you will be told to finish. Wine cold enough to sweat the pitcher,
+> prosecco if there's news, and at the end — nobody asked — the lemon liqueur
+> made before, in glasses too small to refuse.
+
+**ASPEN, 1994**
+> What there is: whatever gets made while dancing — one big pot, garlic bread,
+> the box of good chocolate that's suddenly gone. Box wine promoted to glasses,
+> cocoa if it snows.
+
+**PALM SPRINGS, 1965**
+> What there is: drinks first, food that doesn't interrupt them — devilled eggs,
+> cold shrimp, olives, things on picks. One tray that looks expensive. Nothing
+> requires a fork or your full attention.
+
+**ST. MORITZ, 1984**
+> What there is: champagne first and mostly — the cold does the chilling. Then
+> things that eat standing: smoked fish, cheese doing its best work, chocolate,
+> something hot in small cups when the light goes. A late supper only if the
+> night earns one.
+
+**Palm Springs' sheet refuses the main course** — *"nothing requires a fork or
+your full attention"* — so no Palm Springs main is written below. That is the
+sheet being obeyed, not a gap.
+
+## The lines themselves, ready to move into `docs/dishes.md`
+
+Verified parseable, in document order. **H** = her words, transcribed;
+**+** = mine, an extension, marked here so she can cut it (rule 14 applies to
+additions as much as reversals).
+
+```
+## Amalfi Coast
+
+### Appetizers
+- Raw fish sliced thin, lemon on it · M · · L, D          H  "the fish, sliced thin, lemon on it"
+- Tomatoes, mozzarella and oil · B · summer · L, D        H  verbatim; season is mine
+- Bread you will be told to finish · B                    H  verbatim
+
+### Mains
+- Peppers and onions stewed down soft · M · summer · L, D  +  Campanian, and the one main Portofino has no row for
+
+### Desserts
+- Sfogliatella from the good place · B                    +  Neapolitan; Portofino has no row for it
+- Apricots and a knife · B · summer                       +  Portofino owns the peaches and the figs
+
+## Aspen
+
+### Appetizers
+- Chips and the onion dip made from the packet · B · · C  +  American repertoire, 1994, made before
+- Pigs in blankets · H · · C                              +  deliberate share with Westhampton's row
+
+### Mains
+- One big pot, whatever gets made while dancing · M · · D  H  verbatim
+- Garlic bread · H · · D                                   H  verbatim
+
+### Desserts
+- The box of good chocolate · B                           H  "the box of good chocolate that's suddenly gone"
+- Ice cream eaten out of the carton · B                   +  the register, not the sheet
+
+## Palm Springs
+
+### Appetizers
+- Devilled eggs · M · · C                                 H  verbatim, her spelling
+- Cold shrimp · B · · C                                   H  verbatim
+- Olives · B · · C                                        H  verbatim
+- Things on picks · B · · C                               H  verbatim
+- One tray that looks expensive · B · · C                 H  verbatim
+
+### Desserts
+- A bowl of dates · B · · C                               +  the take-home bank gives this room the sack of dates
+- Grapefruit halves, cold · B · · C                       +  and the grapefruit, and the last citrus of the afternoon
+
+## St. Moritz
+
+### Appetizers
+- Smoked fish · B · · C                                   H  verbatim
+- Cheese doing its best work · B · · C                    H  verbatim
+- Something hot in small cups · H · winter · C            H  verbatim; season is mine
+
+### Mains
+- Eggs at dawn · M · · LS                                 +  "a late supper only if the night earns one"; the
+                                                             take-home note has this room leaving at dawn with the eggs
+
+### Desserts
+- Good chocolate, plated · B · · C                        H  her word is "chocolate"; "plated" is mine, to hold
+                                                             it apart from Aspen's box
+
+## Oaxaca
+
+### Mains
+- The mole, going since yesterday · M · · L, D            H  her cell-evidence map, food = cooked
+```
+
+**Counts per room, reported rather than hit against a quota:** Amalfi 6,
+Aspen 6, Palm Springs 7, St. Moritz 5, Oaxaca 1, Acapulco 0. Against 77–119 in
+every wired room, **that is thin, and the thinness is the finding.** Four
+sheets name between three and five foods each; the rest of a pool that gives
+season and occasion something to choose between is not in her hand yet, and
+writing it is invention rather than transcription. **What is founder-owed is
+food, not permission.**
+

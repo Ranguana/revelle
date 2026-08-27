@@ -455,3 +455,25 @@ rather than let the field be filled. The hard case is a room whose character is
 a BEHAVIOUR — wit moving across a patio — because a behaviour cannot be staged
 as an act; that difficulty is a sign the signature is still unfound, never
 licence to skip it.
+
+**28. HER TONES ARE NOT CUT TO FIT A CAP.** Founder ruling: *"i dont want to
+cut tones. once the drinks and food are added they r different enough."* The
+ten-tone cap is a PROXY for distinctness — a room claiming most of the
+vocabulary stops being tellable from its neighbours — and a proxy is retired
+when the thing it stands in for becomes measurable, not defended for its own
+sake. Rule 26 supplies the real measure: tone affinity says how a room SOUNDS,
+deliverables overlap says what it SERVES, and two rooms alike in temperament
+and opposite in food are neighbours in register, distinct in experience.
+
+The cap has no argument written beside it — a bare number, exactly as `0.65`
+was before it was calibrated, and it fails five of the six new rooms while
+the recalibrated ceilings fail none of them. That is a proxy outliving the risk
+it was hired for.
+
+BUT THE SEQUENCE MATTERS AND IS NOT OPTIONAL: the deliverables measure is MUTE
+while six rooms have no dishes and no drinks — every pair involving them
+returns `unknown`, which rule 26 forbids reading as `disjoint`. Raising the cap
+before the food and drink exist removes a guard and puts nothing in its place.
+So the cap moves WITH the catalogue, not ahead of it, and the change is
+measured the way the ceiling was: build near-duplicate rooms, count what the
+new configuration refuses, and show it refuses MORE than the old one did.
