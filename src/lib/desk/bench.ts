@@ -92,7 +92,7 @@ export async function runBench(
   const catalogue = await loadCatalogue(
     db,
     application.occasion,
-    application.environment
+    application.venueAnswers
   );
 
   const input: SelectionInput = {
@@ -248,6 +248,19 @@ export async function benchApplication(
     occasion,
     occasionOther: nullable(answers.occasion_other),
     environment: text(answers.environment),
+    // db/049. The bench rolls a WHOLE host, so it hands the gate the same four
+    // answers a stored application would. `nullable` rather than `text` on the
+    // three new ones is the load-bearing part: an unanswered field must arrive
+    // as null and prune nothing, and `text` would turn it into "" — which is
+    // not an option code, matches no host_affordance row, and would therefore
+    // read the same today and differently the moment somebody makes the empty
+    // string mean something.
+    venueAnswers: {
+      environment: text(answers.environment),
+      indoorOutdoor: nullable(answers.indoor_outdoor),
+      waterAccess: nullable(answers.water_access),
+      waterUse: nullable(answers.water_use),
+    },
     secret: nullable(answers.secret),
     musicService: nullable(answers.music_service),
     stated,

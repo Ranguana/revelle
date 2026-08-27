@@ -59,7 +59,7 @@ import { loadCatalogue, type Queryable } from "../selection/catalogue.ts";
 import { occasionEligibility } from "../selection/occasion.ts";
 import { placement } from "../selection/slot-coverage.ts";
 import { inSeason } from "../selection/table.ts";
-import { venueEligibility } from "../selection/venue.ts";
+import { composeVenue, venueEligibility } from "../selection/venue.ts";
 import type { OccasionClaim, OccasionCode, Venue } from "../selection/types.ts";
 
 /** Which pool this report enumerates room × occasion coverage for. */
@@ -87,8 +87,15 @@ export type GatePruning = {
    */
   readonly venue: number;
   readonly venueByRequirement: Readonly<Record<string, number>>;
-  /** Per environment, so "it only ever prunes in a studio" is visible. */
-  readonly venueByEnvironment: Readonly<Record<string, number>>;
+  /**
+   * Per ANSWER — `environment=hotel`, `water_access=none` — rather than per
+   * environment, since db/049 gave a host four venue answers instead of one.
+   *
+   * Keyed by the answer that REFUSED, so "it only ever prunes in a studio"
+   * stays visible and "the water gate has never once fired" becomes visible
+   * beside it. An answer absent from this map refused nothing anywhere.
+   */
+  readonly venueByAnswer: Readonly<Record<string, number>>;
   /** (ingredient, her season) pairs the season gate refuses. */
   readonly season: number;
   readonly seasonByBand: Readonly<Record<string, number>>;
@@ -129,6 +136,51 @@ export type AxisZero = {
   readonly reason: string;
 };
 
+/**
+ * ONE REQUIREMENT, MEASURED FROM BOTH ENDS — db/049.
+ *
+ * CLAUDE.md rule 24 says to count in both directions "because they fail
+ * differently and look identical from outside — a gate that matches EVERYTHING
+ * prunes nothing and is invisible, and a gate that matches NOTHING prunes
+ * everything and is member-facing". Before db/049 the second direction could be
+ * inferred from `venueByEnvironment`, badly. It is now measured.
+ *
+ * `claimed` is the demand side: how many rows want this of a room.
+ * `affordedBy` is the supply side: how many of the host configurations the
+ * house models can actually give it. The two zeros mean opposite things and
+ * both are reported by name, because the remedy is different every time:
+ *
+ *   claimed 0                  AN AUTHORING ABSENCE. Nothing wants it yet. Not
+ *                              a wiring bug, and calling it one files a defect
+ *                              against a person's unfinished work.
+ *   claimed >0, refusals 0     INERT. Everything affords it; the gate cannot
+ *                              fire. This is `outdoor_access` before db/035.
+ *   claimed >0, affordedBy 0   MEMBER-FACING. Rows exist that NO HOST CAN EVER
+ *                              RECEIVE. Not a thin pool — an unreachable one,
+ *                              and it is the failure the founder named when the
+ *                              occasion gate was proposed: "filters nothing"
+ *                              becoming "filters to zero".
+ */
+export type RequirementReach = {
+  readonly code: string;
+  readonly label: string;
+  /** `ingredient_requirement` rows carrying it. The demand side. */
+  readonly claimed: number;
+  /** Host configurations that afford it. The supply side. */
+  readonly affordedBy: number;
+  /** (row × host configuration) pairs it refuses. */
+  readonly refusals: number;
+  /** The answers that refuse it — "water_access=none" — in vocabulary order. */
+  readonly refusedByAnswers: readonly string[];
+};
+
+/** A row nothing the house models can deliver. See RequirementReach. */
+export type UnreachableRow = {
+  readonly pool: string;
+  readonly name: string;
+  readonly requirement: string;
+};
+
 export type GateReport = {
   readonly holdings: GateHoldings;
   readonly prunes: GatePruning;
@@ -136,6 +188,15 @@ export type GateReport = {
   readonly zeros: readonly ZeroPair[];
   /** Every room × environment pair the venue gate empties. */
   readonly venueZeros: readonly AxisZero[];
+  /** Every structural_requirement, measured from both ends. db/049. */
+  readonly requirements: readonly RequirementReach[];
+  /** Rows no host configuration can receive. Empty is the healthy answer. */
+  readonly unreachable: readonly UnreachableRow[];
+  /**
+   * How many (environment × inside-or-out × water × swimming) combinations the
+   * house models. The denominator for `affordedBy`.
+   */
+  readonly configurations: number;
   /** Every room × stated-season pair the season gate empties. */
   readonly seasonZeros: readonly AxisZero[];
   readonly environments: readonly string[];
@@ -183,6 +244,41 @@ export function inertGates(report: GateReport): string[] {
     );
   }
 
+  // ── PER REQUIREMENT, db/049 ────────────────────────────────────────
+  //
+  // The venue block above is one verdict over the whole gate, and it goes green
+  // the moment ANY requirement refuses ANYTHING. That was adequate while all
+  // four codes were seeded together by one migration; it stops being adequate
+  // the day a fifth is added, because a new code that refuses nothing hides
+  // behind an old code that refuses plenty. `outdoor_access` proved it — db/033
+  // added the code, db/020's rows made the gate as a whole look alive, and the
+  // grade refused nowhere for two months.
+  //
+  // A CLAIMED-ZERO CODE IS NOT LISTED, and that is the occasion gate's
+  // precedent below applied honestly rather than as a loophole: it is reported
+  // BY NAME with its count wherever this report is printed, and it becomes
+  // subject to every rule here the moment one row claims it.
+  for (const reach of report.requirements) {
+    if (reach.claimed === 0) continue;
+
+    if (reach.affordedBy === 0) {
+      inert.push(
+        `${reach.code}: ${reach.claimed} row(s) claim it and NOT ONE of the ` +
+          `${report.configurations} host configurations the house models can ` +
+          `afford it. These rows cannot be delivered to anybody. This is not a ` +
+          `thin pool, it is an unreachable one.`
+      );
+      continue;
+    }
+    if (reach.refusals === 0) {
+      inert.push(
+        `${reach.code}: ${reach.claimed} row(s) claim it and every one of the ` +
+          `${report.configurations} host configurations affords it, so it ` +
+          `refuses nothing anywhere. A grade wearing a column — see db/035.`
+      );
+    }
+  }
+
   // THE OCCASION GATE IS DELIBERATELY NOT LISTED HERE, and this is the one
   // place in the file where an absence is the finding rather than an omission.
   // `drink_occasion` holds zero rows because the drinks document has no
@@ -205,6 +301,10 @@ export function inertGates(report: GateReport): string[] {
  * real application gets. The loader is private to the engine and takes one
  * environment at a time; this needs all of them at once, which is a different
  * QUERY and the same RULE, and the rule is `venueEligibility`.
+ *
+ * Since db/049 this is the BASE rather than the whole: a host also answers
+ * inside-or-out, what water there is and whether anybody gets in, and
+ * `everyHostConfiguration` below crosses these rooms with those three.
  */
 async function loadEveryRoom(db: Queryable): Promise<Venue[]> {
   const { rows } = await db.query(
@@ -233,6 +333,121 @@ async function loadEveryRoom(db: Queryable): Promise<Venue[]> {
     if (note.length > 0) (venue.notes as Record<string, string>)[requirement] = note;
   }
   return [...byEnvironment.values()];
+}
+
+/**
+ * EVERY HOST THE HOUSE CAN MODEL — db/049, and the enumeration the founder
+ * asked for before a gate goes live.
+ *
+ * Her ruling, made when the occasion gate was proposed and general to every
+ * gate since: enumerate the pairs that would land at zero BEFORE it ships, as a
+ * named list, rather than discovering them from a package. A venue gate's
+ * version of that list is the cross product of everything a host can say about
+ * the physical world — the room, inside or out, what water there is, whether
+ * anybody gets in — against every row that makes a claim on it.
+ *
+ * IT IS A CROSS PRODUCT AND NOT A SAMPLE. Ten rooms × four × eight × three is
+ * under a thousand configurations — small enough to enumerate exactly, and
+ * exactness is the point: `affordedBy = 0` has to mean NOBODY, not "nobody in
+ * the combinations somebody thought to check". The count is REPORTED rather
+ * than written down here (`GateReport.configurations`), because a number in a
+ * comment is a number that goes stale the next time an option is added, and a
+ * stale denominator makes a reachability report quietly wrong.
+ *
+ * The verdicts come from `composeVenue`, which is the same function
+ * `loadVenue` calls, so a refusal counted here is a refusal a real application
+ * gets. Rule 21's guard goes through the consumers: see gates.db.test.ts, which
+ * drives the loader and this reporter over one seeded host and compares.
+ *
+ * The answer combinations include contradictory ones — `poolside` with `none`,
+ * `none` with `in_the_water` — deliberately. A host can give them, so the house
+ * models them, and pretending she cannot is how a report stops describing
+ * reality (rule 20).
+ */
+type HostConfiguration = {
+  readonly venue: Venue;
+  /** quiz_field -> option_code, for a report line and for attribution. */
+  readonly answers: Readonly<Record<string, string>>;
+};
+
+async function everyHostConfiguration(
+  db: Queryable
+): Promise<HostConfiguration[]> {
+  const rooms = await loadEveryRoom(db);
+
+  const claims = await db.query(
+    `select quiz_field, option_code::text as option_code, requirement,
+            provided, note
+       from host_affordance
+      order by quiz_field, option_code, requirement`
+  );
+  const byAnswer = new Map<string, {
+    quizField: string; optionCode: string; requirement: string;
+    provided: boolean; note: string;
+  }[]>();
+  for (const row of claims.rows) {
+    const key = `${String(row.quiz_field)}=${String(row.option_code)}`;
+    const list = byAnswer.get(key) ?? [];
+    list.push({
+      quizField: String(row.quiz_field),
+      optionCode: String(row.option_code),
+      requirement: String(row.requirement),
+      provided: Boolean(row.provided),
+      note: String(row.note ?? ""),
+    });
+    byAnswer.set(key, list);
+  }
+
+  // THE ANSWER SETS COME FROM THE ENUMS, not from a hand-written list and not
+  // from `host_affordance` — a value that affords nothing has no row there, and
+  // building the axis from the affordance table would silently drop every
+  // 'not_decided' from the enumeration. Those are exactly the configurations
+  // where nothing may be pruned, which makes them the ones a reporter must not
+  // lose. Same class of error as `statableSeasons` below, from the other side.
+  const axes: { quizField: string; codes: string[] }[] = [];
+  for (const [quizField, enumType] of [
+    ["indoor_outdoor", "indoor_outdoor"],
+    ["water_access", "water_access"],
+    ["water_use", "water_use"],
+  ] as const) {
+    const { rows } = await db.query(
+      `select unnest(enum_range(null::${enumType}))::text as code order by 1`
+    );
+    axes.push({ quizField, codes: rows.map((row) => String(row.code)) });
+  }
+
+  const configurations: HostConfiguration[] = [];
+  for (const room of rooms) {
+    const environmentRows = Object.entries(room.provides).map(([requirement, provided]) => ({
+      requirement,
+      provided,
+      note: room.notes[requirement] ?? "",
+    }));
+
+    const walk = (index: number, chosen: Record<string, string>) => {
+      if (index === axes.length) {
+        const hostClaims = Object.entries(chosen).flatMap(
+          ([quizField, optionCode]) => byAnswer.get(`${quizField}=${optionCode}`) ?? []
+        );
+        configurations.push({
+          venue: composeVenue({
+            environment: room.environment,
+            label: room.label,
+            environmentRows,
+            hostClaims,
+          }),
+          answers: { environment: room.environment, ...chosen },
+        });
+        return;
+      }
+      for (const code of axes[index].codes) {
+        walk(index + 1, { ...chosen, [axes[index].quizField]: code });
+      }
+    };
+    walk(0, {});
+  }
+
+  return configurations;
 }
 
 /**
@@ -413,15 +628,32 @@ async function holdingsOf(db: Queryable): Promise<GateHoldings> {
 export async function gateReport(db: Queryable): Promise<GateReport> {
   const occasions = await occasionCodes(db);
   const rooms = await loadEveryRoom(db);
+  const configurations = await everyHostConfiguration(db);
   const seasons = await statableSeasons(db);
   const holdings = await holdingsOf(db);
+  const vocabulary = await db.query(
+    `select code, label from structural_requirement order by position, code`
+  );
 
   // One load per occasion, because `slotRules` and `shape` are per-occasion and
   // everything else is not. The ingredients are identical across the nine, and
   // that is asserted rather than assumed below.
   const perOccasion = new Map<string, Awaited<ReturnType<typeof loadCatalogue>>>();
   for (const occasion of occasions) {
-    perOccasion.set(occasion, await loadCatalogue(db, occasion, "not_decided"));
+    // 'not_decided' ON EVERY AXIS, which is the configuration that prunes
+    // NOTHING. The ingredients are the same across all of them — `venue` is the
+    // only field of the snapshot this argument touches, and it is re-derived
+    // per configuration below — so loading the least constrained host is the
+    // one choice that cannot silently shrink the set being measured.
+    perOccasion.set(
+      occasion,
+      await loadCatalogue(db, occasion, {
+        environment: "not_decided",
+        indoorOutdoor: "not_decided",
+        waterAccess: "not_decided",
+        waterUse: "not_decided",
+      })
+    );
   }
 
   const first = perOccasion.get(occasions[0]);
@@ -433,22 +665,80 @@ export async function gateReport(db: Queryable): Promise<GateReport> {
 
   let venuePrunes = 0;
   const venueByRequirement: Record<string, number> = {};
-  const venueByEnvironment: Record<string, number> = {};
-  for (const room of rooms) {
-    let here = 0;
-    for (const ingredient of ingredients) {
-      const verdict = venueEligibility(ingredient, room);
-      if (verdict.eligible) continue;
-      here += 1;
-      venuePrunes += 1;
-      for (const requirement of ingredient.requirements ?? []) {
-        if (room.provides[requirement.code] === false) {
-          venueByRequirement[requirement.code] =
-            (venueByRequirement[requirement.code] ?? 0) + 1;
-        }
+  const venueByAnswer: Record<string, number> = {};
+  // Per requirement: how many configurations afford it, and which answers
+  // refuse it. Rule 24's two directions, kept as two counters because one
+  // number cannot carry both.
+  const affordedBy: Record<string, number> = {};
+  const refusedByAnswers: Record<string, Set<string>> = {};
+  for (const row of vocabulary.rows) {
+    affordedBy[String(row.code)] = 0;
+    refusedByAnswers[String(row.code)] = new Set<string>();
+  }
+
+  for (const configuration of configurations) {
+    const venue = configuration.venue;
+
+    for (const code of Object.keys(affordedBy)) {
+      // db/020's default, restated here because it is the thing that makes the
+      // number honest: a requirement with NO ROW is afforded. Counting only
+      // explicit `true` rows would report `requires_still_water` as unreachable
+      // on every legacy configuration, which is the opposite of what silence
+      // means.
+      if (venue.provides[code] !== false) affordedBy[code] += 1;
+      else {
+        const source = venue.refusedBy?.[code] ?? "environment";
+        refusedByAnswers[code].add(
+          `${source}=${configuration.answers[source] ?? venue.environment}`
+        );
       }
     }
-    venueByEnvironment[room.environment] = here;
+
+    for (const ingredient of ingredients) {
+      const verdict = venueEligibility(ingredient, venue);
+      if (verdict.eligible) continue;
+      venuePrunes += 1;
+      for (const requirement of ingredient.requirements ?? []) {
+        if (venue.provides[requirement.code] !== false) continue;
+        venueByRequirement[requirement.code] =
+          (venueByRequirement[requirement.code] ?? 0) + 1;
+        const source = venue.refusedBy?.[requirement.code] ?? "environment";
+        const answer = `${source}=${configuration.answers[source] ?? venue.environment}`;
+        venueByAnswer[answer] = (venueByAnswer[answer] ?? 0) + 1;
+      }
+    }
+  }
+
+  const requirements: RequirementReach[] = vocabulary.rows.map((row) => {
+    const code = String(row.code);
+    return {
+      code,
+      label: String(row.label ?? code),
+      claimed: holdings.venueRequirements[code] ?? 0,
+      affordedBy: affordedBy[code] ?? 0,
+      refusals: venueByRequirement[code] ?? 0,
+      refusedByAnswers: [...refusedByAnswers[code]].sort(),
+    };
+  });
+
+  // THE ROWS NOBODY CAN RECEIVE. Named individually rather than counted,
+  // because the remedy is per row: either the tag is wrong or the item needs a
+  // fallback authored beside it, and a curator cannot tell which from a number.
+  const unreachableCodes = new Set(
+    requirements.filter((r) => r.claimed > 0 && r.affordedBy === 0).map((r) => r.code)
+  );
+  const unreachable: UnreachableRow[] = [];
+  if (unreachableCodes.size > 0) {
+    for (const ingredient of ingredients) {
+      for (const requirement of ingredient.requirements ?? []) {
+        if (!unreachableCodes.has(requirement.code)) continue;
+        unreachable.push({
+          pool: ingredient.pool,
+          name: ingredient.name,
+          requirement: requirement.code,
+        });
+      }
+    }
   }
 
   /* ── the season gate ────────────────────────────────────────────── */
@@ -617,7 +907,7 @@ export async function gateReport(db: Queryable): Promise<GateReport> {
     prunes: {
       venue: venuePrunes,
       venueByRequirement,
-      venueByEnvironment,
+      venueByAnswer,
       season: seasonPrunes,
       seasonByBand,
       occasion: occasionPrunes,
@@ -626,6 +916,9 @@ export async function gateReport(db: Queryable): Promise<GateReport> {
     zeros,
     venueZeros,
     seasonZeros,
+    requirements,
+    unreachable,
+    configurations: configurations.length,
     environments: rooms.map((room) => room.environment),
     seasons,
     rooms: destinations.length,

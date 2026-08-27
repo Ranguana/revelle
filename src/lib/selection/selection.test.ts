@@ -15,6 +15,7 @@
  */
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { chooseDestinations } from "./destination.ts";
@@ -32,7 +33,9 @@ import {
   similarity,
   similarityDiscount,
 } from "./score.ts";
+import { FIELDS } from "../quiz.ts";
 import { buildVector } from "./vector.ts";
+import { composeVenue, statedAnswers, venueEligibility } from "./venue.ts";
 import {
   withDefaults,
   type Catalogue,
@@ -1103,6 +1106,12 @@ function inputFor(
       occasion: "girls_weekend",
       occasionOther: null,
       environment: "beach",
+      venueAnswers: {
+        environment: "beach",
+        indoorOutdoor: null,
+        waterAccess: null,
+        waterUse: null,
+      },
       secret: "Two of them have not spoken since March.",
       musicService: "print",
       stated: [stated(COASTAL), stated(EASE), stated(NOVELTY, "negative")],
@@ -1972,6 +1981,467 @@ test("a pool the room empties is an ordinary catalogue gap, and names the room",
   assert.ok(menu.gap, "an empty pool is still a gap");
   assert.match(menu.gap!.detail, /an apartment/i, "the room is named");
   assert.match(menu.gap!.detail, /needs to be outdoors/);
+});
+
+// ── 1b. THE OTHER THREE VENUE ANSWERS — db/049 ───────────────────────
+//
+// Inside or out, what water there is, whether anybody gets in. Everything in
+// section 1 applies to them unchanged, and these tests exist because a NEW venue
+// axis is exactly where the thesis erodes: the answer "a pool, and yes, people
+// will be in it" looks like it should raise Palm Springs, and it must not.
+//
+// THE AFFORDANCE ROWS BELOW ARE db/049's, COPIED. That is a duplication of DATA
+// and not of authority (CLAUDE.md rule 21's narrow test), and it is deliberate:
+// these tests have to run with no database, and the rule they exercise —
+// `composeVenue` — is imported rather than restated. The real rows are proved
+// against the real loader in gates.db.test.ts, which is where a drift between
+// this fixture and the migration would surface.
+
+const HOST_INDOOR = [
+  { quizField: "indoor_outdoor", optionCode: "indoor", requirement: "requires_outdoors", provided: false, note: "this evening is inside, and the thing needs a sky" },
+];
+const HOST_OUTDOOR = [
+  { quizField: "indoor_outdoor", optionCode: "outdoor", requirement: "requires_outdoors", provided: true, note: "" },
+  { quizField: "indoor_outdoor", optionCode: "outdoor", requirement: "outdoor_access", provided: true, note: "" },
+];
+const WATER = (code: string, provided: boolean, note: string) => ({
+  quizField: "water_access",
+  optionCode: code,
+  requirement: "requires_still_water",
+  provided,
+  note,
+});
+const SWIMMING = (code: string, provided: boolean, note: string) => ({
+  quizField: "water_use",
+  optionCode: code,
+  requirement: "requires_still_water",
+  provided,
+  note,
+});
+
+const APARTMENT_ROWS = [
+  { requirement: "requires_outdoors", provided: false, note: "there is no outdoors — this is a room, and the thing needs a sky" },
+  { requirement: "outdoor_access", provided: true, note: "" },
+];
+const HOTEL_ROWS = [
+  { requirement: "requires_outdoors", provided: false, note: "there is no outdoors — this is a room, and the thing needs a sky" },
+  { requirement: "outdoor_access", provided: false, note: "there is nowhere here a lit thing and its smoke can be outside" },
+];
+const HOUSE_ROWS = [
+  { requirement: "requires_outdoors", provided: true, note: "" },
+  { requirement: "outdoor_access", provided: true, note: "" },
+];
+
+test("her own statement supersedes the room type, and an apartment with a roof deck is outdoors", () => {
+  const venue = composeVenue({
+    environment: "city_apartment",
+    label: "An apartment",
+    environmentRows: APARTMENT_ROWS,
+    hostClaims: HOST_OUTDOOR,
+  });
+
+  assert.equal(
+    venue.provides.requires_outdoors,
+    true,
+    "db/020 says an apartment has no outdoors; she says her party is outside. " +
+      "ANDing the two would absorb her answer and not honour it (rule 16), and " +
+      "refusing her the outdoor deliverables is preference-by-square-footage."
+  );
+});
+
+test("a house that stays indoors does not get the clambake", () => {
+  const venue = composeVenue({
+    environment: "my_home",
+    label: "A house",
+    environmentRows: HOUSE_ROWS,
+    hostClaims: HOST_INDOOR,
+  });
+
+  assert.equal(venue.provides.requires_outdoors, false);
+  assert.equal(
+    venue.refusedBy?.requires_outdoors,
+    "indoor_outdoor",
+    "the refusal came from her answer, not from her house, and the gap " +
+      "sentence has to say so or a curator authors an indoor clambake"
+  );
+});
+
+test("an indoor party still has a door to the garden — the two outdoor grades are not one", () => {
+  const house = composeVenue({
+    environment: "my_home",
+    label: "A house",
+    environmentRows: HOUSE_ROWS,
+    hostClaims: HOST_INDOOR,
+  });
+  assert.equal(
+    house.provides.outdoor_access,
+    true,
+    "requires_outdoors is about the EVENING; outdoor_access is about the " +
+      "BUILDING. `indoor` writes no claim on the second, so the sparklers " +
+      "survive a dinner party in a dining room."
+  );
+
+  const hotel = composeVenue({
+    environment: "hotel",
+    label: "A hotel",
+    environmentRows: HOTEL_ROWS,
+    hostClaims: HOST_INDOOR,
+  });
+  assert.equal(
+    hotel.provides.outdoor_access,
+    false,
+    "and db/035's sealed hotel room still refuses it, because no host answer " +
+      "spoke to it and the room type therefore stands"
+  );
+});
+
+test("still deciding is no information, and never 'none'", () => {
+  // Every axis undecided. db/049 gives `not_decided` NO ROW at all, so the
+  // fixture is an empty claim list — which is also, exactly, what every
+  // application written before 2026-08-h produces.
+  const undecided = composeVenue({
+    environment: "city_apartment",
+    label: "An apartment",
+    environmentRows: APARTMENT_ROWS,
+    hostClaims: [],
+  });
+
+  const provides = undecided.provides as Record<string, boolean | undefined>;
+  assert.deepEqual(
+    undecided.provides,
+    { requires_outdoors: false, outdoor_access: true },
+    "the room type stands untouched and nothing new is pruned"
+  );
+  assert.equal(
+    provides.requires_still_water,
+    undefined,
+    "an unanswered water question must leave the requirement UNSPOKEN, not " +
+      "false. Reading it as 'none' would delete every water-requiring row " +
+      "from every application ever submitted, silently."
+  );
+});
+
+test("a legacy application states nothing on the three new axes", () => {
+  assert.deepEqual(
+    statedAnswers({
+      environment: "beach",
+      indoorOutdoor: null,
+      waterAccess: null,
+      waterUse: null,
+    }),
+    [],
+    "null means she was never asked"
+  );
+  assert.deepEqual(
+    statedAnswers({
+      environment: "beach",
+      indoorOutdoor: "",
+      waterAccess: "pool",
+      waterUse: null,
+    }),
+    [{ quizField: "water_access", optionCode: "pool" }],
+    "an empty string is a half-written row, not an answer, and must not prune"
+  );
+});
+
+test("presence and use are ANDed: a good pool at a long dinner affords nothing", () => {
+  const poolAndDinner = composeVenue({
+    environment: "my_home",
+    label: "A house",
+    environmentRows: HOUSE_ROWS,
+    hostClaims: [
+      WATER("pool", true, ""),
+      SWIMMING("beside_it", false, "the water is not part of this evening"),
+    ],
+  });
+  assert.equal(
+    poolAndDinner.provides.requires_still_water,
+    false,
+    "the founder's own case. Among host answers, false wins."
+  );
+
+  const poolAndSwimming = composeVenue({
+    environment: "my_home",
+    label: "A house",
+    environmentRows: HOUSE_ROWS,
+    hostClaims: [WATER("pool", true, ""), SWIMMING("in_the_water", true, "")],
+  });
+  assert.equal(poolAndSwimming.provides.requires_still_water, true);
+
+  const noWaterButSwimming = composeVenue({
+    environment: "my_home",
+    label: "A house",
+    environmentRows: HOUSE_ROWS,
+    hostClaims: [
+      WATER("none", false, "there is no water here"),
+      SWIMMING("in_the_water", true, ""),
+    ],
+  });
+  assert.equal(
+    noWaterButSwimming.provides.requires_still_water,
+    false,
+    "two answers, a contradiction, and refusing is the safe direction — " +
+      "sending a float to a host who says there is no water is the failure " +
+      "db/049 exists to stop"
+  );
+});
+
+// ── THE FLOAT, THROUGH THE REAL SELECTION PATH ───────────────────────
+//
+// The acceptance test the founder specified, and it is driven through
+// `scopePools` — the function a real run calls — rather than by reading a row
+// back out of the affordance table. Reading the row proves the row; this proves
+// the gate.
+//
+// Her ruling: "a pool float should only land if the quiz answer is 'has pool'
+// or 'lake'". POOL AND LAKE YES, RIVER AND OCEAN NO, and the reason is that a
+// float needs STILL water — a river takes it downstream and the sea takes it
+// out. All five outcomes are asserted here, plus the two absent cases, because
+// four of the seven are the ones that would ship a float into moving water.
+
+test("the striped floats land in a pool, a lake and a pond, and nowhere else", () => {
+  // THE `product` POOL, not `bank_item`, and the substitution is the fixture's
+  // limit rather than the gate's: SLOT_RULES above models four pools and the
+  // bank is not one of them. `venueEligibility` is polymorphic over pools by
+  // construction — one `ingredient_requirement` table, one verdict function —
+  // so the pool a fixture happens to use changes nothing about what is proved.
+  // The bank row itself is exercised against the real schema in gates.db.test.ts.
+  const floats = ingredient("b1", "product", "The striped floats", {}, {
+    requirements: [
+      {
+        code: "requires_still_water",
+        label: "Needs still water",
+        demand: "needs still water somebody is getting into",
+        note: null,
+      },
+    ],
+  });
+  const cloth = ingredient("b2", "product", "The striped cloth", {});
+
+  // db/049's water_access matrix, copied. See the note at the top of 1b.
+  const ACCESS: Record<string, [boolean, string] | null> = {
+    pool: [true, ""],
+    lake: [true, ""],
+    pond: [true, ""],
+    river: [false, "a river moves, and it takes a float downstream with it"],
+    sea: [false, "the sea has surf, and it takes a float out with it"],
+    not_for_swimming: [false, "the water here is not water anybody gets into"],
+    none: [false, "there is no water here"],
+    not_decided: null,
+  };
+
+  const landsFor = (access: string) => {
+    const claim = ACCESS[access];
+    const venue = composeVenue({
+      environment: "my_home",
+      label: "A house",
+      environmentRows: HOUSE_ROWS,
+      hostClaims: [
+        ...(claim === null ? [] : [WATER(access, claim[0], claim[1])]),
+        SWIMMING("in_the_water", true, ""),
+      ],
+    });
+
+    const pools = scopePools(
+      planSlots(SLOT_RULES, SHAPE, SCALE).slots,
+      [floats, cloth],
+      destination("d1", "CÔTE D'AZUR", {}),
+      "girls_weekend",
+      buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS).weights,
+      [],
+      (id) => FACETS[id]?.label ?? id,
+      SCALE,
+      venue,
+      OPTIONS,
+      OPTIONS.now!
+    );
+    return [...pools.values()].flatMap((p) =>
+      p.candidates.map((c) => c.ingredient.name)
+    );
+  };
+
+  for (const yes of ["pool", "lake", "pond"]) {
+    assert.ok(
+      landsFor(yes).includes("The striped floats"),
+      `a host who answers "${yes}" must receive the floats`
+    );
+  }
+  for (const no of ["river", "sea", "not_for_swimming", "none"]) {
+    assert.ok(
+      !landsFor(no).includes("The striped floats"),
+      `a host who answers "${no}" must NOT receive the floats — a float needs ` +
+        `still water, and moving water takes it away`
+    );
+    assert.ok(
+      landsFor(no).includes("The striped cloth"),
+      `and the rest of the room still arrives: pruning is per ROW, never per ` +
+        `destination. Côte d'Azur does not leave, the float does.`
+    );
+  }
+
+  assert.ok(
+    landsFor("not_decided").includes("The striped floats"),
+    "a host who has not answered is NOT a host without water, and nothing may " +
+      "be pruned on an unknown"
+  );
+});
+
+test("a float refused for want of a pool does not blame her house", () => {
+  const floats = ingredient("b1", "product", "The striped floats", {}, {
+    requirements: [
+      {
+        code: "requires_still_water",
+        label: "Needs still water",
+        demand: "needs still water somebody is getting into",
+        note: null,
+      },
+    ],
+  });
+  const venue = composeVenue({
+    environment: "my_home",
+    label: "A house",
+    environmentRows: HOUSE_ROWS,
+    hostClaims: [WATER("none", false, "there is no water here")],
+  });
+
+  const verdict = venueEligibility(floats, venue);
+  assert.equal(verdict.eligible, false);
+  assert.match(
+    verdict.reason,
+    /there is no water here/,
+    "the note carries the actual reason"
+  );
+  assert.doesNotMatch(
+    verdict.reason,
+    /in a house/,
+    "and the sentence must NOT blame the room. 'impossible in a house' sends " +
+      "whoever reads the gap to author an indoor variant of a thing that " +
+      "needed a pool."
+  );
+});
+
+test("every water answer produces the identical destination ranking", () => {
+  // Section 1's thesis test, on the new axis. A host with a pool must not be
+  // nudged toward Palm Springs — rule 2's forbidden door, reached from the
+  // direction rule 2 did not anticipate.
+  const WATERS = [
+    "pool",
+    "lake",
+    "pond",
+    "river",
+    "sea",
+    "not_for_swimming",
+    "none",
+    "not_decided",
+  ].map((code) => facet(`f-water-${code}`, "water_access", code));
+
+  const rankings = WATERS.map((answer) => {
+    const result = runSelection(
+      inputFor(
+        {},
+        {
+          environment: "my_home",
+          stated: [stated(COASTAL), stated(EASE), stated(answer)],
+        }
+      ),
+      { seed: 11 }
+    );
+    return {
+      answer: answer.code,
+      order: result.candidates.map(
+        (c) => `${c.destination.name}@${c.destinationScore.toFixed(6)}`
+      ),
+    };
+  });
+
+  const first = rankings[0];
+  for (const entry of rankings.slice(1)) {
+    assert.deepEqual(
+      entry.order,
+      first.order,
+      `the destination ranking moved between "${first.answer}" and ` +
+        `"${entry.answer}". ${THESIS}`
+    );
+  }
+  assert.ok(first.order.length > 0, "the fixture actually produced candidates");
+});
+
+/**
+ * THE QUIZ AND THE MIGRATION MUST AGREE ABOUT WHAT A HOST CAN ANSWER.
+ *
+ * Rule 21's narrow test, answered yes: `src/lib/quiz.ts` decides what she can
+ * tap and db/049 decides what the column will accept, and an option that is not
+ * in the enum is a submission Postgres rejects at 3am — while an enum value
+ * with no option is an affordance row keyed to an answer nobody can give.
+ *
+ * It reads the migration as TEXT, which is crude and is the point: it is the
+ * only check of this that runs with no database. `scripts/check-facets.mjs`
+ * does the rigorous version against a live schema and cannot run on a laptop,
+ * so the drift it would catch has to be catchable here too. Same idiom as
+ * deploy.test.ts reading render.yaml.
+ */
+test("every venue answer in the quiz exists in db/049's enum and registry", () => {
+  const sql = readFileSync(
+    new URL("../../../db/049-the-water-and-the-sky.sql", import.meta.url),
+    "utf8"
+  );
+
+  for (const field of ["indoor_outdoor", "water_access", "water_use"]) {
+    const declared = sql.match(
+      new RegExp(`create type ${field} as enum \\(([^)]*)\\)`)
+    );
+    assert.ok(declared, `db/049 declares no enum for ${field}`);
+    const enumValues = [...declared![1].matchAll(/'([a-z_]+)'/g)].map((m) => m[1]);
+
+    const options = FIELDS[field];
+    assert.ok(options, `${field} is not a field in the quiz`);
+    assert.equal(options.type, "single");
+    const codes = (options as { options: readonly { code: string }[] }).options.map(
+      (o) => o.code
+    );
+
+    assert.deepEqual(
+      [...codes].sort(),
+      [...enumValues].sort(),
+      `${field}: the quiz and db/049's enum disagree. An option missing from ` +
+        `the enum is a submission the database rejects; an enum value with no ` +
+        `option is an affordance row keyed to an answer nobody can give.`
+    );
+
+    for (const code of codes) {
+      assert.ok(
+        sql.includes(`('${field}',`) && sql.includes(`'${code}'`),
+        `${field}=${code} is never registered in quiz_option by db/049, so ` +
+          `host_affordance's foreign key could not reference it`
+      );
+    }
+  }
+});
+
+test("no venue answer of any of the four kinds reaches the preference vector", () => {
+  // db/049 added three dimensions to a list that had one. Named individually
+  // rather than looped, so that a dimension dropped from NON_TASTE_DIMENSIONS
+  // fails with its own name in the message.
+  for (const dimension of [
+    "environment",
+    "indoor_outdoor",
+    "water_access",
+    "water_use",
+  ]) {
+    const answer = facet(`f-${dimension}`, dimension, "some_answer");
+    const vector = buildVector(
+      [stated(COASTAL), stated(answer)],
+      [],
+      [],
+      { ...FACETS, [answer.id]: answer },
+      OPTIONS
+    );
+    assert.equal(
+      vector.weights[answer.id],
+      undefined,
+      `a ${dimension} facet reached the preference vector. ${THESIS}`
+    );
+  }
 });
 
 // ── 2. THE EMPHASIS ──────────────────────────────────────────────────

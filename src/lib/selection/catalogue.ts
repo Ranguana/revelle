@@ -23,6 +23,7 @@ import {
 import { runSelection } from "./engine.ts";
 import { hostExclusions } from "./exclusions.ts";
 import { assemblageFingerprint } from "./novelty.ts";
+import { composeVenue, statedAnswers } from "./venue.ts";
 import type {
   Application,
   Candidate,
@@ -47,6 +48,7 @@ import type {
   StatedFacet,
   StructuralRequirement,
   Venue,
+  VenueAnswers,
 } from "./types.ts";
 
 export type Queryable = {
@@ -106,7 +108,7 @@ export async function loadSelectionInput(
   const catalogue = await loadCatalogue(
     db,
     application.occasion,
-    application.environment
+    application.venueAnswers
   );
 
   return { application, history, cohorts, catalogue };
@@ -127,14 +129,14 @@ export async function loadSelectionInput(
 export async function loadCatalogue(
   db: Queryable,
   occasion: OccasionCode,
-  environment: string
+  venueAnswers: VenueAnswers
 ): Promise<Catalogue> {
   const facets = await loadFacets(db);
   const destinations = await loadDestinations(db);
   const ingredients = await loadIngredients(db);
   const slotRules = await loadSlotRules(db, occasion);
   const shape = await loadShape(db, occasion);
-  const venue = await loadVenue(db, environment);
+  const venue = await loadVenue(db, venueAnswers);
   const issued = await loadIssuedFingerprints(db);
 
   return {
@@ -149,24 +151,47 @@ export async function loadCatalogue(
 }
 
 /**
- * THE ROOM SHE IS IN, as a set of affordances — db/020.
+ * THE ROOM SHE IS IN, as a set of affordances — db/020, and db/049.
  *
  * Read here and nowhere else, and read as a room rather than as a taste. Her
- * answer never enters the preference vector (vector.ts lists `environment`
- * among the non-taste dimensions and says why at length), and the database
- * refuses to let an environment facet be tagged onto a destination at all, so
- * this query is the only route the venue has into the engine.
+ * answers never enter the preference vector (vector.ts lists all four venue
+ * dimensions among the non-taste ones and says why at length), and the database
+ * refuses to let any of them be tagged onto a destination at all, so this query
+ * is the only route the venue has into the engine.
+ *
+ * ── TWO READS, ONE RULE ──────────────────────────────────────────────
+ *
+ * The room type comes from `venue_affordance_labelled`, which db/020 built. The
+ * other three answers come from `host_affordance`, which db/049 built. THE RULE
+ * THAT COMBINES THEM IS NOT HERE — it is `composeVenue()` in ./venue.ts,
+ * because `catalogue/gates.ts` has to reach the same verdict over every host
+ * configuration the house models and two copies of a composition rule is
+ * exactly the drift CLAUDE.md rule 21 is about.
+ *
+ * The host query is scoped to the answers she actually gave. Reading the whole
+ * table and filtering in TypeScript would work and is refused on principle: the
+ * failure mode is a host who affords everything, which looks identical to a
+ * host with no constraints and would never be noticed.
  *
  * A NULL RESULT MEANS "the house does not know this room", not "no limits".
  * db/020 seeds a row for every value of environment_type against every
  * requirement, so null is reachable only from an answer written before a new
  * environment was seeded — and nothing is pruned on it, because pruning on an
  * unknown is how a deliverable vanishes for a reason nobody can name.
+ *
+ * THAT NULL SURVIVES db/049 UNCHANGED and it is worth saying why, because the
+ * tempting move is to return a Venue built from the water answers alone. It is
+ * refused: the rejection sentence names the room, `Venue.label` has nothing to
+ * put in it, and the number of applications with an unknown environment is zero
+ * — this is a guard against a schema change, not a live path. A host who has
+ * answered the water question and NOT the room question does not exist, because
+ * every field in the quiz is required.
  */
 async function loadVenue(
   db: Queryable,
-  environment: string
+  answers: VenueAnswers
 ): Promise<Venue | null> {
+  const environment = answers.environment;
   if (!environment) return null;
 
   const { rows } = await db.query(
@@ -182,21 +207,43 @@ async function loadVenue(
 
   if (rows.length === 0) return null;
 
-  const provides: Record<string, boolean> = {};
-  const notes: Record<string, string> = {};
-  for (const row of rows) {
-    const requirement = str(row.requirement);
-    provides[requirement] = Boolean(row.provided);
-    const note = str(row.note ?? "");
-    if (note.length > 0) notes[requirement] = note;
-  }
+  // db/049. One row per (answer, requirement) she has actually stated. An
+  // answer with no row makes no claim — that is "Still deciding", and it is
+  // also every response written before 2026-08-h, where the columns are null
+  // and `statedAnswers` returns nothing for them.
+  const stated = statedAnswers(answers);
+  const { rows: hostRows } =
+    stated.length === 0
+      ? { rows: [] as Record<string, unknown>[] }
+      : await db.query(
+          `select h.quiz_field, h.option_code::text as option_code,
+                  h.requirement, h.provided, h.note
+             from host_affordance h
+             join unnest($1::text[], $2::text[]) as a(quiz_field, option_code)
+               on a.quiz_field = h.quiz_field
+              and a.option_code = h.option_code::text`,
+          [
+            stated.map((pair) => pair.quizField),
+            stated.map((pair) => pair.optionCode),
+          ]
+        );
 
-  return {
+  return composeVenue({
     environment,
     label: str(rows[0].label),
-    provides,
-    notes,
-  };
+    environmentRows: rows.map((row) => ({
+      requirement: str(row.requirement),
+      provided: Boolean(row.provided),
+      note: str(row.note ?? ""),
+    })),
+    hostClaims: hostRows.map((row) => ({
+      quizField: str(row.quiz_field),
+      optionCode: str(row.option_code),
+      requirement: str(row.requirement),
+      provided: Boolean(row.provided),
+      note: str(row.note ?? ""),
+    })),
+  });
 }
 
 /**
@@ -244,6 +291,11 @@ async function loadApplication(
             qr.occasion,
             qr.occasion_other,
             qr.environment,
+            -- db/049. Null on every response written before 2026-08-h, which
+            -- means she was never asked and must prune nothing.
+            qr.indoor_outdoor,
+            qr.water_access,
+            qr.water_use,
             qr.secret,
             qr.music_service,
             qr.created_at,
@@ -317,6 +369,12 @@ async function loadApplication(
     occasion: str(row.occasion) as OccasionCode,
     occasionOther: nullableStr(row.occasion_other),
     environment: str(row.environment),
+    venueAnswers: {
+      environment: str(row.environment),
+      indoorOutdoor: nullableStr(row.indoor_outdoor),
+      waterAccess: nullableStr(row.water_access),
+      waterUse: nullableStr(row.water_use),
+    },
     secret: nullableStr(row.secret),
     musicService: nullableStr(row.music_service),
     stated,

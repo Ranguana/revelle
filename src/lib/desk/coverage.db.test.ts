@@ -254,7 +254,12 @@ async function collect(client: pg.Client): Promise<void> {
   //
   // The environment is passed empty, which is `loadVenue`'s own "no venue" —
   // one of the four applicant filters switched off.
-  const catalogue = await loadCatalogue(client, OCCASION, "");
+  const catalogue = await loadCatalogue(client, OCCASION, {
+    environment: "",
+    indoorOutdoor: null,
+    waterAccess: null,
+    waterUse: null,
+  });
   const plan = planSlots(catalogue.slotRules, catalogue.shape, SCALE);
   for (const slot of plan.slots) slotPools.set(slot.slotCode, slot.pool);
 

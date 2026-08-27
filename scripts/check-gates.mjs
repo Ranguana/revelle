@@ -97,8 +97,8 @@ console.log(`  venue     ${pad(report.prunes.venue)} refusals`);
 for (const [code, n] of Object.entries(report.prunes.venueByRequirement)) {
   console.log(`              ${pad(n)}  on ${code}`);
 }
-for (const [environment, n] of Object.entries(report.prunes.venueByEnvironment)) {
-  if (n > 0) console.log(`              ${pad(n)}  in ${environment}`);
+for (const [answer, n] of Object.entries(report.prunes.venueByAnswer)) {
+  if (n > 0) console.log(`              ${pad(n)}  when she answers ${answer}`);
 }
 console.log(`  season    ${pad(report.prunes.season)} refusals`);
 for (const [band, n] of Object.entries(report.prunes.seasonByBand)) {
@@ -107,6 +107,58 @@ for (const [band, n] of Object.entries(report.prunes.seasonByBand)) {
 console.log(`  occasion  ${pad(report.prunes.occasion)} refusals`);
 for (const [pool, n] of Object.entries(report.prunes.occasionByPool)) {
   console.log(`              ${pad(n)}  in ${pool}`);
+}
+
+console.log(`\n══ EVERY REQUIREMENT, FROM BOTH ENDS ═════════════════════════`);
+console.log(
+  `  ${report.configurations} host configurations — every room she can name ×` +
+    ` inside-or-out ×\n  what water there is × whether anyone gets in. CLAUDE.md` +
+    ` rule 24 asks for the\n  count in both directions, so both are here: what` +
+    ` CLAIMS a requirement, and what\n  can AFFORD it.\n`
+);
+console.log(
+  `  ${"code".padEnd(22)}${"claimed".padStart(8)}${"afforded".padStart(10)}` +
+    `${"refuses".padStart(9)}   refused by`
+);
+for (const reach of report.requirements) {
+  const by = reach.refusedByAnswers.join(", ") || "—";
+  console.log(
+    `  ${reach.code.padEnd(22)}${String(reach.claimed).padStart(8)}` +
+      `${String(reach.affordedBy).padStart(8)}/${String(report.configurations).padEnd(4)}` +
+      `${String(reach.refusals).padStart(8)}   ${by}`
+  );
+}
+
+// THE THREE VERDICTS, spelled out rather than left to a reader comparing
+// columns. They mean opposite things and only one of them is a bug in code.
+const absent = report.requirements.filter((r) => r.claimed === 0);
+if (absent.length > 0) {
+  console.log(
+    `\n  CLAIMED BY NOTHING — an AUTHORING absence, not a wiring one, and`
+  );
+  console.log(
+    `  deliberately NOT counted as inert (the same ruling the occasion gate got):`
+  );
+  for (const reach of absent) {
+    console.log(
+      `    ${reach.code} — the supply side is complete (${reach.affordedBy}/` +
+        `${report.configurations} configurations afford it) and no row in the ` +
+        `catalogue asks for it yet.`
+    );
+  }
+}
+
+if (report.unreachable.length > 0) {
+  console.log(
+    `\n  UNREACHABLE — ${report.unreachable.length} row(s) claim a requirement NO`
+  );
+  console.log(
+    `  host configuration affords. These cannot be delivered to anybody, and`
+  );
+  console.log(`  that is member-facing rather than curator-facing:`);
+  for (const row of report.unreachable) {
+    console.log(`    ${row.pool}: ${row.name} — needs ${row.requirement}`);
+  }
 }
 
 console.log(`\n══ ROOM × OCCASION, FOR THE ${WATCHED_POOL.toUpperCase()} POOL ═══════════════════════`);

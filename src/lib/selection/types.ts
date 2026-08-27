@@ -134,6 +134,17 @@ export type Application = {
   /** Her words, when the occasion is 'other'. Never parsed. */
   occasionOther: string | null;
   environment: string;
+  /**
+   * EVERY ANSWER THE VENUE GATE READS, including `environment` again — db/049.
+   *
+   * `environment` stays where it is because a dozen readers already reach for
+   * it there and it is a fact about the application, not only about the gate.
+   * This is the SET the gate consumes, assembled once so that no caller has to
+   * know which four columns those are; `composeVenue()` is the only thing that
+   * reads it. Three of the four are null on any response written before
+   * 2026-08-h, which means she was never asked and prunes nothing.
+   */
+  venueAnswers: VenueAnswers;
   /** The free-text answer. Held for the curator, verbatim. */
   secret: string | null;
   musicService: string | null;
@@ -309,6 +320,52 @@ export type Venue = {
   provides: Record<string, boolean>;
   /** requirement code -> why not, in the house's words. */
   notes: Record<string, string>;
+  /**
+   * requirement code -> WHICH ANSWER refused it: `environment`,
+   * `indoor_outdoor`, `water_access`, `water_use`. db/049.
+   *
+   * It exists for one sentence and it is worth the field. Before db/049 every
+   * refusal came from the room, so "impossible in an apartment" was always
+   * true. It is now sometimes false in a way that misleads: a float refused
+   * because she has no pool has nothing to do with her house, and telling a
+   * curator the house was the problem sends her to fix the wrong thing.
+   *
+   * Optional because a Venue assembled by hand in a test is not lying when it
+   * omits provenance — it simply has none, and the sentence falls back to the
+   * room, which is what every refusal in the catalogue was until today.
+   */
+  refusedBy?: Record<string, string>;
+};
+
+/**
+ * One row of `host_affordance` — db/049.
+ *
+ * What ONE ANSWER says about ONE requirement. There is no third boolean state:
+ * an option that makes no claim has NO ROW, which is how "Still deciding" is
+ * expressed and why it can never be read as "none".
+ */
+export type HostAffordance = {
+  /** The quiz field the answer belongs to. `indoor_outdoor`, `water_access`, … */
+  readonly quizField: string;
+  readonly optionCode: string;
+  readonly requirement: string;
+  readonly provided: boolean;
+  readonly note: string;
+};
+
+/**
+ * The venue-shaped answers on one application — db/049.
+ *
+ * Null means SHE WAS NEVER ASKED (a response written against a quiz version
+ * before 2026-08-h), which is the same thing as "Still deciding" for every
+ * purpose the engine has: no claim, nothing pruned.
+ */
+export type VenueAnswers = {
+  /** environment_type, and the only one of the four that predates db/049. */
+  readonly environment: string;
+  readonly indoorOutdoor: string | null;
+  readonly waterAccess: string | null;
+  readonly waterUse: string | null;
 };
 
 /** A published destination, with everything the engine needs to judge it. */

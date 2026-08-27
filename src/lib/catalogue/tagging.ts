@@ -199,7 +199,100 @@ const REQUIREMENT_STATEMENTS: readonly RequirementStatement[] = [
            where m.cooking = 'actually_made'
           on conflict do nothing`,
   },
+  {
+    label: "the bank clause that names its own requirement",
+    from: "db/049",
+    // THE AUTHOR ALREADY WROTE THE TAG. THIS IS THE ONE STATEMENT IN THE FILE
+    // THAT GUESSES NOTHING.
+    //
+    // docs/atmosphere-idea-bank-v1.md writes structural requirements INTO the
+    // clause, in the schema's own vocabulary, and has since it was drafted:
+    //
+    //     "pétanque set (requires_outdoors, no indoor fallback)"
+    //     "SPARKLER KIT — long-burn gold, sand bowl, outdoor_access tag …"
+    //
+    // `bank_item.description` is "THE CLAUSE VERBATIM, whole, in her
+    // punctuation" (scripts/seed-bank.mjs), so the tag survives the seeder
+    // intact. What did NOT survive is anywhere to put it: seed-bank parses the
+    // venue tag into a local and then discards it, printing "This seeder writes
+    // no venue at all — declare one at /desk/bank once the rows exist". db/031's
+    // `bank_item.venue` column, which used to hold it, was dropped by db/033.
+    // So the tag has been authored, parsed, and thrown away on every run since.
+    //
+    // THAT IS WHY `outdoor_access` HAS NEVER PRUNED ANYTHING. db/035 built the
+    // whole affordance matrix for it and named the one item that would carry it
+    // — Acapulco's sparkler kit — and no code path has ever written the claim.
+    // The pruning half was built and the claiming half never was, which is the
+    // exact sentence db/039 used to justify deleting two other codes.
+    //
+    // ── WHY IT JOINS structural_requirement RATHER THAN LISTING CODES ───
+    //
+    // CLAUDE.md rule 19: the registry is the only truth, and a hand-written list
+    // of requirement codes here is correct exactly until the next code is
+    // minted — and then wrong without being broken. Joining the vocabulary
+    // table means `requires_still_water` is picked up the day a clause says it,
+    // with no edit to this file. That is the whole delivery mechanism for the
+    // floats: write the code into the clause and it tags itself.
+    //
+    // ── AND WHY IT DOES NOT MATCH ON WORDS ──────────────────────────────
+    //
+    // It matches the CODE, never a synonym, and the reason is a list rather
+    // than a principle. `bank_item_default_slot()` matched "green figs in bowls"
+    // into the table setting on the word `bowl` and missed "faded imperfect
+    // cloth" because its phrase list held `tablecloth`. `'take home'` against
+    // `take-home` misfiled 143 of 152 rows. A `%float%` predicate here would
+    // take Tahiti's "hibiscus floated in water" — a BOWL on a table — and
+    // declare that a host without a swimming pool cannot have flowers. The
+    // near-miss report below exists so that what this predicate deliberately
+    // did NOT take is visible rather than assumed.
+    sql: `insert into ingredient_requirement (entity_table, entity_id, requirement, note)
+          select 'bank_item', b.id, r.code,
+                 'The authored clause names this requirement itself: "' ||
+                 left(b.description, 90) || '"'
+            from bank_item b
+            join structural_requirement r
+              on b.description like '%' || r.code || '%'
+          on conflict do nothing`,
+  },
 ];
+
+/**
+ * WHAT THE CLAUSE MATCHER ACTUALLY TOOK, AND WHAT IT LEFT — CLAUDE.md rule 24.
+ *
+ * "Reading the code tells you what it was meant to match. Only counting tells
+ * you what it did." Three matchers failed silently in one week and all three
+ * passed review, so the statement above reports both directions every run:
+ *
+ *   `matched`    the rows it tagged, BY NAME. A count alone cannot tell a
+ *                curator whether the right rows were taken, and "2" looks
+ *                identical whether it is the pétanque set and the sparklers or
+ *                two rows nobody meant.
+ *   `nearMisses` rows whose text contains a word a looser matcher would have
+ *                grabbed — float, swim, pool, water — and which carry NO
+ *                requirement. This is the list that would have been wrongly
+ *                tagged by the obvious predicate, and it is printed so that
+ *                "the matcher is too narrow" is a judgement somebody makes on
+ *                evidence rather than a thing nobody thinks to check.
+ *
+ * The near-miss query is a REPORT and writes nothing. That distinction is the
+ * whole safety of it: a diagnostic that could tag is a tagger with a modest
+ * name.
+ */
+const CLAUSE_MATCH_SQL = `
+  select b.name, r.requirement
+    from bank_item b
+    join ingredient_requirement r
+      on r.entity_table = 'bank_item' and r.entity_id = b.id
+   order by b.name, r.requirement`;
+
+const NEAR_MISS_SQL = `
+  select b.name, left(b.description, 70) as excerpt
+    from bank_item b
+   where (b.description ~* '\\m(float|floated|swim|swimming|pool|water)\\M')
+     and not exists (
+       select 1 from ingredient_requirement r
+        where r.entity_table = 'bank_item' and r.entity_id = b.id)
+   order by b.name`;
 
 /**
  * A DESTINATION MAY PRESUPPOSE A ROOM — db/033 §4, and the third inert
@@ -227,6 +320,10 @@ const WORLD_REQUIREMENT_SQL = `
 export type VenueTagging = {
   /** Per statement: how many rows it actually wrote THIS run. */
   readonly statements: readonly { label: string; from: string; wrote: number }[];
+  /** Every bank row now carrying a requirement, BY NAME. Rule 24. */
+  readonly matched: readonly { name: string; requirement: string }[];
+  /** Bank rows a looser word-matcher would have taken and this one did not. */
+  readonly nearMisses: readonly { name: string; excerpt: string }[];
   /** Rows in `ingredient_requirement` after the pass, by requirement code. */
   readonly holdings: Readonly<Record<string, number>>;
   readonly total: number;
@@ -251,6 +348,9 @@ async function tagVenueRequirements(db: Queryable): Promise<VenueTagging> {
     `select count(*)::int as n from world where venue_requirement is not null`
   );
 
+  const matched = await db.query(CLAUSE_MATCH_SQL);
+  const nearMisses = await db.query(NEAR_MISS_SQL);
+
   const holdings = await db.query(
     `select requirement, count(*)::int as n
        from ingredient_requirement group by requirement order by requirement`
@@ -266,6 +366,14 @@ async function tagVenueRequirements(db: Queryable): Promise<VenueTagging> {
   void worlds;
   return {
     statements,
+    matched: matched.rows.map((row) => ({
+      name: String(row.name),
+      requirement: String(row.requirement),
+    })),
+    nearMisses: nearMisses.rows.map((row) => ({
+      name: String(row.name),
+      excerpt: String(row.excerpt ?? ""),
+    })),
     holdings: byCode,
     total,
     worldsDeclaring: Number(declaring.rows[0]?.n ?? 0),

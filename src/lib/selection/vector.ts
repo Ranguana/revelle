@@ -100,6 +100,34 @@ const NON_TASTE_DIMENSIONS = new Set([
   "environment",
 
   /*
+   * THE OTHER THREE VENUE ANSWERS — db/049, and every word above applies to
+   * them without amendment.
+   *
+   * Inside or out, what water there is, whether anybody gets in. The founder
+   * asked for all three in one afternoon, and each one is a fact about the
+   * physical world she is standing in rather than a taste. They are here for
+   * the same reason `environment` is, and the temptation is sharper: a host who
+   * says "a pool, and yes, people will be in it" LOOKS like a host who should
+   * be shown Palm Springs, and shipping that instinct as a small positive
+   * weight is exactly the sin rule 2 names — "PREFERENCE-BY-SQUARE-FOOTAGE",
+   * "at any weight, including small ones that look like tie-breaks".
+   *
+   * The correct behaviour is the one that reads as under-using the answer: her
+   * eighteen destinations rank identically whether she has a pool or not, and
+   * the ONLY consequence of the answer is which objects can be sent to her.
+   * Havana in a Brooklyn apartment is the pitch; Palm Springs without a pool is
+   * the same pitch, and the room arrives with the things that work in her
+   * garden instead of the things that float.
+   *
+   * db/049 widens db/020's trigger so all four are refused on a world and on a
+   * cohort at the database, which is why this list cannot be quietly undone
+   * from the data side.
+   */
+  "indoor_outdoor",
+  "water_access",
+  "water_use",
+
+  /*
    * "WHAT DO YOU WANT MORE OF", WHICH IS AN EMPHASIS AND NOT A WEIGHT.
    *
    *   "Each answer points at a slot, and this question shouldn't feed the

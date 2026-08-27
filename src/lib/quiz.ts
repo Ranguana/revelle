@@ -73,8 +73,26 @@ import { TONE_GROUPS, TONES, type Tone } from "./voice.ts";
  * who had a table and chose the late one; against 2026-08-g it may be a
  * cocktail party that starts at eleven. Both resolve, and `quiz_version` on the
  * row says which question she was actually shown. See db/037.
+ *
+ * 2026-08-h asks THREE QUESTIONS ABOUT THE PHYSICAL WORLD she is standing in:
+ * whether the evening is inside, outside or both; what water the place has; and
+ * whether anybody is getting into it.
+ *
+ * Adding questions is additive and would not on its own force a bump. What
+ * forces it is the same thing that forced 2026-08-f: a response written against
+ * 2026-08-g has no `indoor_outdoor` and is NOT missing one. It was never asked,
+ * and everything downstream must read the absence as no-information rather than
+ * as "indoors, no water, nobody swimming" — which is the reading that would
+ * silently delete the outdoor half of the catalogue from every existing
+ * application. The absence is expressed as the absence of an affordance row
+ * (see `composeVenue` in src/lib/selection/venue.ts and db/049), so the older
+ * response keeps exactly the behaviour it had.
+ *
+ * NONE OF THE THREE IS A TASTE. They prune the pool at stage 3 and they never
+ * reach the destination ranking — the same wall `environment` stands behind,
+ * enforced in the same three places. See db/049.
  */
-export const QUIZ_VERSION = "2026-08-g";
+export const QUIZ_VERSION = "2026-08-h";
 
 export type QuizOption = {
   /** Permanent. Stored in the database. */
@@ -205,6 +223,277 @@ const ENVIRONMENTS: readonly QuizOption[] = [
   { code: "garden", label: "A garden" },
   { code: "restaurant_or_venue", label: "A restaurant or venue" },
   { code: "hotel", label: "A hotel" },
+  { code: "not_decided", label: "Still deciding" },
+];
+
+/**
+ * INSIDE OR OUT — the supply side of a gate that has existed since db/020 and
+ * has never once been asked about.
+ *
+ * THE PRIMARY ONE OF THE THREE, and the founder said so when she was asked how
+ * the water questions should sit together:
+ *
+ *     "regarding water — we need to know if an event is outdoors. It also helps
+ *      to know if by lake, pool, pond, on beach."
+ *
+ * NEED against HELPS, and the structure follows the distinction exactly. This
+ * question is UNCONDITIONAL and it is asked on the setting screen, beside the
+ * room, before any water question exists. It is not reachable through the water
+ * question and it is not gated on anything, because A HOST WITH NO WATER AT ALL
+ * STILL HAS TO STATE THAT HER PARTY IS OUTSIDE — that is the fact
+ * `requires_outdoors` has been waiting for since db/020, and hanging it off the
+ * water question would leave every waterless host unable to say it. That is the
+ * `meal_time` failure precisely: a gate at the question, deleting the answer for
+ * a whole class of host, which this quiz made once and removed (see START_HOURS
+ * below).
+ *
+ * The water detail is the secondary half, and "it also helps" is what licenses
+ * it to be a screen of its own after this one rather than a fact competing with
+ * this one for the same screen.
+ *
+ * `requires_outdoors` and `outdoor_access` are both `structural_requirement`
+ * codes, both consulted by `venueEligibility()` on every selection, and until
+ * this question the ONLY thing feeding either of them was `environment` — a
+ * room TYPE. db/035 said so itself, in the paragraph it closed with:
+ *
+ *     "The quiz asks WHERE, not WHAT IT HAS: 'A house', 'An apartment', 'A
+ *      hotel'. There is no option meaning 'any outdoor access at all, even
+ *      small', so a city apartment with a balcony and one without are the same
+ *      answer, and this grade can only ever prune at the granularity of a room
+ *      TYPE. That is a limit of what the member can report, not of this table —
+ *      THE FIX IS A QUIZ OPTION."
+ *
+ * This is that option. It is the fix db/035 named and left for somebody.
+ *
+ * ── WHY IT IS NOT THE ROOM QUESTION AGAIN ───────────────────────────
+ *
+ * `environment` names a PLACE and this names how much of the evening is under
+ * sky, and the two come apart in both directions. A house holds a party that
+ * never leaves the dining room. An apartment holds one that lives on the roof.
+ * Neither fact is recoverable from the other answer, which is the test
+ * `meal_time` failed for two migrations (see START_HOURS below) and the test
+ * this question is written to pass.
+ *
+ * HER ANSWER BEATS THE ROOM TYPE, and that is the whole mechanical point. See
+ * `composeVenue()` in src/lib/selection/venue.ts: where she has stated this,
+ * her statement supersedes db/020's type-level default for these two grades,
+ * because a host reporting her own party is better evidence than a row that
+ * knows only the word "apartment".
+ *
+ * ── THREE VALUES, AND THE FOURTH ONE ARGUED AND REFUSED ─────────────
+ *
+ * The tempting fourth is a split of `both` — "mostly inside, drinks on the
+ * stoop" against "mostly outside" — on the worry that a mostly-inside evening
+ * should not be sent a pétanque set.
+ *
+ * IT IS REFUSED, and the reason is that the requirement vocabulary ALREADY
+ * makes that distinction and asking her to make it again would be two
+ * vocabularies saying one thing in different words — the exact defect db/033 §2
+ * was written to repair. `requires_outdoors` means the thing cannot happen
+ * inside; `outdoor_access` is the lesser grade, a terrace, a stoop, a door to
+ * somewhere. A "both" evening has a door to somewhere by construction, and it
+ * can also host boules: she said part of it is outside. CLAUDE.md rule 2's door
+ * test settles it — CAN this physically happen here, not WOULD it suit a place
+ * like hers. Refusing an outdoor deliverable to a host who has told us her
+ * party is partly outdoors is preference-by-square-footage wearing a
+ * feasibility badge.
+ *
+ * FLAGGED FOR THE FOUNDER rather than settled by me: if she wants "both" split,
+ * it is one option and two `host_affordance` rows. The argument above is why it
+ * was not split on my authority.
+ *
+ * `not_decided` is a real answer and it means NO INFORMATION, never "indoor".
+ * It writes no affordance row at all, so the room type's own default stands and
+ * nothing new is pruned — the same shape db/020 gave `not_decided` on the room
+ * question, for the same reason.
+ */
+const INDOOR_OUTDOOR: readonly QuizOption[] = [
+  { code: "indoor", label: "Inside", hint: "Nothing happens out of doors" },
+  { code: "outdoor", label: "Outside", hint: "All of it, under sky" },
+  { code: "both", label: "Both", hint: "It moves between the two" },
+  { code: "not_decided", label: "Still deciding" },
+];
+
+/**
+ * IS THERE WATER — and the half of the question that presence does not answer.
+ *
+ * The founder: "we need to add a question to the quiz: is there a pool, lake,
+ * river lake?" and then, immediately, the harder half — "is it a swimmable lake
+ * or pond?"
+ *
+ * PRESENCE IS NOT USABILITY, and that is why the options are not her four nouns
+ * on their own. An ornamental pond, a fountain, a river that is cold and fast
+ * are all water, and nobody is getting into any of them. A float sent to a
+ * house with a duck pond is the same failure as a float sent to an apartment,
+ * and a vocabulary that only asked "is there water" would not be able to tell
+ * the two apart. So usability is carried IN THE VALUE rather than in a second
+ * conditional question — she picks the water she has, described the way she
+ * would describe it, and the answer is already precise enough to gate on.
+ *
+ * ── WHY THIS IS NOT A FACET, AT ANY WEIGHT ──────────────────────────
+ *
+ * CLAUDE.md rule 2, said the way rule 2 says it: this may ELIMINATE what cannot
+ * physically happen and it may NEVER RANK what can. A host with a pool is not
+ * nudged toward Palm Springs; a host with none is simply never offered a float.
+ * `water_access` joins `environment` in vector.ts's non-taste list, and db/049
+ * extends db/020's trigger so a destination or a cohort tagged with a water
+ * facet is REFUSED by the database rather than merely discouraged by a comment.
+ * The wall is three-deep for the room question and it is three-deep for this
+ * one, deliberately, because a new axis is exactly where the thesis gets
+ * eroded by somebody who means well.
+ *
+ * ── HER LIST, RECONCILED ────────────────────────────────────────────
+ *
+ * She named the water twice and the two lists differ:
+ *
+ *     "is there a pool, lake, river lake?"
+ *     "it also helps to know if by lake, pool, pond, on beach"
+ *
+ * The second adds `pond` and drops `river` and `ocean` from her phrasing. The
+ * options below are the UNION, and the union rather than the later list is a
+ * decision with a reason: dropping `river` and `sea` would leave a host on a
+ * river with nothing true to tap, and her only remaining answer would be "No
+ * water" — A FALSE FACT WRITTEN INTO A GATE, which is the one thing this axis
+ * must never collect. CLAUDE.md rule 3, from the quiz's side: absence of an
+ * option is not evidence of absence of water. They are kept, and what they
+ * afford is where her ruling does the work.
+ *
+ * `beach` is folded into `sea` rather than given a code of its own, because
+ * `beach` is already an `environment` value meaning WHERE THE PARTY IS HELD,
+ * and one word answering two questions in one quiz is the misreading rule 23 is
+ * about. The label carries her word; the code says which fact it is.
+ *
+ * ── THE FOUR BODIES ARE NOT INTERCHANGEABLE — THE FOUNDER'S RULING ──
+ *
+ *     "a pool float should only land if the quiz answer is 'has pool' or
+ *      'lake'"
+ *
+ * POOL AND LAKE YES, RIVER AND OCEAN NO, and the reason is physical rather than
+ * editorial: A FLOAT NEEDS STILL WATER. A river moves and takes it downstream;
+ * the sea has surf and takes it out. So the requirement db/049 mints is
+ * `requires_still_water`, named for what the object needs rather than for the
+ * room it suits — `requires_pool` would refuse a perfectly good lake, which is
+ * rule 2's forbidden door reached through a name.
+ *
+ * A POND AFFORDS IT TOO, and she did not say so. She named a pond in the second
+ * list and not in the float ruling, and the extension is made on the ruling's
+ * OWN REASON rather than by analogy: a pond is still water, a float sits on it,
+ * and the rule was never about the noun. `not_for_swimming` is there for the
+ * ornamental pond, so nothing is being assumed about a duck pond either.
+ *
+ * THIS IS WHY THE FOUR NOUNS SURVIVE AS FOUR VALUES rather than collapsing into
+ * one "is there water" boolean. A boolean cannot express her rule, and an item
+ * declaring "needs water" would land in a river. Each of the four is its own
+ * row in `host_affordance` with its own verdict and its own sentence, so the
+ * next requirement — swimming from a dock is a real thing a lake and a river
+ * disagree about differently than a float does — is an insert rather than a
+ * question re-asked of hosts who have already answered it.
+ *
+ * ── SINGLE-SELECT, WHICH WAS NOT THE FIRST ANSWER ───────────────────
+ *
+ * Multi looks obviously right: a house can have a pool and back onto a river,
+ * and forcing a choice between two true things is the kind of small lie that
+ * costs trust. It was built that way first and then cut.
+ *
+ * THE PRICE IS THE ARGUMENT. Multi needs `none` and `not_decided` to become
+ * mutually exclusive with the rest — a host cannot have no water AND a pool —
+ * which is validation machinery in this file, a deselect rule in the renderer,
+ * and a constraint in the bench's random host. Three surfaces of new machinery,
+ * bought for a case the gate resolves the same way either way: under her
+ * still-water rule a pool-and-river host is a pool host, because the pool is
+ * what the float lands in and the river changes no verdict beside it.
+ *
+ * WHAT WOULD REVERSE IT, written down so the reversal is an edit rather than a
+ * rediscovery: the day a requirement is afforded by a body she DID NOT name as
+ * her single answer — an item for moving water, wanted by the host who has both
+ * — this becomes multi and the two absent-cases become exclusive. Until then
+ * she names the water her party will actually use, which is the fact the gate
+ * reads.
+ *
+ * `not_decided` is NO INFORMATION and must never resolve to `none`. A host who
+ * has not answered is not a host without water: she writes no affordance row,
+ * so nothing is pruned and she may still receive the float. `none` writes a row
+ * saying false, and that is the difference between the two.
+ */
+const WATER_ACCESS: readonly QuizOption[] = [
+  { code: "pool", label: "A pool" },
+  { code: "lake", label: "A lake" },
+  { code: "pond", label: "A pond you can swim in" },
+  { code: "river", label: "A river" },
+  { code: "sea", label: "The sea, or a beach" },
+  {
+    code: "not_for_swimming",
+    label: "Water, but nobody is getting in",
+    hint: "An ornamental pond, a fountain, a river that is cold and fast",
+  },
+  { code: "none", label: "No water" },
+  { code: "not_decided", label: "Still deciding" },
+];
+
+/**
+ * AND WHETHER ANYBODY IS ACTUALLY GETTING IN.
+ *
+ * The founder's third question, and it is a separate fact rather than a finer
+ * grade of the second: "a host with a good pool having a long dinner does not
+ * want floats." The pool is real, it is swimmable, and the evening is a table.
+ * Presence and use are independently necessary, so they are asked independently
+ * and combined with AND at the point of use — an item that requires water needs
+ * BOTH a usable body of water AND a party that goes into it.
+ *
+ * ── IT DESCRIBES THE EVENING, WHICH IS WHY IT IS ALLOWED TO EXIST ───
+ *
+ * CLAUDE.md rule 1's test: a facet describes the EVENING, a property of her
+ * PEOPLE belongs to the tiles. "Will anyone swim" travels with the party, not
+ * with the guest list — the same six people have a swimming afternoon in July
+ * and a dinner in October. So it is a legitimate question about the evening.
+ *
+ * IT STILL DOES NOT RANK. Being allowed to be a facet is not being required to
+ * be one, and there is no `water` column in the matrix for it to sort on. A
+ * "yes, swimming" answer that lifted the pool rooms would be rule 2's forbidden
+ * door reached from a direction rule 2 did not anticipate — it would nudge her
+ * toward the rooms that suit her property. It prunes and nothing else.
+ *
+ * ── AND IT IS NOT `swim_late`, WHICH IS THE NEAR MISS ───────────────
+ *
+ * GROUP_FUN already offers "Swim long after dark", and the rule-21 question is
+ * whether two surfaces must agree about one fact. THEY MUST NOT: `swim_late` is
+ * one tile of fourteen under a cap of four, so a host who plans a whole
+ * afternoon in the pool and spends her four taps elsewhere has not said no to
+ * swimming — she has said four other things are more them. An answer under a
+ * cap cannot be read as a complete claim, and reading it as one would gate the
+ * floats on a tile she was rationing. Two questions, two facts, no duplication.
+ *
+ * ── NO `activeWhen`, AND IT WAS OFFERED ─────────────────────────────
+ *
+ * The founder's "it also helps to know" licenses a conditional on the water
+ * DETAIL, and the mechanism would work here with no new machinery at all —
+ * `water_access` is single-select, which is the only shape `isFieldActive`
+ * reads, so gating this field on it is one line. It is still not gated, and the
+ * reason is which half of her sentence this field belongs to.
+ *
+ * THIS IS NOT THE DETAIL. It is her own third question — "will there be water
+ * activities" — and it prunes INDEPENDENTLY of presence: a host with a perfectly
+ * good pool who is having a long dinner does not want floats, and that is a
+ * refusal no answer about what water exists can produce. A fact that prunes on
+ * its own is not a follow-up to another fact.
+ *
+ * And the cost of gating is the `meal_time` cost, which this quiz has already
+ * paid once: a host who answers "No water" would never state whether the
+ * evening involves swimming ANYWHERE, and the class of host who is later found
+ * to have needed it is always larger than it looked when the gate was written.
+ *
+ * The test the wording had to pass instead is the one the hour question passed
+ * — every option must be TRUE for every host who can be shown it — and "Nobody
+ * is getting in" is true, unstrained, of a host with no water at all. The tap
+ * costs her a second and buys a fact nothing else supplies.
+ *
+ * FLAGGED, because she licensed the other choice: if the extra tap is not worth
+ * it, `activeWhen: { field: "water_access", is: [...] }` on the field below is
+ * the whole change, and `fieldsInvalidatedBy` already clears a stale answer.
+ */
+const WATER_USE: readonly QuizOption[] = [
+  { code: "in_the_water", label: "People will be in the water" },
+  { code: "beside_it", label: "Nobody is getting in" },
   { code: "not_decided", label: "Still deciding" },
 ];
 
@@ -741,12 +1030,61 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
       },
     ],
   },
+  // TWO FIELDS, AND THEY ARE ONE QUESTION IN TWO HALVES — the standard the
+  // `when` screen set (the month and the hour are both "when") and the contrast
+  // screen before it. The place and how much of it is under sky are both
+  // "where", and splitting them would make the shorter of the two a whole
+  // screen asking whether a party is indoors.
+  //
+  // The order within the screen is the order of the sentence: the room first,
+  // then what is done with it. `indoor_outdoor` is second because it reads as a
+  // qualification of the answer above it, which is what it is.
   {
     key: "environment",
     eyebrow: "The setting",
     title: "Where does it happen?",
     help: "If it is not settled, say so — it changes what we send.",
-    fields: [{ id: "environment", type: "single", options: ENVIRONMENTS }],
+    fields: [
+      { id: "environment", type: "single", label: "The place", options: ENVIRONMENTS },
+      {
+        id: "indoor_outdoor",
+        type: "single",
+        label: "Inside or out",
+        options: INDOOR_OUTDOOR,
+      },
+    ],
+  },
+  // AFTER the setting screen, and that order is the founder's: "we need to know
+  // if an event is outdoors. It also helps to know if by lake, pool, pond, on
+  // beach." The necessary question is answered on the screen before this one,
+  // unconditionally; this screen is the "also helps".
+  //
+  // Straight after the room and before the food, because it is the last fact
+  // about the PLACE and the screen after it moves to what is on the table.
+  //
+  // NOT a third field on the screen above. The room and inside-or-out are one
+  // question about where she will be standing; whether the property has water
+  // is a different subject, and three option grids on one screen is more than
+  // this quiz has ever asked of a host — the two-field screens are two halves,
+  // never three thirds.
+  //
+  // ITS OWN TWO FIELDS ARE two halves, by that same test: what water there is
+  // and whether anybody goes in are one question, and an item that requires
+  // water needs both answers to say yes. Asking them on separate screens would
+  // make the second read as a new subject when it is the completion of the
+  // first.
+  //
+  // Before anything about taste, with the other facts. This describes the
+  // evening; the direction, the voice and the line describe how it should feel.
+  {
+    key: "water",
+    eyebrow: "The water",
+    title: "Is there water?",
+    help: "A pool, a lake, the sea. If nobody is getting in, say so — it changes what we send.",
+    fields: [
+      { id: "water_access", type: "single", label: "What there is", options: WATER_ACCESS },
+      { id: "water_use", type: "single", label: "Whether anyone gets in", options: WATER_USE },
+    ],
   },
   // Straight after the room, because it is the same subject: what the room is
   // for. And before anything about taste, because two of its answers remove a

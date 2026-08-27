@@ -57,7 +57,161 @@
  */
 
 import type { EligibilityVerdict } from "./occasion.ts";
-import type { Ingredient, Venue } from "./types.ts";
+import type { HostAffordance, Ingredient, Venue, VenueAnswers } from "./types.ts";
+
+/**
+ * ── THE ROOM IS NO LONGER THE ONLY THING SHE CAN REPORT — db/049 ─────
+ *
+ * Everything above this line was written when `environment` was the whole of
+ * what the application knew about the physical world, and db/035 closed by
+ * naming the limit that created:
+ *
+ *     "The quiz asks WHERE, not WHAT IT HAS … a city apartment with a balcony
+ *      and one without are the same answer, and this grade can only ever prune
+ *      at the granularity of a room TYPE. That is a limit of what the member
+ *      can report, not of this table — THE FIX IS A QUIZ OPTION."
+ *
+ * There are now three more answers — inside or out, what water there is,
+ * whether anybody is getting in — and `composeVenue` below is the single place
+ * that turns four answers into one room's affordances.
+ *
+ * ── ONE AUTHORITY, AND THE REASON IS RULE 21'S NARROW TEST ───────────
+ *
+ * MUST TWO SURFACES AGREE ABOUT THIS? Yes, and not optionally: the engine's
+ * loader (`loadVenue` in catalogue.ts) and the gate reporter (`gateReport` in
+ * catalogue/gates.ts) both have to say the same thing about what a host's
+ * answers afford, or `check:gates` reports a prune count for a rule the engine
+ * does not run. So the rule lives here, exported, and both of them call it. The
+ * guard for it goes THROUGH the consumers — see gates.db.test.ts, which drives
+ * the loader and the reporter over the same seeded host and compares verdicts,
+ * rather than calling this function twice and comparing it to itself.
+ *
+ * ── THE COMPOSITION RULE, WHICH IS NOT BOOLEAN ALGEBRA ───────────────
+ *
+ *   HER OWN STATEMENT SUPERSEDES THE ROOM TYPE. Where any host answer speaks to
+ *   a requirement, the room type is not consulted for that requirement at all.
+ *   Where none speaks to it, db/020's and db/035's rows stand untouched.
+ *
+ *   AMONG HOST ANSWERS, FALSE WINS. Two axes speak to `requires_still_water`
+ *   and both must say yes.
+ *
+ *   AN ANSWER WITH NO ROW SAYS NOTHING. That is "Still deciding", and it is
+ *   also every response written before db/049 — a null column produces no
+ *   claim, so an older application keeps precisely the behaviour it had.
+ *
+ * Neither pure AND nor pure OR over all four sources is right, and it is worth
+ * one paragraph on why, because both look plausible and both are wrong in a
+ * direction that reaches a member.
+ *
+ * AND-ING EVERYTHING breaks the apartment-with-a-roof-deck. db/020 says an
+ * apartment has no outdoors; she says her party is outside; AND refuses her the
+ * pétanque set. Her answer was absorbed and not honoured (rule 16), and the
+ * refusal is preference-by-square-footage wearing feasibility's badge — the
+ * room type was a GUESS ABOUT A BUILDING and she has just reported the fact.
+ *
+ * OR-ING EVERYTHING breaks the house-that-stays-indoors. The room affords
+ * outdoors, the evening does not use it, and OR sends the clambake to a dinner
+ * party in a dining room — ignoring the one answer that was about this party.
+ *
+ * So: the more specific source wins, and it wins by REPLACING rather than by
+ * combining. Rule 21 again, from its other end — a fact with two owners drifts,
+ * and the drift here is silent and specific.
+ */
+
+/** What one environment row of `venue_affordance_labelled` carries. */
+export type EnvironmentAffordance = {
+  readonly requirement: string;
+  readonly provided: boolean;
+  readonly note: string;
+};
+
+/**
+ * WHICH HOST ANSWERS SPEAK — the one place the four answers are read as a list.
+ *
+ * Rule 19's shape rather than a hand-written list of fields: the pairs come out
+ * of `VenueAnswers` by name, so adding a fifth venue axis means adding it to
+ * the type and to db/049's trigger list, and this function does not change.
+ * `environment` is deliberately NOT among them — it is the base, not an
+ * overlay, and putting it here would make it supersede itself.
+ */
+export function statedAnswers(
+  answers: VenueAnswers
+): readonly { quizField: string; optionCode: string }[] {
+  const pairs: { quizField: string; optionCode: string }[] = [];
+  const push = (quizField: string, optionCode: string | null) => {
+    // A null column is a question she was never asked; an empty string is a
+    // half-written row. Neither is an answer, and neither may prune.
+    if (typeof optionCode === "string" && optionCode.length > 0) {
+      pairs.push({ quizField, optionCode });
+    }
+  };
+  push("indoor_outdoor", answers.indoorOutdoor);
+  push("water_access", answers.waterAccess);
+  push("water_use", answers.waterUse);
+  return pairs;
+}
+
+/**
+ * FOUR ANSWERS, ONE ROOM. The rule above, executed.
+ *
+ * `hostClaims` must already be scoped to the answers she actually gave —
+ * `statedAnswers` says which those are, and the loader's query filters on them.
+ * Passing the whole table would mean every host afforded everything, which is
+ * the failure mode this function is least able to notice on its own.
+ */
+export function composeVenue(input: {
+  readonly environment: string;
+  readonly label: string;
+  readonly environmentRows: readonly EnvironmentAffordance[];
+  readonly hostClaims: readonly HostAffordance[];
+}): Venue {
+  const provides: Record<string, boolean> = {};
+  const notes: Record<string, string> = {};
+  const refusedBy: Record<string, string> = {};
+
+  for (const row of input.environmentRows) {
+    provides[row.requirement] = row.provided;
+    if (row.note.length > 0) notes[row.requirement] = row.note;
+    if (!row.provided) refusedBy[row.requirement] = "environment";
+  }
+
+  // The overlay. Grouped first so that "some host answer spoke" and "every host
+  // answer that spoke said yes" are two separate questions — collapsing them
+  // into one pass would let a single `true` claim erase a `false` one from
+  // another axis depending on row order, which is the kind of bug that only
+  // shows up when somebody adds an `order by`.
+  const byRequirement = new Map<string, HostAffordance[]>();
+  for (const claim of input.hostClaims) {
+    const list = byRequirement.get(claim.requirement) ?? [];
+    list.push(claim);
+    byRequirement.set(claim.requirement, list);
+  }
+
+  for (const [requirement, claims] of byRequirement) {
+    const refusal = claims.find((claim) => !claim.provided);
+
+    // REPLACE, never combine. Her statement supersedes the room type — see the
+    // two worked failures in the header.
+    provides[requirement] = refusal === undefined;
+
+    if (refusal === undefined) {
+      delete notes[requirement];
+      delete refusedBy[requirement];
+      continue;
+    }
+    refusedBy[requirement] = refusal.quizField;
+    if (refusal.note.length > 0) notes[requirement] = refusal.note;
+    else delete notes[requirement];
+  }
+
+  return {
+    environment: input.environment,
+    label: input.label,
+    provides,
+    notes,
+    refusedBy,
+  };
+}
 
 /**
  * May this ingredient be placed in this room?
@@ -93,12 +247,27 @@ export function venueEligibility(
   const first = unmet[0];
   const clause = venue.notes[first.code];
 
+  // WHERE THE SENTENCE PUTS THE BLAME — db/049.
+  //
+  // "impossible in a house" was always true while the room was the only thing
+  // that could refuse anything. It is now sometimes a lie that costs a curator
+  // an afternoon: a float refused because she has no pool has nothing to do
+  // with her house, and a gap sentence blaming the house sends whoever reads it
+  // to author an indoor variant of a thing that needed a pool.
+  //
+  // Untagged provenance falls back to the room, which is correct for every
+  // refusal that existed before today and for every hand-built Venue in a test.
+  const source = venue.refusedBy?.[first.code] ?? "environment";
+  const where =
+    source === "environment"
+      ? `in ${venue.label.toLowerCase()}`
+      : `at this party`;
+
   return {
     eligible: false,
     reason:
-      `impossible in ${venue.label.toLowerCase()}: it ${joinWords(
-        unmet.map((r) => r.demand)
-      )}` + (clause ? ` — ${clause}` : ``),
+      `impossible ${where}: it ${joinWords(unmet.map((r) => r.demand))}` +
+      (clause ? ` — ${clause}` : ``),
   };
 }
 

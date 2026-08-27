@@ -169,7 +169,9 @@ export async function POST(request: Request): Promise<Response> {
            voice_tones,
            secret, guest_count_band, spend_per_person, music_service,
            food_plan, play_appetite, how_made,
-           event_month, meal_time
+           event_month, meal_time,
+           how_it_ends,
+           indoor_outdoor, water_access, water_use
          ) values (
            $1, $2::jsonb, $3, $4,
            $5::occasion_type, $6, $7::environment_type,
@@ -178,7 +180,9 @@ export async function POST(request: Request): Promise<Response> {
            $13, $14::guest_count_band, $15::spend_per_person_band,
            $16::soundtrack_delivery,
            $17::food_plan, $18::play_appetite, $19::making_level,
-           $20::event_month, $21::meal_shape
+           $20::event_month, $21::meal_shape,
+           $22::evening_ending,
+           $23::indoor_outdoor, $24::water_access, $25::water_use
          )
          returning id`,
         [
@@ -231,6 +235,37 @@ export async function POST(request: Request): Promise<Response> {
           isFieldActive(FIELDS.meal_time, answers)
             ? trimmed(answers.meal_time)
             : null,
+          // ── db/037's COLUMN, WHICH THIS ROUTE HAS NEVER WRITTEN ────────
+          //
+          // Found while adding the three below, and it is CLAUDE.md rule 16 in
+          // its purest form: db/037 added `how_it_ends`, added the enum, added
+          // the facet dimension, added the bridge and added the question — and
+          // the column list here was not touched, so every host since has
+          // answered "how does it end?", watched the answer be accepted, and
+          // had it stored ONLY inside the `answers` jsonb where nothing reads
+          // it. `quiz_response_facet` projects the COLUMN, so her ending
+          // resolved to no facet, and `structure.ts` ranked all eighteen rooms
+          // on `ending` against a default. That is the same DEFAULT-ONLY
+          // failure db/037 was written to fix, reintroduced by the one file it
+          // forgot.
+          //
+          // Fixed here rather than filed, because it is one line and because
+          // leaving it while adding three columns beside it would mean shipping
+          // the identical defect knowingly. The three-place rule for a new quiz
+          // answer is: the column (a migration), the projection (the view), and
+          // THIS LIST. Two of the three are easy to remember.
+          answers.how_it_ends,
+          // ── db/049. THE PHYSICAL WORLD ────────────────────────────────
+          //
+          // All three unconditional, so `isFieldActive` is not consulted: none
+          // of them carries an `activeWhen`, and asking would imply they might.
+          // Each is required, so a submission that reached this line has all
+          // three, and a null in these columns can only ever mean a response
+          // written before 2026-08-h — which is exactly what composeVenue()
+          // reads as "she was never asked".
+          answers.indoor_outdoor,
+          answers.water_access,
+          answers.water_use,
         ]
       );
 

@@ -119,6 +119,41 @@ console.log(
     `requirement of their own (db/033 §4).`
 );
 
+// CLAUDE.md rule 24, and it is printed every run rather than on suspicion: a
+// tagger that matched 9 of 152 is not a tagger that worked, and the only way to
+// know which happened is to see the rows.
+console.log(`\n[tag-catalogue] WHAT THE CLAUSE MATCHER TOOK, BY NAME`);
+if (report.venue.matched.length === 0) {
+  console.log(
+    `  NOTHING. No bank clause names a structural_requirement, which is either ` +
+      `an\n  authoring absence or a matcher that has stopped matching — and the ` +
+      `two read\n  identically from here. docs/atmosphere-idea-bank-v1.md ` +
+      `carries at least two\n  ("pétanque set (requires_outdoors…)", "SPARKLER ` +
+      `KIT — … outdoor_access tag"), so\n  zero is a REGRESSION rather than a ` +
+      `gap.`
+  );
+} else {
+  for (const row of report.venue.matched) {
+    console.log(`  ${row.requirement.padEnd(22)} ${row.name}`);
+  }
+}
+
+console.log(
+  `\n[tag-catalogue] WHAT IT DELIBERATELY DID NOT TAKE — ` +
+    `${report.venue.nearMisses.length} near miss(es)`
+);
+console.log(
+  `  Bank rows whose text says float, swim, pool or water and which carry NO\n` +
+    `  requirement. A looser predicate would have taken every one of these. ` +
+    `Tahiti's\n  "hibiscus floated in water" is a BOWL, and tagging it would ` +
+    `tell a host with no\n  swimming pool she cannot have flowers. Read the ` +
+    `list; if a row here genuinely\n  needs the tag, the fix is one word in the ` +
+    `clause, not a wider matcher.`
+);
+for (const row of report.venue.nearMisses) {
+  console.log(`    ${row.name}\n        ${row.excerpt}`);
+}
+
 console.log(`\n[tag-catalogue] WHETHER A DRINK'S SEASON IS A GATE OR A LEAN`);
 console.log(
   `  ${report.season.examined} examined · ${report.season.gated} gated this ` +

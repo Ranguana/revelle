@@ -52,6 +52,7 @@ import test, { after, before } from "node:test";
 
 import pg from "pg";
 
+import { loadCatalogue } from "../selection/catalogue.ts";
 import { gateReport, inertGates, type GateReport } from "./gates.ts";
 
 const URL = process.env.REVELLE_TEST_DATABASE_URL;
@@ -140,6 +141,133 @@ test("the venue gate refuses something, somewhere in the catalogue", { skip }, (
       `rows the engine cannot see (a retired or draft pool), or every room ` +
       `affords everything. Full and inert is the failure that reads exactly ` +
       `like empty and inert.`
+  );
+});
+
+/* ═══ db/049 — THE THREE NEW VENUE ANSWERS ════════════════════════════ */
+
+/**
+ * RULE 21's GUARD, AND IT GOES THROUGH THE CONSUMERS.
+ *
+ * The founder, on the shape a unification test has to take: "it must exercise
+ * both callers end to end — not call the shared function twice and compare it
+ * to itself. A test that cannot fail is worse than no test."
+ *
+ * `composeVenue()` has two consumers that must agree about what a host's
+ * answers afford: the ENGINE's loader, which builds one Venue for one
+ * application, and the REPORTER's enumerator, which builds every one of them.
+ * Nothing
+ * below calls `composeVenue`. One side calls `loadCatalogue` — the function
+ * `loadSelectionInput` calls on every real run — and the other reads
+ * `gateReport`'s own numbers. A future edit that gives either path its own
+ * composition rule turns this red.
+ *
+ * The host chosen is the founder's own case, because it is the one where a
+ * naive AND and a naive OR give different answers: a POOL, at a party where
+ * NOBODY IS GETTING IN. Presence says yes, use says no, and the answer is no.
+ */
+test("the engine and the reporter agree about one host's affordances", { skip }, async () => {
+  const catalogue = await loadCatalogue(client!, "girls_weekend", {
+    environment: "my_home",
+    indoorOutdoor: "outdoor",
+    waterAccess: "pool",
+    waterUse: "beside_it",
+  });
+
+  const venue = catalogue.venue;
+  assert.ok(venue, "loadVenue returned nothing for a real environment");
+
+  assert.equal(
+    venue!.provides.requires_still_water,
+    false,
+    "a good pool at a party nobody swims at affords no float. Among host " +
+      "answers, false wins — see composeVenue()."
+  );
+  assert.equal(
+    venue!.provides.requires_outdoors,
+    true,
+    "and her own statement that the party is outside stands"
+  );
+
+  // The reporter's side: this exact configuration is one of the ones it
+  // enumerates, so the requirement's supply count must be strictly between
+  // nobody and everybody — some host affords a float and some host does not.
+  const water = report!.requirements.find((r) => r.code === "requires_still_water");
+  assert.ok(water, "requires_still_water is not in structural_requirement");
+  assert.ok(
+    water!.affordedBy > 0 && water!.affordedBy < report!.configurations,
+    `requires_still_water is afforded by ${water!.affordedBy} of ` +
+      `${report!.configurations} host configurations. Zero means no host can ` +
+      `ever receive a float; all of them means the gate cannot fire. Both are ` +
+      `the same screen from outside, which is why this counts in two directions.`
+  );
+});
+
+/**
+ * THE SUPPLY SIDE IS COMPLETE EVEN WHERE THE DEMAND SIDE IS NOT.
+ *
+ * db/049 ships the affordance matrix before any row claims `requires_still_water`
+ * — the striped floats are authored in docs/cote-dazur-additions.md and reach
+ * the bank when that clause is written into the idea bank. That is an AUTHORING
+ * absence and `inertGates()` deliberately does not file it as a wiring bug.
+ *
+ * What must still be true, and is asserted rather than assumed, is that the
+ * plumbing is finished: some answers afford it and some refuse it. If this goes
+ * red, the day the float lands it will land everywhere or nowhere.
+ */
+test("every venue requirement is refused by some answer and afforded by others", { skip }, () => {
+  for (const reach of report!.requirements) {
+    assert.ok(
+      reach.affordedBy > 0,
+      `${reach.code} is afforded by NO host configuration. Any row carrying ` +
+        `it would be undeliverable to everybody — the member-facing half of ` +
+        `CLAUDE.md rule 24.`
+    );
+    assert.ok(
+      reach.affordedBy < report!.configurations,
+      `${reach.code} is afforded by every one of the ` +
+        `${report!.configurations} host configurations, so no answer she can ` +
+        `give refuses it. That is db/035's "grade wearing a column", and it is ` +
+        `invisible from outside.`
+    );
+  }
+});
+
+test("no row in the catalogue is undeliverable to every host", { skip }, () => {
+  assert.deepEqual(
+    report!.unreachable,
+    [],
+    "these rows claim a requirement no host configuration affords. They are " +
+      "in the catalogue, they are active, and nobody can ever receive them."
+  );
+});
+
+/**
+ * THE OUTDOOR GATE, WHICH IS THE HALF THAT HAS BEEN INERT SINCE db/033.
+ *
+ * `outdoor_access` was minted by db/033 and given its affordance matrix by
+ * db/035, which named the one item that would carry it — Acapulco's sparkler
+ * kit — and no code path has ever written the claim: seed-bank parses the tag
+ * out of the clause and discards it, and db/033 dropped the column that used to
+ * hold it. db/049's clause matcher in ./tagging.ts is the first thing that
+ * writes it. If this is zero, that matcher has stopped matching.
+ */
+test("the bank clause matcher tagged the rows that name their own requirement", { skip }, () => {
+  const outdoors = report!.requirements.find((r) => r.code === "requires_outdoors");
+  const access = report!.requirements.find((r) => r.code === "outdoor_access");
+  assert.ok(
+    (outdoors?.claimed ?? 0) > 0,
+    "nothing in the catalogue requires outdoors, which cannot be right: " +
+      "docs/menus.md's clambake and every grilled menu do."
+  );
+  assert.ok(
+    (access?.claimed ?? 0) > 0,
+    "`outdoor_access` is claimed by nothing. docs/atmosphere-idea-bank-v1.md " +
+      "writes 'outdoor_access tag' into the sparkler kit's clause and " +
+      "'requires_outdoors' into the pétanque set's, and bank_item.description " +
+      "is the clause verbatim — so zero means the clause matcher in " +
+      "./tagging.ts is no longer finding text that is definitely there. " +
+      "`npm run tag:catalogue` prints what it took, by name."
   );
 });
 
