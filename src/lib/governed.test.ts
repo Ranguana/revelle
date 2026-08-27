@@ -52,9 +52,29 @@ const SEEDERS = [
 
 test("no seeder gives a governed class a live status", () => {
   const root = new URL("../../", import.meta.url).pathname;
+  // ONE EXEMPTION, and it is guarded by the property that justifies it.
+  //
+  // `seed-fixtures.mjs` publishes the worlds it invents, which is correct: it
+  // builds throwaway rows for a bench, not catalogue a member can reach. The
+  // exemption is safe ONLY while that seeder stays out of the deploy chain, so
+  // that is asserted rather than assumed — the day somebody adds it to
+  // `preDeployCommand`, this test fails and the exemption stops applying
+  // instead of quietly covering a real offence.
+  const EXEMPT = new Set(["seed-fixtures"]);
+  const chain = readFileSync(`${root}render.yaml`, "utf8");
+  for (const name of EXEMPT) {
+    assert.ok(
+      !new RegExp(`\\bseed:${name.replace(/^seed-/, "")}\\b`).test(chain),
+      `${name} is exempt from the governed-class rule because it seeds a ` +
+        `bench and never a member's catalogue. It is now in the deploy chain, ` +
+        `so the exemption no longer holds — remove it from the chain or from EXEMPT.`
+    );
+  }
+
   const offences: string[] = [];
 
   for (const name of SEEDERS) {
+    if (EXEMPT.has(name)) continue;
     let src: string;
     try {
       src = readFileSync(`${root}scripts/${name}.mjs`, "utf8");
@@ -65,13 +85,34 @@ test("no seeder gives a governed class a live status", () => {
     const code = src.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
 
     for (const table of GOVERNED) {
-      // `update world set ... status = 'published'`, in any order, across lines.
-      const re = new RegExp(
+      // TWO SHAPES, because the first one alone missed a live offence for as
+      // long as this test has existed. `seed-destinations.mjs` writes
+      //
+      //   insert into world_voice (world_id, voice, status, ...)
+      //   values ($1, $2::jsonb, 'published', ...)
+      //
+      // — the status is POSITIONAL, in a VALUES list, and never appears as
+      // `status = '...'`. The assignment regex below could not see it, so a
+      // governed class published itself on every deploy while this test stayed
+      // green. CLAUDE.md rule 24: the guard was verified by reading it, not by
+      // counting what it caught.
+      const shapes = [
+        // `update world set ... status = 'published'`, in any order, across lines.
         `(?:update|into)\\s+${table}\\b[\\s\\S]{0,400}?status\\s*=\\s*'(${LIVE.join("|")})'`,
-        "i"
-      );
-      const m = re.exec(code);
-      if (m) offences.push(`${name}.mjs sets ${table}.status = '${m[1]}'`);
+        // `insert into world_voice (..., status, ...) values (..., 'published', ...)`
+        // — a column list naming `status` and a live literal anywhere in the
+        // statement that follows. Deliberately loose: a false positive here is
+        // a seeder author writing one comment, and a false negative is a voice
+        // reaching a member unsigned.
+        `into\\s+${table}\\s*\\([^)]*\\bstatus\\b[^)]*\\)[\\s\\S]{0,400}?'(${LIVE.join("|")})'`,
+      ];
+      for (const shape of shapes) {
+        const m = new RegExp(shape, "i").exec(code);
+        if (m) {
+          offences.push(`${name}.mjs writes ${table}.status = '${m[1]}'`);
+          break;
+        }
+      }
     }
   }
 

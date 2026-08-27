@@ -244,12 +244,30 @@ try {
       continue;
     }
 
-    // No version passed: the database numbers it. Inserted straight into
-    // 'published', which validates the shape and supersedes the previous
-    // version in the same statement.
+    // A DRAFT. The superseded reasoning, kept per CLAUDE.md rule 14 because it
+    // was a real argument and not an oversight:
+    //
+    //   "No version passed: the database numbers it. Inserted straight into
+    //    'published', which validates the shape and supersedes the previous
+    //    version in the same statement."
+    //
+    // True, and beside the point. `world_voice` is a GOVERNED class under rule
+    // 13 — a claim about how the house SPEAKS — and a script may not sign one.
+    // This line published a voice on every deploy, for every room, unread. It
+    // survived because `src/lib/governed.test.ts` matched only the shape
+    // `status = 'published'` and this writes the value POSITIONALLY in a
+    // VALUES list, so the guard built to catch exactly this could not see it
+    // (rule 24: the guard was verified by reading, not by counting what it
+    // caught). The guard is now widened and this is the offence it found.
+    //
+    // The convenience the old comment names is real and is not lost: the desk
+    // still validates the shape and supersedes the previous version on the
+    // transition into 'published' (destinations/actions.ts). What changes is
+    // WHO makes that transition — a person, at /desk/destinations/<id>/voice,
+    // which is the whole of rule 13.
     const { rows: inserted } = await client.query(
       `insert into world_voice (world_id, voice, status, authored_by, note)
-       values ($1, $2::jsonb, 'published', $3, $4)
+       values ($1, $2::jsonb, 'draft', $3, $4)
        returning id, version`,
       [
         worldId,
