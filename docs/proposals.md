@@ -1401,6 +1401,15 @@ and Acapulco. **That is an absence of authoring, not a property of the room.**
 
 ## RULINGS OWED — two rooms contradict themselves
 
+> **WITHDRAWN 2026-08-27, NOT ANSWERED — see the pass at the end of this file.**
+> Neither was a contradiction for her to settle. CLAUDE.md rule 29 was written
+> for exactly this: `GAMES: none` is a stale document line and not a ruling, a
+> room whose document and whose voice disagree resolves toward **having** the
+> game, and it does not get asked a third time. Both rooms are now rows —
+> `tahiti-the-last-night` and `acapulco-the-last-song`. Kept whole per rule 14
+> because the instinct to stop and ask was not wrong; what beat it is a
+> standing ruling the section did not have.
+
 Only the founder can settle these. The voice record and the bank record
 disagree and nothing has been changed in either direction.
 
@@ -1448,6 +1457,12 @@ because `ingredient_supplies` is empty on every database the committed chain
 builds (db/044) — no pool has tagged its rows yet.
 
 ### The `game` table is still Westhampton's alone
+
+> **CLOSED 2026-08-27 — see the pass at the end of this file.** Twenty room
+> games are authored in `src/lib/games.ts`, each `native` to its own room, so
+> all eighteen authored rooms now have a game written for them. The seven
+> original rows were **not** rescoped and stay playable everywhere, which is
+> what their affinities always meant.
 
 All of its rows are scoped to `westhampton-1976`, so **seventeen rooms have no
 eligible game-table row.** This work does not change that and does not claim
@@ -1716,3 +1731,283 @@ the ones the cap is actually waiting on.
   more rooms than this one.
 - **Unchanged and still owed: Acapulco's food** (zero dishes, deliberately
   absent from `PER_DESTINATION`) and **Oaxaca's everything-but-the-mole.**
+
+---
+
+# 2026-08-27 — The twenty become rows, and `GAMES: none` stops being asked
+
+**Landed.** `src/lib/games.ts` now holds **27 games**: the original seven, and
+**twenty room games**, one for every `piece: "game_rule"` the founder wrote in
+`src/lib/destinations.ts` — one per room, two each at Amalfi and Aspen. The
+migration is `db/050`. The count is asserted in both directions in
+`src/lib/games.test.ts` and it is twenty, not nineteen.
+
+## There was nothing to adjudicate, and that is the ruling
+
+CLAUDE.md rule 29, founder, twice: *"lets not make a blanket rule that a room
+is gameless"*, then *"i told you that they can have games."*
+
+The two entries filed above under **RULINGS OWED — two rooms contradict
+themselves** are **withdrawn, not answered.** They were never a contradiction
+for her to settle. `docs/atmosphere-idea-bank-v1.md`'s `GAMES: none` lines at
+Tahiti and Acapulco are **stale document lines**; both rooms carry a game in
+their own voice, and rule 29 says a room whose document and whose voice
+disagree resolves toward **having** the game. Both are now rows:
+
+- **TAHITI** — `tahiti-the-last-night`
+- **ACAPULCO** — `acapulco-the-last-song`
+
+`none` still writes no row, no column and no negative claim. `db/050` moves
+that sentence onto the **`game` table's own comment**, where db/048 had put the
+bank half of it on `bank_kind` — the right sentence on the wrong table for the
+question that kept being asked, which is rule 20's second half arriving inside
+this repo's own discipline.
+
+## The twenty, per room
+
+Her sentence is the rule and it is **verbatim**, quoted whole in each row's
+`notes` under the fixed heading `HER RULE, VERBATIM:` and printed on the game's
+own rules card. Everything else — shape, bounds, host role, supplies,
+requirements, printed matter, runbook, contingencies — is **authored here** and
+marked `AUTHORED HERE:` in the same field, so what she may cut is separable
+from what she wrote without anybody guessing.
+
+| room | game | shape | what the house added on top of her sentence |
+|---|---|---|---|
+| Westhampton | The Houseguest List | ambient | the pad kept out of the room, the closing before the last dinner, one name read at the end |
+| Havana | The Song That Gets You Up | scheduled 30–45 | the slip carrying a NAME beside the song, the bowl, the ban on introducing a song before it plays |
+| Vegas | The Late Supper | scheduled 60–90 | counters in place of money, the figure said out loud first, **the signed card** |
+| New York | The List | finale 10–20 | anonymity, tearing rather than burning, reading every slip including the flat ones |
+| Nantucket | What The Weather Will Do | ambient | the written card under something heavy, the room settling it by argument — **HELD, see below** |
+| New Orleans | Nobody Finishes Their Own | scheduled 25–40 | the minute, one sentence of correction at the end |
+| Catskills | The Swim Test | scheduled 20–35 | the ledger as a real object on the table, the show of hands, no voting for your own |
+| Côte d'Azur | One Of Them Is Lying | scheduled 25–40 | the marked card drawn at random, simultaneous pointing, no questions during the round |
+| Portofino | The Boat Count | ambient | the slip kept in a pocket, the count settled by whoever walks in front |
+| Dolomites | The Temperature At The Top | ambient | the unit agreed before anybody writes, the map as a real privilege |
+| Big Sur | The Long Way | scheduled 40–60 | the circle, the bowl for phones, the room rather than the host enforcing no-hurrying |
+| Tahiti | The Last Night | scheduled 10–20 | going round rather than volunteering, more than one person able to lose, writing the answers down |
+| Acapulco | The Last Song | finale 10–20 | **the card by the speaker** that makes the forfeit checkable, the room choosing from what survives |
+| Amalfi | The Numbers, After Dark | scheduled 45–75 | the line / two lines / full card ladder, **the bag passing on a win** |
+| Amalfi | The Five Prizes | finale 15–30 | the dependency on the numbers, prizes visible from the start |
+| Aspen | Somebody's Voice | scheduled 15–25 | voices drawn only from what is already on, one line each |
+| Aspen | The Next Line | ambient | the forfeit paid immediately rather than tallied, bread in the freezer first |
+| Palm Springs | The Best Line | finale 10–20 | **no vote** — her sentence names no winner and a ranking makes somebody last |
+| Oaxaca | Correct The Year | scheduled 25–40 | the correction restricted to the YEAR, the argument finishing before the story goes on |
+| St. Moritz | Before The Light Goes | scheduled 10–20 | **nobody is paid none** — she guarantees everybody gives one and says nothing about receiving |
+
+**Twenty written, twenty scoped, eighteen rooms covered.** Nothing was skipped
+and nothing was rounded.
+
+## `native`, and the defect it surfaced in the seeder
+
+Each of the twenty claims `native: true` on its own room and nothing else,
+because rule 23 says `native` is a **whitelist** and `affinity` is a weight
+that says nothing about eligibility. A game written in one room's voice is the
+whitelist case exactly.
+
+**The seven original games are not rescoped.** They carry affinities to
+`westhampton-1976` and no native claim, so they stay playable everywhere, and
+`src/lib/games.test.ts` now fails if anybody gives one of them a native room.
+
+**THE DEFECT THIS SURFACED, AND IT WOULD HAVE SHIPPED SILENTLY.**
+`scripts/seed-games.mjs` skipped a world scope whose destination did not exist
+and logged one line. That is correct for `forbidden` and for `affinity`, both
+of which mean nothing when the world is absent. **It is not correct for
+`native`, and `native` did not exist on any game when it was written.** A
+skipped native claim does not fail safe — it **inverts**: the row lands with no
+world claim at all, no claim means eligible everywhere, and a game written for
+one room is offered in eighteen with nothing anywhere saying so. Rule 16's
+exact shape.
+
+The seeder now resolves every world **before** the insert loop and creates such
+a game as a **draft**, with its own message. Rule 16 gives three options —
+honour it, refuse it, drop it visibly. Honouring is impossible (no world to
+point at); refusing would fail every fresh deploy; dropping it visibly is what
+is left, and a draft is how this system says a row is not offered.
+
+## Games go LIVE, and one is held
+
+**Checked rather than assumed:** `db/038` classified a `game` row as SHELF, not
+WORLD, and moved this pool to auto-publish. The founder's later ruling that
+there is no hold-back for food or drinks did not need to reach games, because
+games had already moved. The hold-back is the row's own text and nothing else.
+
+**One game carries the marker.** `scripts/seed-games.mjs` and `db/038` both
+said *"no game carries the marker today — the mechanism is in place before it
+is needed."* That claim is now false and is **corrected in the seeder rather
+than deleted** (rule 14), because the argument it made about ORDER was right
+and has been paid off: nothing had to be invented under pressure.
+
+### The Nantucket kill — not established, so written and flagged
+
+`docs/atmosphere-idea-bank-v1.md` line 967 reads `KILLED: the weather-forecast
+act.` and this room's `game_rule` is a weather guess. **Establishing whether
+the kill reaches the game was not possible from the files**, so per the
+instruction the game is written and flagged rather than silently published or
+silently dropped. The reasoning is in the row, which is the only place a
+hold-back is allowed to live.
+
+- **For it being the host act only:** it is filed under `HOST ACTS:`, directly
+  after the pot-dump, the chowder ladle and the shucking — all of them one
+  person performing something. `KILLED_GAMES` is enforced by name against
+  `bank_item` rows and a `game` row is not one. And the mechanism differs: a
+  forecast performed by one person is not everybody guessing once, in writing,
+  with a forfeit.
+- **Against:** both are the weather, tomorrow, at Nantucket, and a kill written
+  that broadly may have meant the whole idea.
+
+**The founder answers this one.** The row is at `/desk/publish`.
+
+## What the seeder will do, and what could not be verified
+
+**`initdb` fails on this machine** — `could not create shared memory segment:
+shmget … Cannot allocate memory` — and the production database is unreachable
+from any laptop (rule 9). **No LIVE count before and after was produced, and
+seed-games has no `--dry-run` to produce one.** Saying so plainly is the whole
+of what can honestly be reported about a database.
+
+What IS computable from the module and the committed chain, and was computed:
+
+| | |
+|---|---|
+| games in the module | 27 |
+| LIVE on a fresh build | **19** (7 originals + 12 room games) |
+| HELD on the founder marker | **1** — `nantucket-what-the-weather-will-do` |
+| HELD for a native room that does not exist yet | **7** — Amalfi ×2, Aspen ×2, Palm Springs, Oaxaca, St. Moritz |
+
+The seven are held because those five rooms are **not keyed into
+`DESTINATIONS`**, so `seed:destinations` does not create them, and `seed:bank`
+— which creates their draft stubs — runs **after** `seed:games` in
+`preDeployCommand`. On the deploy after the stubs exist, the scoping lands and
+the rows are published at the desk. They are drafts on purpose.
+
+**What stands in for the dry run:** `src/lib/games.test.ts` gained seven tests
+that make the seeder's and the database's hard failures fail `npm test` on a
+laptop with no Postgres — unknown facet, unknown requirement kind, unknown
+voice piece, unknown slot, unknown occasion, a slot the shape cannot fill, a
+dangling dependency, a duration on an ambient game, a per-head supply with a
+fixed count. Each was **broken deliberately and watched go red** before being
+trusted. The vocabularies are parsed out of `db/*.sql` rather than restated as
+literals (rule 19), with a floor assertion on each so a parser that matched
+nothing cannot pass by having nothing to compare against (rule 24).
+
+**One parsing bug the count found on the way**, and it is rule 24 exactly: a
+naive split of the SQL on `;` truncates db/010's `slot_kind` insert inside the
+string *"Everyone is playing; nobody has stopped doing anything else."*, loses
+the `finale` slot, and reports a vocabulary gap that is entirely its own. The
+test uses a scanner that respects quoted strings.
+
+## The take-home dependencies — one is now aimed at something
+
+Reported honestly, in both directions.
+
+| take-home | watches | satisfied by content? | resolves? |
+|---|---|---|---|
+| Vegas's IOU | `game yields_iou` | **YES** — `las-vegas-the-late-supper` is `scheduled`, so it fills the `game` slot, and its signed card is a written stake | **no** |
+| Oaxaca's Conquián tally | `ambient_game yields_score_sheet` | no | no |
+| St. Moritz's backgammon column | `ambient_game yields_score_sheet` | no | no |
+| St. Moritz's doubling cube | `ambient_game yields_prize` | no | no |
+
+**The three that remain aimed at nothing are aimed at nothing on CONTENT
+grounds, not on plumbing grounds, and that is the useful half.** Oaxaca's voice
+line is a story game and St. Moritz's is a round of compliments: neither keeps
+a score on paper and neither produces an object. **Mis-shaping either row to
+reach a dependency would be the mis-tag db/010 warns about** — a game bent to
+make a report go quiet. They need a second game each, or a founder ruling that
+those take-homes are supplied some other way.
+
+**AND VEGAS'S DOES NOT RESOLVE EITHER, for the reason `seed-bank` already
+prints:** `ingredient_supplies` is **empty on every database the committed
+chain builds** (db/044 creates it empty; tagging belongs in a pool's own
+seeder, which runs after content exists — rule 22). So the dependency reports
+BROKEN even though the game that satisfies it now exists.
+
+**Deliberately not fixed here.** `seed-games` could write the
+`ingredient_supplies` row and close it, but `scripts/seed-bank.mjs` prints the
+claim *"they would still be aimed at nothing … because `ingredient_supplies` is
+empty on every database the committed chain builds"*, and that file is outside
+this pass's territory. Closing the gap while leaving a false sentence printed
+on every deploy is worse than leaving both consistent. **It is one row and a
+`yields` field on the `Game` type**, and it should be done in the same pass
+that corrects the bank seeder's report.
+
+## Five story games, five engines — a finding, not a duplication
+
+New Orleans, Catskills, Côte d'Azur, Big Sur and Oaxaca all sit a room down and
+tell stories. That is the same surface the Fishbowl audit found across the
+noun-game slips and the Celebrity deck, **and it is not the same finding.** The
+engines differ, and each one is the whole game:
+
+- **New Orleans** hands the ending to the person on your left.
+- **Catskills** rewards the version furthest from a book nobody opens.
+- **Côte d'Azur** hides one liar, drawn at random.
+- **Big Sur** forbids hurrying and forbids checking.
+- **Oaxaca** invites the interruption the other four forbid.
+
+Written into the module so the next audit counts engines and not surfaces. One
+adjacency IS worth watching: **Aspen's Somebody's Voice and the bank's New
+Orleans charades deck** are impressions against a shared text versus a prompt
+drawn and acted silently — different, and close enough to be miscounted.
+
+## What db/050 does, and what it deliberately does not
+
+Two `game_requirement_kind` rows (`music`, `something_playing`), the rule-29
+sentence on the `game` table comment, and a notice. Nothing else, because the
+games are CONTENT and content in a migration can only be corrected by another
+migration (db/010's argument, unchanged).
+
+**Zero is the correct answer on a fresh database**, again: `migrate` runs
+before every seeder, so `game` is empty when db/050 runs. It counts nothing,
+asserts no per-room minimum and derives no row from authored text — each of
+which would be the db/020 failure that ran clean and did nothing for weeks. The
+guard over the games lives in `src/lib/games.test.ts`, where it fails the build
+instead of the deploy.
+
+**Three requirement kinds were considered and refused**, written down so they
+are not re-proposed: `a_second_day` (that is a property of the OCCASION and
+`game_occasion` already says it — rule 21), `water` for Acapulco's swim, and
+`a_view_worth_counting` for Portofino's boats. The last two are `caveat` lines
+instead: a requirement is a filter that silently removes a game, and the
+founder's own sentence naming the room's own furniture should warn a host, not
+delete her evening.
+
+## Rule 25, applied to every one of the twenty
+
+1. **Bookable at backyard size.** Nothing needs a boat, a slope or a pool that
+   the room's own material does not already establish. The three that come near
+   it — the boat count, the temperature at the top, the swim that ends the last
+   song — are **her sentences naming her rooms' own furniture**, and each
+   carries a `caveat` a host reads before she starts rather than at the moment
+   somebody has to go in. New York's list is **torn, not burned**, because an
+   apartment cannot honour a flame.
+2. **No proper noun a guest would not say at the table.** No place name, brand
+   or landmark reaches a name, a rule, a step or a printed piece. Amalfi's kit
+   is "the cards", "the board" and "the meanings sheet".
+3. **No staff.** Every one of the twenty is `hostRole: "plays_too"`, **asserted
+   by a test**. Amalfi's own rule states it — *whoever is calling is playing
+   too* — and the bag passes on a win so that calling is a turn and not a role.
+   Acapulco states it structurally and nobody runs that game at all.
+
+## Kills — checked, and none resurrected
+
+None of the twenty names, needs or implies keno, the card that took the last
+trick, the belote sheet, the cochonnet, your card from the door, a Thoth tarot
+card, the Fischer–Spassky scoresheet, a single domino, or a costume brief.
+Côte d'Azur uses an ordinary pack with a crease in one corner; Big Sur uses
+nothing at all. The weather-forecast act is the one open question and it is
+above.
+
+## Still founder-owed after this pass
+
+1. **Does the Nantucket kill reach the game, or only the host act?** One row is
+   held on it.
+2. **Oaxaca and St. Moritz need a second game each** — an ambient one that
+   keeps a score on paper or leaves an object — or a ruling that those three
+   take-homes are supplied another way. Not invented here.
+3. **`ingredient_supplies` is empty catalogue-wide.** Vegas's IOU is the first
+   dependency with a game behind it and it still will not resolve. One pass,
+   across `seed-games` and `seed-bank` together.
+4. **Nothing in the pool fills the `honouring` slot**, which birthday,
+   anniversary and bridal all require. Twenty new games did not close it and
+   none was bent to look as though it had — db/010 says mis-tagging a party
+   game as an honouring beat to quiet the report is the actual bug.

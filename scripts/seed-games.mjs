@@ -75,9 +75,40 @@
  *     whose authored prose contains the founder-pending marker is created as a
  *     DRAFT and gets no ledger entry, because nothing was offered. There is no
  *     list of held slugs here or anywhere: a list is a thing that falls out of
- *     date, and text cannot. NO GAME CARRIES THE MARKER TODAY — the mechanism
- *     is in place before it is needed, which is the only order in which it can
- *     be trusted. db/038 makes the same test in SQL over the same columns.
+ *     date, and text cannot. db/038 makes the same test in SQL over the same
+ *     columns.
+ *
+ *     THIS BULLET USED TO END "NO GAME CARRIES THE MARKER TODAY — the
+ *     mechanism is in place before it is needed, which is the only order in
+ *     which it can be trusted." That was true and is now false, and it is
+ *     corrected rather than deleted per CLAUDE.md rule 14 because the claim it
+ *     made about ORDER was the right one and is now demonstrated: the
+ *     mechanism was built with nothing to hold, and the first row that needed
+ *     it did not have to invent it under pressure. ONE GAME CARRIES THE MARKER
+ *     — nantucket-what-the-weather-will-do, whose own text asks whether the
+ *     bank document's `KILLED: the weather-forecast act.` reaches the game or
+ *     only the host act. The reasoning is in the row, which is the only place
+ *     a hold-back is ever allowed to live.
+ *
+ *   · A NATIVE SCOPE THAT CANNOT RESOLVE ALSO HOLDS THE GAME. This is new and
+ *     it is CLAUDE.md rule 16 rather than a nicety. A `native` world claim is
+ *     a WHITELIST (rule 23): a game carrying one is eligible ONLY under the
+ *     destinations it names. So a native scope silently skipped because that
+ *     destination has no `world` row does not fail safe — IT INVERTS. The row
+ *     lands with no world claim at all, which means eligible EVERYWHERE, and a
+ *     game written in one room's voice is offered in eighteen with nothing
+ *     anywhere saying so. The bullet below about skipping missing worlds is
+ *     still correct for `forbidden` and for `affinity`, both of which mean
+ *     nothing when the world is absent; it was never correct for `native` and
+ *     `native` did not exist on any game when it was written.
+ *
+ *     It bites today rather than hypothetically: five authored rooms —
+ *     amalfi-1953, aspen-1994, palm-springs-1965, oaxaca-1954,
+ *     st-moritz-1984 — are not keyed into DESTINATIONS, so seed:destinations
+ *     does not create them, and seed:bank (which creates their draft stubs)
+ *     runs AFTER this seeder in preDeployCommand. Seven of the twenty room
+ *     games are therefore held on a fresh build. They are drafts on purpose
+ *     and they are at /desk/publish.
  *   · A game that already exists is LEFT ALONE — name, rules, bounds and all.
  *     A curator's edit in the tool outranks the module, and silently
  *     overwriting her work is the failure this house cares about most. What
@@ -94,7 +125,8 @@
  *     that quietly matches nobody, which is worse than a crash.
  *   · Destination scoping is applied only for worlds that exist. A missing
  *     world is reported and skipped — run npm run seed:destinations first if
- *     the scoping matters to you.
+ *     the scoping matters to you. FOR A `native` CLAIM THE SKIP IS NOT
+ *     ENOUGH, and the bullet above says why.
  *
  * Re-running with nothing changed does nothing at all. The whole run is one
  * transaction: a failure halfway leaves no half-seeded game.
@@ -189,12 +221,43 @@ const PROSE = [
  * Does this game carry a question with the founder's name on it?
  *
  * The same shape as scripts/seed-bank.mjs's `isHeldBack`, over this pool's own
- * prose. No game in src/lib/games.ts carries the marker today; the mechanism
- * exists before the first row that needs it, because a hold-back written on
- * the day it is first needed is a hold-back written under pressure.
+ * prose.
+ *
+ * THIS COMMENT USED TO SAY "No game in src/lib/games.ts carries the marker
+ * today; the mechanism exists before the first row that needs it, because a
+ * hold-back written on the day it is first needed is a hold-back written under
+ * pressure." Kept per CLAUDE.md rule 14, because the argument was right and
+ * has now been paid off: one game carries it —
+ * nantucket-what-the-weather-will-do, asking whether the bank document's kill
+ * of the weather-forecast act reaches the game or only the host act — and
+ * nothing had to be invented to hold it.
  */
 function isHeldBack(game) {
   return carriesFounderQuestion(PROSE.map(([, read]) => read(game)));
+}
+
+/**
+ * THE OTHER REASON A GAME IS HELD, AND IT IS NOT ABOUT TEXT.
+ *
+ * A `native` world claim is a WHITELIST (CLAUDE.md rule 23): the game is
+ * eligible only under the destinations it names. If that destination has no
+ * `world` row, writing nothing does not fail safe — the row lands carrying NO
+ * claim, and no claim means eligible everywhere. A game written in one room's
+ * voice would be offered in all eighteen, silently.
+ *
+ * So the game is created as a DRAFT instead, and this is rule 16's second
+ * option of three: honour it, refuse it, or drop it visibly. Honouring it is
+ * impossible — there is no world to point at. Refusing it would fail the
+ * deploy on every fresh build, because five authored rooms have no world row
+ * when this seeder runs. Dropping it visibly is what is left, and a draft is
+ * how this system says a row is not offered.
+ *
+ * `worldId` is the map of every world slug this run could resolve.
+ */
+function unresolvableNatives(game, worldId) {
+  return game.worlds
+    .filter((scope) => scope.native === true && !worldId.has(scope.world))
+    .map((scope) => scope.world);
 }
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
@@ -264,11 +327,37 @@ try {
     );
   }
 
+  // ── the destinations, resolved once, BEFORE any game is written ────
+  //
+  // Moved ahead of the insert loop because the answer changes what STATUS a
+  // game is created with — see `unresolvableNatives`. Resolving it inside the
+  // scoping pass, where it used to live, is too late: the row is already live
+  // by then and a native claim that never landed cannot be taken back by a
+  // seeder that does not rewrite status.
+  //
+  // One query rather than one per scope, and CLAUDE.md rule 24's procedure
+  // applies to it: the counts are reported below rather than assumed.
+  const wantedWorlds = [
+    ...new Set(ALL_GAMES.flatMap((g) => g.worlds.map((w) => w.world))),
+  ];
+  const { rows: worldRows } = await client.query(
+    `select id, slug::text as slug from world where slug = any($1::text[])`,
+    [wantedWorlds]
+  );
+  const worldId = new Map(worldRows.map((r) => [r.slug, r.id]));
+  const missingWorlds = wantedWorlds.filter((slug) => !worldId.has(slug));
+  log(
+    `worlds   ${worldId.size} of ${wantedWorlds.length} destinations named by a ` +
+      `game exist here` +
+      (missingWorlds.length > 0 ? `; missing: ${missingWorlds.join(", ")}` : "")
+  );
+
   // ── the games ──────────────────────────────────────────────────────
 
   const idBySlug = new Map();
   let created = 0;
   let heldBack = 0;
+  let heldForWorld = 0;
 
   for (const game of ALL_GAMES) {
     const { rows: existing } = await client.query(
@@ -278,7 +367,8 @@ try {
 
     let gameId;
     if (existing.length === 0) {
-      const held = isHeldBack(game);
+      const orphanNatives = unresolvableNatives(game, worldId);
+      const held = isHeldBack(game) || orphanNatives.length > 0;
       const { rows } = await client.query(
         // THE PLACEHOLDERS RUN $1..$21 WITH NO GAP. `status` was the literal
         // 'draft' until db/038 and is now bound like everything else, which is
@@ -320,7 +410,8 @@ try {
           game.runbook.hostRole,
           game.runbook.hostNote ?? null,
           // The whole of the first bullet in one expression: the pool stocks
-          // itself, except where the row itself carries the founder's question.
+          // itself, except where the row itself carries the founder's question
+          // or its native scope has nowhere to land.
           held ? HELD : LIVE,
         ]
       );
@@ -328,10 +419,24 @@ try {
       created += 1;
       if (held) {
         heldBack += 1;
-        log(
-          `held     ${game.slug} (draft, ${game.shape}, ${game.sourcing}) — ` +
-            `its own text carries a founder-pending question`
-        );
+        // Two different reasons, said differently, because they are answered
+        // by two different people: a question is answered by the founder, and
+        // a missing destination is answered by seeding it.
+        if (orphanNatives.length > 0) {
+          heldForWorld += 1;
+          log(
+            `held     ${game.slug} (draft, ${game.shape}, ${game.sourcing}) — ` +
+              `native to ${orphanNatives.join(", ")}, which ${
+                orphanNatives.length === 1 ? "does" : "do"
+              } not exist here. A native claim is a whitelist; skipping it ` +
+              `would offer this game in every room instead of one`
+          );
+        } else {
+          log(
+            `held     ${game.slug} (draft, ${game.shape}, ${game.sourcing}) — ` +
+              `its own text carries a founder-pending question`
+          );
+        }
       } else {
         // In the same transaction as the row, so a game cannot go out with
         // nothing in the ledger saying it did.
@@ -597,32 +702,49 @@ try {
   }
 
   // ── destination scoping — stage 3 ──────────────────────────────────
+  //
+  // Reads `worldId`, resolved once at the top of the run. It used to query per
+  // scope, which was a query per row and, worse, meant the answer arrived
+  // AFTER the game had already been created live — see `unresolvableNatives`.
+  //
+  // A skip here is still correct for a missing world, and it is now only ever
+  // reached by a `forbidden` or `affinity` scope on a room that does not
+  // exist: a game with an unresolvable NATIVE scope was held as a draft on the
+  // way in, so it is not sitting in the catalogue unscoped while this loop
+  // decides what to do about it.
+  let scoped = 0;
+  let scopeSkipped = 0;
   for (const game of ALL_GAMES) {
     for (const scope of game.worlds) {
-      const { rows: world } = await client.query(
-        `select id from world where slug = $1`,
-        [scope.world]
-      );
-      if (world.length === 0) {
+      const id = worldId.get(scope.world);
+      if (id === undefined) {
+        scopeSkipped += 1;
         log(
           `skip     ${game.slug} scoping to ${scope.world} — that destination ` +
-            `is not in the database yet (npm run seed:destinations)`
+            `is not in the database yet (npm run seed:destinations)` +
+            (scope.native === true
+              ? `. The game was held as a draft on the way in, because a ` +
+                `native claim that lands nowhere means eligible everywhere`
+              : "")
         );
         continue;
       }
+      scoped += 1;
 
       await client.query(
         // `native` (db/019) is the CLAIM — "written for this destination and
-        // nowhere else" — and it defaults to false, which is what every
-        // authored game means today. `affinity: 0.4` on ART BATTLE says "the
-        // house would allow it", not "no other house may"; the two are
-        // different columns now precisely so that sentence stays true.
+        // nowhere else" — and it defaults to false. THE SEVEN ORIGINAL GAMES
+        // MEAN THAT: `affinity: 0.4` on ART BATTLE says "the house would allow
+        // it", not "no other house may", and the two are different columns
+        // precisely so that sentence stays true. The twenty room games added
+        // under CLAUDE.md rule 29 are the other case and say so — each is
+        // written in one room's voice and claims `native` on it alone.
         `insert into game_world (game_id, world_id, forbidden, native, affinity, note)
          values ($1, $2, $3, $4, $5, $6)
          on conflict (game_id, world_id) do nothing`,
         [
           idBySlug.get(game.slug),
-          world[0].id,
+          id,
           scope.forbidden === true,
           scope.native === true,
           scope.affinity ?? 0,
@@ -631,6 +753,13 @@ try {
       );
     }
   }
+  // CLAUDE.md rule 24: count what it matched. A scoping pass that wrote
+  // nothing and a scoping pass that wrote everything read identically from
+  // outside, and the second number is the one that changes what is eligible.
+  log(
+    `scoped   ${scoped} game_world claim(s) written or already present, ` +
+      `${scopeSkipped} skipped for a destination that does not exist here`
+  );
 
   // ── what the runbooks say about themselves ─────────────────────────
   //
@@ -669,13 +798,25 @@ try {
         `all ${created - heldBack} back to draft.`
     );
   }
-  if (heldBack > 0) {
+  if (heldBack - heldForWorld > 0) {
     console.log(
-      `\n${heldBack} game(s) stayed DRAFT because the row itself carries a ` +
-        `FOUNDER-PENDING question.\nThey are at /desk/publish, which is where ` +
-        `a question that has been answered gets\nsaid yes to. Removing the ` +
-        `question from src/lib/games.ts does NOT publish an\nexisting row: ` +
-        `no seeder here rewrites the status of a row it did not create.`
+      `\n${heldBack - heldForWorld} game(s) stayed DRAFT because the row ` +
+        `itself carries a FOUNDER-PENDING question.\nThey are at ` +
+        `/desk/publish, which is where a question that has been answered ` +
+        `gets\nsaid yes to. Removing the question from src/lib/games.ts does ` +
+        `NOT publish an\nexisting row: no seeder here rewrites the status of ` +
+        `a row it did not create.`
+    );
+  }
+  if (heldForWorld > 0) {
+    console.log(
+      `\n${heldForWorld} game(s) stayed DRAFT because they are NATIVE to a ` +
+        `destination this database\ndoes not have. A native claim is a ` +
+        `whitelist (CLAUDE.md rule 23), so writing the\nrow without it would ` +
+        `not fail safe — it would offer a game written for one room\nin every ` +
+        `room, silently. Seed the destination and publish them at ` +
+        `/desk/publish;\nthis seeder will not change the status of a row it ` +
+        `did not create.`
     );
   }
 } catch (err) {
