@@ -341,11 +341,27 @@ async function fixture(): Promise<Fixture> {
 
   const bankName = `The good candles ${mark}`;
   const bankItemId = await one(
-    `insert into bank_item (slug, world_id, kind, name, description, status)
-     values ($1, $2, 'good', $3, 'Lit at dusk and nobody mentions it.',
+    `insert into bank_item (slug, kind, name, description, status)
+     values ($1, 'good', $2, 'Lit at dusk and nobody mentions it.',
              'active')
      returning id`,
-    [`picksbench-bank-${mark}`, worldId, bankName]
+    [`picksbench-bank-${mark}`, bankName]
+  );
+  // THE WORLD CLAIM MOVED OUT OF THE ROW — db/043, line 190: `alter table
+  // bank_item drop column world_id`. db/031 had scoped a bank item to a
+  // destination with a not-null FK, which made it the only pool that could not
+  // be shared between two rooms; db/043 replaced it with a `bank_item_world`
+  // CLAIM and backfilled every existing value as `native = true`. This fixture
+  // still wrote the old column, so it failed at insert on any migrated
+  // database — and, being a DB-only bench, it was green on every run that had
+  // no database to be wrong against. CLAUDE.md rule 20's exact shape, found by
+  // standing the database up. The insert below is the same claim db/043's own
+  // backfill writes.
+  await pool.query(
+    `insert into bank_item_world
+       (bank_item_id, world_id, forbidden, native, affinity, note)
+     values ($1, $2, false, true, 0.000, 'Written for this bench.')`,
+    [bankItemId, worldId]
   );
 
   return {

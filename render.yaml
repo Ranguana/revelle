@@ -166,6 +166,35 @@ services:
     # Fixtures and demo occasions are deliberately absent: those invent test
     # customers and they refuse a non-local database anyway.
     #
+    # tag:catalogue added 2026-08-27, and it runs LAST for the reason the whole
+    # step exists. CLAUDE.md rule 22: migrations own schema, seeders own
+    # content, and anything COMPUTED OVER CONTENT runs after content exists.
+    #
+    # db/020 and db/033 derive `ingredient_requirement` rows by matching
+    # authored text — `menu.dishes ilike '%grilled%'`, `world.slug in
+    # ('tahiti', …)` — and `migrate` is the FIRST link of this chain, so every
+    # one of those statements has run against empty tables on every build since
+    # it was written. The table is empty on any database built from this file,
+    # `venueEligibility()` prunes nothing, and open-flame, full-kitchen and
+    # outdoor requirements constrain no package in production today. The
+    # migrations looked right, ran clean, raised nothing and did nothing.
+    #
+    # The same step writes `drink.season_strict`, which seed-drinks has never
+    # written, so no drink is season-gated and a February party is offered the
+    # summer bar with "Summer" printed on the sheet.
+    #
+    # IT IS NOT ALONE IN THIS FILE. `npm run check:gates` is the detector for
+    # the OTHER failure — a tagger that ran and matched nothing, which reads
+    # identically from outside — and it is deliberately NOT in this chain: a
+    # thin catalogue is an authoring gap, and failing a deploy on one would
+    # block a code fix behind a writing task. It runs in CI and as a db test.
+    #
+    # /desk/stocked's sync button runs the same steps through
+    # src/app/api/desk/seed/route.ts, and src/lib/deploy.test.ts fails if the
+    # two lists ever stop naming the same steps in the same order. That guard
+    # is new and it caught a live drift on the day it was written: seed:bank
+    # was in this chain and not in the route's.
+    #
     # A non-zero exit FAILS THE DEPLOY and the old instance keeps serving.
     preDeployCommand: >-
       npm run migrate &&
@@ -175,7 +204,8 @@ services:
       npm run seed:dishes &&
       npm run seed:games &&
       npm run seed:bank &&
-      npm run seed:destinations
+      npm run seed:destinations &&
+      npm run tag:catalogue
 
     envVars:
       # Next 16 requires Node >= 20.9; 22 is what this is developed against.

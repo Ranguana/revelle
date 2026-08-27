@@ -116,6 +116,19 @@ export type Pool = {
   labelColumn: string;
   activeColumn: string;
   activeValue: string;
+  /**
+   * WHETHER THE HOUSE STILL STOCKS THIS POOL AT ALL — db/045's `retired_at`.
+   *
+   * A retired pool keeps every row, its join tables and its registration; what
+   * ends is the stocking. It matters HERE because this screen's whole gesture
+   * is "say yes to these drafts", and inviting a curator to offer a row into a
+   * pool the engine has no slot for is rule 16's failure with a button on it:
+   * the click would be accepted, the row would go live, and nothing would ever
+   * deliver it.
+   */
+  retired: boolean;
+  /** Why, in the founder's or the curator's words. Null on a live pool. */
+  retirementNote: string | null;
 };
 
 /** One row a curator is being asked to say yes to. */
@@ -244,8 +257,11 @@ export async function pools(ask: Ask): Promise<Pool[]> {
     label_column: string;
     active_column: string;
     active_value: string;
+    retired: boolean;
+    retirement_note: string | null;
   }>(
-    `select entity_table, label, label_column, active_column, active_value
+    `select entity_table, label, label_column, active_column, active_value,
+            retired_at is not null as retired, retirement_note
        from ingredient_pool
       where active_column is not null
         and entity_table <> 'world'
@@ -258,6 +274,8 @@ export async function pools(ask: Ask): Promise<Pool[]> {
     labelColumn: row.label_column,
     activeColumn: row.active_column,
     activeValue: row.active_value,
+    retired: row.retired,
+    retirementNote: row.retirement_note,
   }));
 }
 

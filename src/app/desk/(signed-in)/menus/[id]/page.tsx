@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
 import { groupFacets, tagsFor, taggingVocabulary } from "@/lib/desk/facets";
-import { POOL_STATUS } from "@/lib/desk/labels";
+import { MENU_STATUS } from "@/lib/desk/labels";
 import { menuSequence } from "@/lib/desk/lists";
 import { readReview, reviewPass } from "@/lib/desk/review";
 
@@ -27,7 +27,7 @@ export default async function MenuPage({
   const menu = await queryOne<MenuValues & { status: string; name: string }>(
     `select id, slug::text as slug, name, dishes, season::text as season,
             season_note, season_strict, cooking::text as cooking, cooking_note,
-            notes, status::text as status
+            notes, status::text as status, retirement_note
        from menu where id = $1`,
     [id]
   );
@@ -67,7 +67,7 @@ export default async function MenuPage({
   return (
     <>
       <Head eyebrow="The table" title={menu.name}>
-        <Status code={menu.status} label={POOL_STATUS[menu.status]} />
+        <Status code={menu.status} label={MENU_STATUS[menu.status]} />
         <Link href="/desk/menus" className={styles.filter}>
           All menus
         </Link>

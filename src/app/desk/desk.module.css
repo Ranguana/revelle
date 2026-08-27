@@ -1224,6 +1224,20 @@
   min-width: 12rem;
 }
 
+/*
+ * A HEADING OVER SEVERAL COLUMNS — atmosphere's four slots and its total.
+ *
+ * The rule under it is the whole device: it says "these belong together" in
+ * the same gesture the four sub-headings say "and they are counted apart".
+ * Without it a spanning label floats over the middle of the row it covers and
+ * reads as a column of its own.
+ */
+.boardGroup {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.1875rem;
+  color: var(--ink-soft);
+}
+
 .board td {
   border-bottom: 1px solid var(--rule);
   padding: 0 0.625rem 0 0;

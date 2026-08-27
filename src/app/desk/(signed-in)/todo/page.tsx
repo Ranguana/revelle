@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { stamp } from "@/lib/desk/labels";
-import { everyone, openTodos, recentlyDone } from "@/lib/desk/room";
+import { everyone, openTodos, recentlyDone, type Todo } from "@/lib/desk/room";
+import { POOL_SCREEN } from "@/lib/desk/stocked";
 
 import styles from "../../desk.module.css";
 import { Empty, Head, Seam } from "../bits";
@@ -11,6 +12,37 @@ import {
   dismissTodoAction,
   toggleTodoAction,
 } from "../thread/actions";
+
+/**
+ * WHERE A TODO'S SUBJECT IS LOOKED AT.
+ *
+ * This used to be string surgery — `/desk/${todo.subject_table}s/${id}` — with
+ * two hand-written exceptions in front of it for `quiz_response` and `world`.
+ * That is CLAUDE.md rule 19's `/desk/${table}s` verbatim, and it was already
+ * wrong: an engine-found gap on the atmosphere pool carries `bank_item`, which
+ * pluralises to `/desk/bank_items/…` and 404s. The screen is `/desk/bank`.
+ *
+ * `POOL_SCREEN` in src/lib/desk/stocked.ts has held that answer since the
+ * publish screen and the publish action were found keeping two copies of it —
+ * and it already carried `world: "/desk/destinations"`, so the second of the
+ * two hand-written exceptions was a third copy of a fact that module owns. It
+ * is gone. `quiz_response` stays, and stays HERE, because it is not a pool: an
+ * application is not a thing the engine draws from, and `POOL_SCREEN` is
+ * documented as a map of pools rather than a router.
+ *
+ * A subject with no screen now renders as PLAIN TEXT rather than as a link to
+ * nothing (rule 16 — a control that absorbs a click and delivers a 404 has
+ * taken input it cannot honour). `POOL_SCREEN`'s own note says a pool absent
+ * from it "just has no list screen to link to, which is itself worth seeing";
+ * this is what seeing it looks like.
+ */
+function subjectHref(todo: Todo): string | null {
+  const { subject_table: table, subject_id: id } = todo;
+  if (!table || !id) return null;
+  if (table === "quiz_response") return `/desk/applications/${id}`;
+  const screen = POOL_SCREEN[table];
+  return screen ? `${screen}/${id}` : null;
+}
 
 /**
  * THE LIST.
@@ -66,19 +98,14 @@ export default async function TodoPage() {
                   found by the engine · {String(todo.detail.pool ?? "")}
                 </span>
               ) : null}
-              {todo.subject_table ? (
-                <Link
-                  className={styles.link}
-                  href={
-                    todo.subject_table === "quiz_response"
-                      ? `/desk/applications/${todo.subject_id}`
-                      : todo.subject_table === "world"
-                        ? `/desk/destinations/${todo.subject_id}`
-                        : `/desk/${todo.subject_table}s/${todo.subject_id}`
-                  }
-                >
+              {subjectHref(todo) ? (
+                <Link className={styles.link} href={subjectHref(todo)!}>
                   on the {todo.subject_table}
                 </Link>
+              ) : todo.subject_table ? (
+                <span className={styles.todoMeta}>
+                  on the {todo.subject_table} — no screen shows this pool yet
+                </span>
               ) : null}
               <span>{stamp(todo.created_at)}</span>
             </div>

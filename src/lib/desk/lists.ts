@@ -300,20 +300,93 @@ export async function dishSequence(
   return rows.map((row) => row.id);
 }
 
-/* ── the three plain lists ──────────────────────────────────────────── */
+/* ── the menus, which have a second control ─────────────────────────── */
 
 /**
- * Drinks, menus and games each have one control — the status filter every pool
- * screen carries — and no paging. `all` is the absence of a filter and is
- * stored in the URL as nothing, which is why an incoming `status=all` resolves
- * to "" here exactly as it does on the screen.
+ * THE MENU LIST, AND WHY IT IS NOT ONE OF THE THREE PLAIN ONES ANY MORE.
+ *
+ * db/045 retired the whole pool by founder ruling: db/022 deleted the nine
+ * `occasion_slot` rows for `the_menu`, so no package can deliver a menu, and
+ * thirty-nine rows sat in the catalogue looking exactly like stock. They are
+ * KEPT — a menu is an evening and a dish is a plate, composition is still
+ * revertible, and every row keeps its text, its season, its destinations and
+ * its reason.
+ *
+ * Which makes /desk/menus the same screen /desk/destinations already was after
+ * db/028, so it gets the same answer and the argument is stated once, up at
+ * `destinationList`: the default view is THE WORKING SET, the retired ones are
+ * one link away, and THE COUNT IS PRINTED IN BOTH STATES. A list that is
+ * quietly shorter than the truth is the failure this codebase keeps
+ * rediscovering; a screen that shows thirty-nine undeliverable rows as stock is
+ * the failure that produced the coverage-board defect. Neither is acceptable
+ * and the count is what makes the third option honest.
+ *
+ * `status` is still here and still means what it means everywhere. Asking for
+ * `status=discontinued` explicitly IS asking for the retired ones, so it wins
+ * over the toggle rather than fighting it — one axis, two ways to phrase the
+ * same question.
+ */
+export const MENU_FROM = `menu_card m`;
+export const MENU_ORDER = `m.slug`;
+
+export type MenuList = {
+  /** "" | draft | active | discontinued */
+  readonly status: string;
+  /** true when she has asked to see the retired ones too */
+  readonly retired: boolean;
+  /** `where …`, or "" */
+  readonly where: string;
+  readonly binds: readonly unknown[];
+  /** what a pass over this view carries */
+  readonly search: string;
+};
+
+export function menuList(source: Params | string): MenuList {
+  const status = oneOf(reader(source)("status"), POOL_STATUSES);
+  const retired = reader(source)("retired") === "show";
+
+  const clauses: string[] = [];
+  const binds: unknown[] = [];
+  if (status) {
+    binds.push(status);
+    clauses.push(`m.status::text = $${binds.length}`);
+  } else if (!retired) {
+    clauses.push(`m.status <> 'discontinued'`);
+  }
+
+  return {
+    status,
+    retired,
+    where: clauses.length > 0 ? `where ${clauses.join(" and ")}` : "",
+    binds,
+    search: reviewSearch({ status, retired: retired ? "show" : "" }),
+  };
+}
+
+export async function menuSequence(search: string): Promise<string[]> {
+  const list = menuList(search);
+  const rows = await query<{ id: string }>(
+    `select m.id from ${MENU_FROM} ${list.where}
+      order by ${MENU_ORDER} limit ${CAP}`,
+    [...list.binds]
+  );
+  return rows.map((row) => row.id);
+}
+
+/* ── the two plain lists ────────────────────────────────────────────── */
+
+/**
+ * Drinks and games each have one control — the status filter every pool screen
+ * carries — and no paging. `all` is the absence of a filter and is stored in
+ * the URL as nothing, which is why an incoming `status=all` resolves to "" here
+ * exactly as it does on the screen.
  */
 function statusOnly(search: string): string {
   return oneOf(reader(search)("status"), POOL_STATUSES);
 }
 
 /**
- * What a pass over one of those three carries: the status filter, and nothing
+ * What a pass over one of those two carries: the status filter, and nothing
  * else. `all` is the absence of a filter and travels as nothing, so the pass
  * and the screen resolve the same set from the same string.
  */
@@ -342,10 +415,6 @@ async function statusSequence(
 
 export function drinkSequence(search: string): Promise<string[]> {
   return statusSequence("id", "drink_card", "status", "slug", search);
-}
-
-export function menuSequence(search: string): Promise<string[]> {
-  return statusSequence("id", "menu_card", "status", "slug", search);
 }
 
 export function gameSequence(search: string): Promise<string[]> {

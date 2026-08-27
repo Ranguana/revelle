@@ -21,7 +21,13 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
   ],
   [
     { href: "/desk/destinations", label: "Destinations" },
-    { href: "/desk/menus", label: "Menus" },
+    // MENUS ARE NOT IN THE RAIL. Founder ruling, 2026-08-27, said more than
+    // once before it was acted on: the pool is retired (db/045) and a tab for
+    // a pool nothing can deliver is a standing invitation to misread the desk.
+    // The route still exists at /desk/menus so the 39 retired evenings stay
+    // readable to anyone who goes looking — retirement preserved the
+    // sequencing judgement and this does not undo that. It is simply not a
+    // place the desk sends anybody.
     { href: "/desk/dishes", label: "Dishes" },
     { href: "/desk/drinks", label: "Drinks" },
     { href: "/desk/games", label: "Games" },

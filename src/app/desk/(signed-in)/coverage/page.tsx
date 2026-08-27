@@ -37,7 +37,23 @@ import { Empty, Head, Status } from "../bits";
 export const dynamic = "force-dynamic";
 
 export default async function CoveragePage() {
-  const { columns, rows } = await board();
+  const { headings, columns, rows } = await board();
+
+  // The second header row exists only for the headings that span more than one
+  // column — today, atmosphere. A standing column keeps its label in the top
+  // row and reaches down through both.
+  const grouped = headings.some((heading) => heading.span > 1);
+  const subColumns = (() => {
+    const out: { key: string; label: string }[] = [];
+    let at = 0;
+    for (const heading of headings) {
+      if (heading.span > 1) {
+        out.push(...columns.slice(at, at + heading.span));
+      }
+      at += heading.span;
+    }
+    return out;
+  })();
 
   return (
     <>
@@ -52,10 +68,45 @@ export default async function CoveragePage() {
 
       <p className={styles.note}>
         Every destination against the standard in docs/new-destination.md. The
-        making spread is the one that gets missed: a destination whose menus are
-        all made by hand still matches a host who said she wants everything to
+        making spread is the one that gets missed: a destination whose dishes
+        are all made by hand still matches a host who said she wants everything to
         arrive finished — her answer weights the pool, it never filters it — and
         she opens the table to find nothing on it she can have.
+      </p>
+
+      <p className={styles.note}>
+        <strong>The table and the atmosphere are reported per slot.</strong> A
+        column with a number is how many things this destination can put in that
+        one slot; <em>none</em> means every package built here reports a
+        catalogue gap for it, and an amber number means the slot draws as many
+        as the room has, so every evening gets the same one. A single
+        &ldquo;has atmosphere&rdquo; check could only ever say <em>none at
+        all</em>, which with 174 live items never fires — split, it can say a
+        room has table settings and nothing to take home. Those columns are
+        nearly empty across the library and that is the finding, not a fault in
+        the board.
+      </p>
+
+      <p className={styles.note}>
+        <strong>Cells count claims; the total counts things.</strong> One item
+        may claim more than one slot — a rock is both dressing and atmosphere —
+        and it is counted in every cell it can fill, because that is what
+        selection draws from. <em>In all</em> counts each thing once, so it can
+        be smaller than the cells beside it added up. That gap is the
+        multiply-claimed rows, not a miscount.
+      </p>
+
+      <p className={styles.note}>
+        <strong>Serving is measured in dishes, not menus.</strong> db/022
+        composed the table out of three course slots and left the menu pool with
+        no slot to be placed in — <code>occasion_slot</code> has no row for{" "}
+        <code>menu</code> at all. The 39 authored menus are still at{" "}
+        <Link href="/desk/menus" className={styles.whoEmail}>
+          /desk/menus
+        </Link>
+        ; what they are not is evidence that a room can be served, so they are
+        off this board rather than colouring a column nothing draws. The season
+        and making spreads moved with them, for the same reason.
       </p>
 
       <p className={styles.note}>
@@ -75,11 +126,25 @@ export default async function CoveragePage() {
         <table className={styles.board}>
           <thead>
             <tr>
-              <th>Destination</th>
-              {columns.map((column) => (
-                <th key={column.key}>{column.label}</th>
+              <th rowSpan={grouped ? 2 : 1}>Destination</th>
+              {headings.map((heading) => (
+                <th
+                  key={heading.key}
+                  colSpan={heading.span}
+                  rowSpan={grouped && heading.span === 1 ? 2 : 1}
+                  className={heading.span > 1 ? styles.boardGroup : undefined}
+                >
+                  {heading.label}
+                </th>
               ))}
             </tr>
+            {grouped ? (
+              <tr>
+                {subColumns.map((column) => (
+                  <th key={column.key}>{column.label}</th>
+                ))}
+              </tr>
+            ) : null}
           </thead>
           <tbody>
             {rows.map((row) => (

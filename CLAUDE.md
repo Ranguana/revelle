@@ -278,3 +278,104 @@ was written where only someone already looking would find it. When a session
 learns something structural, it goes HERE the same day, in the file every
 agent reads before working. The route was the workaround; this paragraph is
 the memory.
+
+**21. EVERY FACT TWO SURFACES MUST AGREE ON HAS EXACTLY ONE OWNER.**
+A registry for lists, the schema for names, an exported function for logic.
+The defect is DUPLICATION OF AUTHORITY, not duplication of code, and the
+distinction is the whole rule: two files may share a helper and still hold two
+authorities (each hardcoding the same four slot kinds), while one authority can
+serve a dozen call sites happily. Read as "don't repeat yourself" this becomes
+DRY zealotry and produces premature abstraction, which is its own disease.
+
+THE TEST IS NARROW ON PURPOSE: MUST TWO SURFACES AGREE ABOUT THIS? If they are
+allowed to differ, extraction is optional and probably wrong. If they must
+agree and each computes its own answer, they will drift, and the failure is
+exquisite — both look right and mean different things, so the day is spent
+discovering that "coverage" meant two things in two files. Three instances in
+one week: hand-written pool lists (rule 19), table names built by
+concatenation, and a coverage board about to grow its own copy of the gap
+reporter's logic.
+
+THE GUARD MUST GO THROUGH THE CONSUMERS. A test that calls the shared function
+twice and compares it to itself CANNOT FAIL — it is testing the function
+against itself while reporting safety it does not provide, and the bypass it
+exists to catch is somebody adding a second path next month, which by
+definition does not call the shared function. Seed the case, drive both
+surfaces the way production drives them, compare verdicts. Then break one
+deliberately and watch it go red before you believe it.
+
+AND A PARTIAL UNIFICATION THAT LOOKS UNIFIED IS WORSE THAN TWO HONEST PATHS —
+the same reason `(no longer in the catalogue)` was worse than an error. This is
+the week's whole theme in one line: SURFACES THAT CLAIM MORE CERTAINTY THAN
+THEY HAVE, whether the surface is prose, a coverage number, a green test, or an
+architecture diagram. Stopping and reporting that a unification is bigger than
+the task is the system working, not the task failing.
+
+**22. MIGRATIONS OWN SCHEMA. SEEDERS OWN CONTENT. ANYTHING COMPUTED OVER
+CONTENT RUNS AFTER CONTENT EXISTS.** Rule 21's other axis: 21 asks WHO OWNS
+THIS FACT, this asks WHEN MAY IT BE COMPUTED, and they fail differently.
+`preDeployCommand` runs `migrate` before every seeder, so a migration that
+derives rows by matching authored text runs against EMPTY TABLES — not once, on
+every build, forever. db/020 and db/033 tag `ingredient_requirement` that way,
+which is why it is empty on any database built from the committed chain and why
+`venueEligibility()` prunes nothing: open-flame, full-kitchen and outdoor
+requirements constrain no package in production today. The migration looked
+right, ran clean, raised nothing, and did nothing — the week's founding defect,
+sitting inside the gate built to enforce a rule.
+
+So content-dependent computation is a POST-SEED STEP, never a migration. And it
+carries the week's standard guard, in two parts because they catch different
+lies: a build test that FAILS IF THE DERIVED TABLE IS EMPTY after a full build,
+and a detector for A GATE THAT PRUNES ZERO ROWS ACROSS THE WHOLE CATALOGUE. The
+first catches the tagger never running; the second catches it running and
+matching nothing, which reads identically from the outside and is why one guard
+is not enough. Rule 15 says nothing grades that does not prune; this is how you
+find out whether it actually pruned.
+
+**23. A MECHANISM THAT INVITES MISREADING IS A DEFECT, EVEN WHEN IT WORKS.**
+The auditor's sentence, kept verbatim because it is the general lesson: **THE
+FIELD ISN'T BROKEN; IT ANSWERS A DIFFERENT QUESTION THAN IT APPEARS TO.** That
+is subtler than a bug and costlier, because nothing goes red: `affinity` is a
+correct, load-bearing additive weight in stage-4 scoring, and it says NOTHING
+about eligibility — any `native` row is a whitelist, and a non-native row is
+not a claim at all. Sharing therefore requires A SECOND NATIVE ROW; an affinity
+row inserts, renders on the desk, throws nothing, and never travels. The name
+promises the other thing. In one week that misreading produced a wrong report
+from an agent, a wrong ruling from the founder acting on it, and two inert rows
+staged under that ruling — three failures, one absent sentence.
+
+So the fix is never only the label. WHERE A NAME INVITES THE WRONG READING,
+STATE THE FACT AT EVERY PLACE THE WRONG READING WOULD BE MADE — in the doc an
+author writes from, in the migration a reader learns the schema from, beside
+the field itself. Correcting a table name without stating what the field does
+just invites the next agent to re-derive the same misreading from another
+direction. And when the discovery lands, AUDIT WHAT WAS ALREADY BUILT ON THE
+MISREADING rather than only fixing forward: the count of things already written
+wrong is the real size of the defect, and it is never zero.
+
+**24. COUNT WHAT IT MATCHED. ASSUME YOUR MATCHING IS WRONG UNTIL YOU HAVE.**
+Reading the code tells you what it was meant to match. Only counting tells you
+what it did. Three times in one week, counting caught what reading missed, and
+each was invisible to inspection: `bank_item_default_slot()` spelled
+`'take home'` with a space while every authored clause said `take-home`, so 143
+of 152 rows landed in the general bucket and NOTHING SAID ANYTHING; `ingredient_
+requirement` was empty on every build because a migration matched authored text
+against tables that do not exist yet, so a gate that reads as working pruned
+nothing; and `seed-drinks.mjs`'s `Also at:` wrote `on conflict do nothing`,
+which against an existing non-native row leaves the claim inert WHILE PRINTING
+THE DESTINATION IT DID NOT GRANT. All three passed review. All three fell to a
+count.
+
+So the procedure, not the sentiment: after any matching, tagging, parsing or
+classifying step, COUNT THE ROWS IT TOUCHED AND COMPARE THAT NUMBER TO WHAT YOU
+EXPECTED. A tagger that matched 9 of 152 is not a tagger that worked. And count
+in BOTH directions, because they fail differently and look identical from
+outside — a gate that matches EVERYTHING prunes nothing and is invisible, and a
+gate that matches NOTHING prunes everything and is member-facing. The second is
+the one that turns a thin catalogue into an empty package.
+
+Its corollary for tooling: **"NEVER USED" MEANS "NEVER TESTED AGAINST THE
+TABLES IT WILL ACTUALLY MEET."** The drinks `Also at:` line had only ever run
+against emptiness, where broken and correct are indistinguishable. An
+instrument's first real use is its first test unless you force an earlier one —
+so force one, on a build that holds the rows production holds.

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
 import { setTags, validFacetIds } from "@/lib/desk/facets";
-import { COOKING_LEVELS, SEASONS, slugify } from "@/lib/desk/labels";
+import { COOKING_LEVELS, MENU_STATUS, SEASONS, slugify } from "@/lib/desk/labels";
 import { carryReview } from "@/lib/desk/review";
 import { recordAction, requireStaff } from "@/lib/staff";
 
@@ -29,7 +29,22 @@ export type MenuState = { error: string | null };
 
 const SEASON_CODES = SEASONS.map((season) => season.code);
 const COOKING_CODES = COOKING_LEVELS.map((level) => level.code);
-const STATUSES = ["draft", "active", "discontinued"];
+const STATUSES = Object.keys(MENU_STATUS);
+
+/**
+ * THE ONE STATUS THAT COSTS A SENTENCE.
+ *
+ * db/045 added `menu_discontinued_has_reason`: a menu cannot be out of the
+ * catalogue without words saying why, in the same statement that writes the
+ * status (CLAUDE.md rule 17). The database is the backstop and it refuses with
+ * a constraint name, which is not a thing to put in front of a curator — so
+ * this refuses first, in a sentence, at the point she is standing. Rule 16.
+ *
+ * The converse is deliberately NOT enforced. A menu brought back keeps its
+ * note: it is a RECORD of what happened, in the past tense, not a description
+ * of the current state, and db/042 argues that asymmetry at length.
+ */
+const OUT = "discontinued";
 
 function trimmed(form: FormData, key: string): string {
   return String(form.get(key) ?? "").trim();
@@ -58,6 +73,16 @@ export async function saveMenu(
   if (!COOKING_CODES.includes(cooking)) return { error: "Pick how much cooking." };
   if (!STATUSES.includes(status)) return { error: "Unknown status." };
 
+  const retirementNote = trimmed(form, "retirement_note");
+  if (status === OUT && retirementNote.length === 0) {
+    return {
+      error:
+        "A retired menu carries its reason. Say why this one is out — the " +
+        "desk has to render it and somebody six months from now has to read " +
+        "it without an archaeologist.",
+    };
+  }
+
   const slug = slugify(trimmed(form, "slug") || name);
   const facets = await validFacetIds(
     form.getAll("facet").map((value) => String(value))
@@ -74,6 +99,10 @@ export async function saveMenu(
     trimmed(form, "cooking_note"),
     trimmed(form, "notes") || null,
     status,
+    // Empty is NULL, never `''`: db/045's `menu_retirement_note_not_blank`
+    // refuses whitespace, because a blank string is silence wearing a
+    // populated column and looks answered from every angle.
+    retirementNote || null,
   ];
 
   let menuId = id;
@@ -84,16 +113,18 @@ export async function saveMenu(
             set slug = $1, name = $2, dishes = $3, season = $4::season_band,
                 season_note = $5, season_strict = $6,
                 cooking = $7::cooking_level, cooking_note = $8,
-                notes = $9, status = $10::product_status
-          where id = $11`,
+                notes = $9, status = $10::product_status,
+                retirement_note = $11
+          where id = $12`,
         [...values, id]
       );
     } else {
       const rows = await query<{ id: string }>(
         `insert into menu (slug, name, dishes, season, season_note,
-                           season_strict, cooking, cooking_note, notes, status)
+                           season_strict, cooking, cooking_note, notes, status,
+                           retirement_note)
          values ($1,$2,$3,$4::season_band,$5,$6,$7::cooking_level,$8,$9,
-                 $10::product_status)
+                 $10::product_status,$11)
          returning id`,
         values
       );
@@ -182,6 +213,22 @@ export async function setMenuStatus(form: FormData): Promise<void> {
   const id = String(form.get("id") ?? "");
   const status = String(form.get("status") ?? "");
   if (!STATUSES.includes(status)) return;
+
+  /*
+    RETIRING IS NOT A ONE-CLICK GESTURE, and this refuses it by name rather
+    than letting the database do it with a constraint name (rule 16: refuse it,
+    drop it visibly, or honour it — never take it in quietly). A menu going out
+    of the catalogue carries its reason in the same statement, and a reason is a
+    sentence somebody writes, so it belongs on the form where there is a field
+    for it. The list screen no longer renders this value; a stale tab or a
+    hand-built POST still can, and meets this.
+  */
+  if (status === OUT) {
+    throw new Error(
+      "Retiring a menu needs its reason (db/045, CLAUDE.md rule 17). Open the " +
+        "menu and set the status there, where there is a field for the why."
+    );
+  }
 
   const before = await queryOne<{ name: string }>(
     `select name from menu where id = $1`,

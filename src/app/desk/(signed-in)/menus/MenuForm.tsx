@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 
 import type { FacetGroup } from "@/lib/desk/facets";
-import { COOKING_LEVELS, POOL_STATUS, SEASONS } from "@/lib/desk/labels";
+import { COOKING_LEVELS, MENU_STATUS, SEASONS } from "@/lib/desk/labels";
 
 import type { Carried } from "@/lib/desk/review";
 
@@ -40,6 +40,12 @@ export type MenuValues = {
   cooking_note?: string;
   notes?: string | null;
   status?: string;
+  /**
+   * WHY THIS MENU IS NOT OFFERED. db/045's column, required whenever the status
+   * is Retired and KEPT if it is ever brought back — it is a record of what
+   * happened, not a description of the current state.
+   */
+  retirement_note?: string | null;
 };
 
 export default function MenuForm({
@@ -255,7 +261,7 @@ export default function MenuForm({
             defaultValue={values.status ?? "draft"}
             className={styles.select}
           >
-            {Object.entries(POOL_STATUS).map(([code, label]) => (
+            {Object.entries(MENU_STATUS).map(([code, label]) => (
               <option key={code} value={code}>
                 {label}
               </option>
@@ -273,6 +279,28 @@ export default function MenuForm({
             className={styles.input}
           />
         </div>
+      </div>
+
+      {/*
+        THE REASON A RETIREMENT CARRIES.
+
+        Required by the database whenever the status is Retired (db/045), and
+        the save refuses first with a sentence so a curator never meets a
+        constraint name. It is shown in every state on purpose: a menu that has
+        come back keeps its record, in the past tense, and hiding the field
+        would make an existing note look like it had been deleted.
+      */}
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="retirement_note">
+          Why it is retired
+        </label>
+        <input
+          id="retirement_note"
+          name="retirement_note"
+          defaultValue={values.retirement_note ?? ""}
+          className={styles.input}
+          placeholder="Required to retire it. Kept if it comes back."
+        />
       </div>
 
       <div className={styles.buttonRow}>

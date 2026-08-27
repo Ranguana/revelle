@@ -1,6 +1,8 @@
 import { spawn } from "node:child_process";
 import { timingSafeEqual } from "node:crypto";
 
+import { CATALOGUE_CHAIN, type ChainStep } from "@/lib/desk/seed-chain";
+
 /**
  * Seed the catalogue, from inside Render.
  *
@@ -43,20 +45,30 @@ export const dynamic = "force-dynamic";
 /** The seeders are not fast. Well inside Render's ceiling, well past the default. */
 export const maxDuration = 300;
 
-/** Exactly the preDeployCommand render.yaml carries, in order. */
-const STEPS: readonly (readonly [string, ...string[]])[] = [
-  ["seed:destinations"],
-  ["seed:menus"],
-  ["seed:drinks"],
-  // 650 authored lines into 600 dish rows. By far the longest step here, and
-  // still well inside maxDuration — it is one transaction of small writes.
-  ["seed:dishes"],
-  ["seed:games"],
-  // Twice on purpose: the menu, drink and dish seeders create a draft stub for
-  // a destination that has content and no authored look, and this is what
-  // completes a stub once somebody writes the voice.
-  ["seed:destinations"],
-];
+/**
+ * The steps, from the one place that holds them.
+ *
+ * THIS USED TO BE AN ARRAY IN THIS FILE, under the comment "Exactly the
+ * preDeployCommand render.yaml carries, in order" — which it stopped being on
+ * 2026-08-23, when `seed:bank` entered render.yaml and never entered the array.
+ * The button then stocked a catalogue with 180 bank rows, seventeen gestures
+ * and six draft room stubs missing from it, and nothing said anything. Rule 20
+ * one layer in: a list that describes what runs is not what runs.
+ *
+ * The list now lives in src/lib/desk/seed-chain.ts and `src/lib/deploy.test.ts`
+ * compares it against render.yaml's chain, step for step and order for order.
+ * The two cannot be one object — a YAML blueprint cannot import a module — so
+ * the guard goes through the consumers, which is the shape CLAUDE.md rule 21
+ * asks for.
+ *
+ * The last step is `tag:catalogue`, the post-seed tagging step. It is one
+ * exported function (`tagCatalogue()`, src/lib/catalogue/tagging.ts) behind one
+ * wrapper (scripts/tag-catalogue.mjs), and the deploy runs the same wrapper.
+ * The founder, before it was built: "one exported function both paths invoke,
+ * or the button and the deploy drift apart the day after the button existed to
+ * prevent exactly that."
+ */
+const STEPS: readonly ChainStep[] = CATALOGUE_CHAIN;
 
 /**
  * Offering the catalogue, which the seeders deliberately will not do.

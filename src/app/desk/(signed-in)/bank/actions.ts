@@ -194,6 +194,23 @@ export async function saveBankItem(
     // `affinity` rows are NOT touched. They are the other half of db/043 —
     // "this lantern also suits Amalfi, at 0.4" — they carry no `native`, and
     // a destination edit has no business deleting a weight somebody set.
+    //
+    // BUT NOTE WHAT AN AFFINITY ROW IS AND IS NOT, because this comment has
+    // been read as if it described sharing and it does not:
+    //
+    //   affinity re-weights scoring for already-eligible candidates; it never
+    //   confers eligibility — sharing requires a second native row.
+    //
+    // `claimEligibility` (@/lib/selection/occasion.ts) reads a native row as a
+    // WHITELIST. "This lantern also suits Amalfi at 0.4" leaves the lantern
+    // available in its native room ONLY, with a number Amalfi never reads.
+    //
+    // WHICH IS THE HAZARD IN THE STATEMENT ABOVE. Since 2026-08-26 an
+    // `Also at:` line in docs/atmosphere-idea-bank-v1.md gives one item SEVERAL
+    // native rows (scripts/seed-bank.mjs, section 10) — and this form still has
+    // one select, so saving any edit to a shared item deletes its other claims.
+    // The form is not wrong about its own intent; it cannot express a set.
+    // Booked in docs/needs-a-human.md, 2026-08-26, as a screen decision.
     await query(
       `delete from bank_item_world
         where bank_item_id = $1 and native and world_id <> $2`,

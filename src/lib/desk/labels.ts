@@ -55,6 +55,32 @@ export const POOL_STATUS: Readonly<Record<string, string>> = {
   discontinued: "Discontinued",
 };
 
+/**
+ * THE SAME ENUM, ON THE MENU POOL, WHERE THE THIRD VALUE MEANS RETIRED.
+ *
+ * db/045 retired all thirty-nine menus by founder ruling — db/022 deleted the
+ * nine `occasion_slot` rows for `the_menu`, so no package can deliver one. It
+ * could not write `status = 'retired'`: `product_status` has no such value,
+ * and adding one is impossible inside a single migration (Postgres refuses to
+ * USE a new enum value in the transaction that added it) and disproportionate
+ * across the six pools that share the type. So the honest available value is
+ * `discontinued`, and db/045 argues that at length.
+ *
+ * What that leaves is a WORD gap, not a data gap: a menu is not discontinued
+ * by a supplier, it is retired by a decision. The gap is closed here, in the
+ * one place this codebase keeps its vocabulary, rather than by each screen
+ * spelling its own third word — which is how two surfaces come to disagree
+ * about what a status means (rule 21).
+ *
+ * `draft` and `active` are POOL_STATUS's, verbatim, because on a menu they
+ * mean exactly what they mean everywhere else.
+ */
+export const MENU_STATUS: Readonly<Record<string, string>> = {
+  draft: POOL_STATUS.draft,
+  active: POOL_STATUS.active,
+  discontinued: "Retired",
+};
+
 /** world_status in db/001. */
 export const WORLD_STATUS: Readonly<Record<string, string>> = {
   draft: "Draft",

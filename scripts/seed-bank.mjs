@@ -202,6 +202,129 @@
  * nothing about slots, because this script genuinely does not decide them. To
  * see what a row was classified as, read `bank_item_card.slot_code`.
  *
+ * 9. THE EVENING SUPPLIES IT — db/044, AND WHY THE RULE IS *HERE* THIS TIME
+ *
+ * db/044 added the founder's third category: an item the night produces rather
+ * than one the house ships. A row in it carries `supply = 'evening_supplied'`,
+ * a `take_home_quantity` of per_guest or single_artifact, a compulsory
+ * `supply_note`, and zero or more `bank_item_dependency` rows — a SLOT it
+ * watches plus a PREDICATE asked of whatever filled that slot.
+ *
+ * Section 8 above says a classification rule belongs in SQL, and this one does
+ * the opposite. The difference is the number of callers, not a change of mind.
+ * db/043 had to classify 180 EXISTING rows and every later insert, so it had
+ * two callers and needed one shared implementation. db/044 backfills nothing —
+ * every row in the bank today is stocked, on the document's own routing rule —
+ * so `supply` has exactly ONE writer, which is this file, and there is no
+ * second implementation for it to drift from. A trigger here would be a rule
+ * with one caller wearing the costume of a rule with two.
+ *
+ * IT IS READ FROM THE CONTENT, NOT INFERRED FROM IT. The clause says
+ *
+ *     THE EVENING SUPPLIES IT (per guest; from the_drinks yields_cork)
+ *     THE EVENING SUPPLIES IT (one guest only; from game yields_prize)
+ *     THE EVENING SUPPLIES IT (per guest; from the night itself)
+ *
+ * — the founder's own phrase for the category, so the marker reads as English
+ * in the document a person reads, exactly as FOUNDER-PENDING does. The two
+ * identifiers are machine names on purpose: this file does NOT keep a list of
+ * slot codes or supplies codes to check them against (rule 19). db/044 gives
+ * `bank_item_dependency` real foreign keys to `slot_kind` and `supplies_tag`,
+ * so a typo is a failed insert naming the bad code, and the registry stays the
+ * only truth. A dry run can only check the SHAPE, and says so.
+ *
+ * `ships` GOES FALSE, and the database also refuses the alternative.
+ * db/044's CHECK forbids an evening-supplied row that claims to ship, so the
+ * two facts are declared twice and disagreement is an error rather than a
+ * silent correction. Every such row is listed in the report under its own
+ * heading; nothing is set quietly.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * 10. `Also at:` — ONE ITEM, TWO ROOMS, WITHOUT A SECOND COPY OF IT
+ *
+ * THE FACT THIS SECTION EXISTS TO STATE, because it has now been misread
+ * three times in one week — once in a report, once in a ruling, and twice as
+ * two rows that were written and do nothing:
+ *
+ *   AFFINITY RE-WEIGHTS SCORING FOR ALREADY-ELIGIBLE CANDIDATES; IT NEVER
+ *   CONFERS ELIGIBILITY — SHARING REQUIRES A SECOND NATIVE ROW.
+ *
+ * `claimEligibility` (src/lib/selection/occasion.ts) reads a native row as a
+ * WHITELIST: any `native` row makes an item eligible for its native rooms AND
+ * NO OTHERS. A row that is not native and not forbidden IS NOT A CLAIM AT
+ * ALL — `affinity` is the additive term stage 4 scores with (fill.ts:461) and
+ * says nothing whatever about eligibility. So "native to Côte d'Azur, affinity
+ * to Big Sur" does not make the item available at Big Sur. It makes it
+ * available at Côte d'Azur, and adds a number that nothing at Big Sur will
+ * ever get to use, because the item never clears the gate there.
+ *
+ * That mechanism is correct and load-bearing — it is what keeps a game scoped
+ * to Westhampton at +0.4 playable everywhere else. It is not a bug. It just
+ * answers a different question than its name suggests, which is why the fact
+ * is stated here rather than left to be re-derived.
+ *
+ * THE INSTRUMENT. db/043 made the room a join rather than a column precisely
+ * so a shared lantern would stop being six hand-authored lanterns — and then
+ * the document had no way to say it, so the debt stayed. This is the way:
+ *
+ *   the loose dried aromatic — take-home, … (Also at: Big Sur)
+ *   (FOUNDER-PENDING — …)
+ *
+ * A depth-0 parenthetical of the clause, reading `Also at: <destination>,
+ * <destination>`. The LINE is verbatim docs/drinks.md's, where seed-drinks
+ * parses the same words out of a sixth bullet; only the delimiter differs,
+ * because a bank record is one semicolon-delimited clause and not five
+ * bullets. Each name is a key of DESTINATIONS in
+ * scripts/catalogue-vocabulary.mjs — the short name, "Big Sur", never the room
+ * heading "BIG SUR, 1971", whose comma would be read as a list separator.
+ *
+ * Each name becomes another `native = true` row. Not an affinity weight: this
+ * file has never known how strongly an item leans toward a room, and a number
+ * invented here would be a weight nobody authored driving a score nobody
+ * checks — which is the failure above, wearing the other hat.
+ *
+ * IT SHARES THE WHOLE ITEM, VERBATIM — the name, the description, the phase,
+ * the cards riding with it. There is one row and it is claimed twice; there is
+ * no per-room text and there cannot be one, because the row IS the text. So an
+ * item whose words name its own room cannot travel: "the Oaxacan recipe in the
+ * house's hand" arrives at Aspen still saying Oaxaca. Where the two rooms
+ * genuinely need different words, that is TWO ROWS, authored separately, and
+ * the founder decides it — an `Also at:` line is not a way to avoid making
+ * that call.
+ *
+ * WHAT GETS WRITTEN AND WHEN, which is two rules and not one:
+ *
+ *   THE HOME ROOM — the heading the clause sits under — is written only where
+ *     the item has NO native claim at all. Unchanged from db/043 and for its
+ *     reason: moving a lantern from Positano to Amalfi is a curator's decision
+ *     and the file must not undo it on the next deploy.
+ *
+ *   AN `Also at:` ROOM is written whenever that PAIR has no row, even where
+ *     the item already carries native claims — otherwise a line added to an
+ *     item that already exists in the database would do nothing at all, on
+ *     every deploy, silently, which is the entire failure this section is
+ *     about. It is the treatment `claimDependencies` already gives a
+ *     dependency and for the same argument: this is a conjunction the ITEM
+ *     declares about itself, not a single fact the desk owns, and the desk has
+ *     no gesture today that means "drop one of two rooms" — its editor has one
+ *     select, which can only choose a home. THE DAY THE DESK GROWS A
+ *     MULTI-ROOM EDITOR THIS GUARD MUST CHANGE, or a removal there will be
+ *     re-added here.
+ *
+ *   AN EXISTING NON-NATIVE ROW FOR THE PAIR IS UPGRADED to native rather than
+ *     left alone. `on conflict do nothing` would leave the inert affinity row
+ *     inert and report a claim it did not make. A `forbidden` row is NOT
+ *     upgraded — a veto that can be outvoted is not a veto — and the collision
+ *     is a hard failure naming the item, never a silent skip.
+ *
+ * KNOWN, AND NOT FIXED HERE: src/app/desk/(signed-in)/bank/actions.ts saves
+ * the item form with `delete from bank_item_world where native and world_id <>
+ * $2`, so saving ANY edit to a shared item at the desk destroys its second
+ * claim. That form was written when an item had exactly one room. It is
+ * reported at the end of every run that writes a second claim, and it is
+ * booked in docs/needs-a-human.md; it is a screen, and a screen is a person's
+ * call.
+ *
  * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL unless
  * --dry-run.
  */
@@ -261,20 +384,26 @@ function isHeldBack(row) {
 /**
  * THE DESTINATION, AS A CLAIM RATHER THAN A COLUMN — db/043, section 8 above.
  *
- * Written only where the item claims NO destination at all, which is the same
- * shape as `gesture = coalesce(gesture, $2)` at the bottom of this file and the
- * same reason: the desk outranks the file for a curator's decision, and moving
- * a lantern from Positano to Amalfi is one. An `on conflict do nothing` alone
- * would not do — it would re-add the room she had just removed, silently, on
- * the next deploy.
+ * The HOME room is written only where the item claims NO destination at all,
+ * which is the same shape as `gesture = coalesce(gesture, $2)` at the bottom of
+ * this file and the same reason: the desk outranks the file for a curator's
+ * decision, and moving a lantern from Positano to Amalfi is one. An
+ * `on conflict do nothing` alone would not do — it would re-add the room she
+ * had just removed, silently, on the next deploy.
  *
- * `native` because that is what `bank_item.world_id` meant. `affinity` stays at
- * the default 0.000: the file has never said how strongly an item leans toward
- * a room it was not written for, and a number invented here would be a weight
- * nobody authored driving a score nobody checked.
+ * `native` because that is what `bank_item.world_id` meant, and because
+ * `native` is the only thing that grants eligibility at all. `affinity` stays
+ * at the default 0.000: the file has never said how strongly an item leans
+ * toward a room it was not written for, and a number invented here would be a
+ * weight nobody authored driving a score nobody checked.
+ *
+ * Returns the world ids it actually wrote a claim for, so the report can say
+ * which second claims landed and which were already there.
  */
-async function claimDestination(client, bankItemId, worldId) {
-  await client.query(
+async function claimDestination(client, bankItemId, worldId, alsoWorldIds = []) {
+  const written = [];
+
+  const { rowCount } = await client.query(
     `insert into bank_item_world (bank_item_id, world_id, native, note)
      select $1, $2, true, $3
       where not exists (select 1 from bank_item_world
@@ -285,6 +414,87 @@ async function claimDestination(client, bankItemId, worldId) {
       `Written for this destination in ${SOURCE_NAME}, by seed-bank.`,
     ]
   );
+  if (rowCount > 0) written.push(worldId);
+
+  // SECTION 10. A second room is not governed by the guard above: an item that
+  // already carries its home claim would otherwise never gain a claim the file
+  // added afterwards, which is the whole point of the line.
+  //
+  // `do update` rather than `do nothing`, and the difference is the section's
+  // entire subject: a pre-existing row for this pair that is NOT native is an
+  // affinity weight, and an affinity weight is not a claim. Leaving it would
+  // report a share that the eligibility gate does not honour. `where not
+  // forbidden` protects the veto, and the check after it turns the one case
+  // this cannot resolve into a failure with the item's name in it.
+  for (const alsoId of alsoWorldIds) {
+    const { rows: before } = await client.query(
+      `select native, forbidden from bank_item_world
+        where bank_item_id = $1 and world_id = $2`,
+      [bankItemId, alsoId]
+    );
+
+    if (before.length > 0 && before[0].forbidden) {
+      throw new Error(
+        `an "Also at:" line claims a destination this item is already ` +
+          `FORBIDDEN at (bank_item ${bankItemId}, world ${alsoId}). A veto ` +
+          `that can be outvoted is not a veto, so the claim was refused ` +
+          `rather than written over it. Remove one of the two — the line in ` +
+          `${SOURCE_NAME} or the forbidden row at the desk.`
+      );
+    }
+    if (before.length > 0 && before[0].native) continue;
+
+    await client.query(
+      `insert into bank_item_world (bank_item_id, world_id, native, note)
+       values ($1, $2, true, $3)
+       on conflict (bank_item_id, world_id) do update
+          set native = true, note = excluded.note
+        where not bank_item_world.forbidden`,
+      [
+        bankItemId,
+        alsoId,
+        `Also at this destination, per the "Also at:" line in ${SOURCE_NAME}, ` +
+          `by seed-bank. A second NATIVE claim: affinity would not make the ` +
+          `item eligible here.`,
+      ]
+    );
+    written.push(alsoId);
+  }
+
+  return written;
+}
+
+/**
+ * WHAT THE EVENING HAS TO DO — db/044, section 9 above.
+ *
+ * `on conflict do nothing` and nothing else, which is deliberately WEAKER than
+ * claimDestination's guard. There the file must not re-add a room a curator
+ * removed, because `world_id` was a single fact and re-adding it undoes her.
+ * Here a dependency is a conjunction the item declared about itself — a cork
+ * needs bottles whatever a curator thinks — and the desk's move is to fix the
+ * CONTENT rather than to delete the row's reason for existing. So the file
+ * re-asserts what it said and adds nothing it did not say; a dependency the
+ * desk added is left alone because this only ever inserts.
+ *
+ * Both codes go in unvalidated by this file, on purpose. db/044's foreign keys
+ * to `slot_kind` and `supplies_tag` are the check, so a typo fails the insert
+ * naming the bad code — and a list of valid codes kept here would be the
+ * hand-written copy of a registry that CLAUDE.md rule 19 is entirely about.
+ */
+async function claimDependencies(client, bankItemId, dependencies) {
+  for (const dependency of dependencies) {
+    await client.query(
+      `insert into bank_item_dependency (bank_item_id, slot_code, supplies, note)
+       values ($1, $2, $3, $4)
+       on conflict (bank_item_id, slot_code, supplies) do nothing`,
+      [
+        bankItemId,
+        dependency.slotCode,
+        dependency.supplies,
+        `Declared by the clause in ${SOURCE_NAME}, by seed-bank.`,
+      ]
+    );
+  }
 }
 
 /** Kept in sync with the same function in scripts/migrate.mjs and src/lib/db.ts. */
@@ -364,6 +574,7 @@ const BLOCKS = new Map([
  */
 const NOT_A_ROOM = new Set([
   "ROUTING RULES — READ FIRST",
+  "FORMAT NOTES — SAYING A ROW BELONGS TO TWO ROOMS",
   "NEW CONTENT CLASSES (schema-relevant)",
   "FOUNDER-PENDING LEDGER (from this bank)",
 ]);
@@ -445,6 +656,112 @@ const IS_A_KIT = /\bkits?\b/i;
  * unresolved either/or, `ships` defaults true, and the line is reported.
  */
 const OWNED_IF_PRESENT = /owned-if-present|\bglanced\b|\bglance only\b|\bglance\b/i;
+
+/**
+ * THE EVENING SUPPLIES IT — db/044's third category, read off the clause.
+ *
+ * The marker is the founder's own name for the category so that it reads as a
+ * sentence in a document she reads, and the parenthetical carries the two facts
+ * the schema needs:
+ *
+ *     THE EVENING SUPPLIES IT (per guest; from the_drinks yields_cork)
+ *     THE EVENING SUPPLIES IT (one guest only; from ambient_game yields_prize)
+ *     THE EVENING SUPPLIES IT (per guest; from the_main yields_shell + the night itself)
+ *     THE EVENING SUPPLIES IT (per guest; from the night itself)
+ *
+ * `from the night itself` is a REAL ANSWER and not a missing one: a rose hip
+ * off the lane, a stone out of the creek, a strip of the host's own masking
+ * tape. Those have no slot to watch and correctly produce zero dependency
+ * rows — which is why db/044 makes `supply_note` compulsory, so that "decided:
+ * the night supplies it" and "nobody has written the dependency yet" cannot
+ * look the same in the data.
+ *
+ * The codes are NOT validated against a list here. db/044 gives the dependency
+ * table foreign keys to `slot_kind(code)` and `supplies_tag(code)`; a list in
+ * this file would be the hand-written copy CLAUDE.md rule 19 is about, and it
+ * would be wrong the day a slot is added rather than the day it is removed. A
+ * dry run checks the SHAPE — two lowercase identifiers — and says plainly that
+ * the names are the database's to judge.
+ */
+const EVENING_SUPPLIES = /THE EVENING SUPPLIES IT\s*\(([^)]*)\)/;
+
+/** `per guest` / `one guest only` -> db/044's take_home_quantity. */
+const SUPPLY_QUANTITY = new Map([
+  ["per guest", "per_guest"],
+  ["one guest only", "single_artifact"],
+]);
+
+/** One `slot_code supplies_code` pair, or the night itself. */
+const A_DEPENDENCY = /^([a-z][a-z0-9_]*)\s+([a-z][a-z0-9_]*)$/;
+const THE_NIGHT_ITSELF = /^the night itself$/i;
+
+/**
+ * Read the marker, or return null for the 312 rows that do not carry it.
+ *
+ * Every failure here is a FAILURE, not a shrug: a clause that says the evening
+ * supplies it and then cannot say how is the exact ambiguity db/044's
+ * compulsory note exists to forbid, and letting it through as a stocked row
+ * would put an item with no stock on an order.
+ */
+function readSupply(clause, name) {
+  const marked = EVENING_SUPPLIES.exec(clause);
+  if (!marked) return null;
+
+  const inner = marked[1].trim();
+  const at = inner.indexOf(";");
+  if (at === -1) {
+    fail(
+      `"${name}" is marked THE EVENING SUPPLIES IT but its parenthesis has no ` +
+        `";" separating the quantity from the supply: "${inner}". The shape is ` +
+        `"(per guest; from the_drinks yields_cork)".`
+    );
+  }
+
+  const quantity = SUPPLY_QUANTITY.get(inner.slice(0, at).trim().toLowerCase());
+  if (!quantity) {
+    fail(
+      `"${name}" is marked THE EVENING SUPPLIES IT with quantity ` +
+        `"${inner.slice(0, at).trim()}", which is neither "per guest" nor ` +
+        `"one guest only". db/044 has two quantity semantics and they must ` +
+        `never be conflated — a room does not have per-guest take-home ` +
+        `coverage on the strength of one trophy.`
+    );
+  }
+
+  const source = inner.slice(at + 1).trim().replace(/^from\s+/i, "");
+  if (source.length === 0) {
+    fail(
+      `"${name}" is marked THE EVENING SUPPLIES IT and says nothing after ` +
+        `the ";". Say "from the night itself" if nothing in the package ` +
+        `supplies it — that is an answer, and silence is not.`
+    );
+  }
+
+  const dependencies = [];
+  let theNight = false;
+  for (const part of source.split("+").map((p) => p.trim())) {
+    if (THE_NIGHT_ITSELF.test(part)) {
+      theNight = true;
+      continue;
+    }
+    const pair = A_DEPENDENCY.exec(part);
+    if (!pair) {
+      fail(
+        `"${name}" names a supply "${part}", which is neither "the night ` +
+          `itself" nor a "slot_code supplies_code" pair. db/044 watches a ` +
+          `SLOT and asks a PREDICATE of whatever filled it; it never points ` +
+          `at a row.`
+      );
+    }
+    dependencies.push({ slotCode: pair[1], supplies: pair[2] });
+  }
+
+  if (dependencies.length === 0 && !theNight) {
+    fail(`"${name}" is marked THE EVENING SUPPLIES IT and watches nothing.`);
+  }
+
+  return { quantity, dependencies, note: source };
+}
 
 /**
  * PHASE, FROM WORDS SHE ACTUALLY WROTE.
@@ -1071,12 +1388,94 @@ function extractCards(spine, parens) {
 }
 
 /**
+ * THE `Also at:` LINE — section 10.
+ *
+ * A depth-0 parenthetical, so it rides in the channel this document already
+ * uses for everything said ABOUT an item rather than in it: `(GESTURE)`,
+ * `(owned-if-present)`, `(FOUNDER-PENDING — …)`. The words inside are verbatim
+ * docs/drinks.md's sixth bullet.
+ */
+const ALSO_AT = /\(\s*Also at:?\s*([^)]*)\)/i;
+
+/** Anything else that says "also at" and is not the line. See `readAlsoAt`. */
+const SOUNDS_LIKE_ALSO_AT = /\balso\s+at\b/i;
+
+/**
+ * The rooms an `Also at:` line names, and the clause with the line removed.
+ *
+ * REMOVED, because the line is a claim about the row and not part of it. Every
+ * other reader downstream — the name, the description that reaches a member,
+ * the FOUNDER-PENDING test, the `differs` comparison against what the database
+ * already holds — sees the clause exactly as it read before the line was
+ * added. So adding one to an existing item changes its rooms and NOTHING else,
+ * and does not need `--overwrite` to land. Same treatment seed-drinks gives
+ * its sixth bullet, for the same reason.
+ *
+ * A clause that says "also at" anywhere else is a hard failure rather than a
+ * skip: a line the author believed was a claim and the parser silently read as
+ * prose is precisely the shape of failure section 10 exists to end.
+ */
+function readAlsoAt(clause, roomKey, context) {
+  const match = ALSO_AT.exec(clause);
+  if (!match) {
+    if (SOUNDS_LIKE_ALSO_AT.test(clause)) {
+      fail(
+        `${context} "${clause}" says "also at" but not as its own ` +
+          `parenthetical. The only form this file reads is ` +
+          `"(Also at: <destination>, <destination>)" — see section 10. A ` +
+          `phrase that looks like a claim and is read as prose is worse than ` +
+          `a failed run.`
+      );
+    }
+    return { also: [], clause };
+  }
+
+  const also = [];
+  for (const raw of match[1].split(",")) {
+    const heading = raw.trim();
+    if (heading.length === 0) continue;
+    if (!Object.hasOwn(DESTINATIONS, heading)) {
+      const asRoom = Object.hasOwn(ROOM_HEADINGS, heading.toUpperCase());
+      fail(
+        `${context} "Also at" names "${heading}", which is not a destination ` +
+          `this catalogue knows. ` +
+          (asRoom
+            ? `Write the short name — the key of DESTINATIONS in ` +
+              `scripts/catalogue-vocabulary.mjs — and not the room heading: a ` +
+              `heading carries a comma and this list is comma-separated.`
+            : `Add it to DESTINATIONS in scripts/catalogue-vocabulary.mjs — ` +
+              `docs/new-destination.md §5 is about exactly this step.`)
+      );
+    }
+    if (heading === roomKey) {
+      fail(
+        `${context} "Also at" names ${heading}, which is the room the clause ` +
+          `already sits under.`
+      );
+    }
+    if (!also.includes(heading)) also.push(heading);
+  }
+
+  if (also.length === 0) {
+    fail(`${context} "${match[0]}" names no destination at all.`);
+  }
+
+  return {
+    also,
+    clause: clause.replace(ALSO_AT, "").replace(/\s+/g, " ").trim(),
+  };
+}
+
+/**
  * The clause -> everything the row needs, or a refusal.
  *
  * Returns `{ skip, reason }` where the parser will not commit to a row.
  */
-function readClause(raw, context) {
-  const clause = raw.replace(/\.$/, "").trim();
+function readClause(raw, context, roomKey) {
+  const withAlso = raw.replace(/\.$/, "").trim();
+  // Before anything else reads the clause, so that no downstream reader — the
+  // name, the description, the hold-back test — ever sees the line.
+  const { also, clause } = readAlsoAt(withAlso, roomKey, context);
 
   // Her own thinking-out-loud. "oyster... no — pasta board, flour scoop for the
   // lesson" is a line being changed mid-write, and a machine that picks one of
@@ -1122,18 +1521,27 @@ function readClause(raw, context) {
   const lead = /min_lead_days\s*~?\s*(\d+)/.exec(clause);
   const leadNamed = /min_lead_days/.test(clause);
 
+  // db/044. Null for everything that is not in the third category, which is
+  // every row the bank held before today.
+  const supply = readSupply(clause, name);
+
   return {
     skip: false,
     raw: clause,
     name,
+    also,
     isGesture,
     cards: extracted.cards,
     phase,
     venue,
     minLeadDays: lead ? Number(lead[1]) : null,
     leadNamedWithoutNumber: leadNamed && !lead,
-    ships: !OWNED_IF_PRESENT.test(clause),
+    // An evening-supplied row has no stock, so there is no line on the order.
+    // db/044's CHECK refuses the other combination rather than correcting it,
+    // and the report names every row this touched.
+    ships: !OWNED_IF_PRESENT.test(clause) && supply === null,
     weight: /\blow weight\b/i.test(clause) ? LOW_WEIGHT : 1,
+    supply,
     context,
   };
 }
@@ -1274,7 +1682,7 @@ for (const room of rooms) {
     }
 
     for (const raw of splitDepthZero(block.text, ";")) {
-      const read = readClause(raw, citation);
+      const read = readClause(raw, citation, room.key);
       if (read.skip) {
         if (read.declined) {
           declined.push({ room: room.heading, label: block.label, text: raw.trim() });
@@ -1291,6 +1699,19 @@ for (const room of rooms) {
       }
 
       if (read.isGesture) {
+        // A gesture is `world.gesture`, a column on the room — there is no row
+        // for a second room to claim. "Only the signature gesture is
+        // invariant" per room (the document's own routing rule 4), so two
+        // rooms sharing one is a contradiction rather than a saving.
+        if (read.also.length > 0) {
+          fail(
+            `${citation} "${read.name}" is a GESTURE and carries an ` +
+              `"Also at:" line. A gesture is a column on the room, not a row ` +
+              `in a pool, so there is nothing for a second room to claim — ` +
+              `and the document's routing rule 4 makes the signature gesture ` +
+              `invariant per room.`
+          );
+        }
         gestures.push({
           room: room.heading,
           key: room.key,
@@ -1344,6 +1765,8 @@ for (const room of rooms) {
         room: room.heading,
         key: room.key,
         worldSlug: room.slug,
+        // Section 10. Keys of DESTINATIONS, resolved to worlds at write time.
+        also: read.also,
         label: block.label,
         line: block.line,
         kind,
@@ -1354,6 +1777,13 @@ for (const room of rooms) {
         minLeadDays: read.minLeadDays,
         ships: read.ships,
         weight: read.weight,
+        // db/044. `stocked` for every row that does not carry the marker, which
+        // is not a guess: the bank document's own routing rule says the bank
+        // holds purchasable or placeable objects.
+        supply: read.supply ? "evening_supplied" : "stocked",
+        takeHomeQuantity: read.supply ? read.supply.quantity : null,
+        supplyNote: read.supply ? read.supply.note : "",
+        dependencies: read.supply ? read.supply.dependencies : [],
         citation,
         cards: [],
         raw: read.raw,
@@ -1393,7 +1823,10 @@ for (const room of rooms) {
       if (!read.ships) {
         notes.push({
           room: room.heading,
-          kind: "owned-if-present",
+          // TWO REASONS A LINE IS NOT ON THE ORDER since db/044, and the note
+          // says which. Reporting both under "owned-if-present" would have made
+          // a cork look like a turntable the house hopes she owns.
+          kind: read.supply ? "the evening supplies it" : "owned-if-present",
           text: `"${read.name}" ships = false. ${read.raw}`,
         });
       }
@@ -1515,6 +1948,11 @@ for (const item of items) {
       room: item.room,
       key: item.key,
       worldSlug: item.worldSlug,
+      // A card RIDES WITH its item (db/031's technique_card_id), so it goes
+      // wherever the item goes. An item eligible in two rooms whose card was
+      // claimed by one of them would be placed in the second with its card
+      // pruned out from under it.
+      also: item.also,
       kind: "printed_card",
       name: card.name,
       description: [
@@ -1526,6 +1964,13 @@ for (const item of items) {
       minLeadDays: null,
       ships: true,
       weight: 1,
+      // A card is printed matter the house authors, so it is stocked by
+      // definition — including a card riding with an evening-supplied act. The
+      // cork is not printed; the card explaining it would be.
+      supply: "stocked",
+      takeHomeQuantity: null,
+      supplyNote: "",
+      dependencies: [],
       citation: item.citation,
       ridesWith: item.slug,
       // db/031 holds ONE technique_card_id per row. A second card can be
@@ -1742,6 +2187,9 @@ function report() {
       `rides with.`
   );
 
+  reportSupply(allRows);
+  reportShared(allRows);
+
   section("JUDGEMENTS AND GAPS");
   const byKind = new Map();
   for (const note of notes) {
@@ -1825,6 +2273,115 @@ function report() {
   }
 }
 
+/**
+ * THE EVENING SUPPLIES IT — every row db/044's third category touched.
+ *
+ * Printed whether or not there are any, so that "none" is a reading rather than
+ * a section that quietly did not appear. Nothing here is set silently: the two
+ * quantity semantics are separated because that separation is the whole point
+ * of the founder's ruling, and the rows watching nothing are listed under their
+ * own heading because "supplied by the night itself" is a decision somebody
+ * made and not a dependency somebody forgot.
+ */
+function reportSupply(rows) {
+  const supplied = rows.filter((row) => row.supply === "evening_supplied");
+  section("THE EVENING SUPPLIES IT — db/044's third category");
+
+  if (supplied.length === 0) {
+    console.log(
+      `   None. Every row in the document is stocked, which is what the ` +
+        `bank's own\n   routing rule says the bank holds.`
+    );
+    return;
+  }
+
+  const perGuest = supplied.filter((r) => r.takeHomeQuantity === "per_guest");
+  const single = supplied.filter((r) => r.takeHomeQuantity === "single_artifact");
+  const unwatched = supplied.filter((r) => r.dependencies.length === 0);
+
+  console.log(
+    `   ${supplied.length} row(s) carry the marker. Every one ships nothing ` +
+      `(db/044 refuses\n   the other combination) and every one names how the ` +
+      `night produces it.\n`
+  );
+
+  const show = (label, list) => {
+    console.log(`   ${label} — ${list.length}`);
+    for (const row of list) {
+      const watches =
+        row.dependencies.length === 0
+          ? "the night itself"
+          : row.dependencies
+              .map((d) => `${d.slotCode} -> ${d.supplies}`)
+              .join(" AND ");
+      console.log(`     ${row.slug}`);
+      console.log(`       watches  ${watches}`);
+    }
+    console.log("");
+  };
+
+  show("PER GUEST — scales with the dinner", perGuest);
+  show("SINGLE ARTIFACT — one guest gets it", single);
+
+  console.log(
+    `   ${unwatched.length} of them watch NO slot. That is an answer, not a ` +
+      `gap: a rose hip off\n   the lane and a stone out of the creek have ` +
+      `nothing in the package to depend\n   on, and db/044 makes supply_note ` +
+      `compulsory so the data cannot confuse\n   "decided" with "not yet ` +
+      `written".\n`
+  );
+  console.log(
+    `   THE SLOT AND SUPPLIES CODES ABOVE ARE NOT CHECKED BY THIS SCRIPT. ` +
+      `db/044 gives\n   bank_item_dependency real foreign keys to slot_kind ` +
+      `and supplies_tag, so a bad\n   code is a failed insert naming it. A ` +
+      `list of valid codes here would be the\n   hand-written copy rule 19 is ` +
+      `about. A dry run has checked the SHAPE only.`
+  );
+  console.log(
+    `\n   AND NOTHING IN THE CATALOGUE CARRIES A SUPPLIES TAG YET. ` +
+      `ingredient_supplies is\n   created empty by db/044 — a migration runs ` +
+      `BEFORE every seeder, so it cannot\n   tag content that does not exist ` +
+      `(the same reason ingredient_requirement is\n   empty on every database ` +
+      `built by the committed chain). Until a pool's own\n   seeder tags its ` +
+      `rows, every dependency above resolves BROKEN, which is\n   correct and ` +
+      `loud: all ${supplied.length} rows are drafts carrying a founder ` +
+      `question and\n   none of them can reach a member meanwhile.`
+  );
+}
+
+/**
+ * WHAT THE DOCUMENT SAYS BELONGS TO TWO ROOMS — section 10, before a database
+ * is involved, so that `--dry-run` answers it too.
+ */
+function reportShared(rows) {
+  const travelling = rows.filter((row) => (row.also ?? []).length > 0);
+  section('"Also at:" — ONE ROW, CLAIMED BY MORE THAN ONE ROOM');
+
+  if (travelling.length === 0) {
+    console.log(
+      `   None. Every row in the document belongs to the room it sits ` +
+        `under.\n   The line exists (section 10) and nothing uses it yet, ` +
+        `which is a limitation\n   removed rather than data changed.`
+    );
+    return;
+  }
+
+  console.log(
+    `   ${travelling.length} row(s). Each becomes a second NATIVE row in ` +
+      `bank_item_world —\n   the only kind of row that grants eligibility. ` +
+      `Affinity re-weights scoring for\n   candidates that already cleared ` +
+      `the gate and confers none.\n`
+  );
+  for (const row of travelling) {
+    console.log(
+      `   ${row.slug}\n      ${row.worldSlug} + ` +
+        `${row.also.map((key) => DESTINATIONS[key]).join(" + ")}` +
+        `${isHeldBack({ description: row.description }) ? "   [held back — draft]" : ""}`
+    );
+    console.log(`      shares verbatim: "${row.name}"`);
+  }
+}
+
 function reportRoutes(lines, docPath, docName) {
   let headings = new Set();
   try {
@@ -1876,6 +2433,27 @@ let heldBack = 0;
 let gesturesWritten = 0;
 const stubbed = [];
 
+/**
+ * SECTION 10 — every second claim this run touched, and what happened to it.
+ *
+ * Both halves are reported. A claim WRITTEN is the file widening a row's reach
+ * and has to be visible, because CLAUDE.md rule 13 means the widened row is
+ * live the moment it is not held back. A claim ALREADY THERE is reported too,
+ * so a run that appears to do nothing says which of the two nothings it is.
+ */
+const shared = [];
+function recordAlsoAt(row, writtenIds, alsoWorlds) {
+  for (const world of alsoWorlds) {
+    shared.push({
+      slug: row.slug,
+      name: row.name,
+      home: row.worldSlug,
+      also: world.slug,
+      written: writtenIds.includes(world.id),
+    });
+  }
+}
+
 try {
   await client.query("begin");
 
@@ -1897,11 +2475,28 @@ try {
   const idBySlug = new Map();
   for (const row of allRows) {
     const world = worlds.get(row.key);
+    // Section 10. Every room in an `Also at:` line is one of the eighteen the
+    // document already carries, so `worlds` holds it — but ensureWorld is the
+    // one path that may create a world and this file does not get a second,
+    // shorter one for the case it thinks cannot happen.
+    const alsoWorlds = [];
+    for (const key of row.also ?? []) {
+      let target = worlds.get(key);
+      if (!target) {
+        target = await ensureWorld(client, key, "seed-bank");
+        if (target.created) stubbed.push(target.slug);
+        worlds.set(key, target);
+      }
+      alsoWorlds.push(target);
+    }
     const description = row.description.join("\n\n");
 
     const { rows: existing } = await client.query(
       `select id, name, description, kind::text, phase::text,
-              min_lead_days, ships, weight::text, source_citation
+              min_lead_days, ships, weight::text, source_citation,
+              supply::text as supply,
+              take_home_quantity::text as take_home_quantity,
+              supply_note
          from bank_item where slug = $1`,
       [row.slug]
     );
@@ -1921,11 +2516,19 @@ try {
         //
         // `world_id` LEFT THIS LIST IN db/043 and the destination is written
         // one statement later, into bank_item_world. See section 8.
+        //
+        // `supply`, `take_home_quantity` and `supply_note` join the list at
+        // $11..$13 — db/044, section 9. Appended rather than inserted into the
+        // middle for the reason the paragraph above records: this statement has
+        // already been broken once by a column leaving the list and nothing
+        // after it being renumbered.
         `insert into bank_item
            (slug, kind, name, description, phase,
-            min_lead_days, ships, weight, status, source_citation)
+            min_lead_days, ships, weight, status, source_citation,
+            supply, take_home_quantity, supply_note)
          values ($1, $2::bank_kind, $3, $4, $5::bank_phase,
-                 $6, $7, $8, $9::product_status, $10)
+                 $6, $7, $8, $9::product_status, $10,
+                 $11::bank_supply, $12::take_home_quantity, $13)
          returning id`,
         [
           row.slug,
@@ -1940,10 +2543,23 @@ try {
           // except where the row itself carries the founder's question.
           held ? HELD : LIVE,
           row.citation,
+          row.supply,
+          row.takeHomeQuantity,
+          row.supplyNote,
         ]
       );
       idBySlug.set(row.slug, inserted[0].id);
-      await claimDestination(client, inserted[0].id, world.id);
+      recordAlsoAt(
+        row,
+        await claimDestination(
+          client,
+          inserted[0].id,
+          world.id,
+          alsoWorlds.map((w) => w.id)
+        ),
+        alsoWorlds
+      );
+      await claimDependencies(client, inserted[0].id, row.dependencies);
       created += 1;
       if (held) {
         heldBack += 1;
@@ -1966,7 +2582,20 @@ try {
       // on the ordinary re-run. It is NOT part of `differs` — a destination a
       // curator moved at the desk is hers, exactly as the gesture and the
       // technique-card attachment are, and --overwrite governs her WORDS.
-      await claimDestination(client, existing[0].id, world.id);
+      recordAlsoAt(
+        row,
+        await claimDestination(
+          client,
+          existing[0].id,
+          world.id,
+          alsoWorlds.map((w) => w.id)
+        ),
+        alsoWorlds
+      );
+      // Same treatment as the destination and for the same reason: additive,
+      // `on conflict do nothing`, outside `differs`. A dependency a curator
+      // added at the desk is hers, and --overwrite governs the file's WORDS.
+      await claimDependencies(client, existing[0].id, row.dependencies);
       const differs =
         existing[0].name !== row.name ||
         existing[0].description !== description ||
@@ -1975,7 +2604,14 @@ try {
         (existing[0].min_lead_days ?? null) !== row.minLeadDays ||
         existing[0].ships !== row.ships ||
         Number(existing[0].weight) !== row.weight ||
-        existing[0].source_citation !== row.citation;
+        existing[0].source_citation !== row.citation ||
+        // db/044. These three ARE the file's words about where an object comes
+        // from — the clause said "THE EVENING SUPPLIES IT" or it did not — so
+        // they belong on this side of the line with `ships`, not with the
+        // destination claim.
+        existing[0].supply !== row.supply ||
+        (existing[0].take_home_quantity ?? null) !== row.takeHomeQuantity ||
+        existing[0].supply_note !== row.supplyNote;
 
       if (differs && !overwrite) {
         left += 1;
@@ -1998,7 +2634,10 @@ try {
           `update bank_item set name = $2, description = $3, kind = $4::bank_kind,
                   phase = $5::bank_phase,
                   min_lead_days = $6, ships = $7, weight = $8,
-                  source_citation = $9
+                  source_citation = $9,
+                  supply = $10::bank_supply,
+                  take_home_quantity = $11::take_home_quantity,
+                  supply_note = $12
              where id = $1`,
           [
             existing[0].id,
@@ -2010,6 +2649,9 @@ try {
             row.ships,
             row.weight,
             row.citation,
+            row.supply,
+            row.takeHomeQuantity,
+            row.supplyNote,
           ]
         );
         updated += 1;
@@ -2068,6 +2710,34 @@ if (stubbed.length > 0) {
       `\nA draft destination is never chosen for a customer. Author the look ` +
       `and the voice in src/lib/destinations.ts and run ` +
       `npm run seed:destinations, which completes a stub in place.`
+  );
+}
+
+if (shared.length > 0) {
+  const written = shared.filter((claim) => claim.written);
+  console.log(
+    `\n${"─".repeat(72)}\n"Also at:" — ${shared.length} SECOND CLAIM(S), ` +
+      `${written.length} written this run\n${"─".repeat(72)}\n` +
+      `Each is a second NATIVE row in bank_item_world, which is the only kind ` +
+      `of row\nthat makes an item eligible somewhere: affinity re-weights ` +
+      `scoring for candidates\nthat already cleared the gate and confers no ` +
+      `eligibility at all.\n`
+  );
+  for (const claim of shared) {
+    console.log(
+      `   ${claim.written ? "written " : "already "} ${claim.slug} — ` +
+        `${claim.home} + ${claim.also}`
+    );
+  }
+  console.log(
+    `\n   ONE ROW, CLAIMED TWICE: the name and the description travel ` +
+      `verbatim. If the\n   words name their own room, the item cannot ` +
+      `travel and wants two rows instead.\n` +
+      `\n   AND A KNOWN HAZARD, until somebody fixes the screen: the bank ` +
+      `item form\n   (src/app/desk/(signed-in)/bank/actions.ts) has ONE ` +
+      `destination select and its save\n   deletes every other native row, ` +
+      `so saving any edit to one of the rows above at\n   the desk destroys ` +
+      `its second claim. Booked in docs/needs-a-human.md.`
   );
 }
 

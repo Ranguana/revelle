@@ -110,7 +110,14 @@ export default async function PublishPage({
 }: PageProps<"/desk/publish">) {
   const params = await searchParams;
 
-  const registry = await pools(ask);
+  // RETIRED POOLS ARE NOT LISTED HERE. Founder ruling, 2026-08-27: a pool
+  // the engine cannot draw from has nothing to say on the gate, and a row
+  // reading "0 of 0, retired" is the confusion db/045 was meant to end
+  // rather than relocate. The registry still knows them, /desk/publish
+  // still governs them if one is ever un-retired, and the rows are still
+  // readable at their own route — this is a display decision, not a
+  // second retirement.
+  const registry = (await pools(ask)).filter((pool) => !pool.retired);
   const wanted = one(params.pool);
   const world = wanted === "world";
 
@@ -278,6 +285,21 @@ function Board({
                     {row.pool.activeColumn} = {row.pool.activeValue}
                   </code>
                 </div>
+                {/*
+                  A RETIRED POOL SAYS SO WHERE THE YES WOULD BE GIVEN.
+
+                  Read off ingredient_pool (db/045), not hardcoded, so it
+                  appears and disappears with the decision rather than with
+                  somebody's memory. Without it this row reads as a live pool
+                  that happens to be empty, and the next draft menu somebody
+                  writes gets offered into a pool the engine has no slot for —
+                  a yes that is accepted, recorded, and delivers nothing.
+                */}
+                {row.pool.retired ? (
+                  <div className={styles.when}>
+                    <strong>Retired.</strong> {row.pool.retirementNote}
+                  </div>
+                ) : null}
               </td>
               <td className={styles.numeric}>{row.draft}</td>
               <td className={styles.numeric}>{row.active}</td>

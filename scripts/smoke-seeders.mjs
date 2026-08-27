@@ -198,6 +198,31 @@ try {
     });
   }
 
+  /* ── AND THEN: DOES ANY OF IT ACTUALLY REFUSE ANYTHING ────────────── */
+  //
+  // `check:gates` is deliberately NOT in render.yaml's chain and is run here,
+  // and the reason is worth writing down because both halves are decisions.
+  //
+  // NOT IN THE DEPLOY: it fails when a gate holds claims and prunes nothing,
+  // which is an AUTHORING gap — a catalogue too thin for a filter to bite. A
+  // deploy that refuses to ship a code fix until somebody writes more drinks
+  // is a deploy nobody will leave switched on.
+  //
+  // HERE: this is the free place to fail, the same argument the whole file
+  // makes about a seeder's first run. It runs against the database the chain
+  // has just built, which is the only database in existence where the question
+  // "did the tagging step actually change anything" can be asked honestly.
+  //
+  // CLAUDE.md rule 22 asks for two guards because the two failures read
+  // identically from outside — the tagger never ran, versus the tagger ran and
+  // matched nothing. `tag:catalogue` above is the first; this is the second.
+  log(`── check:gates ─────────────────────────────────────────`);
+  execFileSync("npm", ["run", "check:gates"], {
+    cwd: ROOT,
+    stdio: "inherit",
+    env: { ...process.env, DATABASE_URL: scratchUrl, SMOKE_DATABASE_URL: "" },
+  });
+
   /* ── what actually landed ─────────────────────────────────────────── */
 
   const scratchClient = new pg.Client({

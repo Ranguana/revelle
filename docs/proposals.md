@@ -35,6 +35,9 @@ this file did not happen, however clearly it was said somewhere else.
 | 2026-08-23 | `bank_item` INTO THE ENGINE'S `POOLS` — proposed as one line in `src/lib/selection/catalogue.ts` plus a bench proof. **NOT DONE: it is not one line.** `loadIngredients` composes its query from `<table>_facet`, `<table>_occasion`, `<table>_slot` and `<table>_world`, and db/031 called only `install_revelle_ingredients` — so `bank_item_facet`, `bank_item_occasion`, `bank_item_slot` and `bank_item_world` do not exist and the entry would fail at the first query. It also needs a `slot_kind` and `occasion_slot` rows for atmosphere before a bank item can land in a package at all (dishes are the standing example of a pool that loads and has nowhere to go), and `bank_item.world_id` is a direct FK where every other pool uses a `_world` join table carrying `native` and `affinity` — so the world relationship is a design decision, not a copy. Concurrent work in db/038 is in the same area. | audit, this session | **BLOCKED — larger than reported. Needs a migration and a slot decision.** |
 | 2026-08-23 | A ROOM THAT BEGINS AT MIDNIGHT — the after-party as its own destination, first course at one in the morning. The catalogue has nothing starting later than dinner: ten of the eighteen rows sit at `starts = evening` and none later. It would be the only `starts = late` row and therefore instantly distinct on that cell, and it extends the DESCENT COURSE register — the deliberately humble late plate, proposed 2026-08-22 and still unbuilt — from one course to a whole party. **A CONCEPT, NOT A SCHEMA CHANGE, AND NOT A ROW.** db/037 declared `late` as a level of `starts` so that a host can name the hour she is actually starting at; it makes such a room POSSIBLE without requiring it, and until one is written the audit will print `DEAD starts.late` and be right to. Like every other proposed room it **needs a voice before it can be a row** — `docs/new-destination.md` step 0, a brief stating the row it must occupy, then prose written to that brief, then the cell. Nothing here authorises re-declaring an existing room's `starts` cell to fill the level. | founder, in-session | admitted as a concept for future authoring. Not scheduled. |
 | 2026-08-23 | PHASE TAG on bank items — daylight/dusk/dark/all, defaulting all, assembly filters by member hours within the room's authored arc. Phase-lock and turns unchanged. Completes the three axes: seasons for time of year, phases for time of day, tiers for place. | founder, in-session | recorded in `docs/atmosphere.md`. Not built — and neither is `descent` or the tier system, so this is the second instance of an unbuilt pattern. |
+| 2026-08-26 | THE TAKE-HOME SHIPS ITS OWN STOCK. Three take-home proposal sheets (225 items, 18 rooms) each asked the same blocking question: may a `the_take_home` claim POINT AT an existing bank row, or must it ship its own stock? Founder: **"its own"**. Applied to all 225: 152 STAGED as drafts, 24 survive as SECOND CLAIMS with no new stock, 25 KILLED, 20 HELD (the ruling does not reach them), 2 affinity, 1 withdrawn, 1 already struck by an existing kill. Reasoning and the two boundary findings below. | founder ruling, relayed in-session | **applied.** Every item marked in place in its sheet (rule 14 — losers marked, not deleted). The 152 survivors are staged into `docs/atmosphere-idea-bank-v1.md`, each carrying `FOUNDER-PENDING`, so `seed:bank` holds them. Verified: `npm run seed:bank -- --dry-run` goes 180 rows / 174 live / 6 draft → 332 rows / **174 live, unchanged** / 158 draft. |
+| 2026-08-26 | DID THE 47 CASUALTIES ORPHAN ANY SLOT? — asked of every one of them, not just of `the_take_home`, because an item carrying two claims takes both down with it. **ANSWER: NO. Not one (room, slot) pair was left empty by the ruling.** Method: the 47 split 25 KILLED + 20 HELD + 1 withdrawn + 1 already-struck; the 20 HELD were all staged the same day under the category-3 ruling, so they exist as drafts and orphan nothing. Of the 27 permanent casualties, 9 carried a second claim — portofino/`the_table_set`, cote-dazur/`the_light`, cote-dazur/`the_atmosphere`, nantucket/`the_table_set`, amalfi/`the_atmosphere`, big-sur/`the_table_set` (x2), dolomites/`the_atmosphere` (x2) — plus the withdrawn catskills name tag, which was `the_table_set` only. Every one of those pairs still has at least one other row. **AND IT COULD NOT HAVE GONE OTHERWISE, which is the finding worth keeping:** an own-stock kill fires precisely because the item POINTED AT AN EXISTING ROW, and that row is the one already filling the second slot. The kill removes the pointer, never the thing pointed at. | audit, this session | **verified against a scratch Postgres built from the committed chain (db/001–044) plus the full `preDeployCommand` seeder chain. Nothing to fix.** |
+| 2026-08-26 | WESTHAMPTON, 1976 HAD NO DRESSED TABLE — `the_table_set` empty, live AND draft, and db/043 makes that slot REQUIRED at a dinner party, a birthday, an anniversary, a holiday and a no-reason party. So the room low-confidenced every long dinner it was chosen for, silently. The only room of the eighteen with an empty table; the other seventeen carry one to four rows. **NOT caused by the own-stock ruling** — no Westhampton proposal was killed by it, and the hole predates all three sheets. Four rows authored into the room's own register, which dresses a table barely: the cloth off the line, the glasses that do not match, the one platter, the napkins nobody folded. | audit + authoring, this session | **staged as DRAFTS.** Each carries `FOUNDER-PENDING`, so `seed:bank` holds it and the founder publishes from `/desk/publish`. Verified against the scratch chain: `npm run seed:bank -- --dry-run` goes 352 rows / 174 live / 178 draft → 356 rows / **174 live, unchanged** / 182 draft, and all four land in `the_table_set` through `bank_item_default_slot()` with no help. Separately noted, not authored for: `the_light` is empty in EIGHT rooms — amalfi, catskills, havana, new-york, oaxaca, palm-springs, portofino, tahiti — which is not a defect because db/043 makes that slot required nowhere, but it is the next thing anybody looking at this board will ask about. |
 
 ## Recorded as truth, not as a failure
 
@@ -320,3 +323,368 @@ than asking for a deletion. All seven mentions in the repo are the ANTI-costume
 rule: "No clipboards. No costume rule." on the homepage, the dealbreaker filter
 in the selection spec, and "a spelling that performs an accent is a costume" in
 the authoring guide. Nothing to remove.
+
+
+## 2026-08-26 — The take-home ships its own stock
+
+**The question, asked three times.** Three agents drafted `the_take_home`
+proposal sheets — 225 items across all eighteen rooms — and each of them
+independently hit the same wall and named it as blocking. The Catskills sheet
+put it plainest: *"This needs one ruling, not fifteen: may the take-home slot
+POINT AT an existing bank row, or must it ship its own stock?"*
+
+**The founder's answer: "its own".**
+
+### What "its own" decides, and why it is a quantity rule
+
+A table item ships ONE. One arrangement of florals. One banana-leaf runner. One
+posted card of the day's hours. One deck. A take-home ships ONE PER GUEST. So a
+take-home cannot be satisfied by pointing at a row whose stock is a single
+article — which is exactly why New Orleans's *"one of the dark red roses"*
+fails. The florals row is one arrangement, not twelve roses, and the sheet that
+proposed it had already dissolved it into a second claim on that row. The ruling
+says the dissolution was the wrong direction: a take-home there needs its own
+stock or it does not exist.
+
+### The dual-claim boundary — this ruling does NOT reverse the earlier one
+
+The founder's Catskills rock place setting is a place setting AND a keepsake:
+one object, shipped once, claiming two slots. That still stands, and it works
+for a reason worth naming, because the reason is the boundary:
+
+> **A dual claim survives only where the object it sits on is ALREADY
+> per-guest. Otherwise the take-home needs its own row with its own stock.**
+
+The rock is one per guest before anybody claims anything. So are `menu cards
+part-French at each place`, `place cards in stands`, `church fans at places`,
+`go-cups at the door`, `half-coconut bowls`, `tuberose — one stem at each
+place`, `stoneware copitas`, the Celebrity 1960 slips, the tombola cartelle and
+the 1971 noun slips. Those take the second claim and cost nothing. A tarot deck,
+a Napoletane deck, a shucking kit's one knife, a caviar service's one spoon, a
+posted card on a board, a printed camp ledger, a foraged centrepiece and an
+arrangement of roses do not, and never can.
+
+### The one refinement the ruling forced
+
+Recorded because it decides eight items and because getting it wrong in either
+direction is visible. **Where an existing row's stock is BULK, a per-guest slot
+can be carried by raising the order on that row.** Lemons at FULL dose, pampas
+grass, wild lavender, the sack of beans in the tombola kit, the box of apology
+stationery, the sparklers in the sparkler kit: more on the order IS the
+take-home's own stock, it just lives on a line that already exists. Where the
+stock is ONE ARTICLE it cannot be.
+
+This is the test the wording has to pass, because it has to save the Amalfi
+lemon and still kill the New Orleans rose, and "bulk versus one article" is the
+only formulation found that does both.
+
+### Where the ruling and a sheet disagreed
+
+Four entries had their own reasoning reversed, and the disagreement is written
+into the sheet beside the entry rather than silently applied:
+
+- **Nantucket, the oyster knife.** The sheet made it a second claim on the
+  existing shucking kit. The kit ships one knife; the clause says one per person
+  who joined. It is its own line.
+- **Nantucket, the dried hydrangea head.** The sheet moved it fair → strong on
+  the second claim. The jar is one jar at a deliberately careless-SMALL dose,
+  and raising that dose is also the move that would collapse the dose wall
+  against Westhampton's careless-abundant. Killed.
+- **Big Sur, the hand-thrown cup.** *"it is not an extra object, it is the
+  object you were already given"* does not hold — the plates are plates. It is
+  its own per-guest row, so the per-head cost objection the second claim was
+  answering comes back.
+- **New Orleans, the magnolia leaf.** The same object as the rose the sheet
+  dissolved on its own initiative, off the same single arrangement, and kept.
+  Killed.
+
+### The boundary the ruling does not reach — 20 items HELD, not killed
+
+**A family of proposed take-homes points at NO bank row and ships NOTHING**, so
+"its own stock" has nothing to bite on: the champagne cork, the muselet cage
+(twice — St. Moritz and Acapulco), the soaked-off rosé labels, the spent
+sparkler wire, the shell out of the shucking bucket, the rubber bands off the
+lobster claws, the creek stone, the rose hips, the bottle cap, the film
+canister. Their supply is BOTTLES, or the dinner, or the ground — not the guest
+count. Acapulco's sheet says it outright: *"one cork per bottle, so this is not
+per-guest."*
+
+Alongside them sit the one-of-ones: the Vegas IOU (one person owes), the St.
+Moritz doubling cube and caviar tin, the Aspen trophy, the belote sheet and the
+backgammon column (players, not guests), the signed napkin, the Conquián tally,
+Aspen's tape flag (whose own question is whether anything ships at all).
+
+**These are HELD, not staged and not killed.** The quantity reading says they
+should die; the ruling as spoken does not say so, and killing twenty items on an
+extension of two words is not a machine's call. **This is the open question to
+take back to her.**
+
+### The counts
+
+| | items |
+|---|---|
+| STAGED — ships its own per-guest stock | **152** |
+| SECOND CLAIM — survives on an already-per-guest or bulk row, no new stock | **24** |
+| KILLED — points at a row whose stock is one article | **25** |
+| HELD — the ruling does not reach it (see above) | **20** |
+| AFFINITY — rides on a staged parent row | 2 |
+| WITHDRAWN by its own sheet / already struck by an existing kill | 2 |
+| **total proposed** | **225** |
+
+Dual and second claims: **64 proposed, 47 survive, 17 die** — 58 written as
+`slots:` lines on the sheets, plus six the Westhampton/Vegas sheet recommended
+against rows already in the bank (the church fans, the go-cups and the dark red
+roses at New Orleans, the Watten/briscola rules card at Dolomites, Vegas's one
+stem at each place and its wrapped Pick-a-Number prize — of which the fans, the
+go-cups and the stem survive and the other three do not).
+
+**Per room, and the shortfall is not evenly spread.**
+
+| room | proposed | staged | 2nd claim | killed | held | other |
+|---|---|---|---|---|---|---|
+| westhampton-1976 | 9 | 9 | — | — | — | — |
+| new-york | 10 | 7 | 2 | — | 1 | — |
+| new-orleans | 7 | 6 | — | 1 | — | — |
+| dolomites | 7 | 4 | 1 | 2 | — | — |
+| havana | 6 | 3 | 2 | 1 | — | — |
+| las-vegas | 8 | 5 | 2 | — | 1 | — |
+| portofino | 15 | 14 | — | 1 | — | — |
+| tahiti | 14 | 11 | 1 | 2 | — | — |
+| cote-dazur | 14 | 9 | — | 3 | 2 | — |
+| nantucket | 14 | 8 | 1 | 2 | 3 | — |
+| amalfi-1953 | 14 | 9 | 3 | 2 | — | — |
+| big-sur | 13 | 8 | 1 | 2 | 1 | 1 affinity |
+| catskills | 22 | 18 | 2 | 1 | — | 1 withdrawn |
+| palm-springs-1965 | 15 | 10 | 2 | 2 | 1 | — |
+| st-moritz-1984 | 16 | 8 | 2 | 2 | 4 | — |
+| aspen-1994 | 17 | 12 | — | — | 4 | 1 affinity |
+| acapulco-1959 | 11 | 3 | 4 | 1 | 2 | 1 struck |
+| oaxaca-1954 | 13 | 8 | 1 | 3 | 1 | — |
+| **total** | **225** | **152** | **24** | **25** | **20** | **4** |
+
+**The rooms that lost most are the ones whose objects are shared
+infrastructure or borrowed from a bottle.** St. Moritz loses six of sixteen
+(two killed, four held) because silver is the register and silver is not a
+party favour, so half its take-homes were one-of-ones and champagne hardware.
+Acapulco stages only three of eleven — but loses just four, because four more
+survive as claims on rows that were already per-guest, which is the ruling
+working rather than failing. Côte d'Azur and Nantucket lose five each. Dolomites
+stages four of seven; Havana three of six.
+
+**The rooms that lost nothing are the ones that put things in writing.**
+Westhampton nine of nine, Portofino fourteen of fifteen, Catskills twenty of
+twenty-two surviving. Paper is per-guest by nature and never points at a
+centrepiece.
+
+### What was staged, and what deliberately was not
+
+Only the 152 own-stock survivors are in
+`docs/atmosphere-idea-bank-v1.md`. **The 24 second claims are NOT staged, on
+purpose** — a second claim is a `bank_item_slot` row against a row that already
+exists, and writing a bank item for it would create the duplicate stock this
+ruling exists to prevent. They are listed in their sheets under
+`SECOND CLAIM, NOT STAGED` and are a desk action, not a seeder one.
+
+Every staged clause carries the literal marker `FOUNDER-PENDING` inside its own
+text, which is the only hold-back test there is (`FOUNDER_PENDING` in
+`scripts/catalogue-vocabulary.mjs`, read by `carriesFounderQuestion`, matched in
+SQL by db/036's `description not like '%FOUNDER-PENDING%'`). Where the sheet
+raised a real question it is kept verbatim in substance; where the sheet wrote
+`founder question: none`, the row carries the standing one rather than an
+invented one.
+
+**Verified rather than assumed**, per rule 20 — a report generated from
+something other than reality is the most convincing failure this system
+produces:
+
+```
+before  180 bank_item rows · 174 LIVE · 6 draft
+after   332 bank_item rows · 174 LIVE · 158 draft
+```
+
+The live count is IDENTICAL. All 152 additions are held, and the only other six
+held rows are the pre-existing founder-pending ledger items. 17 printed-card
+rows before and 17 after, so no clause spawned a card row whose description
+would have missed the marker.
+
+### Two things this pass did not paper over
+
+**AMALFI COAST, 1953 HAS NO PREMISE.** There is no `AMALFI` block in
+`src/lib/destinations.ts` — it is one of the five unwritten rooms. Its nine
+staged take-homes are built from the bank entry, the matrix row and the contrast
+brief only, and no world fact was invented. The room's heading in the idea bank
+now says so, so a curator reading a staged Amalfi row at the desk cannot miss
+it. If the founder writes that voice and it goes somewhere else, those nine are
+re-read, not kept.
+
+**`seed:bank` now reports 100 "printed matter, uncaught" notes** (up from
+roughly a dozen). That is the seeder working as designed — it reports every
+clause that sounds printed and that `PRINTED_MATTER` does not catch by phrase,
+so that a person extends the phrase table rather than a regex guessing. The
+take-home slot is disproportionately paper, so the list got long. Nothing is
+misfiled; the vocabulary is just now visibly behind the content.
+
+---
+
+## 2026-08-26 — Three rulings on the twenty held take-homes
+
+The founder ruled on the twenty items the previous entry HELD, and on the two
+questions attached to them. All three are recorded here; the schema is
+`db/044-the-evening-supplies-it.sql` and the reader-facing rule is in
+`docs/atmosphere.md`.
+
+### Ruling 1 — THE EVENING SUPPLIES IT is a third category, and it is the best one
+
+> *"These are the take-homes that can't be faked: nothing printed in advance,
+> pure residue of the night actually happening. Your rock, industrialized. Admit
+> it."*
+
+The previous entry read the twenty as a boundary the ruling did not reach and
+said so; the correct reading was that they are a category the vocabulary could
+not name. **What the HELD verdicts were right about is preserved item by item in
+the three sheets** — each now carries a `category-3 ruling` line beneath its
+`own-stock ruling` line saying what beat it and what survived. Several of them
+described the category exactly while calling it a fault: *"the house ships
+nothing here"*, *"foraged, no per-guest quantity declared and nothing on the
+order"*, *"a bank row for it would be a row for nothing, since the bank holds
+purchasable or placeable objects"*. The bank now holds a third thing.
+
+**(a) Dependencies, not stock — and NOT a row reference.** The first draft of
+this model pointed `depends_on` at a supplying row, polymorphically through
+`ingredient_pool`. The founder corrected it before it was built:
+
+> *"The cork depends on the drink SLOT — checkable, because `the_drinks` is
+> always filled. But the shell depends on whichever dish filled `the_main` in
+> this package, and that's decided per-package at composition time. A static
+> `depends_on → revelle_dish.lobster_bucket` is only satisfied when selection
+> happens to draw that dish … A static dish-row FK would produce exactly what
+> you predicted: a check that looks right and fires on the wrong thing — red
+> when the room is fine, green for a package that drew the ceviche."*
+
+So `bank_item_dependency` is `(item, slot_code, supplies)` — a slot watched, and
+a predicate asked of whatever filled it. The predicate is a `supplies_tag`
+carried by the supplying row (`ingredient_supplies`, polymorphic on
+`(entity_table, entity_id)`, the vocabulary `staff_action` and
+`ingredient_requirement` already speak). Two things the losing candidate would
+have done, verified against a database built by the committed deploy chain
+rather than reasoned about:
+
+- **A menu reference could never be satisfied.** `occasion_slot` has ZERO rows
+  whose pool is `menu`. db/022 replaced the set menu with a composed table
+  drawing from `dish`, said "the engine no longer has a slot to put a menu in",
+  and set the menu pool's `typical_draw` to 0.
+- **A dish reference would be a lie in both directions on successive Tuesdays.**
+  Nantucket serves the bucket in some packages and the fog-day chowder in
+  others.
+
+**Unconditional / conditional / broken is DERIVED, never authored.** Whether a
+dependency is unconditional is a fact about what else is in the pool for that
+room, and the pool changes under it — which is exactly the swap the founder
+named ("a curator swaps Positano's drink program to cocktails next spring").
+Read off the catalogue, a `strength` column would be stale within a season.
+
+**(b) Two quantity semantics.** `bank_item.take_home_quantity` is `per_guest`,
+`single_artifact`, or NULL for no promise. Twelve of the twenty are per-guest,
+eight are one-of-ones. **Null may never be counted as per-guest coverage**, and
+the board must show the unstated ones rather than fold them into a total.
+
+### Ruling 2 — the bulk refinement is adopted as stated
+
+Adopted in the words the sheets wrote it in, with her note recorded because it
+is the part that gets lost: *the agent's inability to find another formulation
+that does both is itself evidence this is the right line.*
+
+It decides eight items, all of them `SECOND CLAIM, NOT STAGED` — a dose rise on
+a row that already exists, not a bank item:
+
+| item | room | the bulk row |
+|---|---|---|
+| the grapefruit | Palm Springs | the citrus bowl |
+| blank apology stock | St. Moritz | the apology-champagne stationery box |
+| the spare sparklers | Acapulco | sparklers inside the kit |
+| a lemon from the bowl | Amalfi | lemons at FULL dose |
+| the beans | Amalfi | the tombola kit's bean sack |
+| the larch sprig | Dolomites | larch/pine branches |
+| something off the fruit pile | Havana | the piled whole fruit |
+| a pot's worth of coffee, in paper | Havana | the cafecito kit |
+
+Two deaths are confirmed by the same test and kept rather than deleted: New
+Orleans's **dark red rose** (dissolved in the previous pass) and its twin the
+**magnolia leaf** — `tight classical florals` is one arrangement, not bulk. The
+Amalfi lemon lives and the New Orleans rose dies, which is the test the wording
+had to pass.
+
+### Ruling 3 — the broadsheet is a NAMED BOUNDARY CASE, not a rule change
+
+> *"Don't rewrite the rule to accommodate it; record it in the rule's notes as
+> the test case that defines the boundary. Rules warped around their edge cases
+> get leaky; rules with a named boundary case stay sharp."*
+
+The prohibition's wording is untouched, the Nantucket broadsheet stays `SECOND
+CLAIM, NOT STAGED`, and db/044 writes the case into
+`slot_kind.description` for `the_take_home` — in the rule, where the desk
+renders it, rather than in a document only somebody already looking would open
+(rule 20's second half). Anything arguing from the broadsheet must show the same
+CONSTRUCTION — one printed article that divides into one per seat, each seat's
+different — and not merely the same conclusion.
+
+### Staged, and the live count did not move
+
+`npm run seed:bank -- --dry-run`, before and after:
+
+```
+before  332 bank_item rows · 174 LIVE · 158 draft
+after   352 bank_item rows · 174 LIVE · 178 draft
+```
+
+Also run for real, against a scratch Postgres built by the committed chain:
+20 rows created, 0 went live, 20 stayed in draft; `bank_item` afterwards is 174
+active + 158 draft stocked and 20 draft evening-supplied.
+
+Every one of the twenty carries the founder's own phrase as its marker, which is
+what the seeder reads:
+
+```
+THE EVENING SUPPLIES IT (per guest; from the_drinks yields_cork)
+THE EVENING SUPPLIES IT (one guest only; from ambient_game yields_prize)
+THE EVENING SUPPLIES IT (per guest; from the night itself)
+```
+
+### Three findings this pass did not paper over
+
+**1 · 143 OF 152 TAKE-HOME PROPOSALS WERE IN THE WRONG SLOT, and the cause is
+eleven characters.** `bank_item_default_slot()` (db/043) spells its first phrase
+`'take home'`, with a space; every one of the 152 clauses spells it `take-home`,
+with a hyphen. The branch never fired and they fell through to the general
+bucket. It is exactly the failure db/043 named the slot to prevent — "this room
+has a dressed table and nothing to take home" is only sayable if the take-home
+has a name — and the name existed while the coverage board would have shown
+eighteen empty take-home cells over a pool holding a hundred and fifty of them.
+db/044 corrects the vocabulary and moves only the claims that are still the
+machine's own, identified by the note the classifier writes; a claim a curator
+authored is untouched, because reclassification is her update. **Thirty rows
+declare a SECOND claim in their own text and do not have one** — the founder's
+rock among them — and that is desk authoring, deliberately not done by a
+migration; the query that finds them is in db/044.
+
+**2 · `ingredient_requirement` IS EMPTY ON ANY DATABASE BUILT BY THE COMMITTED
+CHAIN, so `venueEligibility()` prunes nothing.** `preDeployCommand` runs `npm
+run migrate` BEFORE every seeder, and db/020 and db/033 tag requirements by
+matching authored text — against tables that are empty at migration time. Rule
+20's sentence, exactly: a report generated from something other than reality is
+the most convincing failure this system produces. It is why db/044 creates
+`ingredient_supplies` EMPTY and names the tagging as seeder work rather than
+doing it in a migration, and it is a live defect in the venue apparatus that
+rule 2, rule 15 and db/035 all argue about. **Not fixed here — it is somebody
+else's file and it needs its own migration and a decision about where tagging
+lives.**
+
+**3 · `the_drinks` IS NOT ALWAYS FILLED.** The ruling assumes it is
+("checkable, because `the_drinks` is always filled"). On a seeded database six
+of the eighteen rooms have NO eligible drink at all — Acapulco, St. Moritz,
+Aspen, Palm Springs, Oaxaca, Amalfi — and every drink carries a native claim
+somewhere, so nothing is general and nothing pools into them. Six of the twenty
+staged rows watch `the_drinks` in a room with no drink programme, and they will
+report BROKEN. That is the dependency machinery telling the truth on its first
+day: the cork exists because the drink programme pours bottles, and in Acapulco
+it does not pour anything.

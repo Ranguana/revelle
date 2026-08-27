@@ -14,6 +14,12 @@
  * `Queryable`, and so does anything else that can answer a parameterised query.
  */
 
+import {
+  STOCKED_POOLS,
+  idColumnFor,
+  tablesFor,
+  type StockedPool,
+} from "../pools/registry.ts";
 import { runSelection } from "./engine.ts";
 import { hostExclusions } from "./exclusions.ts";
 import { assemblageFingerprint } from "./novelty.ts";
@@ -447,14 +453,39 @@ async function loadDestinations(db: Queryable): Promise<Destination[]> {
 }
 
 /**
- * One entry per pool, and adding a fifth is one entry here plus the three calls
- * in a migration. The identifiers below are a fixed constant of this module —
- * they never come from a request — so composing them into SQL is safe in the
- * one way that matters.
+ * HOW TO READ ONE POOL. Not which pools exist — `../pools/registry.ts` says
+ * that, and this object is keyed by its union so that leaving one out is a
+ * COMPILE ERROR rather than a silence.
+ *
+ * ── THE SENTENCE THIS COMMENT USED TO CARRY, AND WHY IT WENT ─────────
+ *
+ * It read: "One entry per pool, and adding a fifth is one entry here plus the
+ * three calls in a migration. The identifiers below are a fixed constant of
+ * this module — they never come from a request — so composing them into SQL is
+ * safe in the one way that matters."
+ *
+ * Both halves survive in substance. It is still one entry per pool, and the
+ * identifiers are still a constant of the module rather than a value from a
+ * request, so the injection argument stands unchanged and this file still
+ * composes them into SQL. What was wrong was the word "adding": the sentence
+ * described the edit as a thing somebody remembers to make. Twice nobody did.
+ * `menu` was missing for four pools' worth of migrations and `bank_item` for
+ * three, and in neither case did anything go red — see the two notes below,
+ * which are the evidence and stay exactly where they are (CLAUDE.md rule 14).
+ *
+ * `Record<StockedPool, PoolSpec>` is the same list with the remembering taken
+ * out of it. A migration that calls `install_revelle_ingredients` regenerates
+ * `STOCKED_POOLS`, the union gains a member, and this object stops
+ * type-checking until somebody says what the new pool's authored line is
+ * called. That question has no answer in the schema (db/012, db/017, db/021 all
+ * decide it differently), which is why the ANSWERS below are still hand-written
+ * while the KEY SET no longer is.
+ *
+ * `pool` and `table` are gone as fields: both were always the registry's
+ * `entity_table`, spelled a third and fourth time, and a spelling that can
+ * differ is a spelling that will.
  */
-const POOLS: readonly {
-  pool: string;
-  table: string;
+type PoolSpec = {
   /**
    * The column holding the sentence a member reads. `description` in three of
    * the five pools; a menu's is its dishes and a drink's is its cocktails, in
@@ -508,10 +539,14 @@ const POOLS: readonly {
    */
   printed: string | null;
   active: string;
-}[] = [
-  {
-    pool: "product",
-    table: "product",
+};
+
+/**
+ * The key set is the registry's. The values are not, and cannot be: see the
+ * per-pool notes for what each one costs to decide.
+ */
+const POOLS: { readonly [P in StockedPool]: PoolSpec } = {
+  product: {
     describe: "description",
     mirror: null,
     price: "price_cents",
@@ -525,9 +560,7 @@ const POOLS: readonly {
     printed: null,
     active: "t.status = 'active'",
   },
-  {
-    pool: "game",
-    table: "game",
+  game: {
     describe: "description",
     mirror: null,
     price: "price_cents",
@@ -541,9 +574,7 @@ const POOLS: readonly {
     printed: "game_printed_matter",
     active: "t.status = 'active'",
   },
-  {
-    pool: "tracklist",
-    table: "tracklist",
+  tracklist: {
     describe: "description",
     mirror: null,
     price: null,
@@ -567,9 +598,7 @@ const POOLS: readonly {
   // No price column, deliberately: db/012 declines to invent a per-head cost
   // for a menu nobody has priced. It therefore arrives with priceCents null
   // and is listed by name in the budget report, which is the honest version.
-  {
-    pool: "menu",
-    table: "menu",
+  menu: {
     describe: "dishes",
     mirror: null,
     price: null,
@@ -595,9 +624,7 @@ const POOLS: readonly {
   //
   // No price, for db/012's reason unchanged: docs/drinks.md carries no cost and
   // inventing one per head would be a number nobody authored.
-  {
-    pool: "drink",
-    table: "drink",
+  drink: {
     describe: "cocktails",
     mirror: "mocktails",
     price: null,
@@ -638,9 +665,7 @@ const POOLS: readonly {
   // No price, for db/012's reason unchanged: docs/dishes.md carries no cost and
   // inventing one per plate would be a number nobody authored driving a budget
   // nobody checked.
-  {
-    pool: "dish",
-    table: "dish",
+  dish: {
     describe: "name",
     mirror: null,
     price: null,
@@ -678,9 +703,7 @@ const POOLS: readonly {
   // nobody checked. `min_lead_days` is not read here either — it is a
   // fulfilment fact, not a selection one, and the slot rules say nothing about
   // when an order has to be placed.
-  {
-    pool: "bank_item",
-    table: "bank_item",
+  bank_item: {
     describe: "description",
     mirror: null,
     price: null,
@@ -694,14 +717,54 @@ const POOLS: readonly {
     printed: null,
     active: "t.status = 'active'",
   },
-];
+};
+
+/** The engine's view of the pool list, for src/lib/pools/registry.test.ts. */
+export const CATALOGUE_POOLS = Object.keys(POOLS) as StockedPool[];
 
 async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
   const all: Ingredient[] = [];
   const requirements = await loadRequirements(db);
 
-  for (const spec of POOLS) {
-    const idColumn = `${spec.table}_id`;
+  // STOCKED_POOLS rather than Object.keys(POOLS), so the ORDER of the reads is
+  // the registry's and not a property of how this object literal happens to be
+  // typed. Same members either way — the Record type guarantees that — but a
+  // stable order makes two runs of the demo script diffable.
+  for (const pool of STOCKED_POOLS) {
+    const spec = POOLS[pool];
+
+    // FROM THE REGISTRY, NOT FROM CONCATENATION. These four used to be built
+    // here as `${spec.table}_facet`, `_occasion`, `_slot` and `_world`, which
+    // is right until a pool is registered whose migration did not call all four
+    // installers — precisely db/031, which gave `bank_item` a join table and
+    // none of these, and which is why the ATMOSPHERE note above says the entry
+    // "could not simply be added". A guess names a table that is not there and
+    // fails as a 500 at the far end of the query; this fails here, by name,
+    // before a single row is read. CLAUDE.md rule 19.
+    const tables = tablesFor(pool);
+    const missing = !tables
+      ? "not registered at all"
+      : [
+          tables.facetTable ? null : "install_facet_tags",
+          tables.occasionTable ? null : "install_occasion_eligibility",
+          tables.slotTable ? null : "install_slot_eligibility",
+          tables.worldTable ? null : "install_world_affinity",
+        ]
+          .filter(Boolean)
+          .join(", ");
+    if (!tables || missing) {
+      throw new Error(
+        `pool '${pool}' is half-installed and cannot be read: ${missing}. ` +
+          `A migration must run the missing installer(s) before the engine ` +
+          `can see it — see db/043, which did exactly that for bank_item.`
+      );
+    }
+    const facetTable = tables.facetTable;
+    const occasionTable = tables.occasionTable;
+    const slotTable = tables.slotTable;
+    const worldTable = tables.worldTable;
+
+    const idColumn = idColumnFor(pool);
     const { rows } = await db.query(
       `select t.id, t.slug, t.name, t.${spec.describe} as description,
               ${spec.mirror ? `t.${spec.mirror}` : "null::text"} as mirror,
@@ -724,17 +787,17 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
               } as meals,
               coalesce(
                 (select jsonb_object_agg(x.facet_id, x.weight)
-                   from ${spec.table}_facet x where x.${idColumn} = t.id),
+                   from ${facetTable} x where x.${idColumn} = t.id),
                 '{}'::jsonb) as facets,
               coalesce(
                 (select jsonb_agg(jsonb_build_object(
                           'occasion', o.occasion, 'fit', o.fit, 'note', o.note))
-                   from ${spec.table}_occasion o where o.${idColumn} = t.id),
+                   from ${occasionTable} o where o.${idColumn} = t.id),
                 '[]'::jsonb) as occasions,
               coalesce(
                 (select jsonb_agg(jsonb_build_object(
                           'slot_code', sl.slot_code, 'fit', sl.fit, 'note', sl.note))
-                   from ${spec.table}_slot sl where sl.${idColumn} = t.id),
+                   from ${slotTable} sl where sl.${idColumn} = t.id),
                 '[]'::jsonb) as slots,
               -- native is the CLAIM (db/019) and is what makes this a filter
               -- rather than a weight; wd.name is carried for one sentence,
@@ -750,7 +813,7 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
                                              'affinity', w.affinity,
                                              'name', wd.name,
                                              'note', w.note))
-                   from ${spec.table}_world w
+                   from ${worldTable} w
                    join world wd on wd.id = w.world_id
                   where w.${idColumn} = t.id),
                 '{}'::jsonb) as worlds,
@@ -767,16 +830,16 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
                   : "'[]'::jsonb"
               } as printed_matter,
               s.issue_count, s.last_issued_at, s.customer_count
-         from ${spec.table} t
+         from ${pool} t
          left join ingredient_issuance s
-           on s.entity_table = '${spec.pool}' and s.entity_id = t.id
+           on s.entity_table = '${pool}' and s.entity_id = t.id
         where ${spec.active}
         order by t.name`
     );
 
     for (const row of rows) {
       all.push({
-        pool: spec.pool,
+        pool,
         id: str(row.id),
         slug: str(row.slug),
         name: str(row.name),
@@ -803,10 +866,10 @@ async function loadIngredients(db: Queryable): Promise<Ingredient[]> {
         // db/023. Empty means every shape — the default an untagged claim has
         // on all four axes in this schema.
         meals: Array.isArray(row.meals) ? row.meals.map((m) => str(m)) : [],
-        printedMatter: printedMatterFor(spec.pool, row),
+        printedMatter: printedMatterFor(pool, row),
         // Absent and empty mean the same thing: works anywhere. That is the
         // safe default, and it is the one the founder asked for by name.
-        requirements: requirements.get(`${spec.pool}:${str(row.id)}`) ?? [],
+        requirements: requirements.get(`${pool}:${str(row.id)}`) ?? [],
         isFixture: str(row.slug).startsWith("fixture-"),
       });
     }

@@ -76,7 +76,14 @@ export default async function StockedPage({
 }: PageProps<"/desk/stocked">) {
   const params = await searchParams;
 
-  const registry = await pools(ask);
+  // RETIRED POOLS ARE NOT LISTED HERE. Founder ruling, 2026-08-27: a pool
+  // the engine cannot draw from has nothing to say on the audit feed, and a row
+  // reading "0 of 0, retired" is the confusion db/045 was meant to end
+  // rather than relocate. The registry still knows them, /desk/publish
+  // still governs them if one is ever un-retired, and the rows are still
+  // readable at their own route — this is a display decision, not a
+  // second retirement.
+  const registry = (await pools(ask)).filter((pool) => !pool.retired);
   const wanted = one(params.pool);
   // An unknown pool in the query string narrows to nothing rather than
   // silently showing everything, which would be the screen disagreeing with

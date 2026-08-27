@@ -422,9 +422,36 @@ try {
             `Re-run with --overwrite to let the file win.`
         );
       } else {
-        // season_strict is NOT written here. docs/drinks.md names no
-        // hard-filter list, so the file has nothing to say about it and a
-        // curator's answer at the desk is the only one there is.
+        // season_strict is NOT written here, and it is NOT unwritten either.
+        //
+        // THE ARGUMENT THIS COMMENT USED TO MAKE, KEPT WHOLE (CLAUDE.md
+        // rule 14), because it was right about its own scope and the thing that
+        // beat it is a different question:
+        //
+        //     "season_strict is NOT written here. docs/drinks.md names no
+        //      hard-filter list, so the file has nothing to say about it and a
+        //      curator's answer at the desk is the only one there is."
+        //
+        // WHAT BEAT IT: the consequence, which nobody had measured. The column
+        // defaults false, the desk had never been asked, and so NO DRINK IN THE
+        // CATALOGUE WAS SEASON-GATED — a February party was offered the summer
+        // bar with "Summer" printed on the sheet, in PORTOFINO, whose premise is
+        // explicitly off-season and whose two programmes both say Summer. The
+        // founder ruled on 2026-08-27 (docs/needs-a-human.md): this is the same
+        // defect as the empty venue gate, not a second one, and it outranks it
+        // on triage because a sheet that says Summer at a February party is
+        // what the MEMBER reads.
+        //
+        // The half that was right survives untouched: this SEEDER still says
+        // nothing about it, because the document still names no hard-filter
+        // list. What was wrong was the conclusion that therefore nothing may.
+        // `src/lib/catalogue/tagging.ts` derives it from `season_note` by the
+        // rule scripts/seed-dishes.mjs already applies to six hundred dishes —
+        // strict where the band holds the whole of her wording, a lean where
+        // the band is only part of it — as a POST-SEED step, after this seeder
+        // has written the wording it reads. A curator's answer at the desk
+        // still outranks it: the derivation only ever asserts a gate and never
+        // retracts one, without --overwrite.
         await client.query(
           `update drink set name = $2, cocktails = $3, mocktails = $4,
                   season = $5::season_band, season_note = $6,
@@ -450,15 +477,55 @@ try {
     // a destination the way a menu is", and the founder: "some can cross
     // reference". See db/019 and scripts/seed-dishes.mjs, which does this
     // identically for six hundred dishes.
+    //
+    // `do update set native = true` AND NOT `do nothing`, which it was until
+    // 2026-08-26. The two differ in exactly one case and it is the case the
+    // `Also at:` line will actually be used in:
+    //
+    //   affinity re-weights scoring for already-eligible candidates; it never
+    //   confers eligibility — sharing requires a second native row.
+    //
+    // A `drink_world` row that is not native is NOT A CLAIM — `claimEligibility`
+    // (src/lib/selection/occasion.ts) reads native rows as a whitelist, and an
+    // affinity weight on a room the drink is not native to changes a score the
+    // drink is never in the running for. So where a row for this pair already
+    // exists as an affinity weight — set at the desk, or staged by a pass that
+    // read affinity as sharing — `do nothing` left the claim INERT and the run
+    // reported a destination it had not actually given the programme. On a
+    // fresh database the two are indistinguishable, which is why this survived
+    // unnoticed: docs/drinks.md has never carried an `Also at:` line, so this
+    // statement has only ever run against empty tables.
+    //
+    // `affinity` is NOT overwritten on an existing row: a weight somebody set
+    // is hers, and it starts mattering rather than stopping. A `forbidden` row
+    // is not upgraded at all — a veto that can be outvoted is not a veto — and
+    // the check after the loop turns that collision into a failed run.
     for (const heading of drink.destinations) {
       const world = await ensureWorld(client, heading, "seed-drinks");
       if (world.created && !stubbed.includes(world.slug)) stubbed.push(world.slug);
       const { rowCount } = await client.query(
         `insert into drink_world (drink_id, world_id, native, affinity, note)
          values ($1, $2, true, 1.000, $3)
-         on conflict (drink_id, world_id) do nothing`,
+         on conflict (drink_id, world_id) do update
+            set native = true, note = excluded.note
+          where not drink_world.native and not drink_world.forbidden`,
         [drinkId, world.id, "Written for this destination. docs/drinks.md."]
       );
+      const { rows: check } = await client.query(
+        `select native from drink_world where drink_id = $1 and world_id = $2`,
+        [drinkId, world.id]
+      );
+      if (check.length === 0 || !check[0].native) {
+        // `throw`, not `fail()`: this is inside the transaction, and the catch
+        // below is what rolls it back and prints the run's own failure line.
+        throw new Error(
+          `drink ${drink.number} is written for ${heading}, where it is ` +
+            `already FORBIDDEN. A veto that can be outvoted is not a veto, so ` +
+            `the claim was refused rather than written over it. Remove one of ` +
+            `the two — the heading (or "Also at" line) in docs/drinks.md, or ` +
+            `the forbidden row at the desk.`
+        );
+      }
       scoped += rowCount;
     }
   }

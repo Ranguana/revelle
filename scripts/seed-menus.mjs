@@ -41,6 +41,23 @@
  *     itself and the founder VETOES it at /desk/stocked, one row or a whole
  *     run, instead of consenting to it one row at a time. `--activate` is
  *     gone, and refused by name rather than ignored.
+ *
+ *     AND SINCE db/045, "live" IS A QUESTION THIS SCRIPT ASKS RATHER THAN
+ *     KNOWS. The founder retired the menu pool: db/022 deleted the nine
+ *     `occasion_slot` rows for `the_menu`, so no package can deliver a menu,
+ *     and thirty-nine rows sat in the catalogue looking exactly like stock
+ *     until one board read them as coverage. A migration can only retire the
+ *     rows that EXIST when it runs — `preDeployCommand` is `migrate &&
+ *     … && seed:menus`, so on every fresh build this script would create all
+ *     thirty-nine again, live, seconds after the migration retired nothing.
+ *     Retirement by UPDATE alone lasts until the next rebuild.
+ *
+ *     So the decision lives on `ingredient_pool` (rule 19: the registry is the
+ *     only truth) and this script reads it. A menu created into a retired pool
+ *     arrives `discontinued`, carrying the pool's own reason. Nothing here
+ *     hard-codes that the menus are retired: clear `retired_at` on the registry
+ *     row and the next run stocks live again, which is what keeps bringing the
+ *     set menu back a decision rather than a rewrite.
  *   · A menu that already exists is LEFT ALONE and any difference is REPORTED.
  *     A curator's edit at the desk outranks the file. `--overwrite` reverses
  *     that, deliberately and only when asked.
@@ -75,12 +92,14 @@ import pg from "pg";
 
 import {
   DESTINATIONS,
-  LIVE,
   SEASONS,
   ensureWorld,
+  poolRetirement,
   recordAutoPublish,
+  recordAutoRetired,
   refuseActivateFlag,
   stockingRun,
+  stockingStatus,
 } from "./catalogue-vocabulary.mjs";
 
 const SOURCE = fileURLToPath(new URL("../docs/menus.md", import.meta.url));
@@ -272,9 +291,18 @@ let created = 0;
 let left = 0;
 let updated = 0;
 const stubbed = [];
+/** Set once the pool has been read, so the closing report can say which way. */
+let pool = { retired: false, note: null, supersededBy: null };
+/** What a NEW row arrives as — `stockingStatus`, which owns that decision. */
+let stocking = { status: null, retirementNote: null };
 
 try {
   await client.query("begin");
+
+  // WHAT STATUS A NEW ROW ARRIVES IN, asked of the registry rather than
+  // assumed. See the second bullet at the top of this file and db/045.
+  pool = await poolRetirement(client, "menu");
+  stocking = stockingStatus(pool);
 
   const { rows: smellFacet } = await client.query(
     `select id from facet where dimension_code = 'mood' and code = 'cooking_smell'`
@@ -299,8 +327,10 @@ try {
     if (existing.length === 0) {
       const { rows } = await client.query(
         `insert into menu (slug, name, dishes, season, season_note,
-                           season_strict, cooking, cooking_note, status)
-         values ($1, $2, $3, $4::season_band, $5, $6, $7::cooking_level, $8, $9)
+                           season_strict, cooking, cooking_note, status,
+                           retirement_note)
+         values ($1, $2, $3, $4::season_band, $5, $6, $7::cooking_level, $8, $9,
+                 $10)
          returning id`,
         [
           slug,
@@ -311,23 +341,44 @@ try {
           menu.seasonStrict,
           menu.cooking,
           menu.cookingNote,
-          // Live on the way in — see the second bullet at the top of this file.
-          LIVE,
+          // Live on the way in, unless the registry says the pool is retired.
+          // The decision is `stockingStatus`'s and is not re-made here — see
+          // the second bullet at the top of this file, and the note in
+          // catalogue-vocabulary.mjs about why it is a function and not a
+          // ternary. db/045's `menu_discontinued_has_reason` refuses the row
+          // if the two ever come apart.
+          stocking.status,
+          stocking.retirementNote,
         ]
       );
       menuId = rows[0].id;
       created += 1;
-      // In the same transaction as the row, so a menu cannot go out with
-      // nothing in the ledger saying it did.
-      await recordAutoPublish(client, {
-        table: "menu",
-        id: menuId,
-        name: menu.name,
-        seeder: "seed-menus",
-        run: RUN,
-        source: "docs/menus.md",
-      });
-      console.log(`[seed-menus] created  ${slug} (live) — ${menu.name}`);
+      // In the same transaction as the row, so a menu cannot go out — either
+      // way — with nothing in the ledger saying it did.
+      if (pool.retired) {
+        await recordAutoRetired(client, {
+          table: "menu",
+          id: menuId,
+          name: menu.name,
+          seeder: "seed-menus",
+          run: RUN,
+          source: "docs/menus.md",
+          reason: pool.note,
+        });
+      } else {
+        await recordAutoPublish(client, {
+          table: "menu",
+          id: menuId,
+          name: menu.name,
+          seeder: "seed-menus",
+          run: RUN,
+          source: "docs/menus.md",
+        });
+      }
+      console.log(
+        `[seed-menus] created  ${slug} (${pool.retired ? "retired" : "live"})` +
+          ` — ${menu.name}`
+      );
     } else {
       menuId = existing[0].id;
       const row = existing[0];
@@ -423,11 +474,30 @@ if (stubbed.length > 0) {
       `npm run seed:destinations, which completes a stub in place.`
   );
 }
-if (created > 0) {
+if (created > 0 && pool.retired) {
+  // Rule 16: the pool's retirement is absorbed by this run and it says so at
+  // the point of use. A run that printed "39 created" and nothing else would
+  // read, in a deploy log, exactly like the run that stocked them.
+  console.log(
+    `\n${created} menu(s) were created RETIRED on this run, because the menu ` +
+      `pool is retired\n(db/045). They exist, they are readable at ` +
+      `/desk/menus behind "Show the retired",\nand no package can deliver ` +
+      `one — db/022 left the_menu with no occasion_slot rows.\nEach carries ` +
+      `the reason:\n\n  ${pool.note}\n\nTo stock live again: clear ` +
+      `ingredient_pool.retired_at for 'menu' and re-insert\ndb/012's nine ` +
+      `occasion_slot rows. Nothing here has to change.`
+  );
+} else if (created > 0) {
   console.log(
     `\n${created} menu(s) went LIVE on this run. The pool stocks itself ` +
       `(db/036); the desk\nis where that gets vetoed, not where it gets ` +
       `approved. /desk/stocked lists this run\nand sends one menu or all ` +
       `${created} back to draft.`
+  );
+} else if (pool.retired) {
+  console.log(
+    `\nThe menu pool is RETIRED (db/045) — nothing was created and nothing ` +
+      `was re-offered.\nExisting rows keep whatever status the desk has for ` +
+      `them; no seeder writes a status\non a row that already exists.`
   );
 }

@@ -258,7 +258,8 @@ export const SEASONS = {
 /**
  * The wordings the mapped band only PARTLY covers.
  *
- * Read by scripts/seed-dishes.mjs, and by nothing else today.
+ * Read by scripts/seed-dishes.mjs and by src/lib/catalogue/tagging.ts, which is
+ * the post-seed step that finally writes `drink.season_strict`.
  *
  * ── THE RULE, AND WHY IT NEEDS A SECOND LIST ────────────────────────
  *
@@ -278,12 +279,59 @@ export const SEASONS = {
  * filter on a wider band can never exclude a month she wanted — only include a
  * few she did not, which is the honest failure direction.
  *
- * The menus' own two-season wordings ("Winter or spring", "Shoulder season and
- * fall") are deliberately NOT listed: scripts/seed-menus.mjs takes
- * `season_strict` from a prose list in docs/menus.md and adding them here would
- * be a silent behaviour change to a pool this drop does not touch.
+ * ── THE FOUR THAT WERE HELD BACK, AND WHAT BEAT THAT (rule 14) ──────
+ *
+ * This comment used to end:
+ *
+ *     "The menus' own two-season wordings ("Winter or spring", "Shoulder
+ *      season and fall") are deliberately NOT listed: scripts/seed-menus.mjs
+ *      takes `season_strict` from a prose list in docs/menus.md and adding
+ *      them here would be a silent behaviour change to a pool this drop does
+ *      not touch."
+ *
+ * The caution was right and its ground is gone. `seed-menus` still reads its
+ * own prose list and still does not consult this set, so nothing about the menu
+ * pool moves either way — and the menu pool is retired besides (db/045). What
+ * changed is that a THIRD reader arrived: the post-seed step now derives
+ * `drink.season_strict`, which `scripts/seed-drinks.mjs` has never written, and
+ * every one of those four wordings is a drinks wording.
+ *
+ * They are here rather than in a second list beside the drinks because
+ * narrowed-ness is a property of THE WORDING, not of the pool that used it, and
+ * two lists of narrowed wordings would be two answers to one question the day
+ * a wording appeared in both documents — which is the argument at the top of
+ * this file, applied to itself.
+ *
+ * Checked before adding, because a silent behaviour change is exactly what the
+ * old sentence was guarding against: none of the four appears in
+ * docs/dishes.md, whose only wordings are summer, fall, winter, spring, late
+ * summer, early summer, fall/winter and Carnival season. No dish moves.
+ *
+ *   "Spring and summer"        -> summer.  Two seasons named, one held.
+ *   "Spring or summer"         -> summer.  The same wording with a different
+ *                                 conjunction (SEASONS says so where it maps
+ *                                 it), and listed here so that the two do not
+ *                                 read as a distinction somebody drew. No row
+ *                                 in any pool uses it today.
+ *   "Winter or spring"         -> winter.  Two seasons named, one held.
+ *   "Shoulder season and fall" -> shoulder. `shoulder` is spring-or-autumn, so
+ *                                 the band and the wording overlap without
+ *                                 either containing the other — the narrowest
+ *                                 case there is, and a gate on it would refuse
+ *                                 the fall she named.
+ *   "Warm weather"             -> summer.  Tahiti's rum punch. Warm weather in
+ *                                 Tahiti is not three months, and gating on
+ *                                 `summer` would delete May from a drink whose
+ *                                 whole premise is that the weather is warm.
  */
-export const SEASON_NARROWED = new Set(["fall/winter"]);
+export const SEASON_NARROWED = new Set([
+  "fall/winter",
+  "Spring and summer",
+  "Spring or summer",
+  "Winter or spring",
+  "Shoulder season and fall",
+  "Warm weather",
+]);
 
 /**
  * WHAT A DISH IS FOR — her letter codes -> `meal_shape` (db/023).
@@ -473,17 +521,25 @@ export async function ensureWorld(client, heading, by, displayName = heading) {
 export const POOL_STOCKING_ACTOR = "auto: pool-stocking";
 
 /**
- * The two `product_status` values a seeder ever writes, named once.
+ * The `product_status` values a seeder ever writes, named once.
  *
  * `product_status` (db/002) is shared by dish, drink, menu, product, game and
  * bank_item, and `ingredient_pool.active_value` is where the DESK reads which
  * value means offered. A seeder writes the enum literal directly — it is
- * inserting into a known table with a known column — so the pair is named here
+ * inserting into a known table with a known column — so the set is named here
  * rather than spelled into six INSERT statements that would have to be found
- * and changed together if the enum ever grew a third position.
+ * and changed together if the enum ever grew a fourth position.
+ *
+ * `RETIRED` was the third to arrive and it is the enum's own `discontinued`.
+ * db/045 argues at length why that word rather than a new one: the value cannot
+ * be added and used inside one transaction, and re-typing six pools' status
+ * columns to spell one of them differently is a schema-wide migration wearing a
+ * one-pool decision. What closes the gap between the word and the act is the
+ * reason column beside it, never the word.
  */
 export const LIVE = "active";
 export const HELD = "draft";
+export const RETIRED = "discontinued";
 
 /**
  * THE MARKER THAT HOLDS A ROW BACK, spelled ONCE for the whole house.
@@ -602,6 +658,131 @@ export async function recordAutoPublish(
       id,
       `${name} — stocked by ${seeder}`,
       JSON.stringify({ run, seeder, source, created: true, went: "live" }),
+    ]
+  );
+}
+
+/**
+ * IS THIS POOL STILL OFFERED, AND IF NOT, WHY NOT.
+ *
+ * `ingredient_pool` is the registry and rule 19 makes it the only truth about
+ * what pools are; db/045 gave it `retired_at`, `superseded_by` and
+ * `retirement_note` so it is also the only truth about which of them the house
+ * still stocks. A seeder ASKS rather than knowing: the day the founder brings
+ * the set menu back she clears one column, and the next deploy stocks live
+ * again with no script to remember to edit.
+ *
+ * It throws on an unregistered pool rather than defaulting to "live". A seeder
+ * pointed at a table the registry has never heard of is a seeder about to write
+ * rows nothing can see, and guessing the friendly answer is how that stays
+ * invisible.
+ */
+export async function poolRetirement(client, entityTable) {
+  let rows;
+  try {
+    ({ rows } = await client.query(
+      `select retired_at is not null as retired, retirement_note, superseded_by
+         from ingredient_pool where entity_table = $1`,
+      [entityTable]
+    ));
+  } catch (err) {
+    // 42703 undefined_column. `preDeployCommand` always runs `npm run migrate`
+    // first so this cannot happen on a deploy; it happens to a person pointing
+    // a seeder at an older database, and the useful thing to say is which
+    // migration is missing rather than which column.
+    if (err && err.code === "42703") {
+      throw new Error(
+        `ingredient_pool has no retirement columns. Has db/045 been applied? ` +
+          `Run npm run migrate first — the seeder reads the registry to decide ` +
+          `what status a new row arrives in.`
+      );
+    }
+    throw err;
+  }
+  if (rows.length === 0) {
+    throw new Error(
+      `ingredient_pool has no row for '${entityTable}'. The pool is not ` +
+        `registered, so nothing downstream can see what this seeder writes. ` +
+        `Check that the migration calling install_revelle_ingredients ran.`
+    );
+  }
+  return {
+    retired: rows[0].retired,
+    note: rows[0].retirement_note,
+    supersededBy: rows[0].superseded_by,
+  };
+}
+
+/**
+ * WHAT STATUS A NEW ROW ARRIVES IN, AND THE WORDS THAT TRAVEL WITH IT.
+ *
+ * The whole of the decision, in one place, so it can be TESTED rather than
+ * inspected. It was a ternary inside a seeder's INSERT for about an hour, and
+ * the guard written over it could not fail — a test that reads a source file
+ * for a token is testing a spelling, and the spelling next to it was enough to
+ * keep the test green while the behaviour was reverted. CLAUDE.md rule 21's
+ * closing paragraph, learned again: break it deliberately and watch it go red
+ * before you believe it.
+ *
+ * @param pool  a `poolRetirement()` result
+ * @returns `{ status, retirementNote }` — pass both straight into the insert.
+ */
+export function stockingStatus(pool) {
+  if (!pool.retired) return { status: LIVE, retirementNote: null };
+  if (!pool.note || pool.note.trim() === "") {
+    // db/045's `ingredient_pool_retired_has_reason` should make this
+    // unreachable. It is checked anyway because the alternative is writing
+    // rows out of the catalogue with nothing on them saying why — an
+    // adjudication with the opinion torn off, which is the failure rule 17
+    // exists to prevent, arriving through the one door the CHECK does not
+    // cover: a database older than the constraint.
+    throw new Error(
+      "this pool is retired and carries no reason. Refusing to write rows " +
+        "out of the catalogue with nothing saying why (CLAUDE.md rule 17)."
+    );
+  }
+  return { status: RETIRED, retirementNote: pool.note };
+}
+
+/**
+ * Record that a seeder created a row INTO A RETIRED POOL.
+ *
+ * The sibling of `recordAutoPublish`, and a separate function rather than a
+ * flag on that one, because the two record opposite events and a function
+ * called `recordAutoPublish` that can record a non-publish is a name that
+ * lies. /desk/stocked filters the feed on `actor <> 'staff'` rather than on the
+ * verb, so both land in the same audit feed — which is right: a row arriving
+ * retired is exactly as much a thing the founder should be able to see as a row
+ * arriving live.
+ *
+ * `went: "retired"` in the detail, so the feed can tell the two apart without
+ * parsing a sentence, and the pool's own reason travels with it.
+ */
+export async function recordAutoRetired(
+  client,
+  { table, id, name, seeder, run, source, reason }
+) {
+  await client.query(
+    `insert into staff_action
+       (staff_id, actor, action, entity_table, entity_id, summary, detail)
+     values (null, $1, $2, $3, $4::uuid, $5, $6::jsonb)`,
+    [
+      POOL_STOCKING_ACTOR,
+      // Same convention as the verb above: dotted, lower case, past tense.
+      // db/045 writes 'menu.retired' for the rows it moved; this is the same
+      // event arriving by the other door, so it is the same verb.
+      `${table}.retired`,
+      table,
+      id,
+      `${name} — created into a retired pool by ${seeder}`,
+      JSON.stringify({
+        run,
+        seeder,
+        source,
+        created: true,
+        went: "retired",
+        retirement_note: reason,
+      }),
     ]
   );
 }

@@ -3,6 +3,12 @@ import "server-only";
 import type { PoolClient } from "pg";
 
 import { query, transaction } from "@/lib/db";
+import {
+  FACET_ENTITIES,
+  facetTableFor,
+  idColumnFor,
+  type FacetEntity,
+} from "@/lib/pools/registry.ts";
 
 /**
  * The shared vocabulary, and how the desk edits a thing's tags.
@@ -15,26 +21,49 @@ import { query, transaction } from "@/lib/db";
  *
  * ── WHY THE JOIN TABLE NAME IS A LOOKUP AND NOT A STRING ────────────
  *
- * The join tables are created by install_facet_tags() and are all named
- * `<entity>_facet`. Composing that name from a caller's string would be a SQL
- * identifier built from input, which is an injection surface in every function
- * that touches it — the same objection db/002 raises to storing a predicate as
- * text. So the four that exist are listed here, by hand, and anything else is
- * a compile error rather than a query.
+ * This paragraph is preserved because its argument is still correct and is
+ * still the reason the code below is a lookup (CLAUDE.md rule 14):
+ *
+ *     "The join tables are created by install_facet_tags() and are all named
+ *     `<entity>_facet`. Composing that name from a caller's string would be a
+ *     SQL identifier built from input, which is an injection surface in every
+ *     function that touches it — the same objection db/002 raises to storing a
+ *     predicate as text. So the four that exist are listed here, by hand, and
+ *     anything else is a compile error rather than a query."
+ *
+ * A LOOKUP, YES. LISTED HERE BY HAND, NO — and the last clause is what had to
+ * go. "The four that exist" was already seven when it was written, and by the
+ * time it was read it was nine: `tracklist` (db/005) and `bank_item` (db/043)
+ * both had facet tables that this map did not know about, so the desk had no
+ * tag picker for either, and CLAUDE.md rule 19 counts that as the fourth
+ * instance of one bug.
+ *
+ * Everything the injection argument needs survives the change intact. The
+ * identifiers still never come from a request: they come from
+ * `../pools/registry.ts`, which is generated from `db/*.sql` and verified
+ * against a live `facet_tag_entity` by src/lib/pools/registry.db.test.ts. An
+ * unknown pool is still a compile error rather than a query — `Taggable` is now
+ * the registry's `FacetEntity` union, so it is the SAME compile error, raised
+ * by a list nobody can forget to extend.
  */
 
-/** entity table -> its facet join table and the column that points at it. */
-const TAGGABLE = {
-  world: { join: "world_facet", column: "world_id" },
-  product: { join: "product_facet", column: "product_id" },
-  taste_cohort: { join: "taste_cohort_facet", column: "taste_cohort_id" },
-  game: { join: "game_facet", column: "game_id" },
-  menu: { join: "menu_facet", column: "menu_id" },
-  drink: { join: "drink_facet", column: "drink_id" },
-  dish: { join: "dish_facet", column: "dish_id" },
-} as const;
+/**
+ * entity table -> its facet join table and the column that points at it.
+ *
+ * Built from the registry rather than typed out. Both installers derive the
+ * column the same way (`v_column := p_entity_table || '_id'`, db/002 and
+ * db/009) and no migration overrides it; the table name is stored, not guessed.
+ */
+const TAGGABLE: Readonly<
+  Record<FacetEntity, { join: string; column: string }>
+> = Object.fromEntries(
+  FACET_ENTITIES.map((entity) => [
+    entity,
+    { join: facetTableFor(entity), column: idColumnFor(entity) },
+  ])
+) as Record<FacetEntity, { join: string; column: string }>;
 
-export type Taggable = keyof typeof TAGGABLE;
+export type Taggable = FacetEntity;
 
 export type FacetRow = {
   id: string;

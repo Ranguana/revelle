@@ -100,12 +100,14 @@
  * carries them; it does not decide them.
  */
 
-import {
-  humanOccasion,
-  occasionEligibility,
-  slotEligibility,
-  worldEligibility,
-} from "./occasion.ts";
+import { humanOccasion, occasionEligibility } from "./occasion.ts";
+// THE TWO CATALOGUE AXES, ASKED THROUGH THE FUNCTION THE COVERAGE BOARD ALSO
+// ASKS. This file used to call `worldEligibility` and `slotEligibility`
+// directly; src/lib/desk/coverage.ts, built later, would have had to call them
+// the same way and stay that way by hand. See ./slot-coverage.ts for the
+// founder's ruling and for why only these two of the six filters below can be
+// shared with a surface that has no applicant.
+import { placement } from "./slot-coverage.ts";
 import {
   chooseCourse,
   courseOption,
@@ -302,6 +304,27 @@ export function scopePools(
         continue;
       }
 
+      // ── THE TWO CATALOGUE AXES, DECIDED ONCE ───────────────────────
+      //
+      // Destination and slot: the only two of this loop's six filters that are
+      // facts about the ROW rather than about her evening, and therefore the
+      // only two a coverage board with no applicant can ask. Asked here in one
+      // call so that the board and this reporter cannot mean different things
+      // by "covered" — ./slot-coverage.ts carries the argument.
+      //
+      // CONSUMED AT THE TWO POSITIONS THEY HAVE ALWAYS BEEN CONSUMED AT, and
+      // that is deliberate rather than tidy. The destination refusal is rank 0
+      // and comes first; the slot refusal is rank 2 and comes after the venue,
+      // the season, the meal shape and the occasion. Moving either would change
+      // which sentence a curator reads first in a gap, which is the one thing a
+      // refactor here is not allowed to do.
+      const placed = placement(
+        ingredient,
+        destination.id,
+        destination.name,
+        slot.slotCode
+      );
+
       // THE DESTINATION AXIS, as a filter and not a weight.
       //
       // A `forbidden` row vetoes, a `native` row on ANY destination makes the
@@ -309,13 +332,11 @@ export function scopePools(
       // rule is claimEligibility() — the same function the two axes below run —
       // and none of it is repeated here. See occasion.ts and db/019.
       const scope = ingredient.worlds[destination.id];
-      const forWorld = worldEligibility(
-        ingredient.worlds,
-        destination.id,
-        destination.name
-      );
-      if (!forWorld.eligible) {
-        rejected.push({ rank: 0, text: `${ingredient.name} is ${forWorld.reason}` });
+      if (!placed.world.eligible) {
+        rejected.push({
+          rank: 0,
+          text: `${ingredient.name} is ${placed.world.reason}`,
+        });
         continue;
       }
 
@@ -399,9 +420,11 @@ export function scopePools(
       // honouring beat, a game AND per-day material, all of them games — and
       // without this a toast written to mark the person could be placed as
       // day-two material with nothing to object.
-      const forSlot = slotEligibility(ingredient.slots, slot.slotCode);
-      if (!forSlot.eligible) {
-        rejected.push({ rank: 2, text: `${ingredient.name} is ${forSlot.reason}` });
+      if (!placed.slot.eligible) {
+        rejected.push({
+          rank: 2,
+          text: `${ingredient.name} is ${placed.slot.reason}`,
+        });
         continue;
       }
 

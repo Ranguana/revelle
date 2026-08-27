@@ -1,6 +1,10 @@
 import "server-only";
 
 import { query } from "@/lib/db";
+import {
+  REQUIRABLE_POOLS,
+  type RequirablePool,
+} from "@/lib/pools/registry.ts";
 
 /**
  * WHAT A THING NEEDS OF THE ROOM — the desk's end of db/020's
@@ -46,22 +50,29 @@ import { query } from "@/lib/db";
 /**
  * The pools db/033's CHECK will accept an `entity_table` of.
  *
- * A union rather than a string, for the reason facets.ts gives about its join
- * names: an unknown pool should be a compile error and not a constraint
+ * The original note stands and is why this is a union at all (CLAUDE.md rule
+ * 14): "A union rather than a string, for the reason facets.ts gives about its
+ * join names: an unknown pool should be a compile error and not a constraint
  * violation raised as a 500. The value is a bound parameter, never
- * interpolated, so this is about honesty rather than injection.
+ * interpolated, so this is about honesty rather than injection."
+ *
+ * What changed is where the seven names come from. They used to be TYPED HERE,
+ * as a hand-copy of a CHECK constraint living in a migration — two lists, one
+ * fact, and the fact belongs to Postgres. The copy happened to be correct when
+ * it was read, which is the least reassuring state a copy can be in: the
+ * constraint had ALREADY drifted once (db/020 wrote five pools, three more were
+ * registered, db/033 repaired it), and this file would have been just as green
+ * during the drift as it was after the repair.
+ *
+ * `REQUIRABLE_POOLS` is generated from the CHECK itself by
+ * scripts/generate-pool-registry.mjs, and src/lib/pools/registry.test.ts
+ * asserts it equals the stocked-pool list — so a third drift is a red test
+ * naming the pool, rather than a curator meeting a 500 on a form the desk
+ * offered her.
  */
-export const REQUIRABLE = [
-  "product",
-  "game",
-  "tracklist",
-  "menu",
-  "drink",
-  "dish",
-  "bank_item",
-] as const;
+export const REQUIRABLE = REQUIRABLE_POOLS;
 
-export type Requirable = (typeof REQUIRABLE)[number];
+export type Requirable = RequirablePool;
 
 export type RequirementKind = {
   code: string;
@@ -226,7 +237,32 @@ export async function declareRequirement(
   );
 }
 
-/** Clear one. The row going away IS the claim that it works anywhere. */
+/**
+ * Clear one. The row going away IS the claim that it works anywhere.
+ *
+ * ── AND THE POST-SEED STEP MAY PUT IT BACK. SAID HERE, LOUDLY ────────
+ *
+ * `src/lib/catalogue/tagging.ts` re-asserts the derived venue tags on every
+ * deploy and every sync, with `on conflict do nothing` — db/020's own contract,
+ * unchanged, and the reason a re-run is free. It has no way to tell a tag
+ * nobody has looked at from a tag a curator deliberately removed here, so a
+ * clearing of one of the DERIVED tags survives until the next sync and no
+ * longer.
+ *
+ * Which tags are derived is not a guess: they are exactly the rows whose `note`
+ * was written by the tagging step — the clambake, anything grilled, anything
+ * flamed, the fire-lit drink, and every actually-made menu. A requirement a
+ * curator declared here carries her own note and nothing re-asserts it.
+ *
+ * This is stated rather than fixed, on the same footing as
+ * scripts/seed-bank.mjs section 10's `Also at:` write guard, and for the same
+ * reason: the fix is a SCREEN DECISION and not a patch. Either the derivation
+ * learns to record that a human overruled it — a provenance column, so a
+ * cleared derived tag stays cleared — or this form stops offering to clear the
+ * derived ones and says why. Both are somebody's call. CLAUDE.md rule 16 says
+ * the one thing that must not happen is nobody being told, and
+ * docs/needs-a-human.md carries it.
+ */
 export async function clearRequirement(
   entity: Requirable,
   id: string,
