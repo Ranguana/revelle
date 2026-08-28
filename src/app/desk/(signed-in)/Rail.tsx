@@ -51,6 +51,13 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
   // surface of a curator tuning the engine rather than a list to maintain.
   [
     { href: "/desk/bench", label: "Test bench" },
+    // The second bench, beside the first, because they are the same gesture
+    // pointed at the two halves of a destination: one runs the engine that
+    // CHOOSES a room, the other runs the writer that SPEAKS in it. The writer
+    // had no surface at all until this one — it was reachable only from a
+    // member's own portal, which is a strange place to keep the only way to
+    // hear how a house sounds.
+    { href: "/desk/writing", label: "Writing bench" },
     { href: "/desk/matrix", label: "Connections" },
     { href: "/desk/coverage", label: "Coverage" },
   ],

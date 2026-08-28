@@ -58,16 +58,26 @@ import {
  * held apart under pressure, and the failure mode of a weaker model is not a
  * worse line, it is the SAME line in every house. That failure is invisible in
  * a single sample and fatal across a library.
+ *
+ * EXPORTED, and only so that a screen quoting the cost of a call quotes THIS
+ * number. The writing bench at /desk/writing says what a run will spend before
+ * it spends it; a bench that carried its own copy of the model name and the
+ * ceiling would be right until one of them moved and then would be confidently
+ * wrong about a bill (rule 21). Nothing outside this file may pass either of
+ * them to a model.
  */
-const MODEL = "claude-opus-5";
+export const MODEL = "claude-opus-5";
 
 /**
  * Room for the piece and for the thinking that reaches it. `max_tokens` caps
  * both together on this model, and a place card that comes back truncated
  * because the ceiling was set to the length of a place card is the sort of bug
  * that only shows up on the shortest pieces.
+ *
+ * Exported for the same single reason as MODEL above: one number, quoted where
+ * it is spent and where it is displayed.
  */
-const MAX_TOKENS = 4000;
+export const MAX_TOKENS = 4000;
 
 /**
  * `medium`, not `high`.
