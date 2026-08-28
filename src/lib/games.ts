@@ -1042,14 +1042,22 @@ const LETS_MAKE_A_DEAL: Game = {
   howItWorks:
     "Everyone gets a ticket at the door, and earns more by joining anything " +
     "else that happens.\n\n" +
-    "A contestant spends tickets to choose. Door A is a real prize. Door B " +
-    "is not — a potato, a single sock, a ketchup packet, a fruitcake. Door C " +
-    "is a mystery envelope: swap with anyone, double your prize, lose " +
-    "everything, steal a prize, or a mystery gift.\n\n" +
-    "Before any door opens, the audience may buy and sell tickets from the " +
-    "contestant. That market is not a side rule; it is why the room is loud.\n\n" +
-    "At the end, anyone may risk everything they hold on one giant mystery " +
-    "box.",
+    "A round works like this. A name is drawn and that person is the " +
+    "contestant. They pay three tickets to play, and they choose one door " +
+    "and one only. Door A is a real prize. Door B is not — a potato, a " +
+    "single sock, a ketchup packet, a fruitcake. Door C is a mystery " +
+    "envelope: swap with anyone, double your prize, lose everything, steal a " +
+    "prize, or a mystery gift, and the contestant chooses who to swap with " +
+    "or steal from. Whatever is behind the door they picked is theirs, and " +
+    "the other two are not opened.\n\n" +
+    "Before the door opens, the audience gets sixty seconds to buy and sell " +
+    "tickets with the contestant, at whatever price the two of them agree, " +
+    "and every deal goes through the host. A contestant with no tickets left " +
+    "cannot play, which is why the market matters. That market is not a side " +
+    "rule; it is why the room is loud.\n\n" +
+    "Four rounds, four contestants. Then, at the end, anyone may risk " +
+    "everything they hold on one giant mystery box — the first person to say " +
+    "yes takes it, it is opened in front of them, and the night stops there.",
   materials:
     "Real prizes and ridiculous ones, three doors or screens, envelopes, and " +
     "one box big enough to be a problem.",
@@ -1065,10 +1073,20 @@ const LETS_MAKE_A_DEAL: Game = {
 
   scoring:
     "Tickets. One on arrival, more for joining in, and they are spendable " +
-    "and tradeable all night.",
+    "and tradeable all night. Three tickets buys a contestant one door. " +
+    "Nothing is totalled at the end: what people hold, they hold.",
   currencyLabel: "tickets",
   sourceNote: HOUSE,
   notes:
+    "THE PRICE OF A DOOR IS THE HOUSE'S AND IT IS NEW. The founder's own " +
+    "account of this game says a contestant spends tickets to choose and " +
+    "never says how many, which leaves the one number a host has to say out " +
+    "loud before the first round unwritten — and with it, whether the " +
+    "sixty-second market is for anything. Three, against a ticket handed out " +
+    "on arrival and more all evening, makes the market matter without " +
+    "putting a door out of anybody's reach. Four rounds and one door per " +
+    "contestant are the house's too; both were implied by the runbook's own " +
+    "clock and neither was stated.\n\n" +
     "Duration is inferred, not given. The prize list has been run as: wine, " +
     "a gift certificate and good chocolates behind Door A; a potato, a single " +
     "sock, a ketchup packet and a fruitcake behind Door B. The giant box has " +
@@ -1134,32 +1152,37 @@ const LETS_MAKE_A_DEAL: Game = {
       {
         step: "the_market_opens",
         phase: "opening",
-        instruction: "Say how the market works before the first door opens.",
+        instruction: "Say the price of a door and how the market works, before the first round.",
         detail:
-          "The audience may buy and sell tickets from the contestant, for " +
-          "sixty seconds, and then you call it closed. It is not a side rule; " +
-          "it is why the room is loud.",
-        say: "Sixty seconds. Buy from her, sell to her, and every deal goes through me.",
+          "Three tickets to play, one door each and one only. Then sixty " +
+          "seconds in which the audience may buy and sell tickets with the " +
+          "contestant at any price the two of them agree, and then you call " +
+          "it closed. It is not a side rule; it is why the room is loud.",
+        say: "Three tickets buys you one door. Sixty seconds from now: buy from her, sell to her, any price you like, and every deal goes through me.",
+        minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "round_one",
         phase: "playing",
         instruction:
-          "Draw a name for the contestant, open the market, then open the door.",
+          "Draw a name, take three tickets, open the market, then open the one door they pick.",
         detail:
           "DRAW, do not take volunteers. The same three people volunteer for " +
-          "everything and the fourth round is where the room goes quiet. Run " +
-          "the first one slowly — everybody is learning the market by watching it.",
+          "everything and the fourth round is where the room goes quiet. One " +
+          "door only and the other two stay shut. Run the first one slowly — " +
+          "everybody is learning the market by watching it.",
         minutes: 8,
       },
       {
         step: "the_rest_of_the_rounds",
         phase: "playing",
-        instruction: "Three more rounds, faster each time.",
+        instruction: "Three more rounds, a new name each time, faster each time.",
         detail:
-          "Cut the talking and not the market. By round three the audience is " +
-          "running the market without you and you can just open doors.",
+          "Cut the talking and not the market. Four contestants is the " +
+          "whole of it, and a person already drawn is not drawn again. By " +
+          "round three the audience is running the market without you and " +
+          "you can just open doors.",
         minutes: 18,
       },
       {
@@ -2593,6 +2616,64 @@ const IMPOSTER: Game = {
  * forbids hurrying and forbids checking, and Oaxaca invites the interruption
  * the other four forbid. Written down here so the next audit counts five
  * engines rather than one repetition.
+ *
+ * ── THE CLARITY PASS, AND WHAT IT SUPERSEDED ────────────────────────
+ *
+ * Founder, on the whole block: *"rewrite all the games to make the how to
+ * play super clear, not abstract."* Every `runbook` and most of the
+ * `howItWorks` prose below was rewritten against one test — A HOST WHO HAS
+ * NEVER SEEN THE GAME CAN RUN IT FROM THE TEXT ALONE, WITH NOTHING LEFT TO
+ * INTERPRET. Her twenty sentences are untouched and the verbatim test still
+ * compares them character-for-character against `destinations.ts`.
+ *
+ * WHAT THE EARLIER DRAFT WAS ACTUALLY MISSING, because the pattern repeated
+ * across nearly all twenty and is the thing to check first in the next one:
+ *
+ *   TURN ORDER. "Round the table" without saying from whom or which way.
+ *   Eleven games said it. A round with no stated first player is a round a
+ *   host starts by pointing at somebody, which is the one thing several of
+ *   these games are built to avoid.
+ *
+ *   THE TIE. Nearly every game with a winner had no answer for two of them,
+ *   and at these table sizes a tie is the ordinary result rather than the
+ *   edge case — six to ten names tie at the top of a tally more often than
+ *   not. A host settling that in front of everybody is inventing a rule
+ *   under the worst possible conditions.
+ *
+ *   THE ENDING. Several ended on an OBSERVATION rather than a CONDITION:
+ *   "the first ending the table repeats back", "the line whose author does
+ *   not remember saying it", "when somebody finishes and nobody starts",
+ *   "stop one round earlier than the table wants to". Each is a true thing
+ *   about a good night and none of them is an instruction — they can fail to
+ *   happen, and two of the four were in FINALES, where the failure is the
+ *   last thing that happens all evening. Endings are now conditions:
+ *   everybody has gone, the bag is empty, the parcels have run out, the
+ *   chain has come back to her.
+ *
+ *   WHO WINS, AND WHAT WINNING IS. Games with no winner did not say so, and
+ *   games with one did not say what the winner got. Both now say it plainly;
+ *   several of these correctly award nothing at all.
+ *
+ *   THE MECHANIC ITSELF, in three places, which is the worst of it: the
+ *   Vegas table was told to teach a dice game in two minutes and never told
+ *   which game; the Amalfi cards named a line, two lines and a full card
+ *   without saying how many numbers are on a card; and Aspen's voices were
+ *   won by whoever was "guessed fastest", which nobody timed.
+ *
+ * THE GENERAL FORM, and it is rule 3's shape applied to instructions: THE
+ * EARLIER DRAFT WROTE WHAT A GOOD NIGHT LOOKS LIKE AND CALLED IT A RULE.
+ * Both are worth having and they are not the same document — the observation
+ * belongs in `detail`, where it says why, and the rule belongs in
+ * `instruction` and in `howItWorks`, where a host acts on it at nine
+ * o'clock with eleven people waiting. Where a rewrite added a mechanic
+ * rather than clarifying one, the superseded reasoning is preserved in that
+ * game's own `notes` under rule 14, with what beat it.
+ *
+ * TWO DEFECTS FOUND IN PASSING AND FIXED, both of the same kind — a game
+ * whose forfeit cannot be settled because the paper carries no name.
+ * Nantucket's guess card was printed as "One line, and no room for a name"
+ * while the game turns on which named person was closest, and the Dolomites
+ * slips had the same hole. Both cards now carry a name.
  * ═══════════════════════════════════════════════════════════════════ */
 
 /**
@@ -2623,16 +2704,22 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
     "Everyone names the houseguest, once, quietly, and nobody may name " +
     "themselves. The house writes it down and does not say what the tally is.",
   howItWorks:
-    "At some point across the weekend every person says one name to the " +
-    "house and only to the house: whoever in this room is most the " +
-    "houseguest. The one who arrives with nothing. The one who never goes " +
-    "to bed. The one the house is actually for.\n\n" +
-    "Nobody names themselves, which is the only rule that has to be " +
-    "enforced, and it enforces itself the moment somebody tries.\n\n" +
-    "The tally is kept on a pad that stays out of the room. It is never " +
-    "shown, never hinted at, and never used to settle anything. On the last " +
-    "night the top name is read out once and the pad goes in the fire or the " +
-    "bin, and that is the end of it.",
+    "Every person in the house comes and says one name to the host, on their " +
+    "own, at any point before the last dinner: whoever here is most the " +
+    "houseguest. The one who arrives with nothing. The one who never goes to " +
+    "bed. The one the house is actually for. It is said out loud, to her " +
+    "only, and nothing is written in front of the person saying it.\n\n" +
+    "Nobody names themselves. Anybody who tries is told not yourself and " +
+    "names somebody else, and that is the whole of the enforcement.\n\n" +
+    "The host keeps the names on a pad that lives out of the room, one to a " +
+    "line, in the order they were said. She never shows it, never says a " +
+    "number, and never uses it to settle anything else.\n\n" +
+    "The naming closes when the last dinner is served. She counts alone " +
+    "beforehand; if two names are level, the one that reached that count " +
+    "first wins, which is why the pad is kept in order. At the table she " +
+    "says the winning name once, with no count and no runners-up, and then " +
+    "tears the page up in front of everybody. Nobody wins anything and there " +
+    "is nothing to collect.",
   materials: "A pad kept somewhere nobody wanders, and a pencil.",
 
   shape: "ambient",
@@ -2652,7 +2739,13 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
     "last dinner, and every runbook step and contingency. The reading of one " +
     "name at the end is the house's addition and is the first thing to cut " +
     "if she wants the score never shown at all — her sentence permits both " +
-    "and does not choose.",
+    "and does not choose.\n\n" +
+    "THE TIE RULE IS NEW AND IS THE HOUSE'S. A tally of six to ten names " +
+    "ties at the top more often than not, and the earlier draft named one " +
+    "winner without saying what to do when there are two — which left the " +
+    "host inventing a rule at the table with everybody watching. Earliest to " +
+    "reach the count wins, which is why the pad is now kept in order. Her " +
+    "sentence says the house keeps score and does not say how it breaks one.",
 
   runbook: {
     hostRole: "plays_too",
@@ -2673,30 +2766,47 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
       {
         step: "decide_when_it_closes",
         phase: "before",
-        instruction: "Pick the meal the naming closes at, and do not move it.",
+        instruction: "Fix the meal the naming closes at, and do not move it once you have said it.",
         detail:
-          "The last dinner is the natural one. A game that closes when the " +
-          "host feels like closing it is a game somebody suspects of being " +
-          "steered.",
+          "The last dinner. Naming closes when those plates go down: nothing " +
+          "is taken after that, including from somebody who says they were " +
+          "about to. A game that closes when the host feels like closing it " +
+          "is a game somebody suspects of being steered.",
       },
       {
         step: "say_it_once",
         phase: "opening",
-        instruction: "Say the rule at the first dinner, once, and never explain it again.",
+        instruction: "At the first dinner, with everybody sitting down, say the rule once.",
         detail:
-          "Repeating it turns a standing arrangement into a running bit. " +
-          "Said once at a full table it is a thing the weekend now contains.",
-        say: "At some point this weekend, tell me who the houseguest is. Not yourself. I am not going to say what anyone else said.",
+          "Once, at a full table, and never explained again. Say the three " +
+          "things it needs: one name each, said to you on your own, and not " +
+          "yourself. Repeating it later turns a standing arrangement into a " +
+          "running bit.",
+        say: "Some time before the last dinner, find me on your own and tell me one name: whoever here is the houseguest. Not yourself. I will not tell anybody what you said.",
         printedPiece: "rules_card",
       },
       {
         step: "take_them_privately",
         phase: "underway",
-        instruction: "Take each name where nobody else can hear it, and write it down later.",
+        instruction: "Take each name where nobody can hear it, and write it on the pad in order.",
         detail:
-          "In the kitchen, on the stairs, halfway down the lane. Writing it " +
-          "in front of the person turns a confidence into a transaction.",
+          "In the kitchen, on the stairs, halfway down the lane. Nothing is " +
+          "written in front of the person — you go to the pad afterwards and " +
+          "put the name on the next line down, because the order is what " +
+          "settles a tie later. A name of somebody who is not in the house " +
+          "does not go on the pad.",
         supplyItem: "A pad kept out of sight",
+      },
+      {
+        step: "if_somebody_names_themselves",
+        phase: "underway",
+        instruction: "Say not yourself, and wait. Do not write anything down until they go again.",
+        detail:
+          "Two people try it, one of them as a joke. Said flatly and once, " +
+          "they name somebody else in four seconds and it costs the weekend " +
+          "nothing. It is the only rule in this game that gets enforced at " +
+          "all.",
+        say: "Not yourself.",
       },
       {
         step: "refuse_the_first_leak",
@@ -2708,6 +2818,15 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
         say: "I have not counted.",
       },
       {
+        step: "catch_whoever_arrives_late",
+        phase: "underway",
+        instruction: "Say the rule once, on their own, to anybody who arrives after the first dinner.",
+        detail:
+          "On their own and in the same words, so a person who missed the " +
+          "table is not the only one playing a slightly different game. " +
+          "Somebody who arrives on the last afternoon still gets asked.",
+      },
+      {
         step: "chase_the_two_who_forgot",
         phase: "underway",
         instruction: "On the last afternoon, quietly ask anyone who has not named one.",
@@ -2717,12 +2836,24 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
           "perform an answer.",
       },
       {
+        step: "count_it_alone_beforehand",
+        phase: "deciding",
+        instruction: "An hour before the last dinner, count the pad alone and settle any tie yourself.",
+        detail:
+          "Alone, and once. Most names get one or two, so a tie at the top is " +
+          "the usual result rather than the unusual one: THE NAME THAT " +
+          "REACHED THAT COUNT FIRST WINS, which the order on the pad tells " +
+          "you. Nobody is ever told a tie happened.",
+        supplyItem: "A pad kept out of sight",
+      },
+      {
         step: "read_the_one_name",
         phase: "ending",
-        instruction: "At the last dinner, say the name once. No count, no runners-up.",
+        instruction: "At the last dinner, say the one name out loud. No count, no runners-up.",
         detail:
           "One name and no arithmetic. A number invites a recount and a " +
-          "recount is the argument this game was built to avoid.",
+          "recount is the argument this game was built to avoid. Nothing is " +
+          "won and nothing is handed over — the name is the whole of it.",
         say: "The houseguest is you. That is all I am saying about it.",
       },
       {
@@ -2730,8 +2861,9 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
         phase: "ending",
         instruction: "Tear the page out in front of everybody and get rid of it.",
         detail:
-          "In front of them, so nobody spends the drive home wondering who " +
-          "voted for whom. The paper going is the end of the game.",
+          "In front of them, before anybody leaves the table, so nobody " +
+          "spends the drive home wondering who said what. The paper going is " +
+          "the end of the game and there is nothing after it.",
       },
     ],
     contingencies: [
@@ -2885,16 +3017,24 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
     "name their own. Then they are played in order, and the room finds out " +
     "who was right.",
   howItWorks:
-    "A slip each. On it goes one name from this room and one song — the " +
-    "song that gets that person up. Not the song you love. The song they " +
-    "cannot sit through.\n\n" +
-    "Nobody names their own, which is the half that makes it a game rather " +
-    "than a playlist: every song in the queue was chosen for somebody by " +
-    "somebody who has watched them at a party.\n\n" +
-    "They go on in the order the slips came out of the bowl. Nothing is " +
-    "skipped and nothing is explained beforehand. The room works out whose " +
+    "One slip each, two lines on it: somebody else's name from this room, " +
+    "and one song — the song that gets that person up. Not the song you " +
+    "love. The song they cannot sit through. You may not write your own " +
+    "name, and you do not sign the slip.\n\n" +
+    "Everybody folds theirs into the bowl. That is the half that makes it a " +
+    "game rather than a playlist: every song in the queue was chosen for " +
+    "somebody by somebody who has watched them at a party.\n\n" +
+    "The host draws the slips out one at a time, in front of everybody, and " +
+    "queues the songs in the order they come out. Two slips naming the same " +
+    "person both play. Two slips naming the same song play it once, at the " +
+    "first slip's place in the queue.\n\n" +
+    "Then they play in that order. Nothing is skipped, nothing is " +
+    "introduced, and nobody says who wrote what. The room works out whose " +
     "song it is somewhere in the first eight bars, usually because that " +
-    "person is already standing.",
+    "person is already standing.\n\n" +
+    "Nobody wins. It ends when the queue runs out or at the first song after " +
+    "which nobody sits down, whichever comes first, and then the music goes " +
+    "back to being ordinary music.",
   materials:
     "A speaker and something to play from, a bowl, and a slip and a pencil " +
     "for each person.",
@@ -2915,7 +3055,16 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
     "house's, and it is the one interpretive choice in this row: her " +
     "sentence says the song that gets them up and says nobody names their " +
     "own, which only resolves if the song is chosen FOR somebody. Stated " +
-    "here so a later reader can disagree with it in one place.",
+    "here so a later reader can disagree with it in one place.\n\n" +
+    "THREE RULINGS ADDED WHERE THE EARLIER DRAFT LEFT A HOST GUESSING: two " +
+    "slips naming the same person both play, two slips naming the same song " +
+    "play it once at the first slip's place, and a song nobody can find is " +
+    "skipped in silence. The earlier draft said only that nothing is " +
+    "skipped, which is true of the queue and says nothing about the three " +
+    "collisions a bowl of ten slips actually produces. THE ENDING IS ALSO " +
+    "STATED NOW: the empty bowl or the first song after which nobody sits " +
+    "down, whichever comes first. It previously named only the second, which " +
+    "is an ending that can fail to happen.",
 
   runbook: {
     hostRole: "plays_too",
@@ -2951,31 +3100,36 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
       {
         step: "say_the_rule",
         phase: "opening",
-        instruction: "Turn the music down, not off, and say the rule once.",
+        instruction: "Turn the music down, not off, and say the rule once with the slips in your hand.",
         detail:
           "Down and not off. Silence makes an announcement out of it; a " +
-          "room that can still hear something under you stays a room.",
-        say: "One name from this room and one song. The song that gets that person up. Not yours.",
+          "room that can still hear something under you stays a room. Say " +
+          "all three parts: a name, a song, and not your own name.",
+        say: "Take a slip. Write somebody else in this room, and under it the song that gets that person up. Not your own name, and do not sign it.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "write_and_fold",
         phase: "opening",
-        instruction: "Three minutes to write one, folded, into the bowl.",
+        instruction: "Three minutes to write one, fold it in half, and put it in the bowl.",
         detail:
           "Three minutes and not ten. The first name somebody thinks of is " +
-          "the right one, and the second is a compromise nobody dances to.",
+          "the right one, and the second is a compromise nobody dances to. " +
+          "Anybody who arrives while this is happening gets a slip and the " +
+          "same three minutes.",
         minutes: 3,
         printedPiece: "naming_slips",
       },
       {
         step: "draw_and_queue",
         phase: "playing",
-        instruction: "Draw the slips out one at a time and line the songs up in that order.",
+        instruction: "Draw the slips out one at a time in front of everybody and queue them in that order.",
         detail:
-          "Draw them in front of everybody. An order the host arranged is an " +
-          "order somebody will say was arranged.",
+          "Draw them where the room can see. Two slips naming the same " +
+          "person both play; two slips naming the same song play it once, at " +
+          "the first one's place. A song nobody can find is skipped without " +
+          "comment and the next slip takes its place.",
         minutes: 2,
         supplyItem: "A bowl",
       },
@@ -2986,19 +3140,31 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
         detail:
           "The rule that carries the whole game: no introductions. A song " +
           "explained before it plays has been made into a story about the " +
-          "person who chose it, and the person it was chosen for sits down.",
-        minutes: 22,
+          "person who chose it, and the person it was chosen for sits down. " +
+          "Nobody says whose slip is whose, at any point, including you.",
+        minutes: 20,
         supplyItem: "A speaker and something to play from",
       },
       {
         step: "the_one_that_was_right",
         phase: "ending",
-        instruction: "When a song empties the floor, let it finish, then stop.",
+        instruction: "Stop at the empty bowl, or at the first song after which nobody sits down.",
         detail:
-          "The ending is not the last slip. It is the first song after which " +
-          "nobody sits down, and stopping there leaves the room standing.",
+          "Whichever comes first, and it is usually the second. Let that one " +
+          "finish and do not start another from the bowl. The slips that did " +
+          "not get played stay unread.",
         say: "That was somebody paying attention to you.",
-        minutes: 6,
+        minutes: 5,
+      },
+      {
+        step: "put_the_bowl_away",
+        phase: "ending",
+        instruction: "Put the bowl out of sight and put ordinary music back on.",
+        detail:
+          "Nobody wins this and there is nothing to award. The bowl going " +
+          "away is how the room knows the game has finished and the dancing " +
+          "has not.",
+        minutes: 3,
       },
     ],
     contingencies: [
@@ -3161,17 +3327,29 @@ const VEGAS_THE_LATE_SUPPER: Game = {
     "Everybody puts in the same and plays for it. Whoever is up at midnight " +
     "buys the late supper, signs for it, and that is the end of it.",
   howItWorks:
-    "Everybody puts in the same. Not money — the same handful of whatever " +
-    "the house has decided the stake is, counted out identically in front of " +
-    "everybody so nobody starts richer.\n\n" +
-    "Then it is played for, at one table, in whatever game the room already " +
-    "knows. Dice is the fastest to teach and the hardest to hold a grudge " +
-    "over. The house does not care which game it is; it cares that everybody " +
-    "started level and that it stops at midnight.\n\n" +
-    "At midnight the counting stops and whoever is holding the most is the " +
-    "one who buys the late supper. They sign for it, on a card, in front of " +
-    "the table. Nothing is settled in money and nothing carries over to " +
-    "tomorrow, which is what the last clause of the rule is for.",
+    "Everybody puts in the same. Not money — the same handful of counters, " +
+    "twenty each, counted out identically before anybody sits down so nobody " +
+    "starts richer.\n\n" +
+    "Then it is played for at one table, and the house's default is a dice " +
+    "game that takes two minutes to teach. Each hand starts with everybody " +
+    "pushing one counter into the middle. The cup goes round to the left. On " +
+    "your turn you shake five dice out of it, then pick up any of them you " +
+    "do not want and throw those once more — one re-throw and no more — and " +
+    "what is left in front of you is your hand. Five of a kind beats four of " +
+    "a kind, which beats a full house, which beats three of a kind, then two " +
+    "pairs, then a pair, then the highest single die. When everybody has " +
+    "thrown, the best hand takes the middle. Two equal best hands split it " +
+    "and the odd counter stays in the middle for the next one.\n\n" +
+    "Anybody who runs out of counters is out of the hands, keeps their seat, " +
+    "and is one of the people the supper is being bought for. Any other game " +
+    "the room already knows may be swapped in, so long as everybody started " +
+    "level and it stops at midnight.\n\n" +
+    "At midnight the table stops mid-hand and the piles are counted. Whoever " +
+    "is holding the most buys the late supper, signs a card for it in front " +
+    "of everybody, and keeps the card. If two piles are level, both of them " +
+    "sign and they buy it between them. Nothing is settled in money and " +
+    "nothing carries to tomorrow, which is what the last clause of her rule " +
+    "is for: every counter goes back in the bag before anybody stands up.",
   materials:
     "Two dice cups with five dice each, a stake of identical counters for " +
     "everybody, and one card for the winner to sign.",
@@ -3204,7 +3382,24 @@ const VEGAS_THE_LATE_SUPPER: Game = {
     "LOAD-BEARING ADDITION and the reason to read this row twice: the " +
     "take-home bank's Vegas IOU declares `from game yields_iou`, which is a " +
     "dependency on a game that leaves a written stake behind. Her sentence " +
-    "describes the obligation; the card is the house making it an object.",
+    "describes the obligation; the card is the house making it an object.\n\n" +
+    "THE DICE GAME IS NOW WRITTEN OUT, AND THE EARLIER DRAFT'S REFUSAL TO " +
+    "WRITE IT WAS THE DEFECT. It said the table plays whatever game the room " +
+    "already knows and that the house does not care which — true as a " +
+    "principle and useless at nine o'clock, because the next instruction was " +
+    "to teach it in two minutes and nothing anywhere said what IT was. A " +
+    "host with dice cups in her hands and no rules is a host who does not " +
+    "run this. The default is written out in full: an ante, one throw with " +
+    "one re-throw, a hand ranking, and the best hand taking the middle. It " +
+    "is a folk dice game, owned by nobody, printable for the same reason " +
+    "Fishbowl is, and it was chosen over the hidden-bidding version because " +
+    "that one needs a cup in front of every person at once and this row buys " +
+    "two. The permission to swap in another game survives as a sentence " +
+    "rather than as the whole answer. THREE RULINGS ADDED beside it, each covering " +
+    "a thing that happens at every table and had no answer: a player whose " +
+    "counters run out keeps their seat and stops playing hands, a latecomer " +
+    "buys in for the same twenty until eleven, and level piles at midnight " +
+    "both sign and buy it between them rather than throwing for it.",
 
   runbook: {
     hostRole: "plays_too",
@@ -3216,11 +3411,12 @@ const VEGAS_THE_LATE_SUPPER: Game = {
       {
         step: "count_the_stakes_out",
         phase: "before",
-        instruction: "Count out identical stakes and set one at each place before anybody sits.",
+        instruction: "Count twenty counters into a pile at every place before anybody sits down.",
         detail:
-          "Counted out in advance, so nobody watches the counting and nobody " +
-          "can say a pile started bigger. This is the only part of the " +
-          "evening that has to be exactly fair.",
+          "Twenty each, counted out in advance, so nobody watches the " +
+          "counting and nobody can say a pile started bigger. Leave the rest " +
+          "in the bag for anybody who joins later. This is the only part of " +
+          "the evening that has to be exactly fair.",
         supplyItem: "A stake of counters, identical for everybody",
       },
       {
@@ -3247,31 +3443,40 @@ const VEGAS_THE_LATE_SUPPER: Game = {
       {
         step: "teach_it_in_two_minutes",
         phase: "opening",
-        instruction: "Teach the game in two minutes with the cups in your hands.",
+        instruction: "Teach it with the cups in your hands, playing one hand out loud for nothing.",
         detail:
-          "Two minutes, demonstrated, never read. Anything that takes longer " +
-          "to teach than that is the wrong game for a table with drinks on it.",
-        minutes: 2,
+          "Demonstrated, never read. One counter each into the middle. The " +
+          "cup goes round to the left; on your turn you shake out five dice, " +
+          "pick up any you do not want and throw those once more, and stop " +
+          "there. Five of a kind, four of a kind, full house, three of a " +
+          "kind, two pairs, a pair, highest die. When the cup has been all " +
+          "the way round, the best hand takes the middle, and two equal " +
+          "hands split it with the odd counter left in for the next one.",
+        minutes: 4,
         supplyItem: "Dice cups, five dice each",
       },
       {
         step: "play_it",
         phase: "playing",
-        instruction: "Play. Do not keep a written record of anything.",
+        instruction: "Play hands until midnight. Do not keep a written record of anything.",
         detail:
           "The piles are the record. A written tally invites a recount, and " +
-          "a recount at half past eleven is how this ends badly.",
+          "a recount at half past eleven is how this ends badly. Anybody who " +
+          "runs out of counters keeps their seat and stops playing hands. " +
+          "Anybody arriving before eleven buys in for twenty out of the bag; " +
+          "after eleven nobody joins.",
         minutes: 45,
       },
       {
         step: "call_midnight",
         phase: "deciding",
-        instruction: "At midnight, stop the table mid-hand and count the piles.",
+        instruction: "At midnight, stop the table mid-hand and have everybody count their own pile.",
         detail:
           "Mid-hand and not at the end of one. The clock is the rule, and a " +
-          "table allowed to finish a hand is a table allowed to finish two.",
+          "table allowed to finish a hand is a table allowed to finish two. " +
+          "Each person counts their own out loud and says the number.",
         say: "That is midnight. Hands down, count what you have.",
-        minutes: 10,
+        minutes: 8,
       },
       {
         step: "sign_it",
@@ -3279,8 +3484,10 @@ const VEGAS_THE_LATE_SUPPER: Game = {
         instruction: "The largest pile signs the card, and the table watches it happen.",
         detail:
           "Signed in front of everybody, and then it belongs to whoever is " +
-          "buying — not to the house. It is the only thing that leaves this " +
-          "table with a person on it.",
+          "buying — not to the house. If two piles are level, both sign the " +
+          "same card and buy it between them; there is no play-off and no " +
+          "extra throw. It is the only thing that leaves this table with a " +
+          "person on it.",
         say: "You are up. Sign it.",
         minutes: 5,
         printedPiece: "the_iou",
@@ -3425,7 +3632,7 @@ const VEGAS_THE_LATE_SUPPER: Game = {
       description:
         "One line and a rule for a signature. It sits face up in the middle " +
         "all evening and leaves with whoever is up at midnight. This is the " +
-        "written stake the take-home bank's Vegas IOU depends on.",
+        "written stake this room's take-home IOU depends on.",
       voicePiece: "notice",
       quantity: 1,
     },
@@ -3454,16 +3661,21 @@ const NEW_YORK_THE_LIST: Game = {
     "Each guest names one thing that will not be repeated. The list is read " +
     "at midnight, and then it is destroyed in front of everybody.",
   howItWorks:
-    "One slip each, some time in the evening, folded into the bowl. On it " +
-    "goes one thing that will not be repeated. Not a resolution and not a " +
-    "regret — a thing that happened, or was said, or was worn, and is not " +
-    "going to happen again.\n\n" +
-    "Nothing is signed. At midnight the whole list is read out, one slip " +
-    "after another, in the order they come out of the bowl, and nobody says " +
-    "whose is whose.\n\n" +
-    "Then it is torn up, into the bowl, in front of the room. That is the " +
-    "part that makes the first part possible: everybody writes a truer slip " +
-    "when they have watched last year's go.",
+    "A bowl, slips and pencils sit out from the start of the evening. One " +
+    "slip each, written whenever a person feels like it and folded into the " +
+    "bowl. On it goes one thing that will not be repeated: not a resolution " +
+    "and not a regret — a thing that happened, or was said, or was worn, and " +
+    "is not going to happen again. One line, no names, nothing signed.\n\n" +
+    "At midnight one person reads. The reader takes the slips out one at a " +
+    "time and reads every one aloud, flat and in their own voice, in the " +
+    "order they come out. Nobody says whose is whose, nobody guesses out " +
+    "loud, and nothing is skipped — including the blank ones, which are read " +
+    "as blank and passed over without comment.\n\n" +
+    "Nobody wins. There is no vote on the best one and no prize.\n\n" +
+    "Then the reader tears the slips up into the bowl in front of everybody, " +
+    "and the evening is over. That is the part that makes the first part " +
+    "possible: everybody writes a truer slip when they have watched last " +
+    "year's go.",
   materials: "A bowl, a slip and a pencil for each person, and nothing to write with afterwards.",
 
   shape: "finale",
@@ -3482,14 +3694,23 @@ const NEW_YORK_THE_LIST: Game = {
     "SUBSTITUTION and the one place this row departs from the obvious " +
     "reading: destroyed suggests a flame, and a flame is a thing an " +
     "apartment cannot honour. Rule 25's first test decides it — the game has " +
-    "to work in the smallest room that books this evening.",
+    "to work in the smallest room that books this evening.\n\n" +
+    "THE READER IS NOW NAMED IN ADVANCE AND IS NOT THE HOST. The earlier " +
+    "draft said the job could be handed to anybody at the table, which is a " +
+    "decision made at five to midnight in front of everybody, and the " +
+    "obvious person to hand it to is whoever looks least likely to have " +
+    "written anything. Chosen before the evening, it is nothing. It also " +
+    "answers the one question this game invites and had no answer for — " +
+    "somebody guessing out loud whose slip is whose — because the reader has " +
+    "a line to say and reads on. This is a finale, and the last five minutes " +
+    "of an evening are not where a host should be inventing procedure.",
 
   runbook: {
     hostRole: "plays_too",
     hostNote:
       "You write one and it goes in the bowl unsigned like everybody " +
-      "else's. Reading them out is the only job, and it can be handed to " +
-      "anybody at the table.",
+      "else's. Reading is the only job in the game and it is better given " +
+      "away before the evening starts than taken by you at midnight.",
     steps: [
       {
         step: "set_the_bowl_out_early",
@@ -3497,49 +3718,79 @@ const NEW_YORK_THE_LIST: Game = {
         instruction: "Put the bowl, the slips and the pencils out before anybody arrives.",
         detail:
           "Out early and never announced, so that writing one is something " +
-          "people drift over to rather than something that starts.",
+          "people drift over to rather than something that starts. One slip " +
+          "per person and four spare, because somebody always wants a second " +
+          "go at theirs.",
         supplyItem: "A bowl",
         printedPiece: "list_slips",
+      },
+      {
+        step: "decide_who_reads",
+        phase: "before",
+        instruction: "Decide now who reads at midnight, and let it be somebody other than you.",
+        detail:
+          "One reader for the whole list, chosen before the evening rather " +
+          "than at five to twelve. Yours goes in the bowl too, so a reader " +
+          "who is not the host is one more person who cannot be watched for " +
+          "a reaction to their own slip.",
       },
       {
         step: "say_it_once_at_the_table",
         phase: "opening",
         instruction: "Say what the bowl is for, once, while everybody is seated.",
         detail:
-          "Once, at the table, and then leave it alone. Chasing slips turns " +
-          "a confession into homework.",
-        say: "One thing that will not be repeated. Do not sign it. I read them at midnight and then they go.",
+          "Once, at the table, and then leave it alone. Say the four things " +
+          "it needs: one slip each, one line on it, nothing signed, and the " +
+          "hour they get read. Chasing slips afterwards turns a confession " +
+          "into homework.",
+        say: "There is a bowl by the door. One thing on a slip that will not be repeated, one line, do not sign it. At midnight every one of them gets read out and then they get torn up.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "let_them_write_all_evening",
         phase: "opening",
-        instruction: "Leave the bowl alone until five to midnight.",
+        instruction: "Leave the bowl alone until five to midnight, and tell latecomers at the door.",
         detail:
           "The good slips are written at eleven by somebody standing at the " +
-          "sideboard on their own. Nothing you do between now and then " +
-          "improves them.",
-        minutes: 3,
+          "sideboard on their own, and nothing you do before then improves " +
+          "them. Anybody arriving after the table has been told gets the same " +
+          "sentence quietly at the door.",
+        minutes: 2,
       },
       {
         step: "read_them",
         phase: "playing",
-        instruction: "At midnight, read every slip out, in the order they come out of the bowl.",
+        instruction: "At midnight the reader takes them out one at a time and reads every one aloud.",
         detail:
-          "Every one, including the flat ones. Editing the list is the only " +
-          "way to break this game: a room that suspects a slip was skipped " +
-          "stops believing the bowl.",
+          "Every one, in the order they come out, flat and in the reader's " +
+          "own voice, including the blank ones — which are read as blank and " +
+          "passed. Nothing is skipped and nothing is commented on. Editing " +
+          "the list is the only way to break this game: a room that suspects " +
+          "a slip was skipped stops believing the bowl.",
         minutes: 8,
         supplyItem: "A bowl",
+      },
+      {
+        step: "nobody_guesses_out_loud",
+        phase: "playing",
+        instruction: "If somebody starts guessing whose a slip was, say the one rule and read the next.",
+        detail:
+          "It happens on the third or fourth slip, once. Said lightly and " +
+          "once, it does not happen again. The list is anonymous by " +
+          "agreement, not by handwriting, and everybody knows that.",
+        say: "We do not do that with these.",
+        minutes: 2,
       },
       {
         step: "tear_it_up",
         phase: "ending",
         instruction: "Tear the slips into the bowl where the room can see it, and say nothing more.",
         detail:
-          "No summing up. The tearing is the sentence, and a host who " +
-          "follows it with a toast has explained a thing that did not need it.",
+          "All of them, at the table, the moment the last one is read. " +
+          "Nothing is won here, nothing is voted on and nothing is kept. The " +
+          "tearing is the sentence, and a host who follows it with a toast " +
+          "has explained a thing that did not need it.",
         minutes: 4,
       },
     ],
@@ -3682,15 +3933,23 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
     "Everybody writes down what the weather will do tomorrow. In the " +
     "morning, whoever was closest does not have to clear.",
   howItWorks:
-    "At supper, one card each. On it goes tomorrow: what it will do, in as " +
-    "many words as it takes. Fog until ten. Rain by four and then it lifts. " +
-    "Nothing all day.\n\n" +
-    "The cards go face down under something heavy and are not looked at " +
-    "again that night.\n\n" +
-    "In the morning the room reads them out and agrees, out loud and " +
-    "roughly, which one was closest. There is no instrument and no " +
-    "arbitration — the argument about who was closest is most of the game, " +
-    "and it is settled by the room. Whoever wins does not have to clear.",
+    "At supper, one card each, already at the place. On it goes your name " +
+    "and, under it, tomorrow: what the weather will do, in as many words as " +
+    "it takes. Fog until ten. Rain by four and then it lifts. Nothing all " +
+    "day. One card each and no second attempt.\n\n" +
+    "The cards are collected face down and go under something heavy in the " +
+    "middle of the table. Nobody looks at them again that night and nobody " +
+    "reads a forecast out loud.\n\n" +
+    "In the morning, before anybody says what it is doing outside, the cards " +
+    "come out and are read aloud, one after another, in the order they were " +
+    "collected. Then the room argues and agrees, out loud and roughly, which " +
+    "one was closest. There is no instrument and no arbitration — the " +
+    "argument is most of the game. If it is still going after five minutes, " +
+    "the two closest both win and the clearing is split between everybody " +
+    "else.\n\n" +
+    "Whoever wins does not clear: not the breakfast plates, not the supper " +
+    "ones from the night before, not anything until the next meal. That is " +
+    "the whole prize. Nothing is scored and nothing carries to the next day.",
   materials: "A card and a pencil each, and something heavy to put them under.",
 
   shape: "ambient",
@@ -3708,6 +3967,16 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
     "AUTHORED HERE: the written card, the overnight span, the room settling " +
     "it by agreement rather than by instrument, the four-guest floor, and " +
     "every step and contingency.\n\n" +
+    "A CARD THAT COULD NOT BE WON, CORRECTED. The earlier draft printed the " +
+    "guess card as `One line, and no room for a name` while the game turns " +
+    "entirely on which named person was closest — a forfeit decided from " +
+    "anonymous cards, which cannot be done. The card now carries a name at " +
+    "the top and the reading is by name. The order was undefined too, and is " +
+    "now the order the cards were collected in, so nobody chooses to be read " +
+    "last. AND THE ARGUMENT HAS A FLOOR: five minutes, and then the two " +
+    "closest both win. Her sentence says whoever is closest and does not say " +
+    "what happens when a room of eight cannot agree who that is, which it " +
+    "will not, because that is the part she wrote it for.\n\n" +
     "FOUNDER-PENDING — DOES THE KILL REACH THIS GAME. " +
     "docs/atmosphere-idea-bank-v1.md records `KILLED: the weather-forecast " +
     "act.` in Nantucket's HOST ACTS block, immediately after three other " +
@@ -3734,10 +4003,11 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
       {
         step: "cut_the_cards",
         phase: "before",
-        instruction: "Put a card and a pencil at every place before supper.",
+        instruction: "Put a card and a pencil at every place before supper, and two spare at the end.",
         detail:
           "At the place, not passed round. A card already sitting there gets " +
-          "written on; a card handed out has to be introduced.",
+          "written on; a card handed out has to be introduced. The spare two " +
+          "are for whoever comes down late.",
         printedPiece: "guess_cards",
       },
       {
@@ -3752,21 +4022,24 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
       {
         step: "say_it_at_supper",
         phase: "opening",
-        instruction: "Ask the question once, at supper, with everybody sitting down.",
+        instruction: "Ask the question once, at supper, with everybody sitting down and eating.",
         detail:
           "Asked while people are eating it gets an answer in thirty " +
           "seconds. Asked afterwards it gets a discussion about whether " +
-          "anybody has looked.",
-        say: "Write down what it does tomorrow. Whoever is closest is not clearing.",
+          "anybody has looked. Say all three parts: their name at the top, " +
+          "the weather underneath, and what the winner gets out of.",
+        say: "Cards. Your name at the top, and under it what the weather does tomorrow. Whoever is closest does not clear anything until lunch.",
         printedPiece: "rules_card",
       },
       {
         step: "under_the_stone",
         phase: "underway",
-        instruction: "Collect the cards face down and put them under the heavy thing.",
+        instruction: "Collect the cards face down, in one pile, and put them under the heavy thing.",
         detail:
-          "Face down and in front of everybody. Anybody who wants to change " +
-          "theirs later has to move a stone in a quiet house.",
+          "Face down and in front of everybody. Keep the pile in the order " +
+          "you picked them up, because that is the order they get read in " +
+          "and it stops anybody choosing to go last. Anybody who wants to " +
+          "change theirs later has to move a stone in a quiet house.",
         supplyItem: "Something heavy to put them under",
       },
       {
@@ -3777,23 +4050,37 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
           "One person reading a phone screen to the room ends it. This is " +
           "the only rule in the game that has to be defended, and it is " +
           "defended once, lightly, the first time somebody tries.",
+        say: "Not out loud.",
       },
       {
         step: "read_them_at_breakfast",
         phase: "ending",
         instruction: "In the morning, read every card out before anybody says what it is doing.",
         detail:
-          "Before, not after. Cards read after the room has looked out of " +
-          "the window are cards everybody has already scored.",
+          "Before, not after, and in the order they came off the table. Read " +
+          "the name and then the guess. Cards read after the room has looked " +
+          "out of the window are cards everybody has already scored. Anybody " +
+          "still asleep has their card read anyway and can win it in bed.",
       },
       {
         step: "let_the_room_settle_it",
         phase: "ending",
-        instruction: "Let the room argue and then agree. Do not decide it yourself.",
+        instruction: "Let the room argue and agree on one card. Do not decide it yourself.",
         detail:
           "The argument is the game. A host who adjudicates has taken the " +
-          "only entertaining part of it away and made herself a referee.",
+          "only entertaining part of it away and made herself a referee. " +
+          "Give it five minutes by the clock; if it is still going, the two " +
+          "closest both win and the clearing is split between everybody else.",
         say: "Somebody is not clearing. Settle it between you.",
+      },
+      {
+        step: "the_stone_goes_back",
+        phase: "ending",
+        instruction: "Say who is not clearing, put the cards in the bin, and put the stone back.",
+        detail:
+          "Out loud, once, and then it is finished. Nothing is kept, no " +
+          "record is made from one morning to the next, and the winner has " +
+          "won a morning off and nothing else.",
       },
     ],
     contingencies: [
@@ -3814,9 +4101,10 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
       {
         trouble: "over_size",
         answer:
-          "Above twelve the reading takes the whole of breakfast. Read the " +
-          "cards of whoever is at the table when it starts and let the " +
-          "sleepers forfeit by absence.",
+          "Above twelve the reading takes the whole of breakfast. Say at " +
+          "supper that the reading starts at a stated hour and that cards " +
+          "are read whether their writer is at the table or not, so nobody " +
+          "loses by sleeping and nobody waits for them.",
       },
       {
         trouble: "running_long",
@@ -3905,7 +4193,9 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
     {
       piece: "guess_cards",
       label: "The cards",
-      description: "One line, and no room for a name. They go face down under something heavy.",
+      description:
+        "A rule for a name and one line under it for the guess. They go face " +
+        "down under something heavy and are read out by name in the morning.",
       voicePiece: "notice",
       perGuest: true,
     },
@@ -3933,16 +4223,22 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
     "Everybody starts a story and nobody finishes it. The person on your " +
     "left takes it over and gets it wrong, and the wrongness is the point.",
   howItWorks:
-    "Round the table, one at a time. You start a story — a real one, about " +
-    "you — and you get about a minute of it. Then you stop, wherever you " +
-    "are, mid-sentence if that is where the minute lands.\n\n" +
-    "The person on your left finishes it. They were not there. They are not " +
-    "guessing, they are inventing, and they are doing it with total " +
-    "confidence in front of the person it happened to.\n\n" +
-    "The one who started it does not correct anything until the ending is " +
-    "over, and then gets one sentence — one — to say what actually " +
-    "happened. Some of them do not use it, which is the best outcome the " +
-    "game has.",
+    "Round the table to the left, one at a time, starting with the host. You " +
+    "start a story — a real one, about you — and you get one minute of it. " +
+    "At the minute somebody taps a glass and you stop, wherever you are, " +
+    "mid-sentence if that is where the minute lands.\n\n" +
+    "The person on your left finishes it, and gets a minute as well. They " +
+    "were not there. They are not guessing, they are inventing, and they are " +
+    "doing it with total confidence in front of the person it happened to. " +
+    "The person it happened to says nothing at all while it is going on. If " +
+    "the person on your left actually was there, they invent anyway, and it " +
+    "is usually the best ending of the night.\n\n" +
+    "Then the next person to the left starts theirs, and so on. THE ROUND " +
+    "ENDS WHEN EVERYBODY HAS STARTED ONE. Nobody starts a second.\n\n" +
+    "After that, back round the table in the same direction: each person " +
+    "gets one sentence — one — to say what actually happened in theirs. Some " +
+    "of them do not use it, which is the best outcome the game has. Nothing " +
+    "is scored and nobody wins.",
   materials: "Nothing. A table, and something to tap when a minute is up.",
 
   shape: "scheduled",
@@ -3961,7 +4257,17 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
     "every step and contingency. The single sentence of correction is the " +
     "house's addition and is the first thing to cut: her rule does not " +
     "promise the truth ever comes out, and there is a reading in which it " +
-    "never should.",
+    "never should.\n\n" +
+    "THE ENDING WAS A FEELING AND IS NOW A CONDITION. The earlier draft " +
+    "ended the game at `the first ending the table repeats back to " +
+    "somebody`, which is a nice observation and not an instruction: it can " +
+    "fail to happen, it can happen in the second minute, and it contradicts " +
+    "her own first sentence, which says EVERYBODY starts a story. The round " +
+    "now ends when everybody has started one and the sentences have gone " +
+    "round once. TWO OTHER SILENCES FILLED: the finisher gets a minute as " +
+    "well — the earlier draft timed only the teller, so half of every turn " +
+    "had no clock on it at all — and a finisher who was actually there " +
+    "invents anyway rather than being swapped out.",
 
   runbook: {
     hostRole: "plays_too",
@@ -3994,51 +4300,58 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
         detail:
           "Everybody hears the first half. Half the table does not hear that " +
           "they are finishing somebody else's, and finds out at the moment " +
-          "it is their turn.",
-        say: "You get a minute of a true story about you. Then you stop and the person on your left finishes it, and they were not there.",
+          "it is their turn. Say the three timings too: a minute to start, a " +
+          "minute to finish, and it goes to the left.",
+        say: "A minute each of a true story about you. At the minute I tap the glass and you stop, wherever you are, and the person on your left finishes it — and they were not there. Then they start theirs.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "go_first",
         phase: "opening",
-        instruction: "Start one yourself and stop dead on the minute.",
+        instruction: "Start one yourself and stop dead on the minute, mid-word if it lands there.",
         detail:
           "Going first is how you show that the minute is real and that " +
           "stopping mid-sentence is allowed. Nobody believes it until they " +
-          "have watched it happen once.",
+          "have watched it happen once, and the person on your left now has " +
+          "to do the same job in front of everybody.",
         minutes: 3,
       },
       {
         step: "round_the_table",
         phase: "playing",
-        instruction: "Round the table: a minute of starting, then the left finishes it.",
+        instruction: "Left round the table: a minute to start, a minute for the left to finish it.",
         detail:
-          "Tap at a minute whoever is speaking and however good it is. The " +
-          "one who is cut off mid-sentence gets the best ending, every time, " +
-          "because the person on their left has nothing to work with.",
-        minutes: 25,
+          "Tap at a minute whoever is speaking and however good it is, on " +
+          "both halves. The person the story happened to says nothing while " +
+          "it is being finished. If the finisher was actually there, they " +
+          "invent anyway. The one cut off mid-sentence gets the best ending " +
+          "every time, because the person on their left has nothing to work " +
+          "with.",
+        minutes: 22,
         supplyItem: "A spoon and a glass",
       },
       {
         step: "one_sentence_each",
         phase: "deciding",
-        instruction: "At the end, each person gets one sentence to say what really happened.",
+        instruction: "When everybody has started one, go round again: one sentence of what really happened.",
         detail:
-          "One sentence, and going round in the same direction. A story " +
+          "One sentence, same direction, and a person may pass. A story " +
           "corrected at length is a story taken back, and the invented " +
-          "ending was the better one anyway.",
+          "ending was the better one anyway. Nothing is voted on and nobody " +
+          "wins this.",
         minutes: 5,
       },
       {
-        step: "stop_on_a_good_one",
+        step: "everybody_has_gone",
         phase: "ending",
-        instruction: "Stop at the first ending the table repeats back to somebody.",
+        instruction: "Stop when the sentences have gone round once. Do not start a second round.",
         detail:
-          "The room tells you when it is over by starting to quote it. " +
-          "Going one more round past that is how a good table becomes a " +
-          "long one.",
-        minutes: 3,
+          "The round is over when everybody has started a story and had " +
+          "their sentence, and that is the whole of the ending — not a good " +
+          "moment somebody has to spot. A table that goes round twice is a " +
+          "table doing the same thing again knowing how it goes.",
+        minutes: 5,
       },
     ],
     contingencies: [
@@ -4165,12 +4478,19 @@ const CATSKILLS_THE_SWIM_TEST: Game = {
   howItWorks:
     "There is a ledger on the table. It is shut, it stays shut, and " +
     "everybody can see it.\n\n" +
-    "One at a time, everybody tells the story of the swim test — the " +
+    "One at a time, round the table from whoever is sitting nearest the " +
+    "ledger and going left, everybody tells the story of the swim test — the " +
     "morning of it, how far it was, who cried, who cheated, what the water " +
-    "was. Whether any of it happened is not the question anybody is asking.\n\n" +
-    "The room votes for the version furthest from what the ledger would " +
-    "say, by show of hands, and nobody opens the ledger to find out. That is " +
-    "the whole design: the winner is the biggest liar and there is no way to " +
+    "was. There is no clock on a version and nobody may interrupt one. " +
+    "Whether any of it happened is not the question anybody is asking, and " +
+    "nobody has to have been there. There does not have to have been one.\n\n" +
+    "When everybody has told one, there is a single show of hands. One hand " +
+    "each, up once, for the version furthest from what the ledger would say, " +
+    "and nobody may vote for their own. The host counts out loud. A tie is " +
+    "two winners and there is no second round.\n\n" +
+    "The winner gets nothing except being named, out loud, as the furthest " +
+    "from the record. Then the ledger is put away unopened. That is the " +
+    "whole design: the winner is the biggest liar and there is no way to " +
     "prove anybody wrong, so nobody has to defend anything.",
   materials: "A ledger or a hardback notebook, kept shut, and nothing else.",
 
@@ -4195,7 +4515,16 @@ const CATSKILLS_THE_SWIM_TEST: Game = {
     "The ledger being physically present is the house's reading and it is " +
     "the strongest thing in this row: her sentence works without one, and a " +
     "shut book everybody can see is what makes not opening it a decision " +
-    "rather than an absence.",
+    "rather than an absence.\n\n" +
+    "THE ORDER AND THE PRIZE ARE NOW STATED. The earlier draft opened with " +
+    "`ask whoever has the shortest version to go first`, which asks a host " +
+    "to know something nobody at the table knows either, and it left the " +
+    "rest of the order undefined. It now runs left from whoever is sitting " +
+    "nearest the book, which the seating decides and the host does not. AND " +
+    "WINNING IS NOTHING: her sentence says a version wins and never says " +
+    "what winning gets you, so the row says plainly that being named is the " +
+    "whole of it. A host improvising a prize at the end of this one has " +
+    "given an object to the biggest liar in the room.",
 
   runbook: {
     hostRole: "plays_too",
@@ -4230,46 +4559,52 @@ const CATSKILLS_THE_SWIM_TEST: Game = {
           "The hand on the book does more than the sentence does. It " +
           "establishes that the book is in play and that it is not going to " +
           "be opened.",
-        say: "Everybody tells the story of the swim test. Furthest from what this says wins, and this does not get opened.",
+        say: "Everybody tells the story of the swim test, one each, going left from the book. Furthest from what this says wins, and this does not get opened.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
-        step: "start_with_the_shortest",
+        step: "start_left_of_the_ledger",
         phase: "opening",
-        instruction: "Ask whoever has the shortest version to go first.",
+        instruction: "Whoever is sitting nearest the ledger goes first, and it goes left from there.",
         detail:
-          "The short one sets a floor and everybody after it goes further. " +
-          "Starting with the best story means the next six are apologies.",
+          "Decided by the seating and not by you, so nobody is picked and " +
+          "nobody volunteers. Ask the first one for the short version: a " +
+          "short opener sets a floor and everybody after it goes further, " +
+          "where starting with the best story makes the next six apologies.",
         minutes: 2,
       },
       {
         step: "round_the_table",
         phase: "playing",
-        instruction: "One version each, and do not let anybody be interrupted.",
+        instruction: "One version each, left round the table, and do not let anybody be interrupted.",
         detail:
-          "No fact-checking, no adding to somebody else's, and no saying " +
-          "that is not what happened. The whole pleasure is that nobody may " +
-          "correct anybody.",
+          "No clock on a version. No fact-checking, no adding to somebody " +
+          "else's, and no saying that is not what happened. Nobody has to " +
+          "have been there and there does not have to have been a swim test; " +
+          "the whole pleasure is that nobody may correct anybody.",
         minutes: 20,
       },
       {
         step: "hands_up",
         phase: "deciding",
-        instruction: "One show of hands. Furthest from the ledger, and not your own.",
+        instruction: "When everybody has gone, one show of hands. Furthest from the ledger, not your own.",
         detail:
-          "Everybody has one hand and it goes up once. Counting is done out " +
-          "loud, by you, and there is no second round on a tie — a tie is " +
-          "two winners and the room prefers it.",
+          "One hand each and it goes up once, all at the same time, on a " +
+          "count of three. Counting is done out loud, by you, and there is " +
+          "no second round on a tie — a tie is two winners and the room " +
+          "prefers it.",
         minutes: 5,
       },
       {
         step: "the_ledger_stays_shut",
         phase: "ending",
-        instruction: "Announce the winner and put the ledger away without opening it.",
+        instruction: "Name the winner, put the ledger away without opening it, and stop there.",
         detail:
-          "Somebody asks to see it. The answer is no, and it is a much " +
-          "better ending than opening it would be.",
+          "Nothing is handed over: being named furthest from the record is " +
+          "the whole prize and there is no second one. Somebody asks to see " +
+          "the book. The answer is no, and it is a much better ending than " +
+          "opening it would be.",
         say: "Furthest from the record. And the record stays shut.",
         minutes: 3,
       },
@@ -4402,17 +4737,26 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
     "Everybody tells the story of this afternoon. One card in the pack is " +
     "marked, and whoever drew it is inventing the whole thing.",
   howItWorks:
-    "Everybody draws a card before the round starts. One card is marked. " +
-    "Whoever drew it did not have the afternoon everybody else had, and is " +
-    "going to describe it anyway.\n\n" +
-    "Then it goes round the table: the story of this afternoon, from where " +
-    "you were sitting. The true ones are boring, which is the difficulty — " +
-    "the truth is a person saying that the wind moved the table and the good " +
+    "One card each, dealt face down, from a pack cut to exactly one card per " +
+    "person. One of those cards has a mark on the back. Everybody looks at " +
+    "their own without reacting and puts it back face down.\n\n" +
+    "Whoever has the marked card is the liar, and the liar's job is to " +
+    "describe an afternoon that did not happen — somewhere else, doing " +
+    "something else — and to pass it off as this one. Nobody else knows who " +
+    "it is, including the host, who drew a card as well.\n\n" +
+    "Then it goes round the table to the left, starting with whoever is on " +
+    "the dealer's left: the story of this afternoon, from where you were " +
+    "sitting, one each, no interruptions. Nobody may ask anybody a question " +
+    "at any point. The true ones are boring, which is the difficulty — the " +
+    "truth is a person saying that the wind moved the table and the good " +
     "bottle stayed standing, and it sounds exactly as flat as that.\n\n" +
-    "At the end everybody points at once. The liar wins if fewer than half " +
-    "the table has them, and the room wins if more than half does. Nobody " +
-    "may ask a question during the round; the only evidence is what was said " +
-    "and the order it was said in.",
+    "When the last person has finished, everybody points at once on a count " +
+    "of three, with no talking beforehand. Nobody may point at themselves, " +
+    "including the liar. Count the fingers on each person: if MORE THAN HALF " +
+    "the table is pointing at the liar, the room wins; anything less than " +
+    "that, including exactly half, and the liar wins.\n\n" +
+    "The liar turns their card over. Nothing is scored and nothing is " +
+    "awarded, and nobody goes back through who said what.",
   materials: "A pack of cards with one marked on the back, and a table.",
 
   shape: "scheduled",
@@ -4423,8 +4767,10 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
   maxGuests: 12,
 
   scoring:
-    "Everybody points at once, once. The liar wins if fewer than half the " +
-    "table found them. No second vote and no discussion before the pointing.",
+    "Everybody points at once, once, and nobody points at themselves. More " +
+    "than half the table on the liar and the room wins; anything less, " +
+    "including exactly half, and the liar wins. No second vote, no " +
+    "discussion before the pointing, and nothing is awarded either way.",
 
   sourceNote: ROOM_VOICE,
   notes:
@@ -4440,7 +4786,19 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
     "think, including for her.\n\n" +
     "CHECKED AGAINST THE KILLS: this room's two killed items are the belote " +
     "sheet and the cochonnet. Neither is named, needed or implied here — the " +
-    "pack is an ordinary pack and one card has a mark on the back.",
+    "pack is an ordinary pack and one card has a mark on the back.\n\n" +
+    "EXACTLY HALF WAS UNDEFINED AND IS NOW THE LIAR'S. The earlier draft " +
+    "said the liar wins on fewer than half and the room wins on more than " +
+    "half, and said nothing about the case in between — which at a table of " +
+    "six or eight or ten is the single most likely count there is. The room " +
+    "needs MORE THAN HALF; anything under that, exactly half included, is " +
+    "the liar's, on the reasoning that a table which did not agree did not " +
+    "catch anybody. TWO SMALLER THINGS FIXED WITH IT: the round now starts " +
+    "at the dealer's left rather than at an unspecified point in an " +
+    "unspecified seating order, and the liar's job is stated as inventing a " +
+    "whole afternoon rather than as the earlier draft's `did not have the " +
+    "afternoon everybody else had`, which describes a state of affairs and " +
+    "not a thing to do.",
 
   runbook: {
     hostRole: "plays_too",
@@ -4476,49 +4834,56 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
         detail:
           "Dealt first, explained second. A table that knows what it is " +
           "looking for watches the dealing instead of listening.",
-        say: "One of these is marked. Look now, do not react, and put it face down. Whoever has it was not here this afternoon.",
+        say: "One card each, one of them is marked. Look at yours now, do not react, and put it back face down. Whoever has the mark is telling us about an afternoon that did not happen.",
         minutes: 3,
         printedPiece: "rules_card",
       },
       {
         step: "the_no_questions_rule",
         phase: "opening",
-        instruction: "Say that nobody may ask anybody anything until the pointing.",
+        instruction: "Say that nobody may ask anybody anything until the pointing, and say how it is won.",
         detail:
-          "This is the rule that keeps it a story game rather than an " +
-          "interrogation. Questions find the liar in four minutes and " +
-          "nothing interesting is said for the rest of it.",
+          "Both, before the first story. No questions is what keeps it a " +
+          "story game rather than an interrogation — questions find the liar " +
+          "in four minutes and nothing interesting is said for the rest of " +
+          "it. And a table that knows more than half of them have to agree " +
+          "listens differently from one that thinks a single good guess wins.",
+        say: "Nobody asks anybody anything until the end. Then we all point at once, and it takes more than half of us on the same person to catch them.",
         minutes: 3,
       },
       {
         step: "round_the_table",
         phase: "playing",
-        instruction: "The story of this afternoon, one each, in seating order. No interruptions.",
+        instruction: "Left from whoever is on the dealer's left. One story each, and no interruptions.",
         detail:
           "Seating order and not volunteers, so the liar cannot choose to go " +
           "last and build on six true accounts. The person who goes first " +
-          "has the hardest job whichever card they hold.",
+          "has the hardest job whichever card they hold. The round is over " +
+          "when it has gone all the way round once.",
         minutes: 22,
       },
       {
         step: "point_at_once",
         phase: "deciding",
-        instruction: "Everybody points at the same moment. Count to three and do not talk first.",
+        instruction: "Count to three and everybody points. No talking first, and nobody points at themselves.",
         detail:
-          "At once, and with no discussion beforehand. A table that confers " +
+          "At once, with no discussion beforehand — a table that confers " +
           "arrives at one answer, and the whole information in this game is " +
-          "how the table splits.",
-        say: "On three. Do not say anything first.",
+          "how the table splits. Then count the fingers on each person out " +
+          "loud. More than half on one person and the room has them; " +
+          "anything less, exactly half included, and the liar has won.",
+        say: "On three. Do not say anything first, and do not point at yourself.",
         minutes: 6,
       },
       {
         step: "turn_the_card_over",
         phase: "ending",
-        instruction: "The liar turns their card over, and nobody explains anything afterwards.",
+        instruction: "The liar turns their card over, nothing is awarded, and nobody explains anything.",
         detail:
-          "No post-mortem and no going back through who said what. The " +
-          "table wants to and it is the thing that ends the evening ten " +
-          "minutes early.",
+          "Whichever way it went, there is no prize and no score kept. No " +
+          "post-mortem and no going back through who said what: the table " +
+          "wants to, and it is the thing that ends the evening ten minutes " +
+          "early.",
         say: "Turn it over. And nobody go back through it.",
         minutes: 4,
       },
@@ -4644,14 +5009,22 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
     "Everybody writes down the count before anybody leaves. Whoever is " +
     "furthest out at the end buys the espresso.",
   howItWorks:
-    "Before anybody goes anywhere, everybody writes one number on a slip: " +
-    "how many are out there. Nobody counts properly and nobody is allowed " +
-    "to; the whole thing takes eight seconds and the slip goes in a pocket.\n\n" +
+    "Before anybody goes anywhere, while people are still finding shoes and " +
+    "keys, everybody writes one number on a slip: how many are out there. " +
+    "The host says in four words what is being counted before anybody " +
+    "writes. Nobody goes and counts properly and nobody is allowed to; the " +
+    "whole thing takes eight seconds and each person folds their own slip " +
+    "into their own pocket. Nobody collects them.\n\n" +
     "The count is settled on the way back, out loud, by whoever is walking " +
-    "at the front. The number the group agrees on is the number, and it is " +
-    "almost certainly wrong.\n\n" +
-    "Whoever is furthest out buys the espresso. There is no second place and " +
-    "nobody keeps a record from one day to the next.",
+    "at the front. Whatever they say is the number, the group argues it down " +
+    "to one in about a minute, and it is almost certainly wrong. Nobody goes " +
+    "back to check.\n\n" +
+    "At the bar, everybody pulls their slip out and reads their number, " +
+    "going round. Whoever is furthest from the agreed number buys the " +
+    "espresso. If two are equally far out, they buy a round each. There is " +
+    "no second place, nobody keeps a record from one day to the next, and if " +
+    "the group is not going anywhere with a bar in it, the forfeit is the " +
+    "coffee at the house and the loser makes it.",
   materials: "A slip and a pencil each, and something to count.",
 
   shape: "ambient",
@@ -4660,8 +5033,8 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
 
   scoring:
     "One number each, written before leaving. Furthest from the count the " +
-    "group agrees on afterwards buys the espresso. Nothing carries to the " +
-    "next day.",
+    "group agrees on afterwards buys the espresso, and two equally far out " +
+    "buy a round each. Nothing carries to the next day.",
 
   caveat:
     "It counts what is out there, and the room's own material is what " +
@@ -4679,7 +5052,14 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
     "contingency. RULE 25's FIRST TEST, ANSWERED PLAINLY: her sentence names " +
     "boats and this room's whole voice is a house above a harbour, so the " +
     "room's own material establishes what is counted. Nothing here adds a " +
-    "boat to a room that has none.",
+    "boat to a room that has none.\n\n" +
+    "TWO ADDITIONS, BOTH OF THEM THINGS A HOST HITS ON THE FIRST RUN. A tie " +
+    "for furthest out: both buy, one round each, rather than a play-off " +
+    "over a coffee. And a group not walking to a bar: the loser makes the " +
+    "coffee at the house. The earlier draft named the bar as the place the " +
+    "forfeit is paid without saying what to do when there is not one, which " +
+    "leaves the smallest stake in the catalogue unpayable in an apartment — " +
+    "rule 25's first test, arriving through a side door.",
 
   runbook: {
     hostRole: "plays_too",
@@ -4714,17 +5094,18 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
           "Eight seconds each. Anybody who wants to go and look properly is " +
           "told no, which is the only enforcement this game has and the " +
           "reason it is quick.",
-        say: "A number each before we go. Do not go and count.",
+        say: "A number each on a slip before we go, and it is everything you can see from the step. Do not go and count. Keep your own slip.",
         printedPiece: "rules_card",
       },
       {
         step: "pockets",
         phase: "underway",
-        instruction: "Everybody keeps their own slip. You do not collect them.",
+        instruction: "Everybody folds their own slip into their own pocket. You do not collect them.",
         detail:
           "Collected slips are a list you have to carry and produce. Kept " +
           "slips get pulled out of a pocket at the right moment by the " +
-          "person who wrote one.",
+          "person who wrote one. It runs entirely on trust, which is what a " +
+          "coffee is worth.",
       },
       {
         step: "settle_it_walking_back",
@@ -4732,17 +5113,30 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
         instruction: "On the way back, ask whoever is at the front what the count is.",
         detail:
           "Whoever is walking in front, and whatever they say. The group " +
-          "will argue it down to a number in about a minute and that number " +
-          "is the truth for the purposes of an espresso.",
+          "will argue it down to one number in about a minute and that " +
+          "number is the truth for the purposes of an espresso. Nobody goes " +
+          "back to look, whatever anybody claims.",
       },
       {
         step: "the_espresso",
         phase: "ending",
-        instruction: "Read the slips out at the bar and let the furthest one pay.",
+        instruction: "At the bar, everybody reads their slip out, and the furthest from the number pays.",
         detail:
-          "At the bar and not on the walk. The paying has to happen where " +
-          "the paying happens, or it is a result rather than a forfeit.",
+          "Going round, out loud, slips held up. At the bar and not on the " +
+          "walk — the paying has to happen where the paying happens, or it " +
+          "is a result rather than a forfeit. Two people equally far out buy " +
+          "a round each. Where there is no bar, the loser makes the coffee " +
+          "at the house.",
         say: "Slips out. Furthest is buying.",
+      },
+      {
+        step: "nothing_carries",
+        phase: "ending",
+        instruction: "Throw the slips away at the table and do not keep a running record.",
+        detail:
+          "There is no standing champion and no ledger of who has bought " +
+          "what. It is a coffee, and a group that starts keeping score has " +
+          "turned a walk into a league.",
       },
     ],
     contingencies: [
@@ -4869,14 +5263,21 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
     "Everybody writes down what it will be at the top before the first car. " +
     "Whoever is closest reads the map at lunch.",
   howItWorks:
-    "At breakfast, one number each, written on a slip. What it will be at " +
-    "the top, in whatever unit the room is arguing in, agreed before anybody " +
-    "writes.\n\n" +
-    "Nobody may look anything up. The slips go in one pocket — one person's, " +
-    "not the host's — and stay there until the top.\n\n" +
-    "Whatever the number is at the top is the number. Whoever is closest " +
-    "reads the map at lunch, which means they decide where lunch is and what " +
-    "the afternoon does, and everybody else has to go along with it.",
+    "At breakfast, one slip each, already on the table. The room agrees out " +
+    "loud which unit it is guessing in before a single number is written. " +
+    "Then each person writes their name and, under it, what it will be at " +
+    "the top.\n\n" +
+    "Nobody may look anything up, out loud or otherwise. The slips are " +
+    "handed to one person — somebody who is going up, and not the host — and " +
+    "stay in that pocket until the top.\n\n" +
+    "At the top, whoever carried them reads the real number first, from " +
+    "whatever the top uses, and only then reads the slips out by name. " +
+    "Whatever the top says is the number and there is no appeal against it.\n\n" +
+    "Whoever is closest reads the map at lunch: they decide where lunch is " +
+    "and what the afternoon does, until dinner, and nobody overrules them. " +
+    "If two are equally close, both of them read it and lunch goes wherever " +
+    "the two of them agree. Nothing else is won and nothing carries to the " +
+    "next morning.",
   materials: "A slip and a pencil each, and whatever number the top actually has.",
 
   shape: "ambient",
@@ -4903,7 +5304,16 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
     "and contingency. Reading the map at lunch is read here as a REAL " +
     "PRIVILEGE — the winner decides the afternoon — which is the house " +
     "making her prize mean something. Her sentence permits the smaller " +
-    "reading in which it is only a chore.",
+    "reading in which it is only a chore.\n\n" +
+    "THE SLIPS NOW CARRY A NAME, AND THE TIE HAS A RULE. Printed as `one " +
+    "number each` and carried in somebody else's pocket, a winning slip " +
+    "belonged to nobody — the same defect Nantucket's card had, and both " +
+    "are fixed the same way. The tie ruling was previously written down only " +
+    "as advice inside the over-size contingency, where a host running a " +
+    "group of six would never read it; two equally close both read the map " +
+    "and agree lunch between them, and it is now a rule of the game. THE " +
+    "PRIVILEGE ALSO HAS AN END: until dinner. It had none, and a prize with " +
+    "no end is a prize somebody takes back at half past one.",
 
   runbook: {
     hostRole: "plays_too",
@@ -4932,11 +5342,13 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
       {
         step: "agree_the_unit",
         phase: "opening",
-        instruction: "Agree the unit out loud before anybody writes a number.",
+        instruction: "Agree the unit out loud, then say the rule: a name and a number on each slip.",
         detail:
           "Half the table thinks in one and half in the other, and a bet " +
-          "settled across two units is an argument at the top in the wind.",
-        say: "Same scale for everybody. Say which before you write.",
+          "settled across two units is an argument at the top in the wind. " +
+          "The name matters as much as the number, because the slips are " +
+          "read out by name at the top and an unsigned one cannot win.",
+        say: "Same scale for everybody, say which before you write. Then your name on the slip and the number under it, and hand it in.",
         printedPiece: "rules_card",
       },
       {
@@ -4947,25 +5359,30 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
           "One person reading a forecast aloud ends the game before the " +
           "first car. It is the only rule here that needs defending and it " +
           "is defended lightly, the first time.",
+        say: "Not out loud, and not quietly either.",
       },
       {
         step: "read_them_at_the_top",
         phase: "underway",
-        instruction: "At the top, read the number, then read the slips. In that order.",
+        instruction: "At the top, read the real number first, then read every slip out by name.",
         detail:
-          "The number first. Slips read first turn into a discussion about " +
-          "what the number probably is, and somebody adjusts theirs out loud.",
+          "The number first, and it is whatever the top says with no appeal " +
+          "against it. Slips read first turn into a discussion about what " +
+          "the number probably is, and somebody adjusts theirs out loud. " +
+          "Whoever carried them reads them, not you.",
         supplyItem: "Whatever the top uses for a number",
       },
       {
         step: "hand_over_the_map",
         phase: "ending",
-        instruction: "Give the winner the map and do not take it back.",
+        instruction: "Give the winner the map, say how long it is theirs, and do not take it back.",
         detail:
-          "The whole prize is that nobody argues with them until dinner. A " +
-          "host who overrules the map at half past one has taken the stake " +
-          "out of the game for the rest of the week.",
-        say: "You read it. We go where you say.",
+          "Theirs until dinner: they choose where lunch is and what the " +
+          "afternoon does, and nobody overrules them. Two equally close and " +
+          "both of them read it, with lunch going wherever the two of them " +
+          "agree. A host who overrules the map at half past one has taken " +
+          "the stake out of the game for the rest of the week.",
+        say: "You read it. We go where you say, until dinner.",
         supplyItem: "The map",
       },
     ],
@@ -5075,7 +5492,10 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
     {
       piece: "guess_slips",
       label: "The slips",
-      description: "One number each, small enough to go in one person's pocket for the morning.",
+      description:
+        "A rule for a name and one for the number, small enough that all of " +
+        "them go in one person's pocket for the morning and are read out by " +
+        "name at the top.",
       voicePiece: "notice",
       perGuest: true,
     },
@@ -5104,17 +5524,25 @@ const BIG_SUR_THE_LONG_WAY: Game = {
     "One story each, told the long way, with the detours left in. Nobody " +
     "may hurry anybody and nobody can check a single fact.",
   howItWorks:
-    "One story each, and the rule is that it is told the long way. The " +
-    "detour about the car is in. The two paragraphs about the person who is " +
-    "not in the story is in. Anything that would normally be cut for time " +
-    "stays.\n\n" +
+    "Everybody sits in a circle. Phones go in a bowl. The host goes first " +
+    "and then it goes to the left, one story each, all the way round once.\n\n" +
+    "The rule is that a story is told the long way. The detour about the car " +
+    "is in. The two paragraphs about the person who is not in the story are " +
+    "in. Anything that would normally be cut for time stays. There is no " +
+    "clock on a story and nobody says how many are left to go.\n\n" +
     "Nobody may hurry anybody. Not with a look, not with a question that " +
-    "moves it along, not by finishing a sentence. This is the only rule and " +
-    "it is enforced by the room rather than by a host, which takes about two " +
-    "stories to learn.\n\n" +
+    "moves it along, not by finishing a sentence. The room enforces it, not " +
+    "the host: somebody says the rule out loud, lightly, and the story " +
+    "carries on. If nobody in the room does it by the third story, the host " +
+    "does it once and then goes back to not doing it.\n\n" +
     "And nobody can check a single fact, which here is a condition of the " +
     "place rather than a rule anyone imposes. A story that cannot be " +
-    "verified is a story that gets told the way the teller remembers it.",
+    "verified is a story that gets told the way the teller remembers it.\n\n" +
+    "Anybody may pass. A pass is a pass — it goes to the next person with no " +
+    "comment and nobody comes back to them. THE GAME ENDS WHEN THE CIRCLE " +
+    "HAS GONE ROUND ONCE, and the gap after the last story is left alone " +
+    "until it turns into ordinary conversation. Nobody wins and nothing is " +
+    "voted on.",
   materials: "Somewhere to sit round, and no phones out.",
 
   shape: "scheduled",
@@ -5139,7 +5567,16 @@ const BIG_SUR_THE_LONG_WAY: Game = {
     "prepared, and the only instruction is to leave the boring parts in.\n\n" +
     "CHECKED AGAINST THE KILLS: this room's killed item is the Thoth tarot " +
     "card, with the deck surviving as an object. Nothing here uses a deck, " +
-    "a card or a reading of any kind.",
+    "a card or a reading of any kind.\n\n" +
+    "THE ENDING IS ONE LAP, NOT A SILENCE. The earlier draft ended it at " +
+    "`when somebody finishes and nobody starts` — which is the same failure " +
+    "the founder named: a game that stops when it fizzles. Worse here than " +
+    "elsewhere, because a circle with no stated end and no clock is a circle " +
+    "in which the last four people privately work out whether they are still " +
+    "meant to go. Once round, passes counted as gone, and then the gap. THE " +
+    "PASS IS ALSO A RULE NOW rather than an answer buried in a contingency, " +
+    "and the no-hurrying rule says what the host does when the room does not " +
+    "enforce it — she says it once, which is not the same as running it.",
 
   runbook: {
     hostRole: "plays_too",
@@ -5174,7 +5611,7 @@ const BIG_SUR_THE_LONG_WAY: Game = {
           "Nobody hurries anybody, and nothing can be checked. The second is " +
           "a fact about where you are, and saying so is what stops it " +
           "sounding like a house rule about phones.",
-        say: "One each, told the long way, with the detours. Nobody hurries anybody. And there is no signal, so none of it can be checked.",
+        say: "One story each, going left, told the long way with the detours left in. Nobody hurries anybody, and you can pass. There is no signal, so none of it can be checked.",
         minutes: 3,
         printedPiece: "rules_card",
       },
@@ -5185,27 +5622,31 @@ const BIG_SUR_THE_LONG_WAY: Game = {
         detail:
           "The detour is the demonstration. Until somebody has watched a " +
           "story stop dead for two minutes about a car, everybody tells a " +
-          "normal-length story and the game does not exist.",
+          "normal-length story and the game does not exist. Then it goes to " +
+          "the person on your left, and left round from there.",
         minutes: 2,
       },
       {
         step: "round_the_fire",
         phase: "playing",
-        instruction: "Round the circle from whoever is nearest the fire. One each, no clock.",
+        instruction: "Left round the circle, one story each, no clock and nobody called on.",
         detail:
-          "No clock anywhere and no announcement of how many are left. A " +
+          "No clock anywhere and no announcement of how many are left — a " +
           "room that knows there are four to go starts editing on behalf of " +
-          "the queue.",
+          "the queue. A person who passes is passed with no comment and is " +
+          "not returned to. If somebody hurries a teller and nobody in the " +
+          "room says so, say it once yourself and then stop policing it.",
         minutes: 40,
       },
       {
         step: "let_it_stop",
         phase: "ending",
-        instruction: "When somebody finishes and nobody starts, leave it. Do not call the next one.",
+        instruction: "The circle goes round once and stops. Do not start a second lap.",
         detail:
-          "The ending of this game is a gap that lasts eight seconds and " +
-          "then becomes a conversation. Calling the next name across it is " +
-          "the one thing that turns it back into a round of a game.",
+          "Once round is the whole game, passes included. When the last " +
+          "person finishes, leave the gap alone: it lasts about eight " +
+          "seconds and then becomes a conversation. Nobody won anything and " +
+          "there is nothing to say about it.",
         minutes: 5,
       },
     ],
@@ -5335,15 +5776,24 @@ const TAHITI_THE_LAST_NIGHT: Game = {
     "Everybody says what they would want on the last night. Name something " +
     "already on the table and you are cooking tomorrow.",
   howItWorks:
-    "Round the table, once, quickly. Everybody says one thing they would " +
-    "want on the last night — the meal they would ask for if this were the " +
-    "end of it.\n\n" +
-    "The catch is what is in front of you. Name something that is already on " +
-    "the table and you cook tomorrow. So the round is a person scanning " +
-    "eleven dishes at speed and then saying something else.\n\n" +
-    "It takes ten minutes and it produces the next three days of eating, " +
-    "which is the part nobody expects: everything anybody named that nobody " +
-    "has to cook for is now a thing the house knows somebody wants.",
+    "It runs at a full table, once, going left from whoever is on the host's " +
+    "left. One turn each, out loud, no conferring and no changing an answer " +
+    "once it is said. THE ROUND ENDS WHEN IT HAS GONE ALL THE WAY ROUND.\n\n" +
+    "On your turn you say one thing you would want on the last night — the " +
+    "meal you would ask for if this were the end of it. The catch is what is " +
+    "in front of you: name something that is already on this table and you " +
+    "cook tomorrow.\n\n" +
+    "Whether a thing is on the table is settled by looking at it, not by " +
+    "arguing about it. An ingredient of something is not the something. If " +
+    "the table is genuinely split, it is not on the table and the person is " +
+    "safe. Two people naming the same thing are both caught, or both safe, " +
+    "together.\n\n" +
+    "Nobody wins. There is only the forfeit: everybody caught cooks " +
+    "tomorrow, and where that is two or three people they cook it together. " +
+    "If nobody is caught, nobody cooks, and that is a good round rather than " +
+    "a failed one.\n\n" +
+    "Somebody writes the answers down while the round goes, because they are " +
+    "the next three days of eating and nobody remembers them in the morning.",
   materials: "Nothing. A table with food already on it.",
 
   shape: "scheduled",
@@ -5353,8 +5803,9 @@ const TAHITI_THE_LAST_NIGHT: Game = {
   minGuests: 4,
 
   scoring:
-    "One forfeit and no points: anybody who names something already on the " +
-    "table cooks tomorrow. More than one is allowed and they cook together.",
+    "One forfeit and no points, and nobody wins: anybody who names something " +
+    "already on the table cooks tomorrow. More than one is allowed and they " +
+    "cook together. Nobody caught means nobody cooks.",
 
   sourceNote: ROOM_VOICE,
   notes:
@@ -5368,6 +5819,13 @@ const TAHITI_THE_LAST_NIGHT: Game = {
     "one worth arguing with: her sentence is a forfeit game and nothing " +
     "more, and the list of wants that comes out of it is a use somebody " +
     "found for it afterwards.\n\n" +
+    "WHAT COUNTS AS ON THE TABLE IS NOW RULED. The whole game is one " +
+    "judgement — is that thing on this table — and the earlier draft never " +
+    "said who makes it or how. Settled by looking, an ingredient is not the " +
+    "dish, and a genuinely split table means safe. NOBODY CAUGHT IS ALSO " +
+    "ANSWERED, because it is a likely outcome at a careful table and the " +
+    "earlier draft ended on a step that assumed at least one loser: nobody " +
+    "cooks, and the round was a good one.\n\n" +
     "ON GAMES: NONE. docs/atmosphere-idea-bank-v1.md carries the line " +
     '"GAMES: none, on purpose" for this room. CLAUDE.md rule 29 rules that ' +
     "stale rather than authoritative: `none` writes no row and no negative " +
@@ -5407,38 +5865,42 @@ const TAHITI_THE_LAST_NIGHT: Game = {
           "It needs everybody looking at the same table at the same moment. " +
           "Asked while a dish is coming out, half the room has not seen what " +
           "is on it yet.",
-        say: "What would you want on the last night. And look at the table before you answer.",
+        say: "One each, going left: what would you want on the last night. Name anything that is already on this table and you are cooking tomorrow, so look before you answer.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "start_left_and_go_round",
         phase: "opening",
-        instruction: "Start with whoever is on your left and go round. No volunteers.",
+        instruction: "Start with whoever is on your left and go round once. No volunteers.",
         detail:
-          "In order. Volunteers means the confident people go first and " +
-          "everybody else answers a question that has already been answered " +
-          "six times.",
+          "In order, and the round is over when it comes back to you. " +
+          "Volunteers means the confident people go first and everybody else " +
+          "answers a question that has already been answered six times.",
         minutes: 2,
       },
       {
         step: "the_round",
         phase: "playing",
-        instruction: "One each, out loud, no conferring, and write down what they say.",
+        instruction: "One each, out loud, no conferring, and write down what they say as they say it.",
         detail:
-          "No conferring, and nobody gets to change an answer once it is " +
-          "said. The person who says the thing in front of them says it " +
-          "because they were not looking, and that is the joke.",
+          "Nobody gets to change an answer once it is said. Whether a thing " +
+          "is on the table is settled by looking, in two seconds: an " +
+          "ingredient of something is not the something, and a table that is " +
+          "genuinely split means the person is safe. Two people naming the " +
+          "same thing are both caught or both safe together.",
         minutes: 10,
         supplyItem: "Something to write the answers on",
       },
       {
         step: "name_tomorrows_cook",
         phase: "ending",
-        instruction: "Say who is cooking tomorrow, and if it is two people, say both.",
+        instruction: "When the round is back to you, say who is cooking tomorrow. Name all of them.",
         detail:
-          "Both, and they cook together, which is better than either of them " +
-          "cooking alone. Nobody is let off for being close.",
+          "Two or three cook together, which is better than any of them " +
+          "cooking alone, and nobody is let off for being close. If nobody " +
+          "was caught, say so and let it stand: nobody cooks, nobody wins, " +
+          "and the list of answers is still the week's food.",
         say: "That is on the table. You are cooking tomorrow.",
         minutes: 4,
       },
@@ -5563,14 +6025,24 @@ const ACAPULCO_THE_LAST_SONG: Game = {
     "Everybody names the last song. Name one that has already played and " +
     "you are going in the water.",
   howItWorks:
-    "Somebody writes down what plays, all night, on a card that lives by " +
-    "the speaker. Nobody is in charge of it and it is never read out.\n\n" +
-    "At the end, round the room once: everybody names the last song. Not a " +
-    "song they like — the one that should be the last thing anybody hears " +
-    "tonight.\n\n" +
-    "Name one that has already played and you go in the water. Then the room " +
-    "picks from whatever survived, and that one gets played, and it is the " +
-    "last thing.",
+    "A card lives by the speaker all night and whoever changes the music " +
+    "writes down what they put on. Nobody is in charge of it and it is never " +
+    "read out until the end. It will have holes in it, and THE CARD IS THE " +
+    "ONLY EVIDENCE THERE IS: if a song is not written on it, it did not " +
+    "play, whatever anybody remembers.\n\n" +
+    "At the end, the host holds the card up where everyone can see it and " +
+    "goes round the room to the left, starting on her left. One name each, " +
+    "out loud, fast: the last song. Not a song they like — the one that " +
+    "should be the last thing anybody hears tonight.\n\n" +
+    "Name one that is on the card and you go in the water. Everybody caught " +
+    "goes in, together, and their name is out of the choosing. Nobody caught " +
+    "means nobody goes in.\n\n" +
+    "Then the host reads the surviving names back, one at a time, and the " +
+    "room shouts for the one it wants. She says which was loudest and there " +
+    "is no second round; if she genuinely cannot tell, she plays the one " +
+    "named by whoever went in the water.\n\n" +
+    "The swim happens first and the song second. Then it plays, and nothing " +
+    "goes on after it. Nobody wins anything.",
   materials: "A card by the speaker, a pencil, and whatever has been playing.",
 
   shape: "finale",
@@ -5580,9 +6052,10 @@ const ACAPULCO_THE_LAST_SONG: Game = {
   minGuests: 5,
 
   scoring:
-    "One forfeit and one choice. Anybody who names something on the card " +
-    "goes in; the room picks the last song from what is left, by the loudest " +
-    "agreement rather than by a count.",
+    "One forfeit and one choice, and nobody wins. Anybody who names " +
+    "something written on the card goes in and is out of the choosing; the " +
+    "room picks the last song from what is left, by the loudest shout rather " +
+    "than by a count, and the host says which was loudest.",
 
   caveat:
     "The forfeit is a swim, and the room's own material is what supplies the " +
@@ -5602,6 +6075,19 @@ const ACAPULCO_THE_LAST_SONG: Game = {
     "LOAD-BEARING ADDITION: her rule turns on what has already played, and " +
     "without a written list the forfeit is decided by whoever remembers " +
     "loudest, which is an argument rather than a game.\n\n" +
+    "AND THE CARD IS NOW THE ONLY EVIDENCE, WHICH THE EARLIER DRAFT STOPPED " +
+    "SHORT OF SAYING. It admitted the card would be missing four or five " +
+    "songs and called that fine, then hung a forfeit on it without ruling " +
+    "what happens when the room remembers a song the card does not. Not on " +
+    "the card, did not play. It is the only version that can be settled at " +
+    "one in the morning. THE CHOOSING WAS ALSO UNRUNNABLE: `the room picks " +
+    "by the loudest agreement` is not an instruction — the names are now " +
+    "read back one at a time, the room shouts, the host calls it, and a " +
+    "genuine dead heat goes to whoever is going in the water. AND NOBODY IS " +
+    "PUT IN WATER WHO SAYS NO: they are out of the choosing instead, which " +
+    "keeps a cost on it without a host pushing a guest off a step. This is " +
+    "a finale, and every one of these was a decision it left to be improvised " +
+    "at the last minute of the night.\n\n" +
     "ON GAMES: NONE, AND ON STAFF. docs/atmosphere-idea-bank-v1.md carries " +
     '"GAMES: none — the band, the window, and the dancing are the shelf" ' +
     "for this room. CLAUDE.md rule 29 rules that stale rather than " +
@@ -5639,9 +6125,10 @@ const ACAPULCO_THE_LAST_SONG: Game = {
         phase: "underway",
         instruction: "Let whoever changes the music write the song down. Do not chase it.",
         detail:
-          "It will be missing four or five and that is fine. A list with " +
-          "holes is a list somebody can argue with, which is better than a " +
-          "list that settles everything.",
+          "It will be missing four or five and that is fine — a card with " +
+          "holes in it lets somebody get away with one, which is better than " +
+          "a card that catches everybody. What is written on it is settled, " +
+          "and what is not on it did not play.",
         printedPiece: "the_played_card",
       },
       {
@@ -5651,38 +6138,55 @@ const ACAPULCO_THE_LAST_SONG: Game = {
         detail:
           "Too early and there is a lot of night after the last song. Too " +
           "late and there is nobody to hear it.",
-        say: "Last song. Everybody name one, and it had better not have played already.",
+        say: "Last song. One each, going round from here, and it had better not be on this card.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "round_the_room",
         phase: "playing",
-        instruction: "One each, out loud, fast, and hold the card up as they answer.",
+        instruction: "Left from whoever is beside you. One name each, fast, with the card held up.",
         detail:
-          "Held up and visible, so everybody watches the same list. The " +
-          "person who names something that is on it knows before you say " +
-          "anything.",
-        minutes: 10,
+          "Held up and visible, so everybody watches the same list. The card " +
+          "is the only evidence: a song not written on it did not play, " +
+          "whatever anybody remembers, and that is not open to argument. The " +
+          "round is over when it has been round once.",
+        minutes: 8,
         printedPiece: "the_played_card",
+      },
+      {
+        step: "pick_it_from_what_is_left",
+        phase: "deciding",
+        instruction: "Read the surviving names back one at a time and let the room shout for one.",
+        detail:
+          "Anybody caught is out of the choosing. You say which was loudest " +
+          "and there is no second round; if you genuinely cannot tell, play " +
+          "the one named by whoever is going in the water. Nobody caught " +
+          "means nobody is out and you pick from the whole list.",
+        say: "Shout for the one you want. I am only asking once.",
+        minutes: 3,
       },
       {
         step: "the_water",
         phase: "ending",
-        instruction: "Whoever named one that has already played goes in, and then the last song plays.",
+        instruction: "Everybody caught goes in together, and nobody who says no is made to.",
         detail:
-          "In that order. The swim first and the song second, so the song is " +
-          "the last thing rather than the punishment being it.",
-        say: "That played at eleven. In you go.",
-        minutes: 4,
+          "The song is already chosen; it is not played until they are out " +
+          "of the water, so the song is the last thing rather than the " +
+          "punishment being it. Somebody who will not go in " +
+          "says so and nothing more is said about it — being out of the " +
+          "choosing is the whole of what it costs them.",
+        say: "That is on the card. In you go.",
+        minutes: 3,
       },
       {
         step: "play_it_and_stop",
         phase: "ending",
-        instruction: "Play the one the room agreed on and put nothing on after it.",
+        instruction: "Play the one the room shouted for and put nothing on after it.",
         detail:
-          "Nothing after it. The whole game is that the night has an ending " +
-          "somebody chose, and one more song makes it a night that ran out.",
+          "Nothing after it, and nothing is awarded to anybody. The whole " +
+          "game is that the night has an ending somebody chose, and one more " +
+          "song makes it a night that ran out.",
         minutes: 4,
       },
     ],
@@ -5821,16 +6325,28 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
     "The numbers are called after dark, with beans for markers. Whoever is " +
     "calling is playing too, which is what stops it being a hall.",
   howItWorks:
-    "Everybody has a card of numbers and a handful of dried beans. The " +
-    "numbers come out of a bag one at a time and get called out, and " +
-    "everybody covers what they have.\n\n" +
+    "Everybody has a card of fifteen numbers, printed in three rows of five, " +
+    "and a handful of dried beans. The tokens run from one to ninety and " +
+    "come out of a cloth bag one at a time. The caller says the number, then " +
+    "says what the sheet in the middle of the table claims that number " +
+    "means, and everybody who has it puts a bean on it.\n\n" +
+    "There are three things to win, in this order. A LINE is any one row of " +
+    "five covered. TWO LINES is any two rows. A FULL CARD is all fifteen, " +
+    "and it ends the round. You claim by shouting, the caller checks your " +
+    "beans against the tokens already out of the bag, and a wrong claim just " +
+    "carries on playing. Two people claiming on the same number both win it.\n\n" +
+    "Where the evening has the row of wrapped parcels on the table, every " +
+    "rung won takes the next one, unopened, and the winner keeps it on their " +
+    "lap until they are all opened at the end of the night. Where there are " +
+    "no parcels, a rung is won, said out loud, and nothing changes hands.\n\n" +
     "The caller is playing. She has her own card in front of her, she covers " +
-    "her own numbers between calls, and she loses as often as anybody. The " +
-    "bag passes when somebody wins, so calling is a turn rather than a role.\n\n" +
-    "A line is one thing. Two lines is better. A full card is the one that " +
-    "ends the round, and there is a sheet on the table that says what each " +
-    "number is supposed to mean, which is where most of the shouting comes " +
-    "from.",
+    "her own numbers between calls, and she loses as often as anybody. When " +
+    "a full card goes, the bag passes to whoever won it before anything " +
+    "else, and they call the next round. Calling is a turn, not a role.\n\n" +
+    "Play rounds until the parcels have run out, or until three full cards " +
+    "have gone where there are none. That is the end of it, and the sheet of " +
+    "what the numbers mean is where most of the shouting comes from all " +
+    "evening.",
   materials:
     "A bag of numbered tokens, a card each, dried beans for markers, and the " +
     "sheet of what the numbers mean.",
@@ -5842,9 +6358,11 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
   minGuests: 6,
 
   scoring:
-    "A line, then two lines, then a full card, in that order. Beans on the " +
-    "numbers and nothing written down. The caller plays her own card and can " +
-    "win it.",
+    "A line of five, then two lines, then a full card, in that order, each " +
+    "taking the next wrapped parcel unopened. Claimed by shouting and " +
+    "checked against the tokens drawn; two claims on the same number both " +
+    "win. Beans on the numbers and nothing written down. The caller plays " +
+    "her own card and can win it.",
 
   sourceNote: ROOM_VOICE,
   notes:
@@ -5857,6 +6375,17 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
     "MECHANICAL: whoever is calling is playing too is a statement about " +
     "staff, and a caller who never stops calling is staff however many cards " +
     "she is holding.\n\n" +
+    "THE CARD AND THE BAG NOW HAVE NUMBERS ON THEM. The earlier draft named " +
+    "the rungs — a line, two lines, a full card — without ever saying how " +
+    "many numbers are on a card or how a line is made of them, so a line was " +
+    "a word rather than a thing anybody could look down and see. Fifteen " +
+    "numbers in three rows of five, ninety tokens in the bag, and a line is " +
+    "any one row. HOW A WIN IS CLAIMED was missing too: you shout, the " +
+    "caller checks the beans against the tokens already out, a wrong claim " +
+    "carries on, and two claims on the same number both win. AND THE ROUNDS " +
+    "NOW END SOMEWHERE — the parcels running out, or three full cards where " +
+    "the evening has no parcels — in place of `stop one round earlier than " +
+    "the table wants to`, which is a good instinct and not a stopping rule.\n\n" +
     "TWO TABLES, ONE CATEGORY, AND THAT IS CORRECT. The bank already holds " +
     "this room's kit as a `bank_kind = 'game'` row: the board, the tokens, " +
     "the cloth bag, the printed cards. This row is the PLAYABLE CONTENT for " +
@@ -5902,43 +6431,64 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
         printedPiece: "rules_card",
       },
       {
-        step: "say_who_is_calling",
+        step: "say_the_three_things_to_win",
         phase: "opening",
-        instruction: "Say that the caller plays, and that the bag moves when somebody wins.",
+        instruction: "Say the three rungs, how a win is claimed, and that the caller plays too.",
         detail:
-          "Said at the start, so nobody spends the first round waiting to be " +
-          "told the host is running it. Nobody is running it.",
+          "A line is any row of five, two lines is any two rows, a full card " +
+          "is all fifteen and ends the round. You claim by shouting and the " +
+          "caller checks the beans against the tokens out of the bag. Say " +
+          "also that the bag moves when a card fills, so nobody spends the " +
+          "first round waiting to be told the host is running it. Nobody is " +
+          "running it.",
+        say: "A line of five, then two lines, then the full card. Shout when you have it and I will check it. Whoever fills a card takes the bag off me and calls the next one.",
         minutes: 3,
         supplyItem: "A bag for the tokens",
       },
       {
         step: "call_them",
         phase: "playing",
-        instruction: "One at a time, slowly, and say the meaning after the number.",
+        instruction: "One token at a time, slowly, the number first and then what the sheet says.",
         detail:
           "Slowly enough to cover your own card between calls. If you cannot " +
           "keep up with your own card, you are calling too fast for the " +
-          "oldest person at the table as well.",
+          "oldest person at the table as well. A wrong claim is checked, " +
+          "waved off and the round carries on; nobody is out for one.",
         minutes: 45,
         supplyItem: "A bag for the tokens",
+      },
+      {
+        step: "hand_the_parcel_over",
+        phase: "deciding",
+        instruction: "Where there are parcels, each rung won takes the next one, unopened, on a lap.",
+        detail:
+          "Unopened, and it stays that way until they are all opened at the " +
+          "end of the night. Two people claiming the same rung on the same " +
+          "number both take one. Where the evening has no parcels, the rung " +
+          "is said out loud and nothing changes hands, which costs the game " +
+          "nothing.",
+        minutes: 4,
       },
       {
         step: "the_bag_moves",
         phase: "deciding",
         instruction: "When somebody fills a card, hand them the bag before anything else.",
         detail:
-          "Before the prize, before the beans are cleared. The bag moving is " +
-          "the visible fact that this house has no caller.",
-        minutes: 6,
+          "Before the parcel, before the beans are cleared. Everybody sweeps " +
+          "their beans off, the tokens go back in the bag, and the new " +
+          "caller starts the next round. The bag moving is the visible fact " +
+          "that this house has no caller.",
+        minutes: 5,
       },
       {
-        step: "stop_while_they_still_want_one",
+        step: "stop_when_the_parcels_are_gone",
         phase: "ending",
-        instruction: "Stop one round earlier than the table wants to.",
+        instruction: "Stop when the parcels have run out, or after three full cards where there are none.",
         detail:
-          "A table that asks for one more round and does not get it comes " +
-          "back to this next year. A table that plays until it is tired of " +
-          "it does not.",
+          "A stated number of rounds and nothing to judge. If a round is " +
+          "still running when the last parcel goes, play it out to the full " +
+          "card and stop there. Then the bag goes away, whoever is holding " +
+          "it, and the beans go back in the jar.",
         minutes: 3,
       },
     ],
@@ -6023,7 +6573,7 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
   supplies: [
     {
       item: "A bag of numbered tokens",
-      detail: "Wooden, in a cloth bag, and drawn without looking.",
+      detail: "Ninety of them, wooden, in a cloth bag, and drawn without looking.",
       source: "host_buys",
       quantity: 1,
       leadTimeDays: 10,
@@ -6059,7 +6609,10 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
     {
       piece: "number_cards",
       label: "The cards",
-      description: "One each, set in the destination's face, with room for a bean on every number.",
+      description:
+        "One each, set in the destination's face: fifteen numbers between " +
+        "one and ninety, printed in three rows of five, with room for a bean " +
+        "on every one. The rows are what a line means.",
       voicePiece: "notice",
       perGuest: true,
     },
@@ -6097,15 +6650,28 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
     "Five prizes, opened one at a time in front of everybody, in order. The " +
     "last one is worth having and everybody can see it from the start.",
   howItWorks:
-    "Five prizes, wrapped, in a row where the whole table can see them. " +
-    "They ascend: the first is a joke and the fifth is genuinely good, and " +
-    "nobody is told which is which except by the size and the order.\n\n" +
-    "They are opened one at a time, by whoever won them, in front of " +
-    "everybody, in the order they were won. Nothing is opened in private and " +
-    "nothing is opened out of turn.\n\n" +
-    "The unwrapping is what paces the last hour: five separate small events " +
-    "with the room watching each one, ending on the one that was obviously " +
-    "worth having from the moment it went on the table.",
+    "Five prizes, wrapped, in a row on the table from the start of the " +
+    "evening where everybody can see them. They ascend: the first is a joke " +
+    "and the fifth is genuinely good, and nobody is told which is which " +
+    "except by the size and the order.\n\n" +
+    "Across the evening, the game that is running hands them out as they are " +
+    "won — the first parcel to the first winner, and on down the row. They " +
+    "are handed over unopened and stay that way, on a lap, however long that " +
+    "is. Nothing is opened away from the table.\n\n" +
+    "At the end, they are opened one at a time, by whoever is holding them, " +
+    "in the order they were won: first parcel first, fifth last. The room " +
+    "watches each one and nobody talks over an unwrapping. One person " +
+    "holding two opens both, in their order, and there is no rule against " +
+    "having won twice.\n\n" +
+    "If the evening only produced three winners, three are opened and the " +
+    "two left in the row are not opened at all — they go back in the " +
+    "cupboard for next time. THE FIFTH PARCEL IS ALWAYS THE LAST THING: if " +
+    "it was never won, the room opens it together and it belongs to the " +
+    "house.\n\n" +
+    "Nothing is won here. The unwrapping is what paces the last quarter of " +
+    "an hour: five separate small events, ending on the one that was " +
+    "obviously worth having from the moment it went on the table. After the " +
+    "last one there is no speech and nothing else happens.",
   materials:
     "Five wrapped prizes in ascending order, and a clear length of table to " +
     "line them up on.",
@@ -6117,8 +6683,9 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
   minGuests: 6,
 
   scoring:
-    "No score of its own. It spends whatever the evening's game produced, in " +
-    "the order it was produced, and the fifth prize is the ending.",
+    "No score of its own and nobody wins it. It spends whatever the " +
+    "evening's game produced, in the order it was produced; unwon parcels " +
+    "stay wrapped, and the fifth is opened last whatever happened.",
 
   sourceNote: ROOM_VOICE,
   notes:
@@ -6135,7 +6702,17 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
     "produces winners satisfies it, rather than only this one.\n\n" +
     "RULE 25's FIRST TEST: five prizes is a backyard number. The first is a " +
     "lemon off the table and the fifth is a thing somebody would actually " +
-    "want, and nothing in between has to cost anything.",
+    "want, and nothing in between has to cost anything.\n\n" +
+    "FEWER THAN FIVE WINNERS IS THE NORMAL CASE AND HAD NO ANSWER. The " +
+    "earlier draft described five parcels opened by five winners and left a " +
+    "host holding two unclaimed ones at the end of a finale with nothing to " +
+    "do about them. Unwon parcels are not opened and go back in the " +
+    "cupboard, EXCEPT the fifth, which is always the last thing that happens " +
+    "and is opened by the room if nobody won it — because her sentence is " +
+    "about the last one being worth having, and an evening that ends with " +
+    "the good parcel quietly put away has not honoured it. A person who won " +
+    "twice opens both, in order, which the earlier draft's under-minimum " +
+    "answer treated as a failure rather than as a thing that happens.",
 
   runbook: {
     hostRole: "plays_too",
@@ -6169,39 +6746,43 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
           "The one rule that has to be enforced. Somebody will take theirs " +
           "into the kitchen, and the whole evening loses one of its five " +
           "small events.",
-        say: "In order, at this table, one at a time. And the last one is worth having.",
+        say: "Nothing gets opened until the end, and then in the order they were won, at this table, one at a time. The last one is worth having.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "hand_them_out_as_they_are_won",
         phase: "opening",
-        instruction: "Give each prize to its winner unopened and tell them to wait.",
+        instruction: "Give each parcel to its winner unopened, in row order, and tell them to wait.",
         detail:
-          "Unopened and held. A person sitting with a wrapped thing on their " +
-          "lap for twenty minutes is doing more for the room than the prize " +
-          "is.",
+          "First parcel to the first winner and on down the row, unopened " +
+          "and held. A person sitting with a wrapped thing on their lap for " +
+          "an hour is doing more for the room than the prize is. Somebody " +
+          "who wins twice takes two.",
         minutes: 2,
       },
       {
         step: "open_them_one_at_a_time",
         phase: "playing",
-        instruction: "Open them in order, one at a time, with the room watching each.",
+        instruction: "At the end, open them in the order they were won, one at a time, room watching.",
         detail:
-          "One at a time and nobody talks over an unwrapping. Five separate " +
-          "small events, which is what her sentence is asking for and what " +
-          "opening them together would destroy.",
+          "First won opens first, and a person holding two opens both in " +
+          "their order. Nobody talks over an unwrapping. Five separate small " +
+          "events, which is what her sentence is asking for and what opening " +
+          "them together would destroy.",
         minutes: 15,
         supplyItem: "Five prizes, wrapped",
       },
       {
         step: "the_fifth",
         phase: "ending",
-        instruction: "Let the fifth be opened last and let the room look at it.",
+        instruction: "The fifth is opened last, whoever holds it, and then nothing else happens.",
         detail:
-          "No speech after it. The fifth prize being obviously good is the " +
-          "ending of the night, and anything said afterwards is the host " +
-          "adding a second one.",
+          "Always last. If it was never won, the room opens it together and " +
+          "it stays with the house. Parcels nobody won are not opened at all " +
+          "and go back in the cupboard. No speech afterwards: the fifth " +
+          "being obviously good is the ending of the night, and anything " +
+          "said after it is the host adding a second one.",
         minutes: 5,
       },
     ],
@@ -6352,8 +6933,18 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
     "Everybody does a voice. Not a character from anywhere — a character " +
     "from the thing that is already on, which everybody in the room has " +
     "watched eleven times.\n\n" +
-    "One line each, in turn, and the room shouts who it is. The prize is " +
-    "the remote: whoever gets guessed fastest picks what goes on next.\n\n" +
+    "The host goes first and then it goes left, one line each, all the way " +
+    "round once. That is the whole round and nobody gets a second turn.\n\n" +
+    "The room shouts names over each other and the FIRST name shouted is the " +
+    "one that counts. If that first name is right, that voice was got clean. " +
+    "If it is wrong, the voice is not clean however quickly somebody gets it " +
+    "afterwards.\n\n" +
+    "At the end, of everybody who was got clean, the one who went earliest " +
+    "in the round takes the remote. If nobody was got clean, the room shouts " +
+    "for its favourite and the loudest takes it. Either way the host says " +
+    "who it is and there is no second round.\n\n" +
+    "The remote is the whole prize and it lasts one episode: they pick, " +
+    "whatever they pick, and nobody negotiates.\n\n" +
     "The reason it works is that nobody is good at it. A bad impression of " +
     "somebody everybody knows is funnier than a good one, and a room that " +
     "has watched the same thing all week can identify a character from four " +
@@ -6368,8 +6959,10 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
   maxGuests: 12,
 
   scoring:
-    "Guessed fastest wins, judged by the room and not by a clock. The prize " +
-    "is the remote and it lasts exactly one episode.",
+    "The first name shouted at a voice is the one that counts. A voice got " +
+    "right on that first name is clean; of the clean ones, whoever went " +
+    "earliest in the round wins. No clean ones and the room shouts for a " +
+    "favourite. The prize is the remote and it lasts exactly one episode.",
 
   sourceNote: ROOM_VOICE,
   notes:
@@ -6382,6 +6975,15 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
     "with: her sentence says somebody's voice and does not say whose, and " +
     "the wider reading — anybody in the room, anybody at all — is a " +
     "different and probably meaner game.\n\n" +
+    "GUESSED FIRST IS NOW A RULE INSTEAD OF A FEELING, AND IT IS READ " +
+    "LITERALLY FROM HER SENTENCE. The earlier draft said `guessed fastest " +
+    "wins, judged by the room and not by a clock`, which asks a sofa to " +
+    "compare two things nobody timed and would be settled by whoever argues " +
+    "hardest. Her word is FIRST, so: the first name shouted at a voice is " +
+    "the one that counts, a voice got right on that first name is clean, and " +
+    "the earliest clean one in the round takes the remote. Nothing is " +
+    "measured and nothing is compared. The fallback where no voice is got " +
+    "clean is the house's and is the only judged part left.\n\n" +
     "NOT THE SAME GAME AS THE CHARADES DECK. New Orleans has a bank row for " +
     "a charades prompt deck and this is not a second copy of it: a charade " +
     "is a prompt drawn and acted silently, and this is a line said out loud " +
@@ -6421,38 +7023,44 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
           "Paused and not off. A black screen makes an occasion of it; a " +
           "frozen frame keeps the thing everybody is about to imitate " +
           "sitting there.",
-        say: "One line each, somebody from this. Whoever gets guessed first picks what we watch next.",
+        say: "One line each, somebody from this, starting with me and going left. The first name anybody shouts is the one that counts, and if it is right you are still in it. Whoever gets there first picks what we watch next.",
         minutes: 2,
         printedPiece: "rules_card",
       },
       {
         step: "go_first_and_be_bad",
         phase: "opening",
-        instruction: "Go first and do a deliberately poor one.",
+        instruction: "Go first and do a deliberately poor one, then hand the turn to your left.",
         detail:
           "This is the whole permission structure. A host who does a good " +
           "impression first has set a standard, and four people will now " +
-          "pass rather than be worse than her.",
+          "pass rather than be worse than her. Going first is also the best " +
+          "seat, and you have given it away by taking it.",
         minutes: 2,
       },
       {
         step: "round_the_sofa",
         phase: "playing",
-        instruction: "One line each, in turn, and let the room shout over each other.",
+        instruction: "Left round the room, one line each, and let the room shout over each other.",
         detail:
-          "No hands up and no order to the guessing. The mess is the game, " +
-          "and the first name shouted is the one that counts even when three " +
-          "people say it at once.",
+          "No hands up and no order to the guessing. The mess is the game. " +
+          "The first name shouted at a voice is the one that counts, even " +
+          "when three people say it at once: right first time and that voice " +
+          "is clean, wrong first time and it is not, however fast the second " +
+          "shout is. Remember who was clean and in what order.",
         minutes: 14,
       },
       {
         step: "hand_over_the_remote",
         phase: "ending",
-        instruction: "Give the remote to whoever was guessed fastest, and take nothing back.",
+        instruction: "When it has been round once, give the remote to the earliest clean one.",
         detail:
-          "They pick, whatever they pick, and nobody negotiates. A room that " +
-          "overrules the winner has made the prize into a suggestion.",
-        say: "You were fastest. You pick.",
+          "The earliest in the round of everybody who was got right first " +
+          "time. If nobody was, ask the room to shout for a favourite and " +
+          "take the loudest. Say the name yourself, once, and take nothing " +
+          "back — they pick, whatever they pick, and a room that overrules " +
+          "the winner has made the prize into a suggestion.",
+        say: "You were first. You pick, and nobody argues with it.",
         minutes: 3,
         supplyItem: "The remote",
       },
@@ -6468,9 +7076,9 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
       {
         trouble: "under_minimum",
         answer:
-          "Under four, everybody guesses everything instantly and there is " +
-          "no fastest. Play it as two voices each and let the room pick a " +
-          "favourite rather than a winner.",
+          "Under four, every voice is got right first time and the earliest " +
+          "one always wins, which makes the seating the game. Play it as two " +
+          "voices each and let the room shout for a favourite instead.",
       },
       {
         trouble: "over_size",
@@ -6490,8 +7098,9 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
         trouble: "played_before",
         answer:
           "Somebody who has played will have a voice they always do, and the " +
-          "room will guess it in one syllable. That makes them fastest, " +
-          "which is the game rewarding a running joke correctly.",
+          "room will name it on the first shout. That makes them clean, and " +
+          "they win it if they went early enough, which is the game " +
+          "rewarding a running joke correctly.",
       },
       {
         trouble: "not_landing",
@@ -6586,14 +7195,22 @@ const ASPEN_THE_NEXT_LINE: Game = {
     "getting up for the garlic bread.",
   howItWorks:
     "It runs underneath the whole evening and takes nothing out of it. " +
-    "Anybody, at any time, may say the next line before it happens.\n\n" +
+    "Anybody on the sofa, at any time, may say the next line out loud before " +
+    "the screen says it. Nobody is called on and nobody has to.\n\n" +
+    "It does not have to be word for word. If the room agrees that was the " +
+    "line, it was the line, and the room settles that in four seconds with " +
+    "the loudest person being right. Nobody adjudicates and nothing is " +
+    "replayed to check.\n\n" +
     "Get it right and nothing happens, which is correct — being right is its " +
     "own thing and does not need a prize. Get it wrong and you are on garlic " +
-    "bread: you are the one who gets up, goes to the kitchen, and comes back " +
-    "with it.\n\n" +
-    "Nobody keeps a tally. The forfeit is the score, it is paid immediately, " +
-    "and it is the only reason there is ever anything to eat after ten " +
-    "o'clock.",
+    "bread: you get up now, go to the kitchen, and come back with it. If two " +
+    "people call at once and one of them is right, the wrong one goes. If " +
+    "both are wrong, they go together and the trip is a shorter one.\n\n" +
+    "Nobody keeps a tally and nobody wins. The forfeit is the whole of the " +
+    "score, it is paid the moment it is called, and it is the only reason " +
+    "there is ever anything to eat after ten o'clock.\n\n" +
+    "It ends when the freezer is empty or when the screen goes off, " +
+    "whichever comes first, and nobody announces either.",
   materials: "Garlic bread in the freezer, and an oven somebody is willing to turn on.",
 
   shape: "ambient",
@@ -6601,9 +7218,10 @@ const ASPEN_THE_NEXT_LINE: Game = {
   minGuests: 3,
 
   scoring:
-    "Nobody counts anything. Whoever calls a line wrong gets up for the " +
-    "garlic bread, once, and the debt is settled the moment it is on the " +
-    "table.",
+    "Nobody counts anything and nobody wins. Whoever calls a line wrong gets " +
+    "up for the garlic bread, once, and the debt is settled the moment it is " +
+    "on the table. Close enough counts, the room decides, and two people " +
+    "calling at once both go if both were wrong.",
 
   sourceNote: ROOM_VOICE,
   notes:
@@ -6614,7 +7232,17 @@ const ASPEN_THE_NEXT_LINE: Game = {
     "the freezer before anybody sits down, and every step and contingency. " +
     "PAYING IMMEDIATELY IS THE HOUSE'S ADDITION and it is the one that keeps " +
     "this from becoming a running scoreboard, which docs/copy-brief.md would " +
-    "not reach but the room would not survive.",
+    "not reach but the room would not survive.\n\n" +
+    "WHAT COUNTS AS GETTING IT RIGHT IS NOW WRITTEN DOWN: close enough, " +
+    "settled by the room in four seconds, and never by replaying anything. " +
+    "The earlier draft told the host not to adjudicate without ever saying " +
+    "what the standard was, so the first contested call of the night was " +
+    "going to be an argument about whether the game meant word for word. TWO " +
+    "PEOPLE CALLING AT ONCE is ruled the same way — the wrong one goes, and " +
+    "both wrong means both go. AND THE ENDING IS AN EVENT INSTEAD OF AN " +
+    "HOUR OF SILENCE: the empty freezer or the screen going off. Ambient " +
+    "games in this file end by being forgotten, and that stays true; what " +
+    "changes is that a host can now tell somebody when it finished.",
 
   runbook: {
     hostRole: "plays_too",
@@ -6647,7 +7275,7 @@ const ASPEN_THE_NEXT_LINE: Game = {
         detail:
           "Once. It is a rule about a room, not a round, and explaining it " +
           "twice makes it into something that has started.",
-        say: "Say the next line before it happens. Miss it and you are on garlic bread.",
+        say: "Say the next line before it happens, any time, anybody. Close enough counts. Miss it and you are on garlic bread, and you go now.",
         printedPiece: "rules_card",
       },
       {
@@ -6662,20 +7290,31 @@ const ASPEN_THE_NEXT_LINE: Game = {
       {
         step: "never_adjudicate",
         phase: "underway",
-        instruction: "Do not rule on close calls. Let the room shout it out.",
+        instruction: "Do not rule on close calls. Let the room shout it out and take four seconds.",
         detail:
-          "A host who decides what counts has made herself a referee and the " +
-          "game has acquired staff. The room settles it in four seconds and " +
-          "the loudest person is right.",
+          "Close enough counts and word for word is not required. A host who " +
+          "decides what counts has made herself a referee and the game has " +
+          "acquired staff. The room settles it in four seconds and the " +
+          "loudest person is right. Nothing is ever replayed to check.",
+      },
+      {
+        step: "when_two_people_call_at_once",
+        phase: "underway",
+        instruction: "Two at once and one right: the wrong one goes. Both wrong and they go together.",
+        detail:
+          "It happens most nights and the room will look at somebody to " +
+          "settle it. Two people in the kitchen is the better outcome " +
+          "anyway; the trip is shorter and the bread comes back faster.",
       },
       {
         step: "let_it_stop_by_itself",
         phase: "ending",
-        instruction: "When nobody has called a line for an hour, it is over. Say nothing.",
+        instruction: "It ends at the empty freezer or the screen going off, and neither is announced.",
         detail:
-          "An ambient game that is announced as finished leaves a hole where " +
-          "it was. This one ends by being forgotten, with garlic bread on " +
-          "the table.",
+          "Whichever comes first. Nobody wins it, nothing was counted, and " +
+          "an ambient game announced as finished leaves a hole where it was. " +
+          "This one ends with garlic bread on the table and no ceremony " +
+          "attached to it.",
       },
     ],
     contingencies: [
@@ -6806,15 +7445,26 @@ const PALM_SPRINGS_THE_BEST_LINE: Game = {
     "Everyone repeats the best line they have heard tonight, and nobody may " +
     "claim their own. It is the last thing that happens.",
   howItWorks:
-    "Round the patio, once, at the end. Everybody repeats the best thing " +
-    "they have heard anybody say tonight, in the words it was said in, and " +
-    "nobody may claim their own.\n\n" +
+    "It happens where the last of the party is already standing, at the end, " +
+    "and it is never gathered into a circle. The host starts it by saying " +
+    "one line somebody else said tonight, out loud, attributing it to " +
+    "nobody, and then waiting.\n\n" +
+    "After that, anybody says one, whenever they have got one. There is no " +
+    "order, nobody is called on and nobody has to go. One line each, in the " +
+    "words it was said in, and NOBODY MAY CLAIM THEIR OWN — somebody always " +
+    "tries in the first three, and the host says not your own, once, and it " +
+    "becomes the funniest part of the round.\n\n" +
     "Nothing is written down beforehand, which is what makes it work: what " +
     "comes out is what actually stayed, and half of it is something the " +
-    "person who said it does not remember saying.\n\n" +
-    "The room usually works out who said each one, and sometimes it is " +
-    "wrong, and nobody corrects it. It takes a quarter of an hour and it is " +
-    "the last thing before people start finding their things.",
+    "person who said it does not remember saying. The room usually works out " +
+    "who said each one, and sometimes it is wrong, and nobody corrects it.\n\n" +
+    "It ends on the host's line, which is always the last one. She says hers " +
+    "the moment a line gets repeated by somebody who did not hear it the " +
+    "first time, or the moment the gaps get longer than the lines. Once she " +
+    "has said hers, nobody else goes.\n\n" +
+    "Nothing is scored, nothing is voted on and nobody wins. It takes about " +
+    "a quarter of an hour and it is the last thing before people start " +
+    "finding their coats.",
   materials: "Nothing at all.",
 
   shape: "finale",
@@ -6836,22 +7486,34 @@ const PALM_SPRINGS_THE_BEST_LINE: Game = {
     "absence of any vote, and every step and contingency. THE ABSENCE OF A " +
     "VOTE IS DELIBERATE AND IS THE HOUSE'S: her sentence names no winner, " +
     "and a room that ranks the lines has turned the last quarter of an hour " +
-    "into a competition somebody comes last in.",
+    "into a competition somebody comes last in.\n\n" +
+    "THE ENDING WAS UNRUNNABLE AND IS NOW THE HOST'S OWN LINE. The earlier " +
+    "draft ended it at `the line whose author does not remember saying it`, " +
+    "asserted that there is always one, and left a host waiting for a thing " +
+    "that may not arrive — in the last quarter of an hour of the evening, " +
+    "with no order to fall back on, because nothing here goes round and " +
+    "nobody is called on. It now ends on her line, which is always the last " +
+    "one, said when a line comes back round or when the gaps get longer than " +
+    "the lines. That costs her one more line to keep in her head all " +
+    "evening, and it means the finale cannot fail to finish. THE REPEATED " +
+    "LINE, which had no ruling at all, is the same mechanism read from the " +
+    "other side: the second saying stands, and it is the signal.",
 
   runbook: {
     hostRole: "plays_too",
     hostNote:
-      "You go last, and you repeat somebody else's like everybody else. " +
-      "There is nothing to run: the only decision is when to start it.",
+      "You say the first line and the last one, and both of them are " +
+      "somebody else's, like everybody else's. There is nothing to run: the " +
+      "only two decisions are when to start it and when to close it.",
     steps: [
       {
         step: "notice_things_all_evening",
         phase: "before",
-        instruction: "Keep one line of your own in your head from about halfway through.",
+        instruction: "Keep two lines of your own in your head from about halfway through.",
         detail:
-          "You will be asked to go last and you will have spent the evening " +
-          "hosting rather than listening. One line kept from halfway is " +
-          "enough.",
+          "Two, because you say one to start it and one to end it, and you " +
+          "will have spent the evening hosting rather than listening. Two " +
+          "lines kept from halfway is the whole of the preparation.",
       },
       {
         step: "decide_where_it_happens",
@@ -6888,19 +7550,25 @@ const PALM_SPRINGS_THE_BEST_LINE: Game = {
       {
         step: "round_the_patio",
         phase: "playing",
-        instruction: "One each, in no order, until everybody standing there has gone.",
+        instruction: "One line each, in no order. Nobody is called on and nobody has to go.",
         detail:
-          "No order and nobody called on. People go when they have got one, " +
-          "and the gaps between are where the room works out who said what.",
+          "People go when they have got one, and the gaps between are where " +
+          "the room works out who said what. If two people repeat the same " +
+          "line, the second one stands and it is the signal that this is " +
+          "nearly over.",
         minutes: 11,
       },
       {
-        step: "stop_on_the_one_nobody_remembers",
+        step: "say_yours_last",
         phase: "ending",
-        instruction: "End on the line whose author does not remember saying it. Then stop.",
+        instruction: "Say your own line last, and once you have said it nobody else goes.",
         detail:
-          "There is always one. It is the ending, and anything said after it " +
-          "is a summing up of an evening that had just finished itself.",
+          "You close it, and this is the only part of it you decide. Say " +
+          "yours when a line comes back round from somebody who did not hear " +
+          "it the first time, or when the gaps get longer than the lines. " +
+          "Then nothing: no summing up, no vote, nobody won anything, and " +
+          "anything said after it is a second ending for an evening that had " +
+          "just finished itself.",
         minutes: 4,
       },
     ],
@@ -7012,16 +7680,25 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
     "The story is told the long way, and anybody may correct the year. " +
     "Somebody always does, and then it takes twice as long.",
   howItWorks:
-    "One person tells a story that this table has heard before, told the " +
-    "long way, with everything in it.\n\n" +
-    "Anybody may interrupt to correct the year. Not the facts — the year. It " +
-    "was not the summer of the wedding, it was the one after. The " +
-    "correction is allowed at any point, from anybody, and it has to be " +
-    "argued about before the story can go on.\n\n" +
-    "That is the whole game. A story that would take four minutes takes " +
-    "twenty, three people have produced evidence, one person has been " +
-    "wrong in public about something that happened to them, and nothing has " +
-    "been settled.",
+    "One person tells a story that this table was in — not a story about " +
+    "them alone, because half the room has to be able to argue with it — " +
+    "told the long way, with everything in it.\n\n" +
+    "Anybody may interrupt to correct the year. Not the facts, not who was " +
+    "there, not whether it happened. The year. It was not the summer of the " +
+    "wedding, it was the one after. The correction can come at any point, " +
+    "from anybody, including in the middle of a word, and once it has come " +
+    "the whole table argues it out before the story goes on. If the teller " +
+    "simply agrees, somebody corrects the correction, and that is the round " +
+    "working rather than a failure of it.\n\n" +
+    "Nothing may be looked up and nobody is ever declared right. When the " +
+    "argument runs out of itself, the teller picks up where they were.\n\n" +
+    "TWO STORIES AND THAT IS THE GAME. The first is chosen before the " +
+    "evening by the host, and the second goes to whoever argued hardest " +
+    "about the first. There is no third.\n\n" +
+    "Nobody wins, nothing is scored, and no year is ever settled. A story " +
+    "that would take four minutes takes twenty, three people have produced " +
+    "evidence, one person has been wrong in public about something that " +
+    "happened to them, and nothing has been resolved.",
   materials: "Nothing. A table and a story everybody has heard.",
 
   shape: "scheduled",
@@ -7041,6 +7718,14 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
     "HOUSE'S: her sentence names the year, and a table allowed to correct " +
     "anything is a table correcting the teller, which is a different and " +
     "much worse evening.\n\n" +
+    "THE STORY NOW HAS TO BE ONE THE TABLE WAS IN, which the earlier draft " +
+    "left open and which decides whether the game happens at all: a story " +
+    "about the teller alone cannot be corrected by anybody, so the first " +
+    "round produces a long anecdote and no interruptions and a host " +
+    "concludes the game does not work. AND THE TELLER WHO SIMPLY AGREES has " +
+    "an answer now — somebody corrects the correction — because the whole " +
+    "engine stalls the moment a correction is accepted, and accepting one is " +
+    "the polite reflex.\n\n" +
     "FIVE STORY GAMES, FIVE ENGINES. New Orleans hands the ending to the " +
     "left, Catskills rewards the version furthest from a shut book, Côte " +
     "d'Azur hides one liar, Big Sur forbids hurrying, and this one invites " +
@@ -7057,11 +7742,13 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
       {
         step: "pick_the_first_story",
         phase: "before",
-        instruction: "Decide in advance whose story starts it, and make it a good-natured person.",
+        instruction: "Pick whose story starts it, and pick one this table was in.",
         detail:
-          "The first teller gets corrected the most, because the table is " +
-          "learning that it is allowed to. Pick somebody who will find that " +
-          "funny.",
+          "A story about the teller alone cannot be corrected by anybody, " +
+          "and the game does not start. Pick something half the room was " +
+          "there for, and pick a good-natured teller: the first one gets " +
+          "corrected the most, because the table is learning that it is " +
+          "allowed to.",
       },
       {
         step: "know_one_wrong_year_yourself",
@@ -7079,7 +7766,7 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
           "Both halves, together. The long way on its own is a story; the " +
           "correction on its own is heckling. It is only a game when they " +
           "are said in the same breath.",
-        say: "Tell it the long way. And anybody can correct the year.",
+        say: "Tell it the long way, with all of it. And anybody, at any point, can stop it to correct the year — and then we argue about that before it goes on.",
         minutes: 2,
         printedPiece: "rules_card",
       },
@@ -7096,10 +7783,13 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
       {
         step: "let_it_be_derailed",
         phase: "playing",
-        instruction: "Let every correction be argued out before the story goes on.",
+        instruction: "Let every correction be argued right out, by the whole table, before it goes on.",
         detail:
-          "In full, and by the whole table. A host who says let us get back " +
-          "to the story has removed the game and left a long story behind.",
+          "In full, and never hurried back to the story — a host who says " +
+          "let us get back to it has removed the game and left a long story " +
+          "behind. When the argument runs out of itself, the teller picks up " +
+          "where they were. If the teller just agrees, somebody corrects the " +
+          "correction; that is the round working.",
         minutes: 25,
       },
       {
@@ -7107,18 +7797,20 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
         phase: "deciding",
         instruction: "Do not let anybody look it up, and do not let anybody be declared right.",
         detail:
-          "The table wants a verdict and must not have one. Two people " +
-          "certain of different years is the correct end state and it is " +
-          "what makes it worth doing again.",
+          "The table wants a verdict and must not have one. Nothing is " +
+          "scored and nobody wins this. Two people certain of different " +
+          "years is the correct end state and it is what makes it worth " +
+          "doing again.",
         minutes: 5,
       },
       {
         step: "hand_it_on",
         phase: "ending",
-        instruction: "Give the next story to whoever argued hardest, and stop after two.",
+        instruction: "Hand the second story to whoever argued hardest, and stop when it is finished.",
         detail:
-          "Two stories is the whole game. A third is the table doing the " +
-          "same thing again knowing how it goes.",
+          "Two stories is the whole game and the second one ends it, however " +
+          "it goes. A third is the table doing the same thing again knowing " +
+          "how it goes.",
         minutes: 3,
       },
     ],
@@ -7236,13 +7928,24 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
   howItWorks:
     "It happens in the last of the daylight and nowhere else, which is the " +
     "only difficult thing about it: somebody has to notice the light going " +
-    "and say so.\n\n" +
+    "and start it ten minutes before they think.\n\n" +
     "One compliment each, out loud, to a face. Not about somebody who is " +
     "across the room, not to the room in general, and not in the third " +
-    "person. Said to them, with everybody listening.\n\n" +
-    "Nobody chooses who they pay it to in advance and nobody may be paid two. " +
-    "It takes about a quarter of an hour and it is the last thing that " +
-    "happens outside.",
+    "person. Said to them, by name, with everybody listening.\n\n" +
+    "IT RUNS AS A CHAIN, and the chain is what makes it work. The host pays " +
+    "the first one, to anybody. Whoever has just been paid one pays the " +
+    "next, to somebody who has not had one yet. Then that person pays the " +
+    "next, and on round the group. Nobody chooses in advance, nobody is paid " +
+    "twice because the pool of people who have not had one gets smaller " +
+    "every time, and nobody is left out because the chain cannot end until " +
+    "everybody is in it.\n\n" +
+    "The last person left un-paid is the host, so the chain comes back to " +
+    "her. WHEN SHE HAS BEEN PAID ONE, IT IS OVER. Nobody says so and nobody " +
+    "sums it up; the group goes back inside.\n\n" +
+    "If somebody will not say one, the person who paid them names the next " +
+    "one instead and the chain carries on without comment. Anybody who " +
+    "arrives while it is running joins the pool and can be picked. Nothing " +
+    "is scored and nobody wins.",
   materials: "Nothing. The last of the light.",
 
   shape: "scheduled",
@@ -7254,7 +7957,8 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
 
   scoring:
     "Nothing is scored and nobody wins. The only rule with any force is that " +
-    "nobody is paid two and nobody is paid none.",
+    "nobody is paid two and nobody is paid none, and the chain enforces both " +
+    "without anybody keeping a list.",
 
   sourceNote: ROOM_VOICE,
   notes:
@@ -7268,6 +7972,24 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
     "nothing about anybody receiving one, and a round in which one person is " +
     "the only one nobody chose is the worst quarter of an hour this " +
     "catalogue could produce.\n\n" +
+    "THE CHAIN REPLACES THE HOST'S SILENT COUNT, AND THIS IS THE LARGEST " +
+    "CHANGE IN THE FILE. The earlier draft ran it in no order, asked the " +
+    "host to keep track of who had been paid one WITHOUT LETTING IT SHOW, " +
+    "and had her pay the last one herself to whoever nobody chose. Three " +
+    "things are wrong with that and each of them lands on the person it was " +
+    "trying to protect: in a group of twelve, four people are paid before " +
+    "she can stop the second compliment to the same face; the guarantee " +
+    "depends entirely on her arithmetic in failing light; and the person she " +
+    "catches at the end is publicly the one nobody chose, which is the exact " +
+    "outcome the rule exists to prevent. THE CHAIN MAKES IT MECHANICAL: " +
+    "whoever was just paid one pays the next, to somebody who has not had " +
+    "one. Nobody is paid twice because the pool only shrinks, nobody is " +
+    "missed because the chain cannot end while anybody is outside it, and " +
+    "the last person left is always the host — so the ending is a fact " +
+    "rather than a thing she has to notice. She keeps only the two rules and " +
+    "the light. The preserved argument for the old shape: an order-free " +
+    "round feels less like a round, and that was worth something; it was not " +
+    "worth the guarantee.\n\n" +
     "WHAT THIS ROW DOES NOT DO. This room's take-home sheet declares two " +
     "dependencies on an ambient game — a score kept on paper, and a prize " +
     "changing hands. This game is neither: it is scheduled, it keeps no " +
@@ -7277,9 +7999,9 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
   runbook: {
     hostRole: "plays_too",
     hostNote:
-      "You pay one and somebody pays you one. The only job is watching the " +
-      "light and starting it, and it has to be started ten minutes before " +
-      "you think.",
+      "You pay the first one and somebody pays you the last one. The only " +
+      "job is watching the light and starting it, and it has to be started " +
+      "ten minutes before you think.",
     steps: [
       {
         step: "work_out_when_the_light_goes",
@@ -7294,8 +8016,9 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
         phase: "before",
         instruction: "Count who is outside, and remember the number.",
         detail:
-          "You are about to need to know whether everybody has been paid " +
-          "one, and counting afterwards, in the dark, does not work.",
+          "The chain is that many links long and it comes back to you at the " +
+          "end of it, so the count is how you know roughly how long you have " +
+          "and whether the light will hold.",
       },
       {
         step: "start_it_by_paying_one",
@@ -7309,32 +8032,36 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
         printedPiece: "rules_card",
       },
       {
-        step: "say_the_two_rules",
+        step: "say_how_it_passes",
         phase: "opening",
-        instruction: "Say the two rules once, after the first one has landed.",
+        instruction: "After the first one lands, say the two rules and hand the chain to whoever got it.",
         detail:
-          "To a face, and nobody gets two. Said after the first one rather " +
-          "than before, so the room has already heard what the register is.",
-        say: "To their face, and nobody gets paid twice.",
+          "To a face, and to somebody who has not had one. Said after the " +
+          "first rather than before, so the group has already heard what the " +
+          "register is and knows exactly what it is being asked for.",
+        say: "To their face, and to somebody who has not had one yet. You have just had one, so you go next.",
         minutes: 2,
       },
       {
-        step: "let_it_go_round",
+        step: "let_the_chain_run",
         phase: "playing",
-        instruction: "Let people go in whatever order they want, and keep count silently.",
+        instruction: "Whoever was just paid one pays the next, to somebody who has not had one.",
         detail:
-          "Silently. A host visibly ticking people off has made it an " +
-          "administrative round, and the two people left at the end will " +
-          "know they were the two people left at the end.",
+          "The chain does the bookkeeping and you do none: the pool of " +
+          "people who have not had one gets smaller every time, so nobody is " +
+          "paid twice and nobody is missed. If somebody will not say one, " +
+          "whoever paid them names the next person instead and it carries " +
+          "on. Anybody who comes outside while it runs joins the pool.",
         minutes: 11,
       },
       {
-        step: "catch_the_ones_nobody_chose",
+        step: "it_comes_back_to_you",
         phase: "ending",
-        instruction: "Pay the last one yourself, to whoever has not had one.",
+        instruction: "You are the last one left. When somebody pays you one, it is over.",
         detail:
-          "This is the whole job. There is always one person nobody got to, " +
-          "and the round is only worth running if that never shows.",
+          "The chain cannot end anywhere else, which is the whole reason for " +
+          "running it this way. Say nothing afterwards, do not sum it up, " +
+          "and go back inside. Nobody won anything and nobody is thanked.",
         minutes: 3,
       },
     ],

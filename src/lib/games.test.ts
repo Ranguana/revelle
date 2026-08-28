@@ -692,3 +692,58 @@ test("no room game spends a person: rule 25's third test, mechanically", () => {
     );
   });
 });
+
+test("RULE 25.2, MECHANICALLY: no room's name reaches anything a guest reads", () => {
+  /*
+   * "NO PROPER NOUN A GUEST WOULD NOT SAY AT THE TABLE. Place names, brand
+   * names and landmarks are the postcard writing itself."
+   *
+   * The twenty room games are the place this is most likely to fail, because
+   * each one was written FROM a room and it costs one careless sentence to
+   * name it. The block comment in src/lib/games.ts already claims this holds —
+   * "no place name, no brand, no landmark reaches a name, a rule, a step or a
+   * printed piece" — and until now the claim was a paragraph rather than a
+   * check, which is CLAUDE.md rule 20's shape: the file that describes the
+   * rule is not the rule.
+   *
+   * THE VOCABULARY IS DERIVED, NOT LISTED. Rule 19: a hand-written list of
+   * place names is correct until the next room is authored. The words come
+   * out of the room keys themselves, which is exactly the set that must not
+   * appear, and short tokens are dropped because "new", "las", "big" and "st"
+   * are English before they are anywhere.
+   *
+   * SLUGS AND WORLD SCOPES ARE EXEMPT and are checked nowhere here: they are
+   * identifiers, they are never printed, and the same block comment says so.
+   */
+  const forbidden = new Set(
+    ROOMS.flatMap((room) => room.key.split("-")).filter((word) => word.length >= 4)
+  );
+  assert.ok(forbidden.size >= 15, `derived ${forbidden.size} room words from ${ROOMS.length} rooms`);
+
+  each((game) => {
+    const read: string[] = [
+      game.name,
+      game.description,
+      game.howItWorks,
+      game.materials ?? "",
+      game.scoring ?? "",
+      game.caveat ?? "",
+    ];
+    for (const step of game.runbook.steps) {
+      read.push(step.instruction, step.detail ?? "", step.say ?? "");
+    }
+    for (const c of game.runbook.contingencies) read.push(c.answer);
+    for (const p of game.printedMatter) read.push(p.label, p.description ?? "");
+
+    for (const text of read) {
+      for (const word of text.toLowerCase().match(/[a-z0-9]+/g) ?? []) {
+        assert.ok(
+          !forbidden.has(word),
+          `${game.slug} writes "${word}", which is part of a room's name. ` +
+            `A guest reading this at the table has been handed a postcard ` +
+            `(CLAUDE.md rule 25.2). Say the thing, not the place.`
+        );
+      }
+    }
+  });
+});
