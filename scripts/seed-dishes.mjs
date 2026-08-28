@@ -261,6 +261,52 @@ const COURSES = new Map([
 // has no deliverables sheet, so it has no `##` heading in the document and
 // therefore never reaches this check — `counts` only holds rooms the document
 // mentions. It is founder-owed food, not a manifest omission.
+//
+// ── 2026-08-28: ACAPULCO ARRIVES AT 24, AND WHAT BEAT THE PARAGRAPH ABOVE ──
+//
+// The paragraph is kept whole (rule 14) and is now superseded on its verdict
+// while remaining right about its reason. It said the room has no sheet, and it
+// still has none. What changed is that A SHEET IS NOT THE ONLY KIND OF
+// EVIDENCE: `docs/acapulco-1959-food.md` is a researched pass over the Guerrero
+// coast in 1959 — twenty-two dish blocks, each carrying a period check, a
+// rule-6 tier, a stated border test against Oaxaca and its own founder
+// question. Twenty-one of them are converted here, plus three that the second
+// ruling below frees.
+//
+// THE EARLIER RULING THIS REVERSES, QUOTED SO THE REVERSAL IS LEGIBLE.
+// docs/proposals.md, 2026-08-27: "Zero Acapulco dishes are written below.
+// Transcribing an agent's draft into the dish pool under her name is
+// retro-tagging with a byline on it." That was correct about the room's
+// `menu_item` exemplars, which ARE an agent's draft, and it is not what landed:
+// the lines below are sourced research with citations, not exemplars copied
+// across. Rule 13 settles where they may sit — dishes are POOL content that
+// stocks itself and the founder VETOES at the desk rather than consenting in
+// advance. Her instruction on 2026-08-27, verbatim: "no. dont cut corners."
+//
+// TWO FOUNDER RULINGS ON 2026-08-28 SET THE MAINS COUNT AT NINE, and both
+// overturn constraints the source document reasoned under:
+//
+//   1. "so the answer is more dishes." The document argued its mains "will not
+//      honestly grow much past seven" because "the room gets exactly one fire."
+//      Rule 25.3 is about STAFF, not difficulty — "the host can of course make
+//      all of those things" — and a second hot dish implies no second cook.
+//   2. "also get rid of the constraint globally 'or have been finished hours
+//      ago'." The made-ahead requirement is retired catalogue-wide. THE TEST IS
+//      SERVICE: no dish may imply somebody plating to order and carrying it out
+//      while she is at her own table. Nothing below does.
+//
+// So the three added mains are FIRE doing more than one job — grilled oysters,
+// grilled shrimp in their shells, fried fish fillets — and each is a second
+// preparation of a food the document already establishes in this room with a
+// source. None resurrects anything from its "Cut, and why" list: those cuts
+// stand on rule 6 and on period, which neither ruling touched.
+//
+// ONE OF THE TWENTY-TWO DID NOT LAND, and it is named in docs/proposals.md:
+// "Whatever lunch left, put back out cold when dinner starts" names no food,
+// has no making level to give (its own entry says "making: none, twice"), and
+// is already THE RESET — this room's signature gesture, recorded in
+// destinations.ts as owed a `world.gesture` row. As a dish it would fill a
+// member's dish slot with a mechanism. Founder's to route.
 const PER_DESTINATION = {
   "Westhampton": 91,
   "Nantucket": 85,
@@ -275,10 +321,114 @@ const PER_DESTINATION = {
   "New Orleans": 80,
   "Portofino": 80,
   "Amalfi Coast": 22,
-  "Oaxaca": 1,
-  "Palm Springs": 7,
-  "St. Moritz": 5,
-  "Aspen": 6,
+  // 1 -> 4. THREE ADDED, AND THE ROOM STOPS THERE ON RULE 3 RATHER THAN ON A
+  // NUMBER. `tamales` and `tortillas` are named in HER OWN RULING, quoted in
+  // this room's `never` list — "the dishes may always be named — mole, tamales,
+  // tortillas, mezcal are table words. They may never be adjectived" — which is
+  // both the licence for the two lines and the CAP ON THEM: a filling or a
+  // style would be an adjective on a table word, so each noun gets exactly one
+  // line and the clause that follows it is about time, in her register.
+  // `mezcal` is the fourth table word and is a DRINK, so it is not here. The
+  // appetizer is the mezcal plate's other half: the take-home bank establishes
+  // that plate carries ORANGE SLICES and a twist of worm salt off it.
+  //
+  // WHAT IS STILL MISSING IS FOOD, NOT PERMISSION. Beans, rice, the chocolate
+  // beaten with water and "the mole over chicken or turkey" are NOT in this
+  // repository in her hand — docs/proposals.md already recorded that the
+  // paragraph carrying them "does not exist in this repository" and may be an
+  // agent's draft that acquired her name in transit. Rule 3 forbids writing
+  // them on that basis. The drinking chocolate IS evidenced (the chocolate
+  // tablet, the jícara, the molinillo at the chairs-to-the-wall turn) and is a
+  // DRINK, so it belongs to docs/drinks.md and not to this table.
+  //
+  // This room is below EVIDENCE_FLOOR (12) and is reported as such. The fix
+  // that worked for Acapulco is the fix here: a sourced research pass, or a
+  // sheet. Not padding.
+  "Oaxaca": 4,
+  // 7 -> 11, ONE UNDER THE FLOOR, AND THE SHORTFALL IS DELIBERATE.
+  // Palm Springs still has NO MAINS, and that is unchanged by the 2026-08-28
+  // rulings: they retired an inference about LABOUR, and "nothing requires a
+  // fork or your full attention" is a sentence SHE WROTE about the party. The
+  // founder is the only person who can revisit it, and she has been asked
+  // rather than assumed — see docs/proposals.md.
+  //
+  // Three of the four additions come from "things on picks", which is the only
+  // clause in any of the four sheets that names a CATEGORY of preparations
+  // rather than a food; the fourth is the valley's own crop, which the
+  // take-home bank establishes as "a paper sack of medjools — the valley's
+  // actual crop, not an import".
+  //
+  // WHY IT STOPPED AT ELEVEN INSTEAD OF REACHING TWELVE. A twelfth line was
+  // available in the abstract and every candidate failed the count: `Olives
+  // stuffed with almonds` against Vegas' `Blue cheese-stuffed olives` and Côte
+  // d'Azur's `Green olive and almond bowls`; `Radishes with butter and salt`
+  // against TWO existing rows; `Lime sherbet` against three `Lemon sorbet`
+  // rows and a `Melon sorbet`; `Chocolate mints` against `Mints in silver
+  // dishes`. Each would have been "same frame, one ingredient swapped".
+  //
+  // The most useful finding is about her own line `One tray that looks
+  // expensive`, whose CONTENTS the sheet never names: 1965's answers are
+  // smoked salmon, caviar and pâté, and the twelve wired rooms already hold
+  // six, seven and three rows of those respectively. THE EXPENSIVE TRAY CANNOT
+  // BE ENUMERATED WITHOUT TAKING ANOTHER ROOM'S PLATE. That is a real
+  // constraint on this room and it is founder-owed, not an authoring failure.
+  // Eleven honest lines beat twelve with padding.
+  "Palm Springs": 11,
+  // 5 -> 7, AND THE ROOM STOPS SHORT OF THE FLOOR FOR A REASON WORTH READING.
+  // Both additions come from the room's own material rather than from a
+  // species list: the caviar service, the mother-of-pearl spoon and the caviar
+  // tin are all NATIVE St. Moritz rows in the take-home bank, so caviar is
+  // evidenced here by objects the room already ships; and the consommé is a
+  // preparation of her own "something hot in small cups when the light goes",
+  // which the 2026-08-28 ruling frees to be made at the moment.
+  //
+  // WHY IT IS NOT TWELVE, AND THIS IS A FINDING RATHER THAN AN EXCUSE. Her
+  // sheet names four standing foods, and the obvious way to reach twelve is to
+  // enumerate species under them — smoked salmon, smoked trout, smoked eel.
+  // THE COUNT REFUSES IT: the twelve wired rooms already hold six "smoked
+  // salmon + a carrier" rows and four "smoked trout + a carrier" rows, so a
+  // seventh and a fifth would be the single-substitution duplicate CLAUDE.md's
+  // unratified section names — "same frame, one ingredient swapped" — and
+  // would hand this room another room's plate under a new slug. It is the same
+  // reasoning that cut two anchovy lines from Amalfi as near-neighbours of
+  // Portofino's.
+  //
+  // TWO GAPS ARE FOUNDER-OWED, both named in docs/proposals.md: the food of
+  // the late supper her sheet makes conditional ("a late supper only if the
+  // night earns one" names the course and not its contents), and the half-past
+  // eleven course that this room's own timetable card fills with FONDUE —
+  // which rule 6 refuses, because Dolomites owns alpine cheese outright. That
+  // refusal stands and it leaves a real hole she should see.
+  "St. Moritz": 7,
+  // 6 -> 12, AND IT CLEARS EVIDENCE_FLOOR. Her sheet names three foods and a
+  // MECHANISM — "whatever gets made while dancing" — and the mechanism is the
+  // licence: this is the one room whose food is defined by being cooked during
+  // the party, by the people at it, in a kitchen everybody has crowded into.
+  // The 2026-08-28 ruling retiring the made-ahead constraint changes nothing
+  // here except to confirm what she already wrote.
+  //
+  // The six are 1994 American repertoire (rule 6: repertoire goes anywhere the
+  // register fits), on the precedent the founder already let stand in this
+  // room — "Chips and the onion dip made from the packet", marked in
+  // docs/proposals.md as an agent's extension and not cut. Each is self-serve,
+  // which is rule 25.3's only surviving test: nothing here is plated to order
+  // and carried out.
+  //
+  // THE COUNT PICKED THE LINES, NOT TASTE (rule 24). Four candidates were
+  // dropped because a grep of the document found them already spent: `Brownies
+  // from the pan` EXISTS at Big Sur as `M`, so an Aspen `H` would have failed
+  // the seeder's level-disagreement check outright; `Campfire chili` and
+  // `Venison chili` are Big Sur's, so a third chili would have been the
+  // single-substitution duplicate; and `Pickled okra and pepper jelly with
+  // cream cheese` is New Orleans', which killed the cream-cheese-and-pepper-
+  // jelly line. Reading would have caught none of the four.
+  //
+  // `Marshmallow squares` and `Cookies from the tube` are described rather than
+  // branded, following her own two examples in this room — "the onion dip made
+  // from the packet", "the box of good chocolate" — which is rule 25.2 obeyed
+  // in her own idiom.
+  "Aspen": 12,
+  "Acapulco": 24,
 };
 
 function fail(message) {

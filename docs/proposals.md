@@ -2011,3 +2011,202 @@ above.
    anniversary and bridal all require. Twenty new games did not close it and
    none was bent to look as though it had — db/010 says mis-tagging a party
    game as an honouring beat to quiet the report is the actual bug.
+
+---
+
+# 2026-08-28 — FIVE ROOMS GET THEIR FOOD, AND TWO RULINGS RETIRE TWO CONSTRAINTS
+
+## The counts, before and after
+
+| room | before | after | clears `EVIDENCE_FLOOR` (12) |
+|---|---|---|---|
+| Acapulco | 0, no `##` heading at all | **24** | yes |
+| Oaxaca | 1 | **4** | no |
+| Palm Springs | 7 | **11** | no |
+| St. Moritz | 5 | **7** | no |
+| Aspen | 6 | **12** | yes |
+
+Amalfi Coast was NOT touched — a sibling landed her second sheet at 22 and it
+stands. Document total 1079 → 1118 lines.
+
+**Three rooms are still under the floor**, so every pair involving Oaxaca, Palm
+Springs or St. Moritz still returns `unknown` from `overlapFraction`, and rule
+26 forbids reading `unknown` as `disjoint`. That is the finding to act on, and
+each room's reason is written beside its entry in `PER_DESTINATION` rather than
+summarised away here.
+
+## The two rulings, and exactly what each one voided
+
+1. **"so the answer is more dishes."** Rule 25.3 is about STAFF, not difficulty
+   — *"the host can of course make all of those things."*
+2. **"also get rid of the constraint globally 'or have been finished hours
+   ago'."** The made-ahead requirement is retired catalogue-wide. THE TEST IS
+   SERVICE and nothing else: no dish may imply somebody plating to order and
+   carrying it out while she is at her own table.
+
+**What they voided, named so the reversal is legible (rule 14).**
+`docs/acapulco-1959-food.md` reasoned that its mains *"will not honestly grow
+much past seven"* because *"the room gets exactly one fire and everything else
+has to be cold or have been finished hours ago"*, concluding *"a room that
+allows one fire does not have fifteen mains."* Both halves are void; the
+paragraph is kept in that file, unedited, because its reasoning about the
+room's texture is still the best description of it. Three mains were added on
+the strength of the reversal.
+
+**What they did NOT void.** Rule 3, absolutely. Rule 6's tiers and borders. The
+Oaxaca/Acapulco wall — *heat and masa on one side, cold and lime on the other*.
+St. Moritz taking no alpine cheese, which Dolomites owns outright. And every
+cut in the Acapulco document's "Cut, and why" list, each of which rests on rule
+6 or on period.
+
+## The earlier ruling this pass reverses, quoted (rule 14)
+
+This ledger said on 2026-08-27: **"Zero Acapulco dishes are written below.
+Transcribing an agent's draft into the dish pool under her name is retro-tagging
+with a byline on it."**
+
+That was **correct about what it examined** and is not what landed. It was
+judging the room's `menu_item` exemplars in `destinations.ts`, which are
+explicitly agent-drafted. What landed instead is `docs/acapulco-1959-food.md` —
+a sourced research pass with citations, period checks, rule-6 tiers and a
+stated border test per line. The distinction that matters: **a sheet is not the
+only kind of evidence.** Rule 13 settles where such lines may sit — dishes are
+POOL content that stocks itself, and the founder VETOES at the desk rather than
+consenting in advance.
+
+## What landed from the Acapulco document, and the one that did not
+
+**21 of 22 blocks converted**, plus 3 new mains the rulings freed = 24 lines.
+Its three strongest all landed: *morisqueta*, *ceviche in a glass with
+saltines*, and *fish fried yesterday and left in vinegar and onions, eaten
+cold*.
+
+**Held: "Whatever lunch left, put back out cold when dinner starts."** Three
+grounds that stack. It names no food. It has no making level to give — its own
+entry says *"making: none, twice"* — and B/H/M are the only three values a dish
+line may carry, so it cannot be written without inventing an answer to the one
+axis the host is asked about by name. And it is already **THE RESET**, this
+room's signature gesture, which `destinations.ts` records as owed a
+`world.gesture` row in the shape of db/034. As a dish row it would fill a
+member's dish slot with a mechanism instead of food. **Founder's to route:**
+`world.gesture`, a `bank_kind = 'host_act'` row, or overrule and pool it.
+
+## RULINGS OWED
+
+1. **`pozole verde de Guerrero` — reinstate?** The Acapulco document calls it
+   *"the hardest cut in the file and the one most likely to be overruled"*, and
+   part of its context (the one-fire argument) is now void. **Its other two
+   grounds still stand independently**: it is a pot going for hours, which is
+   Oaxaca's entire structure and the axis rule 26 says to keep disjoint; and it
+   is nixtamalized corn, and masa is the wall. Not resurrected here, because a
+   cut she has not reversed is not an agent's to reverse. If she wants it, it
+   should come in as Acapulco's and be removed from anything Oaxaca might later
+   claim.
+2. **Does "more dishes" reach Palm Springs' mains?** Asked rather than decided,
+   because it contradicts a sentence she wrote. Her sheet says *"nothing
+   requires a fork or your full attention"* — a statement about the PARTY, not
+   an inference about labour, so neither ruling touches it. It was obeyed: no
+   mains were written. **This is now load-bearing beyond taste** — the three
+   dish slots are required on every occasion with no exclusion for a standing
+   party, so a room with no mains fails a required slot everywhere. The fix
+   proposed is a `standing drinks` exclusion, not invented mains.
+3. **Every founder question in `docs/acapulco-1959-food.md` travels with its
+   landed line and is still open.** The ones that would change a line if
+   answered: the ceviche's dating (the recipe is documented in a 1969 printing
+   of a title first published in 1947); whether the cold *pulpo* stands on the
+   file's thinnest evidence; whether *morisqueta* and the escabeche keep their
+   table words or become plain English (rule 25.2); whether the garlic shrimp
+   should exist at both appetizer and main size; whether *langosta* reads as
+   the room or as the hotel next to it; whether `Mangoes … · summer` may sit in
+   a December room given rule 25.1 books it in August; and whether `Flan, cold,
+   cut badly` keeps a place it earns only by elimination.
+4. **Oaxaca needs food, not permission.** It reached 4 and stopped. `mole`,
+   `tamales` and `tortillas` are named in HER OWN ruling — *"the dishes may
+   always be named — mole, tamales, tortillas, mezcal are table words. They may
+   never be adjectived"* — which is simultaneously the licence for the two new
+   lines and the CAP on them: a filling or a style would be an adjective on a
+   table word, so each noun gets one line. `mezcal` is the fourth table word
+   and is a drink. The appetizer is the mezcal plate's other half, which the
+   take-home bank establishes carries orange slices and a twist of worm salt.
+   **Beans, rice, the chocolate beaten with water and "the mole over chicken or
+   turkey" remain absent from this repository in her hand** — this ledger
+   already recorded that the paragraph carrying them *"does not exist in this
+   repository"* — so rule 3 forbids writing them. The drinking chocolate IS
+   evidenced (the chocolate tablet, the jícara, the molinillo at the
+   chairs-to-the-wall turn) and is a DRINK. **The fix that worked for Acapulco
+   is the fix here: a sourced research pass, or a sheet.**
+5. **St. Moritz's half-past-eleven course is a real hole.** The room's own
+   timetable card in the take-home bank reads *"seated at nine, fondue at half
+   eleven, the room changes at one, eggs at half five"* — and **rule 6 refuses
+   the fondue**, because Dolomites owns alpine cheese outright. That refusal
+   stands and leaves the 11:30 course unwritten. Her sheet also names *"a late
+   supper only if the night earns one"* without naming its food; only the eggs
+   are evidenced, from the same card and from the bank's *"leave at dawn with
+   the eggs"*.
+
+## What the count found that reading would not have (rule 24)
+
+Four Aspen candidates and four Palm Springs candidates were dropped by a grep of
+the document, not by taste:
+
+- **`Brownies from the pan` already EXISTS at Big Sur as `M`.** An Aspen `H`
+  would have hit the seeder's level-disagreement failure — *"two answers for one
+  dish is one of the lines being wrong, not a nuance"* — and stopped the deploy.
+- **`Campfire chili` and `Venison chili` are both Big Sur's**, so a third chili
+  was the single-substitution duplicate the unratified section names.
+- **`Pickled okra and pepper jelly with cream cheese` is New Orleans'**, which
+  killed the cream-cheese-and-pepper-jelly line.
+- At Palm Springs: `Olives stuffed with almonds` against Vegas' `Blue
+  cheese-stuffed olives` and Côte d'Azur's `Green olive and almond bowls`;
+  `Radishes with butter and salt` against TWO existing rows; `Lime sherbet`
+  against three `Lemon sorbet` rows and a `Melon sorbet`; `Chocolate mints`
+  against `Mints in silver dishes`.
+
+**And the finding that changes how the thin rooms should be grown.** The
+obvious way to take St. Moritz to twelve is to enumerate species under "smoked
+fish". The count refuses it: the twelve wired rooms already hold **six** "smoked
+salmon + a carrier" rows and **four** "smoked trout + a carrier" rows. A seventh
+and a fifth would hand this room another room's plate under a new slug — the
+same reasoning that cut two anchovy lines from Amalfi. The same is true of Palm
+Springs' `One tray that looks expensive`, whose contents her sheet never names:
+1965's answers are smoked salmon, caviar and pâté, and the wired rooms hold six,
+seven and three rows of those. **THE EXPENSIVE TRAY CANNOT BE ENUMERATED
+WITHOUT TAKING ANOTHER ROOM'S PLATE.** That is a genuine constraint on those two
+rooms, not an authoring failure, and it is why they stopped where they did.
+
+## The parse (rule 24)
+
+Run before and after with the committed instruments — `scripts/seed-dishes.mjs`
+for the strict gate and `dishClaims()` from `scripts/deliverables.mjs` for the
+per-room claim sets.
+
+| | before | after |
+|---|---|---|
+| lines matched | 1079 | **1118** |
+| deduped rows (name + course) | 1014 | **1053** |
+| rows under more than one room | 55 | **55** |
+| lines skipped | 0 | **0** |
+| unknown `##` headings | 0 | **0** |
+| season disagreements | 3 | **3** |
+| level disagreements | 0 | **0** |
+
+The three season disagreements are the known ones and are unchanged: `Ambrosia`
+(Westhampton unseasoned / New Orleans winter), `Strawberry shortcake`
+(Nantucket early summer / Vegas unseasoned / New Orleans spring), `Fried
+chicken` (Catskills summer / New Orleans unseasoned).
+
+**39 lines added produced 39 new deduped rows and no new shared rows.** That is
+the number worth reading: not one of the 39 collapsed onto an existing dish, so
+no room was handed another room's plate by accident. It is also what makes the
+Acapulco/Oaxaca border checkable — the two Mexican rooms share **zero** rows.
+
+**THE DATABASE HALF OF THIS WAS NOT RUN, AND SAYING SO IS THE POINT.** `initdb`
+fails on this machine — `shmget … Cannot allocate memory` — so there is no
+Postgres to seed against. `scripts/seed-dishes.mjs` was run with `DATABASE_URL`
+unset, which exercises **every gate before the connection**: the line parser,
+the per-room `PER_DESTINATION` manifest, the level-disagreement check, the
+duplicate-within-a-room check, the season-wording map and slug assignment. It
+reaches `DATABASE_URL is not set` and stops there. What was **not** verified is
+anything only Postgres can see — enum literals, CHECK constraints, bind counts
+on the insert path. That is `npm run smoke:seeders` in CI, against the
+`postgres:17` service container, and it has not run here.

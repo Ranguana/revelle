@@ -8,18 +8,40 @@ multiple destination tags at import. A dish two or three houses serve is
 written under each of their headings; the import makes it one row. Spaghetti
 with clams is written three times below and is one dish.
 
-**"Roughly 50" describes the first twelve rooms and NOT the last five.**
-Aspen, Palm Springs, St. Moritz and Oaxaca hold single digits, because that is
-everything the founder's deliverables sheets actually name. Amalfi Coast held
-single digits too until she sent a second sheet on 2026-08-27 and it went to
-22 — a room grows when more of her food exists, never because its number looked
-small next to its neighbours. The thinness is the record, not a gap to fill:
-padding a room to fifty is an agent authoring her food under her name.
-`PER_DESTINATION` in
-`scripts/seed-dishes.mjs` holds the exact count for every room here and fails
-the deploy if this document and that table disagree — they move in one commit.
-Palm Springs has no Mains and that is her sheet being obeyed. Acapulco has no
-section at all and is owed a sheet.
+**"Roughly 50" describes the first twelve rooms and NOT the last six.**
+`PER_DESTINATION` in `scripts/seed-dishes.mjs` holds the exact count for every
+room here and fails the deploy if this document and that table disagree — they
+move in one commit.
+
+**THE PARAGRAPH THIS REPLACES, KEPT PER RULE 14, AND WHAT BEAT IT.** It read:
+*"Aspen, Palm Springs, St. Moritz and Oaxaca hold single digits, because that is
+everything the founder's deliverables sheets actually name… The thinness is the
+record, not a gap to fill: padding a room to fifty is an agent authoring her
+food under her name."* Its principle is UNCHANGED and still governs every line
+below. What beat its numbers was two founder rulings on 2026-08-28 — *"so the
+answer is more dishes"*, and *"also get rid of the constraint globally 'or have
+been finished hours ago'"* — plus the discovery that a sheet is not the only
+kind of evidence. A room may also grow by ENUMERATING what a sheet names as a
+category ("things on picks", "smoked fish", "whatever gets made while dancing"),
+and by a sourced research pass of the kind `docs/acapulco-1959-food.md` is.
+Neither is invention, and rule 3 still forbids the thing the old paragraph was
+protecting against.
+
+**Made-ahead is no longer a requirement anywhere in this document.** Rule 25.3's
+test is SERVICE and only service: no dish may imply somebody plating it to order
+and carrying it out while the host is at her own table. A dish that only works
+hot, a pot watched during the party, a fire lit at nine — all fine.
+
+**Where the last six rooms stand, and three are still under the floor.** Amalfi
+Coast 22, Acapulco 24 and Aspen 12 clear `EVIDENCE_FLOOR` in
+`scripts/deliverables.mjs`, so rule 26's second number can speak for them.
+Palm Springs 11, St. Moritz 7 and Oaxaca 4 do NOT, and every pair involving
+those three still returns `unknown` — which rule 26 forbids reading as
+`disjoint`. Each stopped where its honest material stopped, and each one's
+reason is written beside its entry in `PER_DESTINATION`. Palm Springs still has
+no Mains: *"nothing requires a fork or your full attention"* is a sentence she
+wrote about the party, not an inference about labour, so it survived both
+rulings and is hers alone to revisit.
 
 ---
 
@@ -1189,8 +1211,13 @@ section at all and is owed a sheet.
 
 ## Oaxaca
 
+### Appetizers
+- Orange slices with worm salt, off the mezcal plate · B · · L, D
+
 ### Mains
 - The mole, going since yesterday · M · · L, D
+- Tamales, because there were always tamales · M · · L, D
+- Tortillas, made this morning, still warm if you come early enough · M · · L, D
 
 ## Palm Springs
 
@@ -1200,10 +1227,14 @@ section at all and is owed a sheet.
 - Olives · B · · C
 - Things on picks · B · · C
 - One tray that looks expensive · B · · C
+- Cheese and pineapple on picks · B · · C
+- Cocktail sausages on picks · B · · C
+- Salted almonds in a low bowl · B · · C
 
 ### Desserts
 - A bowl of dates · B · · C
 - Grapefruit halves, cold · B · · C
+- Dates stuffed with almonds · B · · C
 
 ## St. Moritz
 
@@ -1211,6 +1242,8 @@ section at all and is owed a sheet.
 - Smoked fish · B · · C
 - Cheese doing its best work · B · · C
 - Something hot in small cups · H · winter · C
+- Caviar, and the mother-of-pearl spoon · B · · C
+- Consommé in small cups · H · winter · C
 
 ### Mains
 - Eggs at dawn · M · · LS
@@ -1223,11 +1256,49 @@ section at all and is owed a sheet.
 ### Appetizers
 - Chips and the onion dip made from the packet · B · · C
 - Pigs in blankets · H · · C
+- Seven-layer dip · H · · C
+- Nachos under the broiler · H · · C
 
 ### Mains
 - One big pot, whatever gets made while dancing · M · · D
 - Garlic bread · H · · D
+- Sloppy joes out of the pot, on soft rolls · M · · D
+- Taco night, everything in bowls on the counter · H · · D
 
 ### Desserts
 - The box of good chocolate · B
 - Ice cream eaten out of the carton · B
+- Marshmallow squares, cut in the pan · H · · C
+- Cookies from the tube, baked at eleven · H · · LS
+
+## Acapulco
+
+### Appetizers
+- Oysters on ice, and more lime than anybody needs · B · · L, D, C
+- Ceviche, in a glass, with saltines · M · · L, D, C
+- Coctel de camarón, cold, with a spoon standing in it · M · · L, D, C
+- Pulpo, cooked yesterday, cold, lime and oil · M · · L, D, C
+- Camarones al mojo de ajo, in the pan they were cooked in · M · · L, D
+- Fish fried yesterday and left in vinegar and onions, eaten cold · M · · L, D
+- Jícama, cucumber and green fruit, cut cold, salt and chile and lime · H · · L, D, C
+- Peanuts fried with garlic and too much chile · M · · L, D, C
+
+### Mains
+- Fish off the grill, whole, eaten with your hands and no ceremony · M · · L, D
+- Morisqueta — white rice, beans from the pot, whatever came out of the water on top · M · · L, D
+- Shrimp with garlic, in more butter than is sensible · M · · L, D
+- Chicken on the same coals, rubbed with chile and lime · M · · L, D
+- Langosta, split, on the fire, and lime · M · · D
+- Crab, cracked, in a pile, with a bowl for the shells · M · · L, D
+- Oysters on the coals until they open · M · · L, D
+- Shrimp on the coals in their shells, with lime · M · · L, D
+- Fish fillets, breaded and fried, with lime · M · · L, D
+
+### Desserts
+- Coconut ice, eaten wet, standing up · M · · L, D, C
+- Cocadas, on a tray, going soft in the heat · M · · L, D, C
+- Paletas in a bucket of ice, take one · B · · L, D, C
+- Papaya, cold, cut in the afternoon, with lime · B · · L, D, C
+- Mangoes cut open and salted, with lime · B · summer · L, D, C
+- Plátanos machos, fried, with cream · M · · L, D
+- Flan, cold, cut badly · M · · L, D
