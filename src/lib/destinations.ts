@@ -551,7 +551,14 @@ export const WESTHAMPTON_1976: Destination = {
       "Never mention anything that did not exist in 1976. No links, no apps, no playlists, no confirming online.",
       "Never perform the period. No darling, no swell, no groovy — the house is not doing an impression of itself.",
       "Never wink at the reader about what goes on here. State it plainly or leave it out.",
-      "Never instruct, apologise, or thank. The house does not thank people for coming to it.",
+      // REFORMATTED 2026-08-28, same words in the same order. Was:
+      // "Never instruct, apologise, or thank. The house does not thank people
+      // for coming to it." Three refusals in one clause, and the never-rule
+      // extractor captured `instruct` and stopped at the comma — `apologise`
+      // and `thank` were declared here and enforced nowhere. The extractor
+      // reads a list now; this is belt and braces, because a refusal written as
+      // its own clause cannot be missed by whatever regex comes after it.
+      "Never instruct. Never apologise. Never thank. The house does not thank people for coming to it.",
       "Never address the room by a nickname. No ladies, no everyone, no team.",
       "Never use italics.",
     ],
@@ -3998,7 +4005,12 @@ export const DOLOMITES: Destination = {
       "Never an exclamation point.",
       "Never dare anybody. No conquering, no fearless, no run described as a test. Nobody here is measured against anybody.",
       "Never make the drinking the joke or the point. The mug has the same build with or without, and no line separates the two.",
-      "Never the mountain costume. No yodel, no lederhosen, no phonetic German or Italian. Speck and grappa are the names of real things and stay.",
+      // REFORMATTED 2026-08-28. Was "no phonetic German or Italian". The
+      // extractor splits a list on "or", which turned the tail of that phrase
+      // into the bare word `Italian` — over-broad in the one room whose next
+      // sentence keeps speck and grappa by name. Saying the adjective twice
+      // refuses exactly what she refused and nothing beside it.
+      "Never the mountain costume. No yodel, no lederhosen, no phonetic German, no phonetic Italian. Speck and grappa are the names of real things and stay.",
       "Never make somebody feel slow. The long way loses nothing, and that sentence is load-bearing.",
       "Never write a safety fact as a joke or bury it in a paragraph. It goes first, alone, in the plainest words on the page.",
       "Never name the feeling — no magic, no wonderland, no unforgettable, no memories.",
@@ -6851,7 +6863,13 @@ export const ASPEN_1994: Destination = {
       "Never a costume rule. Also on that list, and the reason the dress instruction here is an object — the big sweatshirt — rather than a rule.",
       "Never photograph the night. Being photographed all night is on that list too, so no line invites a camera and none records one.",
       "Never widen the room. More people than we know is the fourth thing on that list, and a line written to a crowd has broken this destination.",
-      "Never a mountain, a slope, a lift or a resort. There is no skiing in this destination and there never was; the skis are on the wall and the sled has not moved in years.",
+      // REFORMATTED 2026-08-28, same words in the same order. Was:
+      // "Never a mountain, a slope, a lift or a resort." The never-rule
+      // extractor captured `a mountain` and stopped at the comma, so three of
+      // the four refusals in this room's hardest border were enforced by
+      // nothing. Still not enforced by any channel: `skiing`, which the second
+      // sentence refuses in prose and no list carries as a word.
+      "Never a mountain. Never a slope. Never a lift. Never a resort. There is no skiing in this destination and there never was; the skis are on the wall and the sled has not moved in years.",
       "Never imply anybody is carrying a tray. One pot, made while dancing, and whoever's closest hands it over.",
       "Never explain the bit, the in-joke, or why that movie.",
       "Never name the feeling. Warm is the one word this house has for it and it is a fact about the room, not a promise about the reader.",
@@ -9621,7 +9639,16 @@ export const ST_MORITZ_1984: Destination = {
       "Never alpine. The snow is a fact; the adjective is a brochure.",
       "Never chalet. The room is anywhere with an outdoors and an early sunset, so it never owns a building.",
       "Never apres. The word for the hour after is later.",
-      "Never après. The same word with its accent on, because the never-rule channel is spelling-literal and matches only what it is given. Measured: the unaccented clause above catches `apres` and does NOT catch `après`.",
+      // SUPERSEDED 2026-08-28. This clause used to carry its own reason:
+      // "The same word with its accent on, because the never-rule channel is
+      // spelling-literal and matches only what it is given. Measured: the
+      // unaccented clause above catches `apres` and does NOT catch `après`."
+      // That was true and is not any more. The channel folds both sides — NFD,
+      // combining marks stripped — so one clause would now catch both
+      // spellings. The clause stays because the refusal is hers and because a
+      // room should not depend on a script's normalisation to refuse a word it
+      // can simply name; the workaround's argument moves here, where it belongs.
+      "Never après. The same word with its accent on.",
       "Never glam. Golden is the word, and it is about the light.",
       "Never solemn. Her refusal, verbatim: no solemnity survives here.",
       "Never hushed. The important part is not said under the breath in this room.",
