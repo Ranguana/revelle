@@ -32,16 +32,27 @@ test is SERVICE and only service: no dish may imply somebody plating it to order
 and carrying it out while the host is at her own table. A dish that only works
 hot, a pot watched during the party, a fire lit at nine — all fine.
 
-**Where the last six rooms stand, and three are still under the floor.** Amalfi
-Coast 22, Acapulco 24 and Aspen 12 clear `EVIDENCE_FLOOR` in
+**Where the last six rooms stand, and two are still under the floor.** Amalfi
+Coast 22, Acapulco 24, Aspen 12 and Oaxaca 36 clear `EVIDENCE_FLOOR` in
 `scripts/deliverables.mjs`, so rule 26's second number can speak for them.
-Palm Springs 11, St. Moritz 7 and Oaxaca 4 do NOT, and every pair involving
-those three still returns `unknown` — which rule 26 forbids reading as
-`disjoint`. Each stopped where its honest material stopped, and each one's
-reason is written beside its entry in `PER_DESTINATION`. Palm Springs still has
-no Mains: *"nothing requires a fork or your full attention"* is a sentence she
-wrote about the party, not an inference about labour, so it survived both
-rulings and is hers alone to revisit.
+Palm Springs 11 and St. Moritz 7 do NOT, and every pair involving those two
+still returns `unknown` — which rule 26 forbids reading as `disjoint`. Each
+stopped where its honest material stopped, and each one's reason is written
+beside its entry in `PER_DESTINATION`. Palm Springs still has no Mains:
+*"nothing requires a fork or your full attention"* is a sentence she wrote
+about the party, not an inference about labour, so it survived both rulings and
+is hers alone to revisit.
+
+**THE SENTENCE THIS REPLACES, KEPT PER RULE 14.** It read *"three are still
+under the floor… Palm Springs 11, St. Moritz 7 and Oaxaca 4 do NOT."* What beat
+it was not a change of principle but the remedy that paragraph itself
+prescribed — a sourced research pass, `docs/oaxaca-1954-food.md`, which took
+Oaxaca 4 → 36 on 2026-08-28. Thirty-six of its thirty-seven blocks landed;
+chichilo negro was cut by founder ruling and is recorded as cut in that file
+rather than deleted from it. Oaxaca was the LAST room under the floor, so
+`unknown` on the second number now belongs to Palm Springs and St. Moritz
+alone — 105 of 153 pairs were measurable before it landed and 120 are after,
+fifteen of them Oaxaca's.
 
 ---
 
@@ -1213,11 +1224,45 @@ rulings and is hers alone to revisit.
 
 ### Appetizers
 - Orange slices with worm salt, off the mezcal plate · B · · L, D
+- Chapulines — grasshoppers toasted on the comal with garlic and chile, and a lime · M · summer · L, D
+- Tostadas with chintextle — the smoked chile paste, ground on the metate and spread thin · M · · L, D
+- Quesillo — the cheese that comes in a ball, pulled apart in strings at the table · B · · L, D
+- Memelas — thick oval tortillas pinched at the rim, with asiento and beans · M · · L, D
+- Empanadas de amarillo — masa folded on the comal over chicken and yellow mole · M · · L, D
+- Molotes — masa rolled around potato and chorizo and fried until it cracks · M · · L, D
+- Chicatana salsa — the winged ants toasted and ground in the molcajete with chile · M · early summer · L, D
+- Quesadillas of squash blossom, folded on the comal over quesillo · M · summer · L, D
+- Tortillas, made this morning, still warm if you come early enough · M · · L, D
 
 ### Mains
 - The mole, going since yesterday · M · · L, D
+- Mole coloradito — the brick-red one, ground with almonds and oregano, over pork or chicken · M · · L, D
+- Mole amarillo, with chochoyotes — the yellow one, hierba santa through it, masa dumplings dropped in near the end · M · · L, D
+- Mole verde — green chiles, cilantro and green tomato, with pork and white beans · M · · L, D
+- Mole rojo — the same family as the black one, the chiles less toasted and the heat further forward, with chicken · M · · L, D
+- Manchamanteles — the sweet one, plantain and pineapple cooked into it with pork, and it stains the cloth · M · · L, D
+- Estofado — the braise with almonds, olives and capers, over chicken and rice · M · · L, D
+- Segueza — yellow corn broken on the metate and simmered with guajillo and goat, and its name means feast · M · · L, D
+- Higaditos, the morning after — beaten egg set in the broth the mole was cooked in, with turkey, in bowls · M · · L, D
 - Tamales, because there were always tamales · M · · L, D
-- Tortillas, made this morning, still warm if you come early enough · M · · L, D
+- Tamales de chepil — masa with the fresh herb worked straight in, steamed, nothing inside · M · · L, D
+- Tamales de frijol — ground beans and asiento worked into the masa, and they keep · M · · L, D
+- A tlayuda — the big hard tortilla, reheated, with asiento and a chile salsa on it · M · · L, D
+- Tasajo — beef salted and dried in long sheets, on the coals a minute and torn up · M · · L, D
+- Cecina enchilada — pork in thin sheets rubbed with chile, on the same coals · M · · L, D
+- Sopa de guías, with chochoyotes — the whole squash plant in one pot, shoots, flowers and young corn · M · summer · L, D
+- Black beans from the pot, with an avocado leaf in it · M · · L, D
+- Arroz con chepil — rice cooked through with the herb, and it goes under everything · M · · L, D
+- Chiles pasilla oaxaqueño, stuffed and battered — the smoked chile filled with shredded pork, olives and capers · M · · L, D
+- Chiles de agua, stuffed with quesillo — the green chile that grows only in this valley, roasted and peeled · M · · L, D
+
+### Desserts
+- Nicuatole — corn set firm with cinnamon and piloncillo in a clay dish, and cut · M · · L, D
+- Pan de yema — the egg-yolk bread, from the village baker, for dunking · B · · L, D
+- Buñuelos, fried and sugared, made in quantity · M · winter · L, D
+- Nieve de leche quemada — milk cooked until it browns, then frozen · M · · L, D
+- Nieve de jiotilla — the cactus fruit off the dry hills, frozen · M · · L, D
+- Calabaza en dulce — yellow squash cooked down in piloncillo syrup, with figs in it · M · fall · L, D
 
 ## Palm Springs
 

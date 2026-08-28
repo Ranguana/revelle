@@ -48,6 +48,10 @@ this file did not happen, however clearly it was said somewhere else.
 | 2026-08-27 | **`audit-matrix.mjs` DOES NOT NOTICE WHEN A FLIP DISSOLVES A DECLARED TWIN.** Found by the St. Moritz `starts` measurement above. The script checks that no UNDECLARED pair sits below the gate, and that no room is declared in two twin pairs. It does **not** check that a DECLARED twin is still below the gate. So flipping `st-moritz-1984.starts` takes `st-moritz-1984 / acapulco-1959` from 2 to 3, the pair silently drops off the DECLARED TWINS list, reappears in ZERO MARGIN with no note that it used to be a twin, and `twinRule.declared` is left describing a relationship that no longer exists — while every downstream reader believes a voice tiebreak is in force between two rooms the matrix now routes apart on its own. Rule 23 exactly: a mechanism that invites misreading is a defect even when it works. The fix is one loop — for each declared pair, if `d >= gate`, say so — and it belongs in the script. | audit, this session | **NOT FIXED. `scripts/audit-matrix.mjs` is another agent's file this session.** No flip has been applied, so nothing is currently mis-declared; this is a trap laid for the next person who applies one. |
 | 2026-08-27 | **A DECLARED TWIN'S `voiceAffinity` IN THE MATRIX IS NOW STALE, AND IT IS THE ONE THAT MATTERED.** `data/destination-matrix.json` records `st-moritz-1984 / acapulco-1959` with `voiceAffinity: null`, and `check:matrix` prints *"UNMEASURABLE — a voice is unwritten"*. `docs/voices-draft/VERIFICATION.md` section 6 recorded the same thing as outstanding debt: *"both twin pairs remain zero-of-two written."* **With ST. MORITZ, 1984 authored it is measurable, and it passes: 0.426 against the strict ceiling of 0.58**, `npm run check:voices -- --facets acapulco-1959 st-moritz-1984`. Twin condition 2 is satisfied for the first time since the pair was declared. The number is NOT written into the matrix by this pass: the file is founder territory and hand-typed, and the room whose voice produces the number is not wired. | measurement, this session | **REPORTED, NOT APPLIED.** Owed on the day the room is wired: update that one field, and the remaining `null` is `aspen-1994 / oaxaca-1954`, which is measurable too (0.517) and equally stale. |
 | 2026-08-27 | `check:voice-output`'s NEVER-RULE CHANNEL IS SPELLING-LITERAL AND DOES NOT NORMALISE DIACRITICS. Fourth room running against the same tool, and this is the new finding: `"Never apres."` catches `apres` and does **not** catch `après`. The `insteadOf` channel caught both only because ST. MORITZ's lexicon lists both spellings explicitly, which is why the gap would have been invisible to anyone reading the summary line rather than the two channels separately. Worked around in `destinations.ts` with a second `never` clause carrying the accented spelling. **Re-confirmed for the fourth time, unchanged:** the tool does not read `voice.banned` (this room's `amazing`, `memories`, `iconic`, `vibe` and `guys` all pass clean), and it has no punctuation pass (a line with three exclamation marks returns "No banned shapes found", so ST. MORITZ's *"exclamation earned at the door and at the toast"* — the only punctuation licence in the library — is unenforceable there). **What DID work:** writing every refusal as its own "never" per the 2026-08-27 row above took the catch rate to **eight of eight** on the displaced-terms channel and eight of nine on the never-rule channel before the accent fix, first time out. | audit, this session | **worked around in `destinations.ts`, not fixed in the tool.** The fix is a fold of both channels through the same normalisation the displaced-terms channel already has. |
+| 2026-08-28 | **OAXACA'S FOOD LANDS — 4 → 36, AND IT WAS THE LAST ROOM UNDER `EVIDENCE_FLOOR`.** `docs/oaxaca-1954-food.md` is a sourced research pass over the Valles Centrales in 1954 — 37 dish blocks, each with a period check, a rule-6 tier, a border test against Acapulco, a border test against Oaxaca's OWN other regions, and a founder question. **36 landed**; chichilo negro is cut on her ruling — *"no funeral mole"* — and is kept in that file marked CUT rather than deleted (rule 14). Her four existing lines are preserved verbatim and none was rewritten. `PER_DESTINATION` moved 4 → 36 in the same commit. **Rule 25.2's second clause applied to all 32 new lines**: each names the dish and then says plainly what it is, on Acapulco's morisqueta pattern, because a member is reading a card. | authoring + audit, this session | **LANDED AND VERIFIED.** Committed parser 1118 → 1150 lines matched, 1053 → 1085 deduped rows, 0 skipped, 0 level disagreements, season disagreements 3 → 3. **32 new lines produced 32 new rows — zero deduped onto any existing room.** Oaxaca clears the floor at 36; measurable pairs 105 → 120 of 153. |
+| 2026-08-28 | **THE SMASHED CLAY PLATE IS OWED TO THE BANK AS A `host_act`, AND NO ROW WAS CREATED.** Founder ruling on the buñuelo: the December season is accepted and the plate is a HOST ACT rather than part of the dish. So `Buñuelos, fried and sugared, made in quantity` landed in `docs/dishes.md` saying nothing about a plate, and the plate — you eat the buñuelo, you make a wish, you throw the clay plate on the ground, and the year's old business goes with it — has nowhere to live yet. `bank_kind = 'host_act'` is the slot, `scripts/seed-bank.mjs` is another agent's file this session, and rule 27 wants twenty of these per room against Oaxaca's current handful. Rule 29's shape: its absence from the bank is an authoring gap, not a ruling. | founder ruling + this session | **RECORDED AS OWED. Nothing created.** The dish half is landed; the gesture half is a bank pass. |
+| 2026-08-28 | **`December` IS NOT A SEASON WORDING THE CATALOGUE HOLDS, AND ONE WAS NOT ADDED.** The buñuelo's season binds to the valley's December feast weeks. `SEASONS` in `scripts/catalogue-vocabulary.mjs` is matched exactly and its own header says a new wording is a decision, not a default — so the line was written `winter`, the closest true statement `season_band` can make, which is also the call Havana's own `Buñuelos in anise syrup · M (winter)` already made in this document. Flagged rather than quietly widened. | this session | **MAPPED, NOT ADDED.** If she wants December as its own wording it is a `SEASONS` entry and a `SEASON_NARROWED` decision, and that file was not touched. |
+
 
 ## Recorded as truth, not as a failure
 
@@ -2210,3 +2214,192 @@ reaches `DATABASE_URL is not set` and stops there. What was **not** verified is
 anything only Postgres can see — enum literals, CHECK constraints, bind counts
 on the insert path. That is `npm run smoke:seeders` in CI, against the
 `postgres:17` service container, and it has not run here.
+
+---
+
+# 2026-08-28 (later) — OAXACA LANDS, AND THE LAST ROOM CLEARS THE FLOOR
+
+`docs/oaxaca-1954-food.md` → `docs/dishes.md`. The room goes **4 → 36** and
+`PER_DESTINATION` in `scripts/seed-dishes.mjs` moved in the same commit, because
+`seed:dishes` is in the pre-deploy chain and a manifest that disagrees with the
+document fails the run. A sibling watched that guard fire for real.
+
+## The three founder rulings this pass was written under
+
+1. **CHICHILO NEGRO IS CUT** — *"no funeral mole."* Thirty-six of thirty-seven
+   land. The block is kept whole in the research file, marked CUT at its
+   heading, because rule 14 preserves superseded reasoning and a deleted
+   argument gets re-made. It is not to be reinstated from the evidence still
+   sitting in it.
+2. **BUÑUELOS STAND**, both attached questions resolved. December is accepted;
+   the smashed clay plate is a HOST ACT and not part of the dish. The dish
+   landed and says nothing about a plate. The plate is owed to the bank and is
+   in the ledger above as owed.
+3. **NAMING IS SETTLED** and is now rule 25.2 — a dish's own name is a table
+   word in any language, and **the name never works alone.** Every one of the
+   thirty-two new lines names the dish and then says plainly what it is.
+
+## The four existing lines, and what happened to each
+
+**Nothing was rewritten.** Rule 14 licenses a rewrite that improves a line while
+keeping her sentence's substance; none of the four needed one, and the research
+file's own verdict on three of them is *"her line stands; this block is its
+evidence."*
+
+| her line | what the research pass did to it |
+|---|---|
+| `Orange slices with worm salt, off the mezcal plate` | **kept verbatim.** Its block's founder question is *"none. This line already exists and the research confirms it rather than changing it."* The confirmation is a 1931 UNAM thesis on the *chilocuiles* placing worm-flavoured mezcal at two valley towns — twenty-three years before the room. |
+| `The mole, going since yesterday` | **kept verbatim. It is hers and it is the room.** Its block asked a SCHEMA question, not a copy one: does the pool carry this line AND a separate `mole negro` row? Taken as **her line IS the negro**, with coloradito, amarillo, verde, rojo and manchamanteles named beside it. That reading changes nothing about her sentence, which is why it could be taken rather than asked again. |
+| `Tamales, because there were always tamales` | **kept verbatim.** Its block is *Tamales in banana leaf, with mole negro inside* and its founder question is *"none. Her line stands; this block is its evidence."* So her line IS the banana-leaf mole-negro tamal, with chepil and frijol named beside it. |
+| `Tortillas, made this morning, still warm if you come early enough` | **kept verbatim.** Its block's argument is that this is not a tortilla line at all — it is a line about a MORNING, and *if you come early enough* is the clause no other room can take. |
+
+**The cap clause that stopped the last pass is retired by her, not by me.**
+`PER_DESTINATION`'s old Oaxaca comment read her `never` line — *"the dishes may
+always be named — mole, tamales, tortillas, mezcal are table words. They may
+never be adjectived"* — as capping each table word at one dish. Her ruling of
+2026-08-28: *"the table-word rule governs voice and copy, not the schema… 'Mole
+negro' versus 'mole coloradito' is taxonomy, not adjectiving; Oaxaca has seven
+moles and the catalogue may name every one."* The old comment is kept whole
+beside the new one.
+
+## Collisions — every name checked before it was written, and counted after
+
+The pool dedupes on `name + course` exactly, so a collision is an exact name
+match — but the ones worth checking are the SEMANTIC ones, and three rooms were
+swept by hand before any line was written.
+
+| where | what it holds | how Oaxaca's line resolves against it |
+|---|---|---|
+| **Havana** | `Buñuelos in anise syrup · M (winter)` | **The one real near-collision, and they do not dedupe.** Havana's is the Cuban form — fried dough in anise syrup. Oaxaca's is `Buñuelos, fried and sugared, made in quantity`, and the thing that makes it Oaxacan (the plate) is a host act and is not on the line. Two dishes, two names, two rows. Named here rather than resolved silently because Oaxaca/Havana is the founder's validation pair and a collision there does real damage. |
+| **Havana** | `Cuban tamales`, `Tamal en cazuela` | No collision. Oaxaca's three are `Tamales, because there were always tamales`, `Tamales de chepil`, `Tamales de frijol`. |
+| **Havana** | black beans, black beans and rice, flan ×2, plantains ×4, churros, papaya with lime, rice pudding, fresh cheese | No collision. Oaxaca's bean line is `Black beans from the pot, with an avocado leaf in it` — the leaf is the whole claim, and the research file argues it as the closest call in the mains. **No flan, no plantain, no churro and no rice-pudding line was written**: the research file cut flan explicitly, on Acapulco's reasoning that this room's ending has nowhere to put it. |
+| **Acapulco** | `Morisqueta — white rice, beans from the pot, whatever came out of the water on top` | No collision, and this is where the border gets TESTED rather than asserted. Oaxaca's rice is `Arroz con chepil` — cooked *with* a valley herb, going under a mole. Same grain, two countries of the plate. |
+| **Acapulco** | chicken with chile, chile as a seasoning word, flan, plantains, coconut ice, cocadas, paletas | No collision. Cocadas were cut by the research pass on the ground that **this pass is the valley and cocadas are the coast** — Acapulco's own file predicted that collision and it did not happen because nothing coastal was written. Not one coastal Oaxacan dish is in the file. |
+| **New Orleans** | several rice-and-beans lines | No collision on any name. |
+| **Big Sur** | `Brownies from the pan` | Nothing near it; no Oaxacan dessert is a tray bake. |
+
+**And then it was counted, because reading is not checking (rule 24).**
+**32 new lines produced 32 new deduped rows.** Zero collapsed onto an existing
+dish in any room. Had any of the seven above been a real collision the row count
+would have moved by less than the line count, and that is the only instrument
+that would have caught it.
+
+## The parse (rule 24), before and after, committed instruments
+
+| | before | after |
+|---|---|---|
+| lines matched | 1118 | **1150** |
+| deduped rows (name + course) | 1053 | **1085** |
+| lines skipped | 0 | **0** |
+| lines skipped, named | none | **none** |
+| season disagreements | 3 | **3** |
+| level disagreements | 0 | **0** |
+| Oaxaca, per `PER_DESTINATION` | 4 | **36** |
+
+The three season disagreements are the known ones and are untouched: `Ambrosia`
+(Westhampton unseasoned / New Orleans winter), `Strawberry shortcake` (Nantucket
+early summer / Vegas unseasoned / New Orleans spring), `Fried chicken`
+(Catskills summer / New Orleans unseasoned). **No Oaxaca line is in that list**,
+which follows from the row above: a season can only disagree across two rooms
+serving the same dish, and no Oaxaca dish is served anywhere else.
+
+## THE FLOOR RESULT — the founder's validation case, measured
+
+`npm run check:voices`, the committed instrument.
+
+| | before | after |
+|---|---|---|
+| pairs measurable on the second number | 105 of 153 | **120 of 153** |
+| pairs returning `unknown` | 48 | **33** |
+| rooms with no measurable pool | oaxaca-1954 (4), palm-springs-1965 (11), st-moritz-1984 (7) | **palm-springs-1965 (11), st-moritz-1984 (7)** |
+
+**Fifteen pairs move from `unknown` to measurable** — every Oaxaca pair except
+the two whose OTHER room is still under the floor. Oaxaca was the last room
+under `EVIDENCE_FLOOR`, so from here `unknown` on the second number means Palm
+Springs or St. Moritz and nothing else.
+
+**OAXACA / HAVANA — the founder's own validation case — reads tone `0.730`,
+deliverables `0.000`.** Tone-close and deliverables-disjoint: two rooms that are
+neighbours in register and completely distinct in what they serve, which is
+exactly the verdict rule 26 was written to make sayable, and it is now **ADMITTED
+ON THE SECOND NUMBER AND RECORDED AS SUCH** rather than resting on an `unknown`
+that must not be read as `disjoint`. Structural distance 3, monitor tier, ok.
+
+**ACAPULCO / OAXACA reads tone `0.101`, deliverables `0.000`.** The two Mexican
+rooms share **not one row**, measured rather than asserted, and the mandatory
+border — *heat and masa on one side, cold and lime on the other* — is now
+checkable by an instrument instead of by an argument.
+
+## What did NOT land, and why, every one of them
+
+- **Chichilo negro.** Founder ruling, above. The only block of the thirty-seven
+  held back.
+- **The smashed clay plate.** A host act by her ruling, not a dish. In the
+  ledger as owed to `bank_kind = 'host_act'`.
+- **Everything in the research file's own "Cut, and why" list**, unchanged by
+  this landing and not re-litigated: pozole in every form (Mixteca, on a firmer
+  citation than the founder had), caldo de piedra (Chinantec — a founder lead,
+  cut with the reason written down), totopos and garnachas (Istmo), tetelas
+  (Mixteca), chileajo (three attributions, none of them the valley), entomatadas
+  and enfrijoladas (documented Oaxacan and cut on rule 30 — a form the whole
+  country makes buys this room no distinction), barbacoa, guacamole, cocadas
+  (the coast, and Acapulco's), mole poblano and chiles en nogada (Puebla), flan,
+  and the market grill alley and the nieve garden, both of which fail period.
+- **Everything in its "Held, not cut" list** — marquesote, ante, empanadas de
+  Corpus, conserva de tejocote, the seven Valles Centrales breads Larousse
+  names, gusanos de maguey as a dish, frijoles con hierba de conejo, piedrazos,
+  tesupos. Real positive evidence, not enough of it, and rule 29 says their
+  absence is the catalogue being unfinished rather than a ruling. **The breads
+  are the most promising unworked seam in the room.**
+- **Every drink.** Mezcal, café de olla, chocolate de agua, tejate, atole,
+  champurrado. `docs/drink-explosion.md` records this room at zero drinks, which
+  is a real gap and a separate pass; writing chocolate into the dish pool would
+  fill a member's dish slot with the drinks gap.
+- **Every place name.** Etla, Teotitlán del Valle, Santo Domingo Tomaltepec,
+  San Agustín Yatareni, the two city markets. Load-bearing evidence, all of it
+  house-only under rule 25.2, all of it still in the research file.
+
+## RULINGS OWED — the founder questions the research file raised and the landing did not answer
+
+Rule 13 says dishes are POOL content that stocks itself and that she VETOES at
+the desk rather than consenting in advance, so none of these held a line back.
+They are carried here so the veto is an informed one.
+
+- **Three tamal rows** (hers, chepil, frijol) — taxonomy or her one line.
+- **Rojo and coloradito** are close enough that a member might not tell them
+  apart. Both rows, or one?
+- **Manchamanteles** carries a live Oaxaca/Puebla dispute. Landed as `regional`
+  with the dispute recorded, on the reading that both claimants are named in
+  Mexican sources and two of them put it on the Oaxacan seven-list.
+- **Estofado and manchamanteles are two answers to one slot** — which dish is
+  the seventh mole. Both are written; neither was adjudicated.
+- **Tasajo and cecina** are the same gesture at two animals; **memelas and
+  squash-blossom quesadillas** are the same technique at two fillings. She may
+  want one of each pair.
+- **Arroz con chepil** — does she want a rice line in a room whose starch
+  argument is masa?
+- **The avocado leaf** — is it enough to make a national bean pot a Oaxacan
+  line?
+- **Nieve de leche quemada** is the closest this room comes to Acapulco's frozen
+  shelf. Kept on material and register; it is the line to cut if she reads it as
+  too close.
+- **Chicatana salsa** exists for two weeks a year and `season` cannot hold two
+  weeks; it landed `early summer`.
+- **Nieve de jiotilla** landed with an empty season, flagged rather than
+  guessed.
+- **Three of the six desserts carry a season.** Is a seasonal dessert shelf what
+  she wants for a room whose premise is an undated Sunday?
+- **Higaditos** — a dish whose whole identity is THE MORNING AFTER, in a room
+  whose premise is an afternoon that recedes at dusk. The research file calls it
+  the best fit in the file and flags that as a strong claim.
+
+## THE DATABASE HALF WAS NOT RUN, AND SAYING SO IS THE POINT
+
+`initdb` fails on this machine — `shmget … Cannot allocate memory` — so there is
+no Postgres to seed against. The parser, the `PER_DESTINATION` manifest, the
+level-disagreement check, the duplicate-within-a-room check, the season-wording
+map and slug assignment all ran and all pass; they are every gate before the
+connection. What was **not** verified is anything only Postgres can see — enum
+literals, CHECK constraints, bind counts on the insert path. That is
+`npm run smoke:seeders` in CI against the `postgres:17` service container, and it
+has not run here.

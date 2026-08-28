@@ -344,7 +344,43 @@ const PER_DESTINATION = {
   // This room is below EVIDENCE_FLOOR (12) and is reported as such. The fix
   // that worked for Acapulco is the fix here: a sourced research pass, or a
   // sheet. Not padding.
-  "Oaxaca": 4,
+  //
+  // ── 2026-08-28: 4 -> 36. THE FIX THE PARAGRAPH ABOVE NAMED, TAKEN. ──
+  //
+  // The paragraph is kept whole (rule 14) and is superseded on its number by
+  // the exact remedy it prescribed: `docs/oaxaca-1954-food.md` is a sourced
+  // research pass over the Valles Centrales in 1954 — thirty-seven dish blocks,
+  // each carrying a period check, a rule-6 tier, a border test against Acapulco
+  // and a border test against Oaxaca's own other regions, and its own founder
+  // question. THIRTY-SIX LAND. Chichilo negro is cut by founder ruling — "no
+  // funeral mole" — and is recorded as cut in that file rather than deleted
+  // from it, so nobody reinstates it from the evidence still in its block.
+  //
+  // ITS CAP CLAUSE IS RETIRED BY THE FOUNDER, NOT BY ME. The paragraph read her
+  // `never` line as capping each table word at one dish. Her ruling of
+  // 2026-08-28, quoted in that file: "the table-word rule governs voice and
+  // copy, not the schema… 'Mole negro' versus 'mole coloradito' is taxonomy,
+  // not adjectiving; Oaxaca has seven moles and the catalogue may name every
+  // one." So `mole` is six lines and `tamales` is three, and what the rule
+  // still forbids — `authentic mole`, `traditional tamales` — is copy and is
+  // nowhere in the document.
+  //
+  // HER FOUR LINES ARE PRESERVED VERBATIM, none of them rewritten: the mezcal
+  // plate's orange slices, "The mole, going since yesterday", "Tamales, because
+  // there were always tamales" and the tortillas. The research file rewrote
+  // them WITH EVIDENCE rather than replacing them, and its own verdict on three
+  // of the four is "her line stands; this block is its evidence".
+  //
+  // WHAT IS STILL MISSING IS DRINKS. Mezcal, café de olla, chocolate de agua,
+  // tejate, atole and champurrado are all documented valley things and all of
+  // them are DRINKS; `docs/drink-explosion.md` records this room at zero. That
+  // gap is real and is a separate pass — writing chocolate into the dish pool
+  // would fill a member's dish slot with the drinks gap.
+  //
+  // At 36 this room clears EVIDENCE_FLOOR (12) and it is the LAST room to do
+  // so, so rule 26's second number now speaks for every Oaxaca pair — including
+  // Oaxaca/Havana, the founder's own validation case.
+  "Oaxaca": 36,
   // 7 -> 11, ONE UNDER THE FLOOR, AND THE SHORTFALL IS DELIBERATE.
   // Palm Springs still has NO MAINS, and that is unchanged by the 2026-08-28
   // rulings: they retired an inference about LABOUR, and "nothing requires a
