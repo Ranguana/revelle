@@ -196,6 +196,36 @@ services:
     # was in this chain and not in the route's.
     #
     # A non-zero exit FAILS THE DEPLOY and the old instance keeps serving.
+    # ── THIS CHAIN WAS NOT ON THE SERVICE, 2026-08-08 to 2026-08-29 ─────
+    #
+    # For the whole life of the service the live preDeployCommand was exactly
+    # `npm run migrate`. Not a truncated version of the chain below — the
+    # first line of it, and nothing after. Every seeder here had never run on
+    # deploy, ever.
+    #
+    # It surfaced when six wired destinations could not be published: five had
+    # no world_voice row at all and the sixth had one draft from some other
+    # path. The rooms were authored, tested, wired and seeded into `world` by
+    # hand; nothing had ever written their voices, because the step that
+    # writes them was in this file and not on the service.
+    #
+    # Rule 20, at full price: THE FILE THAT DESCRIBES THE DEPLOY IS NOT THE
+    # DEPLOY. This block's own comment already warned about it in the smaller
+    # case — `seed:bank` in the chain and not in the route's, "for four days
+    # while it did not" — and the larger case was sitting underneath it the
+    # whole time, because nobody read the live value.
+    #
+    # HOW TO CHECK, and it takes one call:
+    #
+    #   GET https://api.render.com/v1/services/<id>
+    #     -> .serviceDetails.envSpecificDetails.preDeployCommand
+    #
+    # HOW TO SET IT. PATCH the same URL with the command at
+    # `serviceDetails.preDeployCommand` — NOT nested under
+    # envSpecificDetails, which is where the GET returns it. Sending it
+    # nested returns HTTP 200 and changes nothing, so a caller who trusts the
+    # status code will believe it worked. Read it back after writing it.
+    #
     preDeployCommand: >-
       npm run migrate &&
       npm run seed:destinations &&
