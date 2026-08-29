@@ -71,6 +71,17 @@ jobs:
       # — the same rule render.yaml's buildCommand follows.
       - run: npm ci
 
+      # `next typegen` FIRST, because PageProps and LayoutProps are GENERATED.
+      #
+      # Next 16 writes those globals into .next/types during a build. A bare
+      # `tsc --noEmit` never generates them, so this step failed with ~20
+      # "Cannot find name 'PageProps'" errors on every commit for weeks —
+      # while Render stayed green, because `next build` generates them on the
+      # way past. Red CI and green deploys, and the red was pure noise that
+      # trained everyone to ignore the one signal that would have carried a
+      # real failure. Rule 15: an instrument that always says the same thing
+      # is not measuring anything.
+      - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm run lint
       - run: npm test
