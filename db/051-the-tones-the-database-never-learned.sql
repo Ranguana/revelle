@@ -57,6 +57,37 @@ insert into facet (dimension_code, code, label, description, provenance) values
   ('voice_tone', 'up_early_anyway', 'However late it went, they are up and out in the morning', '', 'quiz')
 on conflict (dimension_code, code) do nothing;
 
+-- ── FIRST, THE OPTION ITSELF — db/016's TEMPLATE PREDATES THIS ───────
+--
+-- db/037 added quiz_option and pointed quiz_option_facet at it:
+--
+--   foreign key (quiz_field, option_code)
+--     references quiz_option (quiz_field, option_code)
+--
+-- db/016 added `good_natured` with three inserts and no fourth, because in
+-- db/016's world quiz_option did not exist. Copying that template verbatim
+-- fails now with a foreign key violation, which is exactly what it did on
+-- the first attempt at this migration. A TEMPLATE IS A SNAPSHOT OF THE
+-- SCHEMA IT WAS WRITTEN AGAINST; the schema moved underneath it.
+--
+-- quiz_option "carries no meaning of its own" (db/037): it is the identity
+-- of an answer a host can give, and everything the answer MEANS still lives
+-- in quiz_option_facet below.
+
+insert into quiz_option (quiz_field, option_code) values
+  ('voice_tones', 'bigger_every_telling'),
+  ('voice_tones', 'closes_the_bar'),
+  ('voice_tones', 'eat_before_you_speak'),
+  ('voice_tones', 'feeds_you_first'),
+  ('voice_tones', 'finishes_your_sentences'),
+  ('voice_tones', 'fluent_in_everyone'),
+  ('voice_tones', 'marvels_out_loud'),
+  ('voice_tones', 'shows_you_things'),
+  ('voice_tones', 'the_same_stories'),
+  ('voice_tones', 'toasts_everything'),
+  ('voice_tones', 'up_early_anyway')
+on conflict (quiz_field, option_code) do nothing;
+
 insert into quiz_option_facet (quiz_field, option_code, facet_id, answer_polarity)
 select 'voice_tones', f.code, f.id, 'positive'
   from facet f
@@ -127,6 +158,7 @@ do $$
 declare
   n_tones   integer;
   n_weights integer;
+  n_options integer;
 begin
   select count(*) into n_tones
     from facet
@@ -139,6 +171,13 @@ begin
    where t.dimension_code = 'voice_tone'
      and t.code in ('bigger_every_telling', 'closes_the_bar', 'eat_before_you_speak', 'feeds_you_first', 'finishes_your_sentences', 'fluent_in_everyone', 'marvels_out_loud', 'shows_you_things', 'the_same_stories', 'toasts_everything', 'up_early_anyway');
 
+  select count(*) into n_options
+    from quiz_option
+   where quiz_field = 'voice_tones' and option_code in ('bigger_every_telling', 'closes_the_bar', 'eat_before_you_speak', 'feeds_you_first', 'finishes_your_sentences', 'fluent_in_everyone', 'marvels_out_loud', 'shows_you_things', 'the_same_stories', 'toasts_everything', 'up_early_anyway');
+
+  if n_options <> 11 then
+    raise exception 'expected 11 quiz_option rows, found %', n_options;
+  end if;
   if n_tones <> 11 then
     raise exception 'expected 11 tones, found %', n_tones;
   end if;
