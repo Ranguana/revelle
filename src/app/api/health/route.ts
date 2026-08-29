@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 
 import { query } from "@/lib/db";
 import { DESTINATIONS } from "@/lib/destinations";
+import { staffAllowlist } from "@/lib/staff-allowlist";
 import { isServable } from "@/lib/voice-check";
 
 /**
@@ -91,12 +92,36 @@ export async function GET(request: Request): Promise<Response> {
   // Retired rows are excluded on both sides: a retired room is deliberately
   // absent from the dashboard, so counting it here would report agreement
   // where the screen shows none.
-  const rows = await query<{ slug: string; status: string }>(
-    "select slug::text as slug, status::text as status from world order by slug"
+  // Voices are joined in because "a destination is published only if it has a
+  // published voice" (src/lib/desk/coverage.ts). A report counting world rows
+  // alone said `agree: true` about a catalogue that could not issue a single
+  // Revelle — the defect this route exists to end, one level down.
+  const rows = await query<{
+    slug: string;
+    status: string;
+    voice: string | null;
+    drafts: string;
+  }>(
+    `select w.slug::text as slug,
+            w.status::text as status,
+            (select 'v' || v.version from world_voice v
+              where v.world_id = w.id and v.status = 'published'
+              limit 1) as voice,
+            (select count(*)::text from world_voice v
+              where v.world_id = w.id and v.status = 'draft') as drafts
+       from world w
+      order by w.slug`
   );
   const live = rows.filter((r) => r.status !== "retired").map((r) => r.slug);
   const liveSet = new Set(live);
   const servableSet = new Set(servable);
+
+  // A look and no voice: it cannot hold an invitation, a menu card or a prep
+  // list, because everything in a Revelle is written in the room's voice and
+  // there is no fallback voice by design.
+  const voiceless = rows
+    .filter((r) => r.status !== "retired" && !r.voice)
+    .map((r) => `${r.slug} (${r.drafts} draft${r.drafts === "1" ? "" : "s"} waiting)`);
 
   const missing = servable.filter((s) => !liveSet.has(s));
   const extra = live.filter((s) => !servableSet.has(s));
@@ -114,7 +139,32 @@ export async function GET(request: Request): Promise<Response> {
       registry: servable.length,
       worlds: live.length,
       seeded: missing.length === 0,
-      agree: missing.length === 0 && extra.length === 0,
+      // Rows landing is not a usable catalogue. A voiceless room is not
+      // servable, so it cannot count toward agreement.
+      agree:
+        missing.length === 0 && extra.length === 0 && voiceless.length === 0,
+      voices: live.length - voiceless.length,
+      voiceless,
+      // ── WHY THE DOOR IS DESCRIBED HERE ──────────────────────────────
+      //
+      // The sign-in form returns the SAME response whether the address is
+      // staff, a member, an applicant or unknown, and it returns ok even when
+      // the mail fails — deliberate anti-enumeration (src/lib/login.ts). The
+      // real reason goes to a log. When the only person who can read that log
+      // is locked out by the thing she is trying to diagnose, the design is
+      // airtight and useless at once.
+      //
+      // So: COUNTS AND BOOLEANS, never an address and never a key. This says
+      // whether the door is configured, not who may walk through it, and it
+      // grants nothing — it is strictly a smaller read than the digest.
+      door: {
+        staffCount: staffAllowlist().length,
+        mailKeySet: Boolean((process.env.RESEND_API_KEY ?? "").trim()),
+        mailFromSet: Boolean((process.env.MAIL_FROM ?? "").trim()),
+        // Not a secret; it is the host the magic link points AT, and a wrong
+        // value here sends a working link to a dead address.
+        appUrl: process.env.APP_URL ?? null,
+      },
       // In the registry, no row yet. The seeder has not run, or not fully.
       missing,
       // A row with no authored room behind it. Usually a stub or a rename.
