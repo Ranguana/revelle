@@ -86,10 +86,13 @@ import {
 import { matrixDistance, isDeclaredTwin, differingFacets } from "../src/lib/matrix.ts";
 import {
   deliverableClaims,
+  dishClaims,
+  drinkClaims,
   overlapFraction,
   deliverablesVerdict,
+  roomEvidence,
   DELIVERABLES_CLOSE,
-  EVIDENCE_FLOOR,
+  EVIDENCE_FLOORS,
 } from "./deliverables.mjs";
 import * as CATALOGUE from "../src/lib/destinations.ts";
 
@@ -143,6 +146,8 @@ const facetsIdx = argv.indexOf("--facets");
 
 const ALL = authoredRooms();
 const CLAIMS = deliverableClaims();
+const DISHES = dishClaims();
+const DRINKS = drinkClaims();
 
 /* Rule 24, in the direction that catches a discovery rule matching too little:
  * every key in DESTINATION_TONES must have been found. */
@@ -342,7 +347,7 @@ for (let i = 0; i < rooms.length; i++)
     const twin = isDeclaredTwin(a.key, b.key);
     const ceiling = voiceCeiling(distance, twin);
     const toneBreaches = score >= ceiling.limit;
-    const overlap = overlapFraction(CLAIMS.get(a.key), CLAIMS.get(b.key));
+    const overlap = overlapFraction(a.key, b.key, CLAIMS);
     const v = deliverablesVerdict(toneBreaches, overlap);
     pairs.push({
       a,
@@ -443,8 +448,88 @@ const unknown = pairs.filter((p) => p.overlap === null);
 const ovs = measurable.map((p) => p.overlap).sort((x, y) => x - y);
 console.log(`\nDELIVERABLES (shared dishes and drinks, as a fraction of the smaller pool)`);
 console.log(
-  `   ${measurable.length} of ${pairs.length} pairs measurable · ${unknown.length} UNKNOWN ` +
-    `(a room under the evidence floor of ${EVIDENCE_FLOOR} claims)`
+  `   FLOORS ARE PER DECLARED FOOD IDENTITY (CLAUDE.md rule 30): ` +
+    Object.entries(EVIDENCE_FLOORS)
+      .map(([k, v]) => `${k} ${v}`)
+      .join(" · ") +
+    `.\n   The room declares in src/lib/food-identity.ts; the floor enforces in ` +
+    `scripts/deliverables.mjs.\n   A table room at 14 is SHORT where an incidental room ` +
+    `at 7 is COMPLETE, and one number cannot say that.`
+);
+
+/* ── EVERY ROOM AGAINST ITS OWN FLOOR ────────────────────────────────
+ *
+ * Rule 24, and the reason this is a table rather than a sentence: the only
+ * honest way to report a per-identity floor is per room, because the same
+ * count means different things at two rooms. Printing "two rooms are under
+ * twelve" was true and useless — it named Palm Springs and St. Moritz as
+ * defects when both of them REFUSE a seated meal in the founder's own sheets.
+ *
+ * `roomEvidence` throws for a room that has not declared, and it is not
+ * caught: a reporter that skipped an undeclared room would be the silent
+ * default the ruling forbids, printing a clean table with a hole in it. */
+const evidence = rooms.map((r) => roomEvidence(r.key, CLAIMS));
+const shortRooms = evidence.filter((e) => e.short);
+console.log(`\n   EVERY ROOM AGAINST ITS OWN FLOOR`);
+console.log(
+  `   room                 dish  drink  total  identity     floor  standing`
+);
+for (const e of [...evidence].sort((x, y) =>
+  x.identity === y.identity
+    ? x.size - y.size
+    : x.identity.localeCompare(y.identity)
+)) {
+  const d = DISHES.get(e.slug)?.size ?? 0;
+  const k = DRINKS.get(e.slug)?.size ?? 0;
+  const margin = e.size - e.floor;
+  console.log(
+    `   ${e.slug.padEnd(20)} ${String(d).padStart(4)} ${String(k).padStart(6)} ` +
+      `${String(e.size).padStart(6)}  ${e.identity.padEnd(12)} ${String(e.floor).padStart(5)}  ` +
+      (e.short
+        ? `SHORT by ${-margin}`
+        : margin === 0
+          ? `clear, exactly at it`
+          : `clear (+${margin})`)
+  );
+}
+console.log(
+  `   ${evidence.length} rooms declared · ${shortRooms.length} SHORT against their own identity` +
+    (shortRooms.length
+      ? `: ${shortRooms.map((e) => `${e.slug} (${e.size}/${e.floor}, ${e.identity})`).join(", ")}`
+      : ` — every room clears the floor it claims`)
+);
+
+/* ── WHAT EACH FLOOR ACTUALLY REFUSES (rule 22's second guard) ────────
+ *
+ * "A detector for a gate that prunes zero rows across the whole catalogue."
+ * Three floors replaced one, and a floor that refuses nothing is inert — it
+ * may still be the right number, but the report must not let it look like it
+ * is working. So each floor is counted separately, in pairs, which is the unit
+ * the measure actually produces. */
+const gatedBy = {};
+for (const identity of Object.keys(EVIDENCE_FLOORS)) gatedBy[identity] = 0;
+for (const p of unknown) {
+  for (const e of [roomEvidence(p.a.key, CLAIMS), roomEvidence(p.b.key, CLAIMS)])
+    if (e.short) gatedBy[e.identity]++;
+}
+console.log(`\n   WHAT EACH FLOOR REFUSES, IN PAIRS`);
+for (const [identity, floor] of Object.entries(EVIDENCE_FLOORS))
+  console.log(
+    `   ${identity.padEnd(12)} ${String(floor).padStart(3)}   ` +
+      `${String(gatedBy[identity]).padStart(3)} pair-sides refused   ` +
+      `(${evidence.filter((e) => e.identity === identity).length} rooms declared it)`
+  );
+if (Object.values(gatedBy).every((n) => n === 0))
+  console.log(
+    `   *** NO FLOOR REFUSES A PAIR TODAY. Every room clears its own number, so all\n` +
+      `   ${pairs.length} pairs are measurable and the three floors prune nothing —\n` +
+      `   CLAUDE.md rule 22's second guard, reported rather than shipped quietly.\n` +
+      `   The floors are not therefore wrong: the one thing they still refuse is a room\n` +
+      `   with NO declaration, which throws rather than defaulting to the old twelve. ***`
+  );
+console.log(
+  `\n   ${measurable.length} of ${pairs.length} pairs measurable · ${unknown.length} UNKNOWN ` +
+    `(a room under the floor its own declared identity owes)`
 );
 if (ovs.length)
   console.log(
@@ -462,16 +547,6 @@ if (observedMax < DELIVERABLES_CLOSE)
       `   rather than shipped quietly. The threshold is FOUNDER-PENDING and is not\n` +
       `   tuned down to fit, because the pairs it exists to judge are the unmeasurable\n` +
       `   ones. See the argument in scripts/deliverables.mjs.`
-  );
-const roomsUnmeasured = rooms.filter(
-  (r) => (CLAIMS.get(r.key)?.size ?? 0) < EVIDENCE_FLOOR
-);
-if (roomsUnmeasured.length)
-  console.log(
-    `   rooms with no measurable pool: ` +
-      roomsUnmeasured
-        .map((r) => `${r.key} (${CLAIMS.get(r.key)?.size ?? 0})`)
-        .join(", ")
   );
 
 const admitted = pairs.filter((p) => p.verdict === "admitted");

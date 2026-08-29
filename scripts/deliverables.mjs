@@ -58,11 +58,16 @@
  * emit on seed-bank so the existing parse is reused. That is written up in the
  * handover rather than guessed at here.
  *
- * THE CONSEQUENCE IS LOAD-BEARING AND IS REPORTED, NOT HIDDEN: dishes and
- * drinks between them cover the TWELVE WIRED ROOMS AND NO OTHERS. The bank is
- * the only authored document carrying all eighteen. So every pair involving a
- * proposed room is `unknown` today — see below, and see the reporter, which
- * prints the count.
+ * THE CONSEQUENCE IS LOAD-BEARING AND IS REPORTED, NOT HIDDEN. When this was
+ * written, dishes and drinks between them covered the TWELVE WIRED ROOMS AND
+ * NO OTHERS, the bank was the only authored document carrying all eighteen,
+ * and every pair involving a proposed room was therefore `unknown`. THAT IS NO
+ * LONGER TRUE: docs/dishes.md now carries all eighteen, the six newest rooms
+ * hold between seven and thirty-six claims, and the reporter prints the pool
+ * size for every room rather than a coverage caveat. Drinks are still twelve
+ * rooms only, which is why the six newest rooms are dish-only pools and why
+ * their counts are smaller than a wired room's by construction as well as by
+ * identity.
  *
  * ── ABSENCE IS NOT DISJOINTNESS ──────────────────────────────────────
  *
@@ -77,9 +82,18 @@
  * has to handle `null` explicitly rather than letting it fall through a
  * comparison as a small number. `deliverablesVerdict` refuses to admit a pair
  * on an unknown, which is the whole reason the floor exists.
+ *
+ * AND THE FLOOR IS PER DECLARED FOOD IDENTITY, NOT UNIFORM — see
+ * `EVIDENCE_FLOORS` below and `src/lib/food-identity.ts`. The trap has a
+ * second half that a single number walks straight into: a room can be under a
+ * uniform floor because its food was never written, OR because it is a room
+ * that serves almost none, and those two are as indistinguishable from a count
+ * as absence and distinctness are from a fraction. The room's own declaration
+ * is what separates them.
  */
 import { readFileSync } from "node:fs";
 import { DESTINATIONS as HEADING_TO_SLUG } from "./catalogue-vocabulary.mjs";
+import { foodIdentityOf } from "../src/lib/food-identity.ts";
 
 const read = (name) =>
   readFileSync(new URL(`../docs/${name}`, import.meta.url), "utf8");
@@ -201,20 +215,122 @@ function splitTopLevel(text) {
 }
 
 /**
- * THE EVIDENCE FLOOR, and the argument for the number.
+ * THE EVIDENCE FLOORS, PER DECLARED FOOD IDENTITY.
  *
- * A room needs enough claims for a shared one to mean something. At five
- * claims a single coincidence is worth 0.20 of the fraction, which is larger
- * than the gap between any two verdicts this measure would ever produce — so
- * below that the number is noise wearing three decimal places. Twelve is one
- * full drink programme plus a course, and it is comfortably under the smallest
- * real pool in either document, so it excludes nothing that has actually been
- * written.
+ * ── WHAT WAS HERE BEFORE, AND WHAT BEAT IT (rule 14) ─────────────────
  *
- * It is deliberately a floor on the SMALLER room. A pair is only as measurable
- * as its thinner side.
+ * Until 2026-08-29 this was a single number, `EVIDENCE_FLOOR = 12`, and its
+ * argument is preserved because half of it is still load-bearing:
+ *
+ *   "A room needs enough claims for a shared one to mean something. At five
+ *    claims a single coincidence is worth 0.20 of the fraction, which is
+ *    larger than the gap between any two verdicts this measure would ever
+ *    produce — so below that the number is noise wearing three decimal places.
+ *    Twelve is one full drink programme plus a course, and it is comfortably
+ *    under the smallest real pool in either document, so it excludes nothing
+ *    that has actually been written."
+ *
+ * The estimator half of that stands. The last clause is what failed: twelve
+ * was NOT under the smallest real pool. Palm Springs authored eleven claims
+ * and St. Moritz seven, and neither is short — both rooms REFUSE a seated meal
+ * in the founder's own deliverables sheets ("nothing requires a fork";
+ * "things that eat standing"). A uniform floor called both of them incomplete
+ * and put a number in front of an author, which is CLAUDE.md rule 30's exact
+ * failure: AUTHORING TO HIT A METRIC IS THE FAILURE THE METRIC WAS BUILT TO
+ * DETECT. Reaching twelve at either room could only have been done by taking
+ * plates the wired rooms already hold.
+ *
+ * Founder ruling, 2026-08-29: FLOORS ARE PER FOOD-IDENTITY, and the identity
+ * is a CLAIM the room makes rather than something this file infers from the
+ * row count. `src/lib/food-identity.ts` is the declaring half and carries the
+ * argument for why an inferred identity would be a gate that cannot fire.
+ *
+ * ── TABLE, 20 ────────────────────────────────────────────────────────
+ *
+ * Her number. A room whose spine is the meal owes a meal: three courses that
+ * can be composed more than one way across a season, which is roughly seven
+ * apiece. It is also the only floor with real headroom over the estimator's
+ * needs, and that is correct — a table room has the most to be wrong about.
+ *
+ * ── EXPRESSION, 12 ───────────────────────────────────────────────────
+ *
+ * Her number, and it is the old uniform floor kept where it was always right:
+ * one full drink programme plus a course. A room that feeds people well while
+ * the evening happens around the food needs enough to compose a night from,
+ * and not a menu.
+ *
+ * ── INCIDENTAL, 6 — the number this file had to pick ─────────────────
+ *
+ * She gave a band, "something like 6–8", and the choice inside it is argued
+ * from the OTHER constant in this module rather than from the catalogue.
+ *
+ * At a floor of F, one coincidental shared claim is worth 1/F of the overlap
+ * fraction. `DELIVERABLES_CLOSE` is 0.2, so a single accident alone tips a
+ * pair to "close" at F = 5 (0.200) and cannot at F = 6 (0.167). SIX IS THE
+ * SMALLEST FLOOR AT WHICH ONE COINCIDENCE CANNOT BY ITSELF PRODUCE A BREACH,
+ * which is the strongest guarantee available down here — two coincidences
+ * would need F >= 11, and requiring eleven of a room that authored seven is
+ * the uniform floor coming back through the window.
+ *
+ * WHY NOT 7 OR 8, SAID PLAINLY BECAUSE IT IS THE PART THAT COULD BE FITTED TO
+ * THE DATA. St. Moritz stands at seven claims. A floor of 8 makes it short by
+ * one row and sends somebody to write one dish for arithmetic; a floor of 7
+ * puts it exactly on the line, one recount from unmeasurable. Both of those
+ * are numbers chosen by looking at the catalogue, which is what the
+ * `DELIVERABLES_CLOSE` block below refuses to do two hundred lines from here.
+ * Six is chosen without looking at it, and the fact that it leaves both
+ * incidental rooms clear is a consequence rather than the reason.
+ *
+ * THE COST IS CARRIED AND REPORTED, NOT FIXED BY AUTHORING. An incidental room
+ * is a genuinely noisier estimate than a table room: one shared claim moves it
+ * 0.167 where it moves Côte d'Azur 0.007. The founder's ruling is that the
+ * room's identity wins and the floor bends — so the noise is a property of the
+ * measure at these rooms, and `check:voices` prints the pool size beside every
+ * verdict for that reason.
+ *
+ * The floor is still applied to BOTH rooms of a pair, each against its own
+ * identity's number. A pair is only as measurable as its thinner side, and
+ * "thin" now means thin FOR WHAT THIS ROOM CLAIMS TO BE.
  */
-export const EVIDENCE_FLOOR = 12;
+export const EVIDENCE_FLOORS = Object.freeze({
+  table: 20,
+  expression: 12,
+  incidental: 6,
+});
+
+/**
+ * The floor this room owes, or an exception.
+ *
+ * NO DEFAULT, AND ESPECIALLY NOT THE OLD TWELVE. `foodIdentityOf` throws for a
+ * room that has not declared, and this deliberately does not catch it: no
+ * identity means no floor means no verdict. Falling back to twelve would
+ * reinstate the exact defect the declaration exists to remove, because twelve
+ * is the number at which an under-authored table room looks healthy.
+ */
+export function evidenceFloor(slug) {
+  const identity = foodIdentityOf(slug);
+  const floor = EVIDENCE_FLOORS[identity];
+  if (floor === undefined)
+    throw new Error(
+      `Food identity "${identity}" (declared for "${slug}") has no evidence ` +
+        `floor. EVIDENCE_FLOORS and the FoodIdentity union have drifted apart.`
+    );
+  return floor;
+}
+
+/**
+ * One room's standing against its OWN declared identity.
+ *
+ * The reporting shape, and the reason the report can say the sentence that
+ * matters: a table room at fourteen is SHORT where an incidental room at seven
+ * is COMPLETE, and no single number can tell you that.
+ */
+export function roomEvidence(slug, claims) {
+  const identity = foodIdentityOf(slug);
+  const floor = EVIDENCE_FLOORS[identity];
+  const size = claims.get(slug)?.size ?? 0;
+  return { slug, identity, floor, size, short: size < floor };
+}
 
 /**
  * HOW MUCH OF THE SMALLER ROOM THE LARGER ONE ALSO SERVES, 0..1.
@@ -239,16 +355,28 @@ export const EVIDENCE_FLOOR = 12;
  *   SOMEWHERE ELSE. A room whose whole table is a subset of another room's
  *   scores 1.0, which is correct and is exactly the confusion the founder is
  *   guarding against. Its known weakness is that it flatters small pools, and
- *   that weakness is precisely what EVIDENCE_FLOOR exists to bound: the
+ *   that weakness is precisely what the EVIDENCE_FLOORS exist to bound: the
  *   estimator is unstable below a certain size, so below that size it declines
  *   to answer rather than answering badly.
  *
- * Returns null when either room is under the floor. NULL IS NOT ZERO and a
- * caller that treats it as a small number has reintroduced the bug.
+ * Returns null when either room is under ITS OWN identity's floor. NULL IS NOT
+ * ZERO and a caller that treats it as a small number has reintroduced the bug.
+ *
+ * ── WHY IT TAKES SLUGS AND THE POOL, NOT TWO SETS ────────────────────
+ *
+ * It used to take the two claim sets and compare both against one constant.
+ * Two sets cannot answer "is this room short", because shortness is now a
+ * question about WHICH ROOM this is — so the function has to be able to look
+ * the identity up, and the only way to guarantee no caller pairs a room with
+ * the wrong floor is to stop letting callers supply floors at all. Rule 21's
+ * consumer clause: one owner, reached through one door.
  */
-export function overlapFraction(a, b) {
+export function overlapFraction(aKey, bKey, claims) {
+  const a = claims.get(aKey);
+  const b = claims.get(bKey);
   if (!a || !b) return null;
-  if (a.size < EVIDENCE_FLOOR || b.size < EVIDENCE_FLOOR) return null;
+  if (a.size < evidenceFloor(aKey)) return null;
+  if (b.size < evidenceFloor(bKey)) return null;
   let shared = 0;
   for (const claim of a) if (b.has(claim)) shared++;
   return shared / Math.min(a.size, b.size);
@@ -335,8 +463,9 @@ export function deliverablesVerdict(toneBreaches, overlap) {
       verdict: "BREACH",
       why:
         "tone-close, and the deliverables number is UNKNOWN — one of these rooms " +
-        "has too few authored dishes and drinks to measure. Not admitted: an " +
-        "unwritten pool reads identical to a distinct one",
+        "holds fewer authored dishes and drinks than ITS OWN DECLARED FOOD " +
+        "IDENTITY owes. Not admitted: an unwritten pool reads identical to a " +
+        "distinct one",
     };
   if (overlap >= DELIVERABLES_CLOSE)
     return {
