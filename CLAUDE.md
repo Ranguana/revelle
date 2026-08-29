@@ -591,3 +591,38 @@ long-simmered pot and so is a mole, but pozole is Guerrero-and-north and putting
 it in Oaxaca is Mexico-generic — the ceviche-in-Amalfi error wearing a pot.
 STRUCTURE-FIT IS HOW WRONG-COUNTRY DISHES ARRIVE. Evidence of rootedness, never
 resemblance of form.
+
+---
+
+**31. AN UNOBSERVABLE COMMIT IS VERIFIED BY ITS OBSERVABLE NEIGHBOUR.**
+A commit that touches only documentation compiles to nothing and cannot be
+found in a deployed artifact — not because the deploy failed, but *by
+construction*. Verify it through the nearest commit that did emit output:
+if `HEAD~1` rewrote something served, and that something is present, then
+`HEAD` is live too, because they built together.
+
+Worked example, 2026-08-29. `e6d3e9d` changed only this file. Its parent
+`0dc55c8` had rewritten SVG path geometry in `src/app/apply/tone-marks.tsx`,
+which `QuizFlow.tsx` imports into a PUBLIC page. Pulling the chunks behind
+`/apply` and grepping them: four pre-change path strings absent, four
+post-change strings present. Clean in both directions, so the build is
+`0dc55c8`-or-later, and "`0dc55c8` is live" and "`e6d3e9d` is live" are the
+same observable claim.
+
+**Both directions or it is not evidence.** Finding the new strings alone
+proves far less than also finding the old ones gone — a partial deploy, a
+cached chunk, or a coincidental match all survive a one-directional check.
+
+And the rule this pairs with: **verify the readback path exists before
+demanding a readback.** The same day, four numbers were promised "from
+production" against machinery that serves none of them — `check:matrix` and
+the deliverables overlap are CLI scripts no route imports, and `voiceAffinity`
+scores a guest's answers against rooms, never two rooms against each other. It
+was not a failure to fetch; the reading did not exist. **Where a number is
+read from is a fact to establish first, and it belongs in the label** — a
+build-time authoring gate read locally against a clean worktree is correct and
+should say so, not apologise for not being production.
+
+`/api/health` exists so this is never re-derived: `sha`, `registry`, `worlds`,
+`seeded`, and the slugs that differ. See rule 21 for why it reports both
+authorities rather than picking one.
