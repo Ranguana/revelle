@@ -203,11 +203,21 @@ export default async function DestinationPage({
 
       {pass ? <Review pass={pass} noun="destinations" /> : null}
 
+      {/* THE LINK SAYS WHICH OF THE TWO JOBS IS ACTUALLY OUTSTANDING.
+          It read "Write the voice" in both cases, and the refusal it follows
+          ends with the same words, so a room whose voice was already written,
+          seeded and waiting in draft read as a room with no voice at all —
+          for hours, more than once, to the person who had written it. The
+          refusal is right that the room cannot be published; it is the
+          instruction after it that was wrong half the time. A draft waiting
+          is one click, and the click is nowhere near a blank page. */}
       {refused ? (
         <p className={styles.error}>
           {refused}{" "}
           <Link href={`/desk/destinations/${id}/voice`} className={styles.link}>
-            Write the voice
+            {voices.some((voice) => voice.status === "draft")
+              ? "Publish the draft that is waiting"
+              : "Write the voice"}
           </Link>
           .
         </p>
