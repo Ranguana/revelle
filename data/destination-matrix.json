@@ -393,7 +393,7 @@
           "acapulco-1959"
         ],
         "distance": 2,
-        "voiceAffinity": null,
+        "voiceAffinity": 0.426,
         "status": "UNVERIFIED — neither voice is written, so the affinity condition cannot be measured. Admitted on the row; the twin claim is provisional until both voices exist."
       },
       {
@@ -402,7 +402,7 @@
           "aspen-1994"
         ],
         "distance": 2,
-        "voiceAffinity": null,
+        "voiceAffinity": 0.507,
         "status": "UNVERIFIED — neither voice is written, so the affinity condition cannot be measured. Same handling as St. Moritz/Acapulco: the row is admitted and the twin claim is provisional until both voices exist."
       },
       {
