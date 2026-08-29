@@ -390,11 +390,51 @@ governing every room still unwritten:
   2. **NO PROPER NOUN A GUEST WOULD NOT SAY AT THE TABLE.** Place names,
      brand names and landmarks are the postcard writing itself. What survives
      is what somebody would actually name out loud while eating.
-  3. **NO LABOUR OR STAFF THE HOST DOES NOT HAVE.** Abundance is MADE IN
-     ADVANCE, never SERVED. The moment a line implies somebody carrying a tray,
-     it has described a restaurant and handed the evening to staff who do not
-     exist. Acapulco says it structurally — "there is no staff in this voice;
-     things appear, nobody serves them" — and that is the test for every room.
+
+     **A DISH'S OWN NAME IS A TABLE WORD, IN ANY LANGUAGE.** Decided 2026-08-28
+     when the founder handed the call over, and it settles both Mexican rooms
+     at once. The test is not whether a Brooklyn guest recognises the word —
+     it is whether somebody AT THAT TABLE, IN THAT YEAR, would say it. In a
+     Oaxaca valley kitchen in 1954, `higaditos` is simply what the dish is
+     called; there is no other name for it, and refusing it would leave the
+     room unable to name its own food. So `segueza`, `chintextle`, `higaditos`,
+     `nicuatole`, `morisqueta`, `escabeche` all pass, exactly as her own ruling
+     already passed `mole`, `tamales` and `tortillas`.
+
+     What the clause actually refuses is a proper noun doing MARKETING work: a
+     restaurant's name (`Tagliolini Antica Trattoria` — cut), a region deployed
+     as a brand, a producer, an appellation. The distinction is whether the
+     name IDENTIFIES the thing or SELLS it. `Provolone del Monaco` and a
+     `Sorrento` orange identify — they are what the cheese and the fruit are
+     called — and both were kept.
+
+     **And the name is never left to do the work alone**, because a member is
+     reading a card: the dish line carries the name AND says plainly what it
+     is. `Higaditos` tells her nothing; the line that names it and then
+     describes it tells her everything, in the room's own register, without
+     translating the food into somebody else's.
+  3. **NO LABOUR OR STAFF THE HOST DOES NOT HAVE.** The moment a line implies
+     somebody carrying a tray, it has described a restaurant and handed the
+     evening to staff who do not exist. Acapulco says it structurally — "there
+     is no staff in this voice; things appear, nobody serves them" — and that
+     is the test for every room.
+
+     **THE TEST IS SERVICE. IT IS NOT DIFFICULTY AND IT IS NOT TIMING.** Twice
+     in one day this clause was misread into a constraint on the FOOD rather
+     than on the SERVING, and both readings are retired by founder ruling:
+     "the host can of course make all of those things", and "get rid of the
+     constraint globally 'or have been finished hours ago'." A host may cook
+     anything ambitious, and she may cook it DURING the party — a pot going
+     while people arrive, a fire lit at nine, a thing that only works hot.
+     What she cannot do is have somebody else plate it to order and carry it
+     out while she is at her own table.
+
+     The phrase "made in advance" survives only as a DESCRIPTION of how many
+     rooms happen to work, never as a requirement. An agent inferring a menu
+     limit from an imagined kitchen — "the room gets one fire, so it does not
+     have fifteen mains" — has invented a constraint the founder did not write
+     and has shrunk her catalogue to fit it. Rule 29's shape again: absence is
+     the catalogue being unfinished, not a fact about the room.
 
 Together they are rule 5's arithmetic made checkable: a row can clear distance
 3 against every other room and still describe a postcard, and these are the
@@ -477,3 +517,77 @@ before the food and drink exist removes a guard and puts nothing in its place.
 So the cap moves WITH the catalogue, not ahead of it, and the change is
 measured the way the ceiling was: build near-duplicate rooms, count what the
 new configuration refuses, and show it refuses MORE than the old one did.
+
+**29. EVERY ROOM MAY HAVE GAMES. `GAMES: none` IS NOT A RULING.**
+Founder, twice: *"lets not make a blanket rule that a room is gameless"*, then
+*"i told you that they can have games."* It does not get asked a third time.
+
+The bank document's `GAMES: none` lines at Tahiti (*"none, on purpose"*) and
+Acapulco (*"none — the band, the window, and the dancing are the shelf"*) are
+STALE, not authoritative. Both rooms carry a `piece: "game_rule"` in their own
+voice — Tahiti's *"Everybody says what they would want on the last night"*,
+Acapulco's *"Everybody names the last song. Whoever names one already played
+goes in the water."* Those are the games. An agent finding a document and a
+voice in disagreement about whether a room has games resolves it toward HAVING
+them, and does not file it as a contradiction for her to adjudicate.
+
+`none` writes no row, no column and no negative claim — it never did, and no
+mechanism may be "completed" by writing gamelessness down. A room with no game
+row has an AUTHORING ABSENCE, never a property.
+
+The general form, and it is the third time this week: A ROOM'S ABSENCE OF
+SOMETHING IS ALMOST NEVER A FACT ABOUT THE ROOM. It was Palm Springs having "no
+gesture" (rule 27 — it had a weak one), it was six rooms being "gameless"
+(a parser routing by heading), and it was rooms reading as deliverables-disjoint
+when neither had any dishes (rule 26's `unknown`). Absence is the catalogue
+being unfinished. Treat it as a gap to fill, and bring the founder the fill,
+not the question.
+
+**30. IDENTITY LIVES IN WHAT ONLY YOU CAN CLAIM. FLOORS ARE PER-IDENTITY.**
+The dish-pool form of the discriminative-vocabulary result, and the same law
+holds in both places. A room cannot reach a coverage floor by enumerating
+generics, because the generics are already taken: reaching twelve at St. Moritz
+meant listing species under "smoked fish" against six existing "smoked salmon"
+rows and four "smoked trout"; reaching twelve at Palm Springs meant unpacking
+"one tray that looks expensive" into caviar and pâté the wired rooms already
+hold. **The rooms that clear a floor clear it on DISTINCTIVE food** — Acapulco's
+morisqueta, Amalfi's scialatielli — and a room padded with generics has bought
+a number and sold its identity.
+
+**PERIOD GENERICS ARE NOT CLAIMED, AND THAT IS THE WAY THROUGH.** 1965 cocktail
+food is a real genre with names no other room can take: rumaki, clams casino,
+stuffed celery, onion dip in the good bowl. Era-specific beats category-generic
+every time, and it is available wherever a room has a year.
+
+**AND A UNIFORM FLOOR IS ITSELF THE ERROR.** Rooms differ on food identity —
+some are table rooms and some are food-incidental — so a single number applied
+to all of them manufactures dishes nobody's party needs. Founder ruling: FLOORS
+ARE PER FOOD-IDENTITY. Table rooms carry twenty and more; incidental rooms
+carry fewer and are not short. Palm Springs refusing a main course is the room
+working, not a gap, and **authoring to hit a metric is the failure the metric
+was built to detect.**
+
+**A DECLARED IDENTITY, NEVER AN INFERRED ONE.** The floor per identity is only
+a guard if the identity is a CLAIM the room makes — `table` / `expression` /
+`incidental`, the three values the matrix work already uses, authored once and
+consumed twice. If the measure instead infers "incidental" from a low row
+count, then AN UNDER-AUTHORED TABLE ROOM READS AS A HEALTHY INCIDENTAL ROOM and
+the floor stops catching the exact defect it exists for — rule 22's gate that
+cannot fire, arriving through a back door. The room declares; the floor
+enforces. Table rooms owe twenty and more, expression rooms twelve, incidental
+rooms six to eight.
+
+**AND COUNTING DEFENDS TRUE DISTINCTIONS, NOT ONLY FALSE MATCHES.** The
+hyphen lesson's positive twin (rule 24): Havana's *"Buñuelos in anise syrup"*
+and Oaxaca's *"Buñuelos, fried and sugared, made in quantity"* survived as two
+rows only because a count proved they did not dedupe. **Read side by side,
+anyone would have merged them** — and merging them would have collapsed the
+founder's own validation pair. The count is what said they were different; the
+eye said they were the same.
+
+Its sibling trap, and the reason "it fits the structure" is never enough: a
+dish that matches a room's SHAPE may still be the wrong region. Pozole is a
+long-simmered pot and so is a mole, but pozole is Guerrero-and-north and putting
+it in Oaxaca is Mexico-generic — the ceviche-in-Amalfi error wearing a pot.
+STRUCTURE-FIT IS HOW WRONG-COUNTRY DISHES ARRIVE. Evidence of rootedness, never
+resemblance of form.
