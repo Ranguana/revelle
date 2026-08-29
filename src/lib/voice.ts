@@ -953,7 +953,12 @@ export const TONES = [
     code: "fluent_in_everyone",
     label: "They know everybody's story before you finish it",
     group: "knowing",
-    draft: true,
+    // PROMOTED 2026-08-29 with PALM SPRINGS, 1965, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     facets: [
       { code: "knowingness", weight: 0.9 },
       { code: "warmth", weight: 0.3 },
@@ -964,7 +969,12 @@ export const TONES = [
     code: "closes_the_bar",
     label: "The night has never once beaten them",
     group: "pace",
-    draft: true,
+    // PROMOTED 2026-08-29 with ASPEN, 1994, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     facets: [
       { code: "volume", weight: 0.7 },
       { code: "cadence_unhurried", weight: -0.7 },
@@ -975,7 +985,12 @@ export const TONES = [
     code: "finishes_your_sentences",
     label: "Everybody talks over everybody, and it is affection",
     group: "volume",
-    draft: true,
+    // PROMOTED 2026-08-29 with AMALFI, 1953, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     facets: [
       { code: "cadence_clipped", weight: 0.8 },
       { code: "volume", weight: 0.7 },
@@ -1001,7 +1016,12 @@ export const TONES = [
     code: "up_early_anyway",
     label: "However late it went, they are up and out in the morning",
     group: "precision",
-    draft: true,
+    // PROMOTED 2026-08-29 with ASPEN, 1994, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     facets: [
       { code: "precision", weight: 0.8 },
       { code: "earnestness", weight: 0.7 },
@@ -1043,7 +1063,12 @@ export const TONES = [
     code: "feeds_you_first",
     label: "A plate reaches you before anybody asks your name",
     group: "kindness",
-    draft: true,
+    // PROMOTED 2026-08-29 with AMALFI, 1953, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     facets: [
       { code: "warmth", weight: 0.9 },
       { code: "earnestness", weight: 0.7 },
@@ -1056,7 +1081,12 @@ export const TONES = [
     code: "eat_before_you_speak",
     label: "Eat first. Whatever it is will keep",
     group: "pace",
-    draft: true,
+    // PROMOTED 2026-08-29 with AMALFI, 1953, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     facets: [
       { code: "cadence_unhurried", weight: 0.9 },
       { code: "earnestness", weight: 0.6 },
@@ -1069,7 +1099,12 @@ export const TONES = [
     code: "the_same_stories",
     label: "The same stories, told again, corrected the same way",
     group: "knowing",
-    draft: true,
+    // PROMOTED 2026-08-29 with AMALFI, 1953, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     // knowingness sits at 0.35 where `in_jokes` is 1, and that gap IS the
     // distance from CATSKILLS. An in-joke is a reference you must already get.
     // This is a story everybody has heard and wants again.
@@ -1085,7 +1120,12 @@ export const TONES = [
     code: "marvels_out_loud",
     label: "Says a thing is beautiful, out loud, and means it",
     group: "kindness",
-    draft: true,
+    // PROMOTED 2026-08-29 with AMALFI, 1953, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     facets: [
       { code: "earnestness", weight: 1 },
       { code: "warmth", weight: 0.8 },
@@ -1097,7 +1137,12 @@ export const TONES = [
     code: "shows_you_things",
     label: "Takes your elbow and turns you toward something",
     group: "knowing",
-    draft: true,
+    // PROMOTED 2026-08-29 with AMALFI, 1953, which claims it. The art moved up out
+    // of design/tone-icons/pending/ in the same commit, so the tile carries a
+    // mark rather than rendering blank, and the room that claims it is keyed
+    // into DESTINATIONS in the same commit too — a cleared flag with no
+    // registered claimer fails "every tone is claimed by at least one
+    // destination", which is why the four steps are not four commits.
     // The far pole from `in_jokes`: that one assumes you already know, this one
     // is certain you have never seen it. Theatricality is held at 0.3 because
     // LAS VEGAS runs 0.7 to 1 across its performance tones — this room SHOWS

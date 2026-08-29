@@ -53,12 +53,22 @@ function room(slug: string): Room {
 test("all eighteen authored rooms are reachable by the checker", () => {
   assert.equal(ALL.length, 18, "eighteen rooms are authored; the checker must reach every one");
   const notKeyed = ALL.filter((d) => !isKeyed(d)).map((d) => d.key).sort();
-  // Not a defect and not something to fix here: these five are authored and
-  // deliberately unkeyed, and each one's block in destinations.ts says why.
-  // The assertion is that the QA path reaches them anyway, because a refusal
-  // list nothing can be pointed at is the same defect as one nothing reads.
-  assert.deepEqual(notKeyed,
-    ["amalfi-1953", "aspen-1994", "oaxaca-1954", "palm-springs-1965", "st-moritz-1984"]);
+  // KEPT PER RULE 14. THIS LIST WAS FIVE — `amalfi-1953`, `aspen-1994`,
+  // `oaxaca-1954`, `palm-springs-1965`, `st-moritz-1984` — and the comment
+  // beside it said "not a defect and not something to fix here: these five are
+  // authored and deliberately unkeyed, and each one's block in destinations.ts
+  // says why. The assertion is that the QA path reaches them anyway, because a
+  // refusal list nothing can be pointed at is the same defect as one nothing
+  // reads." That was right for as long as it was true, and this test is the
+  // reason the five rooms' refusals were enforceable while they waited.
+  //
+  // WHAT BEAT IT: the founder cleared the last gate on 2026-08-29 and all five
+  // are keyed into DESTINATIONS. The list is empty now, and the assertion is
+  // strictly stronger for it — the QA path must not merely REACH a room, it
+  // must resolve every room through the registry the product itself uses.
+  // Emptiness is the claim, so a room slipping back out of DESTINATIONS goes
+  // red here rather than quietly rejoining a tolerated list.
+  assert.deepEqual(notKeyed, []);
 });
 
 /* ── the defect, reproduced ───────────────────────────────────────────*/

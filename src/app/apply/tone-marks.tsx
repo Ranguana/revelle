@@ -85,8 +85,8 @@ export const TONE_MARKS: Record<string, ReactNode> = {
   "closes_the_bar": (
     <>
     <g transform="translate(0 0) scale(1)" fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 51.5 L22 30 C22 25 27.5 23 27.5 18 L27.5 12 L36.5 12 L36.5 18 C36.5 23 42 25 42 30 L42 51.5 Z" />
-    <path d="M27 15 L37 15" /><path d="M22 37 L42 37" /><path d="M22 44 L42 44" />
+    <path d="M22 51.5 L22 32 C22 26 29 24 29 19 L29 11 L35 11 L35 19 C35 24 42 26 42 32 L42 51.5 Z" />
+    <path d="M28.5 14.5 L35.5 14.5" /><path d="M22 38 L42 38" /><path d="M22 45 L42 45" />
     <path d="M44.1 46.8 L51.6 45.2 L52.5 49.4 L45 51 Z" stroke="var(--oxblood)" />
     <path d="M9 53 L55 53" />
     </g>
@@ -169,19 +169,20 @@ export const TONE_MARKS: Record<string, ReactNode> = {
     <>
     <g transform="translate(0 0) scale(1)" fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 41 A23 11 0 1 0 55 41 A23 11 0 1 0 9 41 Z" /><path d="M18 41 A14 6 0 1 0 46 41 A14 6 0 1 0 18 41 Z" />
-    <path d="M21.5 40 C24 32 40 32 42.5 40" stroke="var(--oxblood)" />
-    <path d="M27 27 C24 23.5 30 20 27 16" stroke="var(--gold)" /><path d="M37 27 C34 23.5 40 20 37 16" stroke="var(--gold)" />
+    <path d="M20 41 C22.5 31 41.5 31 44 41 Z" stroke="var(--oxblood)" />
+    <path d="M27 28 C24 24.5 30 21 27 17" stroke="var(--gold)" /><path d="M37 28 C34 24.5 40 21 37 17" stroke="var(--gold)" />
     </g>
     </>
   ),
   "finishes_your_sentences": (
     <>
     <g transform="translate(0 0) scale(1)" fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M10.21 31.5 A9 6.5 30 1 0 25.79 40.5 A9 6.5 30 1 0 10.21 31.5 Z" />
-    <path d="M19.51 28.5 A9 6.5 30 1 0 35.09 37.5 A9 6.5 30 1 0 19.51 28.5 Z" stroke="var(--oxblood)" />
-    <path d="M28.81 25.5 A9 6.5 30 1 0 44.39 34.5 A9 6.5 30 1 0 28.81 25.5 Z" />
-    <path d="M38.11 22.5 A9 6.5 30 1 0 53.69 31.5 A9 6.5 30 1 0 38.11 22.5 Z" />
-    <path d="M12 46 L52 46 L48 51 L16 51 Z" />
+    <path d="M10.82 27.44 A8.5 5.5 55 1 0 20.58 41.36 A8.5 5.5 55 1 0 10.82 27.44 Z" />
+    <path d="M18.92 26.04 A8.5 5.5 55 1 0 28.68 39.96 A8.5 5.5 55 1 0 18.92 26.04 Z" />
+    <path d="M27.02 24.64 A8.5 5.5 55 1 0 36.78 38.56 A8.5 5.5 55 1 0 27.02 24.64 Z" stroke="var(--oxblood)" />
+    <path d="M35.12 23.24 A8.5 5.5 55 1 0 44.88 37.16 A8.5 5.5 55 1 0 35.12 23.24 Z" />
+    <path d="M43.22 21.84 A8.5 5.5 55 1 0 52.98 35.76 A8.5 5.5 55 1 0 43.22 21.84 Z" />
+    <path d="M12 47 L52 47 L48 52 L16 52 Z" />
     </g>
     </>
   ),
@@ -275,8 +276,8 @@ export const TONE_MARKS: Record<string, ReactNode> = {
   "marvels_out_loud": (
     <>
     <g transform="translate(0 0) scale(1)" fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M46.95 33.58 A15 15 0 1 1 31.99 11.13 A13.5 13.5 0 0 0 46.95 33.58 Z" />
-    <path d="M17.1 19.84 A18 18 0 0 1 40.16 9.1" stroke="var(--gold)" />
+    <path d="M46.95 35.58 A15 15 0 1 1 31.99 13.13 A13.5 13.5 0 0 0 46.95 35.58 Z" />
+    <path d="M15.65 23.08 A19 19 0 0 1 29.08 9.65" stroke="var(--gold)" />
     <path d="M10 49.5 L54 49.5" />
     <path d="M13 55 C13 49.5 23 49.5 23 55 M23 55 C23 49.5 33 49.5 33 55 M33 55 C33 49.5 43 49.5 43 55 M43 55 C43 49.5 53 49.5 53 55" />
     </g>
@@ -475,11 +476,11 @@ export const TONE_MARKS: Record<string, ReactNode> = {
   "up_early_anyway": (
     <>
     <g transform="translate(0 0) scale(1)" fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 52 L25 22 L39 22 L42 52 Z" /><path d="M20 52 L44 52" />
-    <path d="M26 22 C26 15 38 15 38 22" /><path d="M32 16.75 L32 14.5" />
-    <path d="M39 24 C46 23 49 18 48 13 L50.5 17 C50.5 24 46 30 40 30" />
-    <path d="M25 27 C15 27 15 40 24 40" />
-    <path d="M30.5 13 A1.5 1.5 0 1 0 33.5 13 A1.5 1.5 0 1 0 30.5 13 Z" stroke="var(--oxblood)" />
+    <path d="M19 52 L23 22 L41 22 L45 52 Z" /><path d="M17 52 L47 52" />
+    <path d="M24 22 C24 14 40 14 40 22" /><path d="M32 16 L32 14" />
+    <path d="M41 26 C46 25 49 22 48.5 18 L52 21 C52 27 47 32 42 33" />
+    <path d="M23 28 C9 28 9 42 22 42" />
+    <path d="M30.5 12.5 A1.5 1.5 0 1 0 33.5 12.5 A1.5 1.5 0 1 0 30.5 12.5 Z" stroke="var(--oxblood)" />
     </g>
     </>
   ),

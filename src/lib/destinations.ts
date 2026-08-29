@@ -10230,6 +10230,60 @@ export const DESTINATIONS = {
   // ten-tone cap, both affinity tiers, the hand-overlap guard and the
   // stated-triple test exactly as the founder authored it.
   "acapulco-1959": ACAPULCO_1959,
+  // WIRED 2026-08-29. Three things blocked it and all three are answered.
+  // (1) THIRTEEN TONES AGAINST A CAP OF TEN — the founder ruled the cap moves
+  // rather than her tones (CLAUDE.md rule 28), on the express condition that
+  // the deliverables measure be live first; `npm run check:voices` now reports
+  // 153 of 153 pairs measurable, 0 unknown, so the condition is met and the cap
+  // is 13 with its refusal counts written beside it in src/lib/voice.test.ts.
+  // (2) SIX DRAFT TONES — `feeds_you_first`, `eat_before_you_speak`,
+  // `marvels_out_loud`, `the_same_stories`, `finishes_your_sentences`,
+  // `shows_you_things` — promoted in this commit, art and all. The block above
+  // says seven and named `bigger_every_telling`; that one was promoted with
+  // ACAPULCO on 2026-08-27, so the bill was six.
+  // (3) AFFINITY 0.817 WITH HAVANA — that was a breach of the old flat 0.80 and
+  // is not one under the recalibrated monitor ceiling of 0.92. The two share
+  // exactly one code (`laughs_first`, 0.143 of the smaller hand against a guard
+  // of 0.80), so the echo instrument does not fire: kinship at structural
+  // distance 3, not a copy.
+  "amalfi-1953": AMALFI_1953,
+  // WIRED 2026-08-29. Its four blockers went one at a time and the block above
+  // records three of them. The ceiling refit of 2026-08-27 answered affinity
+  // (ASPEN/CATSKILLS passes the 0.92 monitor ceiling, and the hand guard does
+  // not fire at 0.667 against 0.80). The STATED TRIPLE was the last thing
+  // holding the pair apart, and the founder ruled it: this room is
+  // `familiar/second_person/absurd`, Catskills keeps
+  // `familiar/second_person/warm`, so the pair parts on humour and the
+  // uniqueness assertion passes on her value rather than on an agent's. The cap
+  // took the twelve tones (rule 28), and `closes_the_bar` and `up_early_anyway`
+  // are promoted in this commit.
+  "aspen-1994": ASPEN_1994,
+  // WIRED 2026-08-29. Its only blocker was the tone count — thirteen against a
+  // cap of ten — and rule 28 moved the cap rather than her tones. It owed no
+  // art at all: the block above says five promotions, and by the time the room
+  // landed all five had already come up with AMALFI in this same commit
+  // (`feeds_you_first`, `eat_before_you_speak`, `the_same_stories`,
+  // `shows_you_things`) or with ACAPULCO in 2026-08-27 (`toasts_everything`).
+  // The founder's own validation pairs are the reason to read this room's
+  // numbers rather than assume them: HAVANA / OAXACA and ACAPULCO / OAXACA are
+  // quoted in full by `npm run check:voices`.
+  "oaxaca-1954": OAXACA_1954,
+  // WIRED 2026-08-29. Twelve tones against a cap of ten, and one draft —
+  // `fluent_in_everyone`, promoted here with its art. The block above records
+  // that this room was ONE TONE from being blocked on the cap alone; the cap
+  // moved instead (rule 28) and her hand is intact, `makes_an_entrance`
+  // included, which the affinity block above the tone list shows is
+  // load-bearing against WESTHAMPTON.
+  "palm-springs-1965": PALM_SPRINGS_1965,
+  // WIRED 2026-08-29. It never needed the cap — she gave exactly ten — and its
+  // whole bill was art. The block above says three draft flags and three SVGs;
+  // by the time it landed the bill was ZERO, because `fluent_in_everyone` came
+  // up with PALM SPRINGS, `closes_the_bar` with ASPEN, and `toasts_everything`
+  // with ACAPULCO on 2026-08-27, all promoted with their marks. The gesture
+  // migration this block calls owed unconditionally is still owed and is not a
+  // wiring blocker: `world` for `st-moritz-1984` is seeded draft, so nothing
+  // reaches a member on this commit.
+  "st-moritz-1984": ST_MORITZ_1984,
 } as const satisfies Record<string, Destination>;
 
 export type DestinationKey = keyof typeof DESTINATIONS;
@@ -10257,4 +10311,9 @@ export const DESTINATION_TONES = {
   "big-sur": BIG_SUR_TONES,
   tahiti: TAHITI_TONES,
   "acapulco-1959": ACAPULCO_1959_TONES,
+  "amalfi-1953": AMALFI_1953_TONES,
+  "aspen-1994": ASPEN_1994_TONES,
+  "oaxaca-1954": OAXACA_1954_TONES,
+  "palm-springs-1965": PALM_SPRINGS_1965_TONES,
+  "st-moritz-1984": ST_MORITZ_1984_TONES,
 } as const satisfies Record<DestinationKey, readonly ToneWeight[]>;

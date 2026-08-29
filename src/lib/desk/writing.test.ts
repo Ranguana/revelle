@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { authoredRooms, roomBySlug } from "../voice-check.ts";
+import { authoredRooms, isServable, roomBySlug } from "../voice-check.ts";
 import type { Destination, PieceKind } from "../tokens.ts";
 import {
   MAX_ROOMS,
@@ -281,32 +281,67 @@ test("a line the prompt does not carry is reported missing, not dropped", () => 
 
 /* ── the rooms and the pieces ────────────────────────────────────────── */
 
+/**
+ * KEPT PER RULE 14, for both tests below.
+ *
+ * They were written while five rooms were authored and unwired, and they said
+ * so literally: the first asserted `firstUnwired > 0` and `rooms.some(r =>
+ * !r.servable)` — "the unwired rooms are missing" — and the second opened with
+ * `benchRooms().find((r) => !r.servable)` and asserted `servable === false` on
+ * the outcome. That was the right shape for the catalogue they were written
+ * against, and it is what kept the labelled group honest while the five waited.
+ *
+ * WHAT BEAT IT: the catalogue caught up on 2026-08-29. All eighteen authored
+ * rooms are keyed into `DESTINATIONS`, so there is no unwired room to find and
+ * both tests were asserting that the catalogue stay incomplete.
+ *
+ * WHAT THEY ASSERT INSTEAD, and why it is the same claim rather than a weaker
+ * one: the property was never "some room is unwired". It was that the BENCH
+ * DOES NOT CONSULT SERVABILITY when deciding what to offer or what to write —
+ * `benchRooms()` walks `authoredRooms()` and only SORTS on `servable`, and
+ * `runWritingBench` resolves through `roomBySlug`, which is the authored roster
+ * and not the registry. Those are asserted directly below, so the tests hold
+ * whether the unwired set is five rooms or none, and the day a nineteenth room
+ * is drafted ahead of being wired they cover it without being rewritten.
+ *
+ * What is honestly lost: the end-to-end drive of a real unwired room through
+ * the writer. It cannot be reproduced without an unwired room, and inventing a
+ * fixture room would test the fixture. Said here rather than left as a green
+ * test claiming more than it checks.
+ */
 test("the picker offers every authored room, servable ones first", () => {
   const rooms = benchRooms();
   assert.equal(rooms.length, authoredRooms().length);
-
+  // EVERY authored room is offered, by key — the point the `some(!servable)`
+  // assertion was making, said against the whole roster instead of against the
+  // existence of an unwired one.
+  assert.deepEqual(
+    rooms.map((r) => r.slug).sort(),
+    authoredRooms().map((d) => d.key).sort(),
+    "the bench offers a different set of rooms than the roster holds"
+  );
+  // And the order is the invariant, stated so it cannot go vacuous: no servable
+  // room sits below an unwired one, whatever the split happens to be.
   const firstUnwired = rooms.findIndex((r) => !r.servable);
-  assert.ok(firstUnwired > 0, "no servable rooms at the top of the list");
   assert.ok(
-    rooms.slice(firstUnwired).every((r) => !r.servable),
+    firstUnwired === -1 || rooms.slice(firstUnwired).every((r) => !r.servable),
     "a servable room is sorted below an unwired one"
   );
-  // The unwired ones are OFFERED. Omitting them would hide exactly the voices
-  // nobody has read a line out of.
-  assert.ok(rooms.some((r) => !r.servable), "the unwired rooms are missing");
 });
 
-test("an unwired room can be written in, and says it is not servable", async () => {
-  const unwired = benchRooms().find((r) => !r.servable);
-  assert.ok(unwired, "no unwired room to check");
-
+test("the bench writes an authored room without asking whether it is servable", async () => {
+  // Any authored room, taken from the roster rather than from `DESTINATIONS`,
+  // because the roster is what the bench itself resolves through.
+  const room = authoredRooms()[0];
   const writer = stub(() => "a line");
-  const run = await runWritingBench(
-    input({ slugs: [unwired.slug] }),
-    writer
-  );
-  assert.equal(run.rooms[0].servable, false);
+  const run = await runWritingBench(input({ slugs: [room.key] }), writer);
+
   assert.ok(run.rooms[0].written, "the writer refused an authored room");
+  // Reported, not assumed: the outcome carries the room's real servability, so
+  // the column on /desk/writing says QA-read or catalogue from the same fact
+  // `isServable` holds rather than from a second copy of it.
+  assert.equal(run.rooms[0].servable, isServable(room));
+  assert.equal(run.rooms[0].slug, room.key);
 });
 
 test("the word ceiling for a piece is the one the member's screen uses", () => {

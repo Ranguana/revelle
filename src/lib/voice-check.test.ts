@@ -152,11 +152,34 @@ test("every authored room is a Destination, and the cast in the adapter is hones
 /**
  * THE FACT THIS BENCH IS BUILT ON, asserted rather than assumed.
  *
- * More rooms are authored than are servable, and the difference is the five the
- * bench offers under a label. `DESTINATIONS` is the authority on which rooms a
- * member can be sent; `authoredRooms()` is the authority on which exist. Both
- * are read here, so a room being wired — Acapulco was, on 2026-08-27 — moves it
- * from one list to the other with nothing to edit.
+ * `DESTINATIONS` is the authority on which rooms a member can be sent;
+ * `authoredRooms()` is the authority on which exist. Both are read here, so a
+ * room being wired — Acapulco on 2026-08-27, the last five on 2026-08-29 —
+ * moves it from one list to the other with nothing to edit.
+ *
+ * KEPT PER RULE 14. THIS TEST ALSO ASSERTED `unwired.length > 0`, under the
+ * heading "more rooms are authored than are servable, and the difference is the
+ * five the bench offers under a label", and its failure message read: "no
+ * unwired rooms — if the catalogue really did catch up, delete the labelled
+ * group on /desk/writing rather than leaving it drawing nothing." It was a good
+ * assertion: while the five waited, it is what stopped the label being quietly
+ * dropped from a screen that still needed it.
+ *
+ * WHAT BEAT IT: the catalogue caught up. All eighteen authored rooms are keyed,
+ * so authored and servable are the same set today and an assertion that at
+ * least one room is unwired now demands the catalogue stay incomplete.
+ *
+ * AND THE INSTRUCTION IT LEFT IS DELIBERATELY NOT FOLLOWED, which is the part
+ * worth writing down. The labelled group on /desk/writing is NOT deleted,
+ * because it is not drawing nothing: `WritingForm.tsx` already renders it under
+ * `authored.length > 0`, so with the list empty the group does not render at
+ * all, and `benchRooms()` keeps sorting on `servable` for whenever a
+ * nineteenth room is authored ahead of being wired. Deleting a correct
+ * conditional to celebrate a full catalogue would mean rebuilding it the next
+ * time a room is drafted. The assertion below is what the instruction was
+ * really protecting, and it holds in BOTH directions on its own: any room that
+ * is authored and not keyed drops out of `servable` and fails the deepEqual,
+ * and any key in `DESTINATIONS` with no authored room fails it too.
  */
 test("servable means keyed into DESTINATIONS, and nothing else does", () => {
   const servable = authoredRooms()
@@ -165,13 +188,11 @@ test("servable means keyed into DESTINATIONS, and nothing else does", () => {
     .sort();
   assert.deepEqual(servable, Object.keys(DESTINATIONS).sort());
 
-  const unwired = authoredRooms().filter((room) => !isServable(room));
-  assert.ok(
-    unwired.length > 0,
-    "no unwired rooms — if the catalogue really did catch up, delete the " +
-      "labelled group on /desk/writing rather than leaving it drawing nothing"
-  );
-  for (const room of unwired) {
+  // Whatever the split is, it is honest at the row: nothing reads as unwired
+  // while being keyed. Vacuous today, and it is the assertion that stops a
+  // future room being labelled QA-only on the bench while a member can be sent
+  // it — the direction that costs something.
+  for (const room of authoredRooms().filter((room) => !isServable(room))) {
     assert.ok(
       !(room.key in DESTINATIONS),
       `${room.key} reads as unwired and is keyed`

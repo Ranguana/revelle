@@ -139,13 +139,70 @@ test("the question asks for the tones, and asks for them the way it says", () =>
 
 /* ── the round trip ────────────────────────────────────────────────── */
 
+/**
+ * HOW MANY TONES ONE ROOM MAY CLAIM — measured, 2026-08-29.
+ *
+ * KEPT PER RULE 14. THE OLD VALUE WAS 10, and its whole argument was the
+ * failure message it shipped with: "the vocabulary is doing the work of a
+ * paragraph, and a host cannot make that many claims." That is a real risk and
+ * the number was a PROXY for it — a room claiming most of the vocabulary stops
+ * being tellable from its neighbours. What the proxy never had was an argument
+ * beside it: no distribution, no measured refusal, no calibration. A bare
+ * number, exactly the shape `0.65` was before it was calibrated, and by the end
+ * it was failing five authored rooms that every real guard passes.
+ *
+ * WHAT BEAT IT: CLAUDE.md rule 28, and the condition rule 28 attached to
+ * itself. The founder's ruling — "i dont want to cut tones. once the drinks and
+ * food are added they r different enough" — was made conditional on the second
+ * number existing: "the cap moves WITH the catalogue, not ahead of it… the
+ * deliverables measure is MUTE while six rooms have no dishes." That condition
+ * is now met. `npm run check:voices` reports 153 OF 153 PAIRS MEASURABLE, 0
+ * UNKNOWN, after the per-identity floors of 5df056d. A proxy is retired when
+ * the thing it stood in for becomes measurable; it is not defended for its own
+ * sake.
+ *
+ * WHERE 13 COMES FROM: the authored rooms, not a wish. The largest hand in the
+ * catalogue is 13 — Amalfi and Oaxaca, both from the founder's own verbatim
+ * tone lists. Aspen and Palm Springs carry 12, St. Moritz 10. The cap sits at
+ * what she actually wrote, so it still refuses a room that reaches past the
+ * whole vocabulary while refusing none of the rooms she authored.
+ *
+ * WHAT THE MOVE COSTS, COUNTED (rule 24), and measured the way the ceiling
+ * recalibration was measured — over the SAME 420 constructions from
+ * `src/lib/voice-duplicates.ts` that `npm run check:voices -- --duplicates`
+ * prints, all 18 rooms, 0-2 tones dropped, weights jittered, the stated triple
+ * restated 0/1/2/3 at a time:
+ *
+ *   refused by the OLD configuration (cap 10 + monitor ceiling + hand guard
+ *     + the stated-triple uniqueness test)                        420 of 420
+ *   refused by the NEW configuration (cap 13, everything else as before)
+ *                                                                 420 of 420
+ *   constructions the old caught and the new lets through                  0
+ *
+ * NO LESS IS REFUSED. The cap fired on 120 of the 420 and was never the only
+ * thing firing on any of them: the count of constructions REFUSED BY THE CAP
+ * ALONE, with no other instrument catching them, is 0 at a cap of 10 and 0 at a
+ * cap of 13.
+ *
+ * SO SAY PLAINLY WHAT DOES THE WORK, because the cap has been read as the
+ * echo guard and is not: `TONE_HAND_OVERLAP_MAX` (0.8) catches ALL 420 — an
+ * echo is a copied list of codes, and that is the instrument that compares
+ * lists. The monitor ceiling catches 240, the stated-triple uniqueness test 105.
+ * A hand length has never caught a copy and cannot: a copyist shortens a hand,
+ * they do not lengthen one, so the cap is the one guard an echo passes by
+ * getting MORE like an echo.
+ */
+const DESTINATION_TONE_MAX = 13;
+
 test("a destination's tones are real, weighted legally, and few", () => {
   for (const [key, tones] of Object.entries(DESTINATION_TONES)) {
     assert.ok(tones.length >= 6, `${key} is described in too few tones`);
     assert.ok(
-      tones.length <= 10,
-      `${key} needs more than ten tones — the vocabulary is doing the work of ` +
-        `a paragraph, and a host cannot make that many claims`
+      tones.length <= DESTINATION_TONE_MAX,
+      `${key} claims ${tones.length} tones against a cap of ${DESTINATION_TONE_MAX} — ` +
+        `the vocabulary is doing the work of a paragraph, and a host cannot make ` +
+        `that many claims. This is NOT the echo guard: see toneHandOverlap and ` +
+        `the argument above this test before reading a breach as a duplicated room.`
     );
     for (const { code, weight } of tones) {
       assert.ok(TONE_CODES.has(code), `${key} -> unknown tone ${code}`);
