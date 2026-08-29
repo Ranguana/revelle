@@ -265,6 +265,29 @@ try {
     // transition into 'published' (destinations/actions.ts). What changes is
     // WHO makes that transition — a person, at /desk/destinations/<id>/voice,
     // which is the whole of rule 13.
+    // A DRAFT ALREADY WAITING IS NOT A REASON TO WRITE ANOTHER ONE.
+    //
+    // render.yaml runs seed:destinations TWICE per deploy, on every deploy.
+    // Before this check, a room with no published voice fell straight through
+    // to the insert every single run — so each deploy left two more identical
+    // drafts, and a room waiting a week for a signature accumulated a pile of
+    // them. Nothing failed, which is why it went unseen: the rows were valid,
+    // the transaction committed, and the count was the only symptom.
+    const { rows: waiting } = await client.query(
+      `select id, version from world_voice
+        where world_id = $1 and status = 'draft' and voice = $2::jsonb`,
+      [worldId, payload]
+    );
+
+    if (waiting.length > 0) {
+      console.log(
+        `[seed-destinations] voice    ${key} v${waiting[0].version} DRAFT ` +
+          `already waiting, unchanged — publish it at ` +
+          `/desk/destinations/<id>/voice`
+      );
+      continue;
+    }
+
     const { rows: inserted } = await client.query(
       `insert into world_voice (world_id, voice, status, authored_by, note)
        values ($1, $2::jsonb, 'draft', $3, $4)
@@ -279,10 +302,20 @@ try {
       ]
     );
 
+    // SAY 'DRAFT', BECAUSE IT IS A DRAFT.
+    //
+    // This line said "published" for as long as the insert above wrote
+    // 'draft' — left behind when the status changed and nothing re-read it.
+    // The deploy log therefore reported success in the wrong word on every
+    // run, which is the whole reason a room could sit voiceless while the
+    // logs read as though its voice had been issued. Rule 23: a mechanism
+    // that invites misreading is a defect even when it works.
     console.log(
-      `[seed-destinations] voice    ${key} v${inserted[0].version} published` +
+      `[seed-destinations] voice    ${key} v${inserted[0].version} DRAFT ` +
+        `written — NOT in force. A person signs it at ` +
+        `/desk/destinations/<id>/voice` +
         (published.length > 0
-          ? ` (v${published[0].version} superseded; Revelles issued in it keep it)`
+          ? ` (v${published[0].version} stays in force until they do)`
           : "")
     );
   }
