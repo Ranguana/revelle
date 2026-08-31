@@ -2335,6 +2335,19 @@ const IMPOSTER: Game = {
   maxGuests: 12,
 
   externalName: "Imposter",
+  // A BROWSER LINK, NOT A STORE LISTING, and the choice is the recommendation.
+  //
+  // db/010: "We may NAME it and point a host at it." The name alone was not
+  // pointing — there are at least eight apps called some version of Imposter
+  // across the two stores, so "look it up" hands her a search result and a
+  // guess on the night. Founder ruling 2026-08-31: it gets a link.
+  //
+  // A store listing would have been the obvious answer and is the wrong one:
+  // it is one platform, and a party is not one platform. Half the room
+  // installing an iOS link is the failure this points at. This runs in a
+  // browser, needs no install and costs nothing, which is what `materials`
+  // already says the game needs — a phone each, not an account each.
+  externalUrl: "https://imposter.app/",
   caveat:
     "Not ours. It needs a phone each and signal that holds, and it can be " +
     "pulled or paywalled between the day this is designed and the night it " +

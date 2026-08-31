@@ -534,6 +534,42 @@ test("the shape of a game and the columns db/010 constrains agree", () => {
   });
 });
 
+test("A RECOMMENDED GAME POINTS SOMEWHERE, not just names something", () => {
+  /*
+   * db/010 grants the house two rights over somebody else's game — name it,
+   * point a host at it — and enforced only the first. `imposter` carried a
+   * name and no link from the day it was written, which left the host's last
+   * step a search box on the night: there are at least eight products called
+   * some version of Imposter across the two stores.
+   *
+   * Founder, 2026-08-31: "imposter should have a link to the app."
+   *
+   * Mirrored by db/053's game_recommended_points_somewhere, and asserted here
+   * too because the pool is authored in this file and a test fails faster
+   * than a deploy. Rule 15: the gap has to be able to go red.
+   */
+  const recommended = ALL_GAMES.filter((g) => g.sourcing === "recommended");
+  assert.ok(recommended.length > 0, "no recommended games — this test is asleep");
+
+  for (const game of recommended) {
+    assert.ok(
+      game.externalName,
+      `${game.slug} is recommended and names nothing`
+    );
+    assert.ok(
+      game.externalUrl,
+      `${game.slug} names "${game.externalName}" and points nowhere. A name is ` +
+        `not finding it; the house may point at somebody else's game and this ` +
+        `is the pointing.`
+    );
+    assert.match(
+      game.externalUrl,
+      /^https:\/\//,
+      `${game.slug}'s link is not https — a host opens this on a phone at a party`
+    );
+  }
+});
+
 test("ONE PRINTED PIECE PER GAME, counted in both directions", () => {
   /*
    * Founder: "for each game 1 printed matter not 3 for each game, consolidate
