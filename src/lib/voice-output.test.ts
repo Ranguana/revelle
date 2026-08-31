@@ -184,7 +184,7 @@ test("the checker does not fire on the catalogue's own authored copy", () => {
     "palm-springs-1965: Nobody is making a speech. The compliment is already out there somewhere.",
     "tahiti: Wednesday. The boat came in with more than expected. Dinner is later than yesterday.",
     "westhampton-1976: Everyone names a houseguest. Nobody names themselves. The house keeps score and will not show it.",
-    "westhampton-1976: Vintage summer glamour. Very questionable houseguests.",
+    "westhampton-1976: Vintage summer glamour. Easy, beachy, no fuss. Tennis at 8 am and cocktails at 5.",
   ];
   const fired: string[] = [];
   let lines = 0;
