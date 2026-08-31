@@ -272,9 +272,16 @@ export function inertGates(report: GateReport): string[] {
     }
     if (reach.refusals === 0) {
       inert.push(
-        `${reach.code}: ${reach.claimed} row(s) claim it and every one of the ` +
-          `${report.configurations} host configurations affords it, so it ` +
-          `refuses nothing anywhere. A grade wearing a column — see db/035.`
+        // The number is READ, not asserted. This said "every one of the
+        // ${configurations}" regardless of what the table above it printed,
+        // so on the night the gate was half-fixed the verdict claimed
+        // 960/960 while its own breakdown showed 480/960 — and the person
+        // reading it believed the verdict. A report that contradicts its own
+        // table teaches you to distrust the table (rule 23).
+        `${reach.code}: ${reach.claimed} live row(s) claim it and ` +
+          `${reach.affordedBy} of ${report.configurations} host ` +
+          `configurations afford it, so it refuses nothing anywhere. ` +
+          `A grade wearing a column — see db/035.`
       );
     }
   }
@@ -547,8 +554,34 @@ async function occasionCodes(db: Queryable): Promise<OccasionCode[]> {
 
 async function holdingsOf(db: Queryable): Promise<GateHoldings> {
   const requirements = await db.query(
-    `select requirement, count(*)::int as n
-       from ingredient_requirement group by requirement order by requirement`
+    // ── A RETIRED POOL IS NOT DEMAND ────────────────────────────────
+    //
+    // This counted every ingredient_requirement row, and the count is the
+    // DEMAND side of rule 24's both-directions measure — so a requirement
+    // whose only claimants had been retired read as heavily claimed and
+    // refusing nothing, which is the exact signature of a broken gate.
+    //
+    // `requires_full_kitchen` is that case and it cost two wrong diagnoses.
+    // Its 17 claimants are all menus (db/020: `where m.cooking =
+    // 'actually_made'`), and db/045 retired the menu pool. The gate is
+    // CORRECT — 480 of 960 configurations refuse it, in exactly the five
+    // rooms with no kitchen she can cook in — and it prunes nothing because
+    // nothing live asks for it.
+    //
+    // That is an AUTHORING absence, not a wiring one, and this file already
+    // rules on that case: `claimed === 0` continues rather than failing, the
+    // same ruling `requires_still_water` gets. The rule was right; the count
+    // feeding it was not (rule 24: count what it matched).
+    //
+    // NOT extended to dishes by symmetry. src/lib/catalogue/tagging.ts says
+    // why, in the comment above this same insert: "symmetry is not evidence."
+    // Whether an atomised dish claims a full kitchen is the founder's to
+    // author, and this file has no standing to invent the claim.
+    `select r.requirement, count(*)::int as n
+       from ingredient_requirement r
+       join ingredient_pool p on p.entity_table = r.entity_table
+      where p.retired_at is null
+      group by r.requirement order by r.requirement`
   );
   const venueRequirements: Record<string, number> = {};
   let venueRequirementRows = 0;
