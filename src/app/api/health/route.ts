@@ -1,7 +1,12 @@
 import { timingSafeEqual } from "node:crypto";
 
 import { query } from "@/lib/db";
-import { copyDriftReport } from "@/lib/desk/drift";
+import { copyDrift as copyFields, copyDriftReport } from "@/lib/desk/drift";
+import {
+  settlementOf,
+  unsettled,
+  type ReconciliationRecord,
+} from "@/lib/desk/reconcile";
 import { DESTINATIONS } from "@/lib/destinations";
 import { staffAllowlist } from "@/lib/staff-allowlist";
 import { isServable } from "@/lib/voice-check";
@@ -168,7 +173,54 @@ export async function GET(request: Request): Promise<Response> {
   // Retired rows are excluded HERE and not in the module: `world.status` is
   // not a fact src/lib/desk/drift.ts can see, and a module guessing at it
   // would be a second authority on which rooms count.
-  const copyDrift = copyDriftReport(rows.filter((r) => r.status !== "retired"));
+  const working = rows.filter((r) => r.status !== "retired");
+  const copyDrift = copyDriftReport(working);
+
+  // ── AND THE NUMBER THAT CAN ACTUALLY REACH ZERO ─────────────────────
+  //
+  // `copyDrift` cannot, and that is not a defect in it. A `database wins`
+  // verdict leaves the file and the row disagreeing FOREVER, on purpose,
+  // because the database is what a member reads and the file is 4,900 lines of
+  // argument nobody is going to regenerate. A detector demanding that number
+  // reach zero would be demanding the founder reverse a decision to make a
+  // light go green — which is how a tripwire becomes furniture.
+  //
+  // So db/055 records the verdicts and this reports the difference between
+  // them. `copyUnsettled` is drift NOBODY HAS RULED ON, plus drift that was
+  // ruled on and has since moved — the two states a person still owes an
+  // afternoon. That one is meant to hit zero and stay there, and when it does
+  // not, the reason is in the string.
+  const settlements = await query<
+    ReconciliationRecord & { slug: string }
+  >(
+    `select w.slug::text as slug, c.id::text as id, c.field, c.verdict,
+            c.registry_value, c.database_value, c.chosen_value,
+            c.provenance, c.note, c.decided_at, null as decided_by_email
+       from copy_reconciliation_current c
+       join world w on w.id = c.world_id`
+  );
+  const byField = new Map(
+    settlements.map((row) => [`${row.slug}:${row.field}`, row])
+  );
+  const pending = working.flatMap((row) =>
+    copyFields(row).map((item) => ({
+      slug: row.slug,
+      field: item.key,
+      settlement: settlementOf(
+        byField.get(`${row.slug}:${item.key}`) ?? null,
+        item.file,
+        item.live
+      ),
+    }))
+  );
+  const copyUnsettled = unsettled(pending);
+  // Counted over FIELDS, not over the strings above: `copyDrift` and
+  // `copyUnsettled` are both one line per ROOM, and a room with a settled
+  // tagline and an unruled premise appears in both. Subtracting the two
+  // lengths would report a room half-done as a room untouched.
+  const copySettled = pending.filter(
+    (item) => item.settlement.state === "settled"
+  ).length;
 
   const missing = servable.filter((s) => !liveSet.has(s));
   const extra = live.filter((s) => !servableSet.has(s));
@@ -219,6 +271,14 @@ export async function GET(request: Request): Promise<Response> {
       // registry. False is a prompt to look, not necessarily a defect.
       copyAgrees: copyDrift.length === 0,
       copyDrift,
+      // The one that is meant to reach zero. See the block above `copyDrift`:
+      // a settled `database wins` is a permanent, deliberate difference, so
+      // `copyAgrees` will read false forever and correctly. This says whether
+      // anything is still WAITING — never ruled on, or ruled on against text
+      // that has moved since. `copySettled` counts FIELDS; `copyDrift` and
+      // `copyUnsettled` are one line per ROOM.
+      copySettled,
+      copyUnsettled,
       // Rows waiting for a person, across every live pool. The publish queue,
       // as distinct from the engine's decision queue in /api/desk/digest.
       sitting,

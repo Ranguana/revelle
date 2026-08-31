@@ -45,6 +45,14 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
     // the two labels next to each other is reading the rule.
     { href: "/desk/publish", label: "Publish" },
     { href: "/desk/stocked", label: "Stocked" },
+    // THE THIRD GESTURE, beside the other two and last because it is the
+    // narrowest. Publish is consent, Stocked is the veto, and this settles the
+    // one question neither can reach: where the database's copy and
+    // src/lib/destinations.ts have parted, which side a member reads. It is in
+    // the rail rather than folded into Destinations because it is a pass —
+    // something you sit down and finish — and a pass with no door is a screen
+    // nobody finds twice.
+    { href: "/desk/reconcile", label: "Reconcile" },
   ],
   // The three screens that show what the library DOES rather than what is in
   // it. Their own group, above the messages, because they are the working

@@ -132,6 +132,50 @@ export async function saveDestination(
     form.getAll("facet").map((value) => String(value))
   );
 
+  /*
+   * ── WHICH COPY THIS SAVE ACTUALLY CHANGED ──────────────────────────
+   *
+   * `destination.updated` is the only evidence in this system that a HUMAN
+   * chose a room's member-facing copy rather than a seeder writing it once —
+   * no script can record a ledger row, because `recordAction` needs a
+   * signed-in staff member. /desk/reconcile rests its whole two-pile sort on
+   * that fact.
+   *
+   * And on its own it OVERSTATES, in precisely the shape rule 23 describes:
+   * this action fires on every save of the form, so a palette tweak and a
+   * rewritten premise are the same row in the ledger. Reading one as the other
+   * is a wrong report, and a wrong report about provenance produces a wrong
+   * ruling about copy a member reads.
+   *
+   * So the save says what it touched. One read of the three columns before the
+   * write — the cost of a save is already a round trip and a redirect — and
+   * `detail.copy_changed` carries the answer forward. It cannot be recovered
+   * backwards for rows already written; the reconciliation screen says so on
+   * every row that predates this, rather than letting the absence read as
+   * "she never touched the tagline".
+   *
+   * The list is EMPTY, never absent, when a save changed no copy at all. An
+   * empty array is the positive claim "this save touched none of it", and that
+   * is the claim the negative case on the reconciliation screen depends on.
+   */
+  const before = id
+    ? await queryOne<{ name: string; tagline: string; description: string }>(
+        `select name, tagline, description from world where id = $1`,
+        [id]
+      )
+    : null;
+  const copyChanged = before
+    ? (
+        [
+          ["name", before.name, name],
+          ["tagline", before.tagline, tagline],
+          ["premise", before.description, trimmed(form, "description")],
+        ] as const
+      )
+        .filter(([, was, now]) => (was ?? "").trim() !== now)
+        .map(([field]) => field)
+    : null;
+
   let worldId = id;
   try {
     if (id) {
@@ -192,7 +236,16 @@ export async function saveDestination(
     entityTable: "world",
     entityId: worldId,
     summary: name,
-    detail: { slug, occasions, facets: facets.length },
+    // `copy_changed` only on an update: on a create every field is new, and a
+    // list saying so would make the seeder's own row look like a curator's
+    // choice on /desk/reconcile — which is the exact distinction that screen
+    // exists to draw. See WHICH COPY THIS SAVE ACTUALLY CHANGED above.
+    detail: {
+      slug,
+      occasions,
+      facets: facets.length,
+      ...(copyChanged ? { copy_changed: copyChanged } : {}),
+    },
   });
 
   revalidatePath("/desk/destinations");
