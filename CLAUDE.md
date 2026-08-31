@@ -677,3 +677,39 @@ into the shape a parser expected.
 that it would be consistent, stop — and say the gap is an authoring absence,
 which is a finding, not a failure. See rule 15 for why a gap that can go red
 is worth more than a gap quietly filled.
+
+---
+
+**33. SCRATCH-SEEDED VERSUS PRODUCTION-UNSEEDED.**
+Founder's wording, 2026-08-31, after it wedged a deploy:
+
+> "CI validated the migration against a database whose seeds had already
+> supplied what production has never received. The general form: ANY CHECK
+> THAT RUNS POST-SEED IN SCRATCH BUT PRE-SEED IN PRODUCTION WILL PASS CI AND
+> WEDGE THE DEPLOY."
+
+The worked case. `db/053` added `check (sourcing <> 'recommended' or
+external_url is not null)`. `scripts/smoke-seeders.mjs` builds a fresh
+database, so the migration ran against an EMPTY `game` table — where a check
+constraint is satisfied vacuously — and the seeder then inserted imposter
+WITH its url. Green, honestly green, and wrong: in production the migration
+meets the row as it stands, and render.yaml runs migrate BEFORE the seeders,
+so the value the constraint requires does not exist yet.
+
+**This is not a coverage gap. It is a class of defect outside what a
+from-scratch check tests at all**, and no amount of green in that check
+speaks to it. Nothing in the apparatus — CI, `check:gates`, the local matrix
+— reads production data.
+
+**AND THIS SERVICE IS MAXIMALLY EXPOSED TO IT RIGHT NOW.** The eight seeders
+in render.yaml's chain have never run here (see that file): the live
+`preDeployCommand` was `npm run migrate` alone for the service's whole life.
+So EVERY seed-supplied value is a potential instance of this until the first
+full chain completes. The deploy that finally runs it is not just carrying
+`db/054` and a counter — it retires the failure class, by making production a
+seeded database for the first time.
+
+**The rule for authoring one.** A constraint over seed-supplied data must
+BACKFILL before it constrains, in the same migration, and must NAME what it
+cannot repair rather than invent a value for it (rule 32). `db/053` is the
+worked example in both halves.
