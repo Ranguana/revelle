@@ -479,7 +479,7 @@ test(
     process.env.DATABASE_URL = URL;
     process.env.DESK_DIGEST_TOKEN = process.env.DESK_DIGEST_TOKEN || "gates-db-test";
     if (!hooked) {
-      register("../desk/coverage.db.test.hooks.mjs", import.meta.url);
+      register("../desk/alias.test.hooks.mjs", import.meta.url);
       hooked = true;
     }
     const route = (await import("../../app/api/desk/seed/route.ts")) as {

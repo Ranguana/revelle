@@ -223,7 +223,7 @@ async function collect(client: pg.Client): Promise<void> {
   // because the pool is built on first use and stashed on globalThis.
   process.env.DATABASE_URL = URL;
   if (!hooked) {
-    register("./coverage.db.test.hooks.mjs", import.meta.url);
+    register("./alias.test.hooks.mjs", import.meta.url);
     hooked = true;
   }
   const coverage = (await import("./coverage.ts")) as {

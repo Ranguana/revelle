@@ -178,10 +178,10 @@ before(async () => {
   // The board reads through src/lib/db.ts, which takes its connection string
   // from DATABASE_URL. Pointed at the test database and imported only after,
   // because the pool is built on first use and stashed on globalThis. The
-  // resolver hook is ./coverage.db.test.hooks.mjs — shared with its sibling
+  // resolver hook is ./alias.test.hooks.mjs — shared with its sibling
   // rather than copied, since it teaches Node the same two things.
   process.env.DATABASE_URL = URL;
-  register("./coverage.db.test.hooks.mjs", import.meta.url);
+  register("./alias.test.hooks.mjs", import.meta.url);
   const coverage = (await import("./coverage.ts")) as {
     board: () => Promise<BoardShape>;
   };

@@ -32,7 +32,17 @@
  *
  * `.mjs` and not `.ts`, and named `*.test.hooks.mjs` rather than `*.test.ts`,
  * so `npm test`'s glob does not pick it up as a test file. It is loaded by
- * `module.register()` from ./coverage.db.test.ts and by nothing else.
+ * `module.register()` from the tests that need it and never imported.
+ *
+ * ── IT USED TO BE CALLED coverage.db.test.hooks.mjs ─────────────────
+ *
+ * It was written for one test and had four callers within a fortnight —
+ * coverage.db.test.ts, also-at.db.test.ts, gates.db.test.ts and
+ * reconcile.test.ts. The name said it belonged to the first of them, which is
+ * the kind of label that eventually persuades somebody to write a second copy
+ * for "their" test rather than register this one. Renamed rather than
+ * duplicated: rule 21 is about authority, and "what `@/` means to Node" is a
+ * fact every test must agree on.
  */
 import { pathToFileURL } from "node:url";
 
