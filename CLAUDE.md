@@ -626,3 +626,32 @@ should say so, not apologise for not being production.
 `/api/health` exists so this is never re-derived: `sha`, `registry`, `worlds`,
 `seeded`, and the slugs that differ. See rule 21 for why it reports both
 authorities rather than picking one.
+
+---
+
+**32. SYMMETRY IS NOT EVIDENCE.**
+That two things resemble each other is not a reason to treat them the same.
+The tempting move is always to "finish the job": one pool is tagged, so tag
+the neighbour; one room got a gesture, so give them all one; a requirement
+lost its claimants, so re-point it at whatever replaced them.
+
+Worked example, 2026-08-31. `requires_full_kitchen` is claimed only by menus
+(db/020, `where m.cooking = 'actually_made'`), and db/045 retired the menu
+pool — so the requirement had no live demand and the gate report called it
+inert. The obvious repair was to claim it for dishes, which are what menus
+became. That would have been a machine inventing demand so a gate looked
+busy, and `src/lib/catalogue/tagging.ts` had already refused it in writing:
+
+    "This comment exists so that the next person does not 'finish the job'
+     by symmetry: symmetry is not evidence."
+
+Whether an atomised dish needs a full kitchen is an AUTHORING question with a
+founder's answer. The same reasoning decided the drinks in the same session:
+twenty of twenty-five programmes contain an occasion-shaped word and not one
+is an occasion claim, so the corpus was taken at its word rather than tidied
+into the shape a parser expected.
+
+**The test: can you point at the row that says so?** If the only argument is
+that it would be consistent, stop — and say the gap is an authoring absence,
+which is a finding, not a failure. See rule 15 for why a gap that can go red
+is worth more than a gap quietly filled.

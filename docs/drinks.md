@@ -248,3 +248,69 @@ drink at it — or a bar with nothing to eat beside it.
 `havana` — written to these two programmes rather than the other way round. A
 bar that shakes rather than stirs and serves coffee at every hour, including
 after midnight, is most of what the destination knows about itself.
+
+---
+
+# THE MEAL-SHAPE RULING — how a drink reaches an occasion
+
+**Founder ruling, 2026-08-31, transcribed in the session it was made.** It
+closes the only open item in the engine's decision queue, written by the
+engine on 2026-08-29:
+
+> No drink is scoped to an occasion, and none can be from the document as it
+> stands: all 25 programmes name a MEAL SHAPE and `docs/drinks.md` has no
+> occasion field. db/023 ruled these two are different axes. Either the
+> document grows an occasion field, or the drinks gain a meal-shape axis of
+> their own — **a decision, not a patch.**
+
+## The ruling
+
+> "drinks gain a meal-shape axis of their own, and occasion scoping derives
+> through it. The evidence in the explosion doc decides it — 20 of 25
+> programmes name meal shapes, zero name occasions, so the authored truth of
+> this corpus is meal shape; adding an occasion field to the document would
+> mean inventing 76 occasion claims that mostly just restate the meal-shape
+> mapping, a second authority for one fact. Instead: drinks claim what their
+> authors actually wrote (dinner, brunch, late supper, standing drinks), each
+> occasion declares its meal shape(s) once — most already imply it — and
+> occasion→drink eligibility is a join, not an authoring pass. db/023's
+> two-axes ruling is respected because the axes stay separate and connect by
+> mapping. If a genuinely occasion-specific drink ever appears (champagne
+> claiming Something Bridal regardless of meal), that's a narrow additive
+> field later, on evidence."
+
+## Why this is the conservative answer, not the clever one
+
+The other branch — an occasion field on the document — reads as the direct
+fix and is the expensive one. It would require **76 occasion claims that
+nobody wrote**, each mostly restating the meal-shape mapping, which is a
+second authority for one fact (`CLAUDE.md` rule 21) and 76 opportunities for
+an agent's guess to acquire the founder's name (rule 3).
+
+The ruling instead takes the corpus at its word. `docs/drink-explosion.md`
+re-derived the finding by hand rather than trusting the prior pass: twenty of
+twenty-five programme names contain a word a naive parser would scope on, and
+**not one is a legitimate occasion claim** — every hit is `dinner`, `supper`,
+`dinner party`, `boat` or `beach day`, all of them db/023's meal-shape axis.
+
+## What it requires, and the order
+
+`meal_shape` already exists as a closed enum (db/023): `brunch`, `lunch`,
+`cocktails`, `long_dinner`, `late_supper`. Nothing maps an occasion to it yet.
+
+1. **Drinks claim a meal shape** — from what their authors wrote, never inferred.
+2. **Each occasion declares its meal shape(s), once.** Most already imply it.
+3. **Eligibility is the join.** No third table, no per-drink occasion field.
+
+**NOT BUILT YET, AND DELIBERATELY.** The 76 atomised drinks live in
+`docs/drink-explosion.md`, which is untracked and unseeded. Building the axis
+before the rows exist would produce a gate with no claimants — the
+`requires_still_water` situation, and the shape of the defect that made
+`requires_full_kitchen` unreadable for two days. The axis lands when the
+drinks do.
+
+## The escape hatch, stated so it is not reinvented
+
+A genuinely occasion-specific drink — champagne claiming Something Bridal
+regardless of meal — gets **a narrow additive field, later, on evidence**. Not
+now, and not by symmetry.
