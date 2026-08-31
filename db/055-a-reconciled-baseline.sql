@@ -233,11 +233,11 @@ begin
     'copy_reconciliation is append-only: row % may not be %.',
     coalesce(old.id, new.id), lower(tg_op)
     using errcode = 'restrict_violation',
-          hint =
-      'Re-deciding a field INSERTS another row; the newest is the one in '
-      'force. CLAUDE.md rule 14 — superseded reasoning is preserved, never '
-      'deleted, and a reconciliation is exactly the kind of ruling somebody '
-      'reverses later needing to know what the first one was reasoning about.';
+          hint = 'Re-deciding a field INSERTS another row; the newest is the '
+                 'one in force. CLAUDE.md rule 14 — superseded reasoning is '
+                 'preserved, never deleted, and a reconciliation is exactly '
+                 'the kind of ruling somebody reverses later needing to know '
+                 'what the first one was reasoning about.';
 end;
 $$;
 

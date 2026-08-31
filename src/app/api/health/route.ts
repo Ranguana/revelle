@@ -195,7 +195,12 @@ export async function GET(request: Request): Promise<Response> {
   >(
     `select w.slug::text as slug, c.id::text as id, c.field, c.verdict,
             c.registry_value, c.database_value, c.chosen_value,
-            c.provenance, c.note, c.decided_at, null as decided_by_email
+            c.provenance, c.note, c.decided_at,
+            -- Cast, not a bare null: an untyped null comes back as unknown.
+            -- Null at all because this route has no use for the address --
+            -- /api/health reports counts and slugs and never a person, which
+            -- is the rule the door block below states at length.
+            null::text as decided_by_email
        from copy_reconciliation_current c
        join world w on w.id = c.world_id`
   );
