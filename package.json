@@ -31,6 +31,8 @@
     "selection:demo": "node scripts/selection-demo.mjs",
     "build:tone-marks": "node scripts/build-tone-marks.mjs",
     "check:tone-marks": "node scripts/build-tone-marks.mjs --check",
+    "gen:registry-dates": "node scripts/registry-dates.mjs",
+    "check:registry-dates": "node scripts/registry-dates.mjs --check",
     "activate:catalogue": "node scripts/activate-catalogue.mjs",
     "smoke:seeders": "node scripts/smoke-seeders.mjs",
     "check:matrix": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/audit-matrix.mjs",
