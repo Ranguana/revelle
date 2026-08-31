@@ -101,9 +101,13 @@ export async function GET(request: Request): Promise<Response> {
     status: string;
     voice: string | null;
     drafts: string;
+    name: string;
+    tagline: string;
+    description: string;
   }>(
     `select w.slug::text as slug,
             w.status::text as status,
+            w.name, w.tagline, w.description,
             (select 'v' || v.version from world_voice v
               where v.world_id = w.id and v.status = 'published'
               limit 1) as voice,
@@ -122,6 +126,36 @@ export async function GET(request: Request): Promise<Response> {
   const voiceless = rows
     .filter((r) => r.status !== "retired" && !r.voice)
     .map((r) => `${r.slug} (${r.drafts} draft${r.drafts === "1" ? "" : "s"} waiting)`);
+
+  // ── COPY DRIFT ──────────────────────────────────────────────────────
+  //
+  // The seeder NEVER overwrites a curator: it writes name, tagline and
+  // premise when it CREATES a room and leaves them alone forever after. That
+  // rule is right — a script has no standing to reverse a judgement made in
+  // the tool — but it means the registry and the database can say different
+  // things indefinitely and nothing reconciles them.
+  //
+  // It happened, and it reached a member: WESTHAMPTON, 1976 read "Vintage
+  // summer glamour. No cooking" on the portal while destinations.ts said
+  // "Very questionable houseguests." Found by a person reading a screen,
+  // which is the most expensive detector there is.
+  //
+  // So this reports DISAGREEMENT, and nothing more. It does not say which is
+  // right — the database is authoritative for copy, and a curator's edit is
+  // exactly the case that shows up here as drift. It is a prompt to look, not
+  // a defect. Same shape as `missing` and `extra`: name the rows, so the
+  // question is answerable instead of merely raised.
+  const copyDrift = Object.entries(DESTINATIONS)
+    .filter(([, room]) => isServable(room))
+    .flatMap(([slug, room]) => {
+      const row = rows.find((r) => r.slug === slug);
+      if (!row || row.status === "retired") return [];
+      const fields: string[] = [];
+      if (row.name !== room.name) fields.push("name");
+      if (row.tagline !== room.tagline) fields.push("tagline");
+      if (row.description !== room.premise) fields.push("premise");
+      return fields.length > 0 ? [`${slug} (${fields.join(", ")})`] : [];
+    });
 
   const missing = servable.filter((s) => !liveSet.has(s));
   const extra = live.filter((s) => !servableSet.has(s));
@@ -145,6 +179,10 @@ export async function GET(request: Request): Promise<Response> {
         missing.length === 0 && extra.length === 0 && voiceless.length === 0,
       voices: live.length - voiceless.length,
       voiceless,
+      // True when every live room's name, tagline and premise match the
+      // registry. False is a prompt to look, not necessarily a defect.
+      copyAgrees: copyDrift.length === 0,
+      copyDrift,
       // ── WHY THE DOOR IS DESCRIBED HERE ──────────────────────────────
       //
       // The sign-in form returns the SAME response whether the address is
