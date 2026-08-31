@@ -239,8 +239,32 @@ export function venueEligibility(
   const requirements = ingredient.requirements ?? [];
   if (requirements.length === 0) return { eligible: true, reason: "" };
 
+  // ── SILENCE IS A REFUSAL, NOT A PERMISSION ──────────────────────────
+  //
+  // This read `=== false`, so a requirement with NO ROW was `undefined`, and
+  // `undefined === false` is false: not refused, therefore allowed. That was
+  // deliberate and it is preserved here because the reasoning was sound and
+  // the mechanism was not — db/020's default IS generous, but it expresses
+  // that generosity by INSERTING `provided = true` rows, one per environment,
+  // in a cross join that ran once. Restating the default in code as well made
+  // the code the second owner of it (rule 21), and when the rows and the code
+  // disagreed the code won silently.
+  //
+  // WHAT BEAT IT: db/020's cross join ran against the environments that
+  // existed the day it ran. Anything added to `environment_type` afterwards
+  // has no row at all, and every requirement was therefore afforded there —
+  // which is how `requires_full_kitchen` came to be claimed by 17 rows,
+  // refused for beach, poolside, garden, hotel and restaurant in the
+  // migration source, and still afforded by all 960 configurations the house
+  // models. A gate that cannot fire.
+  //
+  // `!== true` fails CLOSED: an affordance nobody has stated refuses, loudly,
+  // and the backfill that follows is then a correction of a visible wrong
+  // answer rather than the only thing standing between a gate and silence.
+  // Backfilling alone would have left the NEXT environment silently
+  // permissive. See CLAUDE.md rule 15.
   const unmet = requirements.filter(
-    (requirement) => venue.provides[requirement.code] === false
+    (requirement) => venue.provides[requirement.code] !== true
   );
   if (unmet.length === 0) return { eligible: true, reason: "" };
 

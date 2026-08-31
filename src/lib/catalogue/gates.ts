@@ -680,12 +680,29 @@ export async function gateReport(db: Queryable): Promise<GateReport> {
     const venue = configuration.venue;
 
     for (const code of Object.keys(affordedBy)) {
-      // db/020's default, restated here because it is the thing that makes the
-      // number honest: a requirement with NO ROW is afforded. Counting only
-      // explicit `true` rows would report `requires_still_water` as unreachable
-      // on every legacy configuration, which is the opposite of what silence
-      // means.
-      if (venue.provides[code] !== false) affordedBy[code] += 1;
+      // ── WHAT SILENCE MEANS, AND WHY THIS FLIPPED ────────────────────
+      //
+      // This read `!== false`, under the reasoning preserved verbatim here
+      // because it is the exact belief that hid the defect:
+      //
+      //   "db/020's default, restated here because it is the thing that makes
+      //    the number honest: a requirement with NO ROW is afforded. Counting
+      //    only explicit `true` rows would report `requires_still_water` as
+      //    unreachable on every legacy configuration, which is the opposite of
+      //    what silence means."
+      //
+      // WHAT BEAT IT: this detector exists to find requirements that never
+      // prune, and it counted a missing row as an affordance — so an axis with
+      // NO ROWS AT ALL reported as universally afforded, which is precisely
+      // the signature of the thing it is looking for. It found
+      // `requires_full_kitchen` anyway, and the finding was right, but it
+      // would have reported the same number for a requirement that was
+      // perfectly configured and one that had been forgotten entirely.
+      //
+      // `=== true` matches src/lib/selection/venue.ts, which is the rule that
+      // actually decides. A detector that models the engine loosely is a
+      // detector that grades a system nobody runs (rule 21).
+      if (venue.provides[code] === true) affordedBy[code] += 1;
       else {
         const source = venue.refusedBy?.[code] ?? "environment";
         refusedByAnswers[code].add(
@@ -699,7 +716,9 @@ export async function gateReport(db: Queryable): Promise<GateReport> {
       if (verdict.eligible) continue;
       venuePrunes += 1;
       for (const requirement of ingredient.requirements ?? []) {
-        if (venue.provides[requirement.code] !== false) continue;
+        // Same flip, same reason: skip only what is EXPLICITLY afforded, so a
+        // missing row is counted as the refusal the engine now treats it as.
+        if (venue.provides[requirement.code] === true) continue;
         venueByRequirement[requirement.code] =
           (venueByRequirement[requirement.code] ?? 0) + 1;
         const source = venue.refusedBy?.[requirement.code] ?? "environment";
