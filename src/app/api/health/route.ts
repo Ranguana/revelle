@@ -160,6 +160,29 @@ export async function GET(request: Request): Promise<Response> {
   const missing = servable.filter((s) => !liveSet.has(s));
   const extra = live.filter((s) => !servableSet.has(s));
 
+  // ── THE PUBLISH BACKLOG, AS A NUMBER ────────────────────────────────
+  //
+  // db/054. A status report once said "THE QUEUE: 1" meaning the engine's
+  // decision queue, while the backlog a curator actually feels — rows waiting
+  // for a person — was measured nowhere she could read it. The policy answer
+  // (db/036: pool classes stock themselves) is correct and is not a count:
+  // rows predating it, and anything hand-drafted, are unaffected by it.
+  //
+  // Registry-driven, so a seventh pool appears here without an edit.
+  const pools = await query<{
+    entity_table: string;
+    total: string;
+    issuable: string;
+    sitting: string;
+  }>("select entity_table, total, issuable, sitting from pool_standing()");
+
+  const sittingByPool = Object.fromEntries(
+    pools
+      .filter((p) => Number(p.sitting) > 0)
+      .map((p) => [p.entity_table, Number(p.sitting)])
+  );
+  const sitting = pools.reduce((n, p) => n + Number(p.sitting), 0);
+
   const byStatus = rows.reduce<Record<string, number>>((acc, r) => {
     acc[r.status] = (acc[r.status] ?? 0) + 1;
     return acc;
@@ -183,6 +206,10 @@ export async function GET(request: Request): Promise<Response> {
       // registry. False is a prompt to look, not necessarily a defect.
       copyAgrees: copyDrift.length === 0,
       copyDrift,
+      // Rows waiting for a person, across every live pool. The publish queue,
+      // as distinct from the engine's decision queue in /api/desk/digest.
+      sitting,
+      sittingByPool,
       // ── WHY THE DOOR IS DESCRIBED HERE ──────────────────────────────
       //
       // The sign-in form returns the SAME response whether the address is
