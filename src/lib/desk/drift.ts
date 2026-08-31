@@ -233,6 +233,89 @@ function normalise(value: unknown): string {
   return typeof value === "string" ? value.replace(/\r\n/g, "\n").trim() : "";
 }
 
+/* ── the copy predicate, and its ONE owner ─────────────────────────── */
+
+/**
+ * WHERE THE MEMBER-FACING COPY OF ONE ROOM HAS PARTED FROM THE FILE.
+ *
+ * The name, the tagline and the premise — nothing else. Split out of
+ * `destinationDrift` and exported because THREE surfaces now have to agree
+ * about what "the copy has drifted" means, and rule 21 says a fact two
+ * surfaces must agree on has exactly one owner:
+ *
+ *   · this module's own report, on a destination's page;
+ *   · `copyAgrees` / `copyDrift` in src/app/api/health/route.ts;
+ *   · the reconciliation desk, /desk/reconcile.
+ *
+ * IT WAS ALREADY TWO. The health route compared with a bare `!==` on the raw
+ * column while this module compared through `normalise`, so a premise
+ * differing only by a trailing newline was drift on one surface and not on
+ * the other — the exquisite failure rule 21 describes, where both look right
+ * and mean different things. The reconciliation table records a verdict
+ * against a FIELD, and a field that is drifted here and clean there cannot be
+ * reconciled at all: it would show as settled on one screen and unreconciled
+ * on the next, forever.
+ *
+ * So the predicate is here, once, and the two other surfaces call it. Trailing
+ * whitespace is not a curator's judgement; everything else is.
+ */
+export function copyDrift(live: LiveDestination): ProseDrift[] {
+  const file = authored(live.slug);
+  if (!file) return [];
+  const out: ProseDrift[] = [];
+  for (const field of ROW_FIELDS) {
+    const fileValue = normalise(field.from(file));
+    const liveValue = normalise(field.live(live));
+    if (fileValue !== liveValue) {
+      out.push({
+        key: field.key,
+        label: field.label,
+        source: "row",
+        where: field.where,
+        file: fileValue,
+        live: liveValue,
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * The same predicate over a whole catalogue, rendered the way /api/health
+ * names a drifting room: `westhampton-1976 (tagline, premise)`.
+ *
+ * The STRING is here rather than in the route for the same reason the
+ * comparison is: the reconciliation desk quotes the health line back at a
+ * person ("this is what the detector is still reporting"), and two spellings
+ * of one report is how a person concludes the screens disagree.
+ *
+ * A room the file does not author contributes nothing — there is no other side
+ * to differ from, which is exactly what `copyDrift` already returns for it.
+ * Retired rooms are the CALLER'S to exclude: this module cannot see a status
+ * and must not pretend to.
+ */
+export function copyDriftReport(
+  live: readonly LiveDestination[]
+): string[] {
+  return live.flatMap((row) => {
+    const fields = copyDrift(row);
+    return fields.length > 0
+      ? [`${row.slug} (${fields.map((field) => field.key).join(", ")})`]
+      : [];
+  });
+}
+
+/** The three fields this house reconciles, in the file's own vocabulary. */
+export const COPY_FIELDS = ROW_FIELDS.map((field) => field.key);
+
+/** The authored value of one copy field, or null when the file has no room. */
+export function authoredCopy(slug: string, field: string): string | null {
+  const file = authored(slug);
+  if (!file) return null;
+  const found = ROW_FIELDS.find((entry) => entry.key === field);
+  return found ? normalise(found.from(file)) : null;
+}
+
 /* ── tones ─────────────────────────────────────────────────────────── */
 
 export type ToneDrift = {
@@ -298,22 +381,11 @@ export function destinationDrift(live: LiveDestination): DestinationDrift {
 
   if (!file) return empty;
 
-  const prose: ProseDrift[] = [];
-
-  for (const field of ROW_FIELDS) {
-    const fileValue = normalise(field.from(file));
-    const liveValue = normalise(field.live(live));
-    if (fileValue !== liveValue) {
-      prose.push({
-        key: field.key,
-        label: field.label,
-        source: "row",
-        where: field.where,
-        file: fileValue,
-        live: liveValue,
-      });
-    }
-  }
+  // The row half comes from `copyDrift` rather than being computed again
+  // here: /api/health and /desk/reconcile ask the same question of the same
+  // three fields, and the day this loop and that function differ by a `trim`
+  // is the day a reconciled field reads as unreconciled on the next screen.
+  const prose: ProseDrift[] = copyDrift(live);
 
   // `undefined` means the caller did not fetch a voice; `null` means the query
   // ran and there is none published. Neither is a difference, and the two are

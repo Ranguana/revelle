@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 
 import { query } from "@/lib/db";
+import { copyDriftReport } from "@/lib/desk/drift";
 import { DESTINATIONS } from "@/lib/destinations";
 import { staffAllowlist } from "@/lib/staff-allowlist";
 import { isServable } from "@/lib/voice-check";
@@ -145,17 +146,29 @@ export async function GET(request: Request): Promise<Response> {
   // exactly the case that shows up here as drift. It is a prompt to look, not
   // a defect. Same shape as `missing` and `extra`: name the rows, so the
   // question is answerable instead of merely raised.
-  const copyDrift = Object.entries(DESTINATIONS)
-    .filter(([, room]) => isServable(room))
-    .flatMap(([slug, room]) => {
-      const row = rows.find((r) => r.slug === slug);
-      if (!row || row.status === "retired") return [];
-      const fields: string[] = [];
-      if (row.name !== room.name) fields.push("name");
-      if (row.tagline !== room.tagline) fields.push("tagline");
-      if (row.description !== room.premise) fields.push("premise");
-      return fields.length > 0 ? [`${slug} (${fields.join(", ")})`] : [];
-    });
+  //
+  // ── AND IT IS NOT THIS ROUTE'S PREDICATE ANY MORE ───────────────────
+  //
+  // It used to be. Three lines of `row.tagline !== room.tagline` sat here
+  // while src/lib/desk/drift.ts compared the same three fields through
+  // `normalise` — a trim and a line-ending fold — so a premise differing only
+  // by trailing whitespace was drift on this route and no drift on the desk.
+  // Rule 21's exquisite failure: both surfaces looked right and meant
+  // different things, and nothing could go red, because neither side is wrong
+  // on its own.
+  //
+  // It stopped being survivable when the reconciliation desk landed. A verdict
+  // is recorded against one (room, field) pair, and a field this route calls
+  // drifted while the desk calls it clean cannot be reconciled at all: it
+  // would sit on the detector forever with nothing on the screen to click.
+  // `copyDriftReport` is the one owner and both surfaces call it — including
+  // the sentence it renders, because two spellings of one report is how a
+  // person concludes the two screens disagree.
+  //
+  // Retired rows are excluded HERE and not in the module: `world.status` is
+  // not a fact src/lib/desk/drift.ts can see, and a module guessing at it
+  // would be a second authority on which rooms count.
+  const copyDrift = copyDriftReport(rows.filter((r) => r.status !== "retired"));
 
   const missing = servable.filter((s) => !liveSet.has(s));
   const extra = live.filter((s) => !servableSet.has(s));
