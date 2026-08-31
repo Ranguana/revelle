@@ -534,6 +534,51 @@ test("the shape of a game and the columns db/010 constrains agree", () => {
   });
 });
 
+test("ONE PRINTED PIECE PER GAME, counted in both directions", () => {
+  /*
+   * Founder: "for each game 1 printed matter not 3 for each game, consolidate
+   * it. but again it wasnt actually done." The ruling had been made before and
+   * had lived in the block comment at the top of src/lib/games.ts, which is
+   * CLAUDE.md rule 20's shape — the file that describes the rule is not the
+   * rule, and a paragraph does not go red.
+   *
+   * COUNTED IN BOTH DIRECTIONS (rule 24), because the two failures look
+   * identical from outside and are opposite: a provided game that drifts back
+   * to two pieces, and a provided game that has quietly lost the only one it
+   * had. Zero is a real defect here — a game the house provides and prints
+   * nothing for is a game with no object in the room.
+   *
+   * Recommended games are the other side of it and are asserted at zero in
+   * "A RECOMMENDED GAME'S RUNBOOK IS THE HOUSE'S OWN PART ONLY", which is
+   * where db/010's sourcing trigger is mirrored. That absence is a claim the
+   * schema enforces, not the authoring gap CLAUDE.md rule 29 is about.
+   */
+  const provided = ALL_GAMES.filter((g) => g.sourcing === "provided");
+  assert.equal(provided.length, 26, `${provided.length} provided games rather than 26`);
+
+  for (const game of provided) {
+    assert.equal(
+      game.printedMatter.length,
+      1,
+      `${game.slug} prints ${game.printedMatter.length} pieces rather than 1. ` +
+        `One artwork per game, set once in the destination's face; a game that ` +
+        `needs several things at once gets one PERFORATED sheet, not several ` +
+        `objects. Nothing may be dropped to reach the number.`
+    );
+    const [piece] = game.printedMatter;
+    assert.ok(
+      !(piece.perGuest === true && piece.quantity !== undefined),
+      `${game.slug}/${piece.piece}: db/010 refuses a fixed count on a per-head piece`
+    );
+    assert.ok(
+      (piece.description ?? "").length > 0,
+      `${game.slug}/${piece.piece} carries everything this game prints and says ` +
+        `nothing about what is on it. The description is the only place the ` +
+        `merged pieces survive.`
+    );
+  }
+});
+
 /* ═══════════════════════════════════════════════════════════════════
  * CLAUDE.md RULE 29 — EVERY ROOM MAY HAVE GAMES
  *

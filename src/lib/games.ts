@@ -45,6 +45,42 @@
  * misread.
  *
  * ─────────────────────────────────────────────────────────────────────
+ * ONE PRINTED PIECE PER GAME
+ *
+ * Founder, ruling on a file that had five pieces on the auction and three on
+ * the art battle: "for each game 1 printed matter not 3 for each game,
+ * consolidate it. but again it wasnt actually done."
+ *
+ * So every provided game below carries exactly ONE `printedMatter` row. It is
+ * one artwork, set once in the destination's face, and it arrives as one
+ * sheet. Where a game needs several things in the room at once, the sheet is
+ * PERFORATED and the host separates it — the device fishbowl's slips already
+ * used, generalised. Nothing was dropped to reach the number: everything the
+ * several rows carried is written into the one that survives, and where the
+ * merge changed how an object gets into the room, the runbook step that puts
+ * it there was changed with it.
+ *
+ * THE SUPERSEDED READING, kept per CLAUDE.md rule 14 because it is the one a
+ * later agent will re-derive: the pieces used to be split by KIND OF WRITING —
+ * a ballot was a `notice`, a door card a `heading`, a paddle a `place_card`,
+ * and only the rules were a `game_rule`. db/010's own comment still gives "the
+ * writer's prompt for a voting slip knows it is a `notice`" as the reason the
+ * `voice_piece` column exists. That was a good argument for a schema and a bad
+ * one for a catalogue: it produced three and five objects per game, each its
+ * own design job, for a house that prints one thing. The column is unharmed —
+ * it now says what the whole sheet is, and the whole sheet is a `game_rule`,
+ * because what the house writes on it is the game explained. The blanks a
+ * guest fills in are not house writing and never were.
+ *
+ * WHAT WAS DELIBERATELY NOT DONE: `imposter` still prints nothing, and no row
+ * was authored for it. It is RECOMMENDED, db/010's trigger refuses printed
+ * matter for a recommended game in both directions, and games.test.ts asserts
+ * the count is zero. Rule 29 says an absence is almost never a fact about the
+ * thing — this is the exception it leaves room for, because the absence here
+ * is a POSITIVE claim the schema enforces rather than an authoring gap: we may
+ * name somebody else's game and may not print a card for it.
+ *
+ * ─────────────────────────────────────────────────────────────────────
  * THE FACET VOCABULARY, AND WHERE IT IS SHORT
  *
  * Every tag below is an EXISTING facet from db/002 — the vocabulary a host
@@ -159,6 +195,12 @@ export type GameSupply = {
 export type GameRequirement = { requirement: string; note?: string };
 
 /** A real object, set in the destination's palette and face. */
+/**
+ * db/010. ONE OF THESE PER PROVIDED GAME, and none at all for a recommended
+ * one. See "ONE PRINTED PIECE PER GAME" at the top of this file for the
+ * founder's ruling and for what the split rows used to be; games.test.ts
+ * counts it in both directions.
+ */
 export type GamePrintedPiece = {
   piece: string;
   label: string;
@@ -435,13 +477,14 @@ const ART_BATTLE: Game = {
         step: "draw_the_prompt",
         phase: "opening",
         instruction:
-          "Have somebody draw one prompt card from the five and read it out.",
+          "Have somebody tear the five prompt tabs off their sheet, fold " +
+          "them, and draw one.",
         detail:
           "You do not pick it. A prompt the host chose is a prompt the host " +
           "is answering for; a prompt the room drew belongs to the room.",
         say: "Pick one and read it out. That is the prompt and there is no second one.",
         minutes: 2,
-        printedPiece: "prompt_cards",
+        printedPiece: "the_sheet",
       },
       {
         step: "the_two_rules",
@@ -449,7 +492,7 @@ const ART_BATTLE: Game = {
         instruction: "Say the two rules and start the clock.",
         say: "Nothing gets signed. When I call time, put it down and leave the room.",
         minutes: 1,
-        printedPiece: "rules_card",
+        printedPiece: "the_sheet",
       },
       {
         step: "paint",
@@ -505,7 +548,7 @@ const ART_BATTLE: Game = {
           "one nobody has ever broken.",
         say: "Five categories, one number in each. Not your own.",
         minutes: 5,
-        printedPiece: "voting_slips",
+        printedPiece: "the_sheet",
       },
       {
         step: "the_count",
@@ -689,26 +732,17 @@ const ART_BATTLE: Game = {
   ],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rules",
-      description: "Three rounds and the twist, short enough to read aloud.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
-      piece: "prompt_cards",
-      label: "The prompts",
+      piece: "the_sheet",
+      label: "The sheet",
       description:
-        "One per round, face down. Written for the destination — this is the " +
-        "part a curator authors.",
-      voicePiece: "notice",
-      quantity: 5,
-    },
-    {
-      piece: "voting_slips",
-      label: "The ballot",
-      description: "Five categories, one line each.",
-      voicePiece: "notice",
+        "One a head, perforated. The rules at the head — three rounds and " +
+        "the twist, short enough to read aloud. The ballot under them: five " +
+        "categories, one line each. Five prompt tabs along the foot, printed " +
+        "on the reverse so they read blank face up; somebody tears the five " +
+        "off one sheet, folds them, and draws the prompt from those. The " +
+        "prompts are written for the destination and are the part a curator " +
+        "authors.",
+      voicePiece: "game_rule",
       perGuest: true,
     },
   ],
@@ -814,7 +848,7 @@ const REVERSE_SCAVENGER_HUNT: Game = {
           "Nothing is hidden, and nothing may be taken.",
         say: "Nothing is hidden. Nothing may be taken. Everything on that list has to be given to you, by somebody in this room, in the next forty-five minutes.",
         minutes: 2,
-        printedPiece: "rules_card",
+        printedPiece: "point_list",
       },
       {
         step: "the_hunt",
@@ -1011,16 +1045,12 @@ const REVERSE_SCAVENGER_HUNT: Game = {
     {
       piece: "point_list",
       label: "The list",
-      description: "Ten lines and what each is worth.",
-      voicePiece: "notice",
-      perGuest: true,
-    },
-    {
-      piece: "rules_card",
-      label: "The rules",
-      description: "Nothing is taken. Everything is given. Forty-five minutes.",
+      description:
+        "One a head. The two rules at the head — nothing is taken, " +
+        "everything is given, forty-five minutes — and under them the ten " +
+        "lines and what each is worth.",
       voicePiece: "game_rule",
-      quantity: 1,
+      perGuest: true,
     },
   ],
   dependencies: [],
@@ -1113,11 +1143,13 @@ const LETS_MAKE_A_DEAL: Game = {
       {
         step: "write_the_envelopes",
         phase: "before",
-        instruction: "Write the five Door C envelopes and shuffle them.",
+        instruction:
+          "Cut the five Door C slips off the sheet, put them in envelopes, and " +
+          "shuffle them.",
         detail:
           "Swap with anyone. Double your prize. Lose everything. Steal a " +
           "prize. A mystery gift. Nothing is written on the outside.",
-        printedPiece: "mystery_envelopes",
+        printedPiece: "the_sheet",
         supplyItem: "Envelopes",
       },
       {
@@ -1136,7 +1168,7 @@ const LETS_MAKE_A_DEAL: Game = {
           "Hand them out for joining anything — a toast, a photograph, the " +
           "washing up. The market later is only as loud as the number of " +
           "tickets in the room.",
-        printedPiece: "tickets",
+        printedPiece: "the_sheet",
       },
       {
         step: "call_the_room",
@@ -1147,7 +1179,7 @@ const LETS_MAKE_A_DEAL: Game = {
           "three curtained corners pointing at them is the whole invitation.",
         say: "Door A. Door B. Door C. One of these is worth having and I am the only person who knows which.",
         minutes: 4,
-        printedPiece: "door_cards",
+        printedPiece: "the_sheet",
       },
       {
         step: "the_market_opens",
@@ -1160,7 +1192,7 @@ const LETS_MAKE_A_DEAL: Game = {
           "it closed. It is not a side rule; it is why the room is loud.",
         say: "Three tickets buys you one door. Sixty seconds from now: buy from her, sell to her, any price you like, and every deal goes through me.",
         minutes: 2,
-        printedPiece: "rules_card",
+        printedPiece: "the_sheet",
       },
       {
         step: "round_one",
@@ -1339,34 +1371,18 @@ const LETS_MAKE_A_DEAL: Game = {
   ],
   printedMatter: [
     {
-      piece: "tickets",
-      label: "The tickets",
-      description: "The currency. Handed out at the door and traded all night.",
-      voicePiece: "notice",
-      perGuest: true,
-    },
-    {
-      piece: "door_cards",
-      label: "Door A, Door B, Door C",
-      description: "One card per door, large enough to be read across a room.",
-      voicePiece: "heading",
-      quantity: 3,
-    },
-    {
-      piece: "mystery_envelopes",
-      label: "The Door C envelopes",
+      piece: "the_sheet",
+      label: "The sheet",
       description:
-        "Swap with anyone. Double your prize. Lose everything. Steal a prize. " +
-        "A mystery gift.",
-      voicePiece: "notice",
-      quantity: 5,
-    },
-    {
-      piece: "rules_card",
-      label: "The rules",
-      description: "Three doors, the market, and the final gamble.",
+        "One sheet, perforated, cut up before anybody arrives. Three door " +
+        "cards, large enough to be read across a room, with the rules — " +
+        "three doors, the market, and the final gamble — printed on the " +
+        "backs that face you. Five Door C slips: swap with anyone, double " +
+        "your prize, lose everything, steal a prize, a mystery gift; they go " +
+        "into envelopes with nothing written on the outside. And the " +
+        "tickets, which are the currency. Print the sheet again for more " +
+        "tickets; a room only ever needs one set of doors.",
       voicePiece: "game_rule",
-      quantity: 1,
     },
   ],
   dependencies: [],
@@ -1434,12 +1450,14 @@ const SECRET_GAME_CARDS: Game = {
       {
         step: "read_the_deck",
         phase: "before",
-        instruction: "Read the whole deck yourself, including the wicked ones.",
+        instruction:
+          "Tear the sheets apart, then read the whole deck yourself, including " +
+          "the wicked ones.",
         detail:
           "Take out anything that will not survive this particular room. You " +
           "are the only person who will ever see all of it, and a card that " +
           "lands badly at eleven cannot be taken back.",
-        printedPiece: "the_deck",
+        printedPiece: "the_sheet",
       },
       {
         step: "the_bowl_at_the_door",
@@ -1451,7 +1469,7 @@ const SECRET_GAME_CARDS: Game = {
           "somebody arrives is a card they carry all night; a card found at " +
           "half past ten is a chore.",
         supplyItem: "A bowl or a hat to draw from",
-        printedPiece: "scorecards",
+        printedPiece: "the_sheet",
       },
       {
         step: "one_each_at_the_door",
@@ -1504,7 +1522,7 @@ const SECRET_GAME_CARDS: Game = {
         detail:
           "Not before. A deck counted at nine o'clock is a scoreboard, and a " +
           "scoreboard makes people stop doing the hard ones.",
-        printedPiece: "scorecards",
+        printedPiece: "the_sheet",
       },
       {
         step: "read_them_out",
@@ -1640,21 +1658,17 @@ const SECRET_GAME_CARDS: Game = {
   ],
   printedMatter: [
     {
-      piece: "the_deck",
-      label: "The deck",
+      piece: "the_sheet",
+      label: "The sheet",
       description:
-        "One card per guest, drawn at the door. Easy, middling, hard, and the " +
-        "wicked ones mixed in unmarked.",
+        "One a head, perforated into two and torn apart before anybody " +
+        "arrives. The card — easy, middling, hard, and the wicked ones mixed " +
+        "in unmarked — goes face down in the bowl to be drawn at the door. " +
+        "The scorecard sits beside the bowl and is what you mark. They are " +
+        "torn apart and never handed over together: a wicked card can make " +
+        "somebody swap scorecards, and a scorecard that still had the " +
+        "challenge on it would hand over the secret the whole deck runs on.",
       voicePiece: "game_rule",
-      perGuest: true,
-    },
-    {
-      piece: "scorecards",
-      label: "The scorecards",
-      description:
-        "What you have completed. A wicked card can make somebody swap theirs " +
-        "with yours, so they have to be real objects.",
-      voicePiece: "notice",
       perGuest: true,
     },
   ],
@@ -1744,14 +1758,14 @@ const THE_SECRET_AUCTION: Game = {
         step: "hide_the_lots",
         phase: "before",
         instruction:
-          "Choose the lots, put them in order, and cover them with a sheet.",
+          "Choose the lots, put them in order, and cover them with a cloth.",
         detail:
           "Nobody sees a lot before the auction opens; that is the whole trick " +
           "and it is the only rule of this game that cannot be recovered from. " +
           "Order them: something small and stupid first, the Golden Ticket " +
           "second to last, the best thing last.",
         supplyItem: "The real lots",
-        printedPiece: "the_lot_list",
+        printedPiece: "the_sheet",
       },
       {
         step: "the_artwork_as_lots",
@@ -1773,7 +1787,7 @@ const THE_SECRET_AUCTION: Game = {
           "Name that game on the ticket, or it is an argument in twelve " +
           "months. If there is no next year, leave it out — a ticket to " +
           "nothing is the one lot that can make the whole currency look silly.",
-        printedPiece: "golden_ticket",
+        printedPiece: "the_sheet",
       },
       {
         step: "pay_in_cash",
@@ -1784,7 +1798,7 @@ const THE_SECRET_AUCTION: Game = {
           "Never a tally, never settled later. The stack stays on you and not " +
           "on a table. A guest holding money she can feel plays differently " +
           "from a guest who has been told a number.",
-        printedPiece: "party_bucks",
+        printedPiece: "the_sheet",
       },
       {
         step: "pay_for_spirit",
@@ -1811,14 +1825,14 @@ const THE_SECRET_AUCTION: Game = {
       {
         step: "the_reveal",
         phase: "opening",
-        instruction: "Take the sheet off and say what the money was for.",
+        instruction: "Take the cloth off and say what the money was for.",
         detail:
           "This is the reveal and it only happens once. Say it flat. The room " +
           "has been earning a currency all night without being told what it " +
           "buys, and the objects do the work.",
         say: "Everything you have been paid tonight is spendable, once, on this table. Nothing here goes home with me.",
         minutes: 3,
-        printedPiece: "bidding_paddles",
+        printedPiece: "the_sheet",
       },
       {
         step: "the_first_lot",
@@ -1850,7 +1864,7 @@ const THE_SECRET_AUCTION: Game = {
           "reaches into next year and it should be the most expensive thing " +
           "in the room.",
         minutes: 4,
-        printedPiece: "golden_ticket",
+        printedPiece: "the_sheet",
       },
       {
         step: "how_a_bid_is_settled",
@@ -1861,7 +1875,7 @@ const THE_SECRET_AUCTION: Game = {
           "number keep going up. If two paddles genuinely land together, take " +
           "the one you heard first and mean it. Nobody has ever gone back over " +
           "an auctioneer who sounded certain.",
-        printedPiece: "rules_card",
+        printedPiece: "the_sheet",
       },
       {
         step: "the_last_lot",
@@ -1989,39 +2003,19 @@ const THE_SECRET_AUCTION: Game = {
   ],
   printedMatter: [
     {
-      piece: "party_bucks",
-      label: "Party Bucks",
+      piece: "the_sheet",
+      label: "The sheet",
       description:
-        "The currency, printed in the destination's own face. A stack of them.",
-      voicePiece: "notice",
-    },
-    {
-      piece: "the_lot_list",
-      label: "The lots",
-      description: "Face down until the auction opens. That is the whole trick.",
-      voicePiece: "heading",
-      quantity: 1,
-    },
-    {
-      piece: "golden_ticket",
-      label: "The Golden Ticket",
-      description: "An automatic win in the first game of next year. One only.",
-      voicePiece: "notice",
-      quantity: 1,
-    },
-    {
-      piece: "bidding_paddles",
-      label: "The paddles",
-      description: "Numbered, one each.",
-      voicePiece: "place_card",
-      perGuest: true,
-    },
-    {
-      piece: "rules_card",
-      label: "The rules",
-      description: "What the money was for, and what it buys.",
+        "One sheet, perforated, cut up before anybody arrives — which is " +
+        "also what keeps the lots secret, because the only person who ever " +
+        "handles it whole is you. The paddles, numbered, one a head. Party " +
+        "Bucks, the currency, in the destination's own face; print the sheet " +
+        "again for more of them. The Golden Ticket, which names the game it " +
+        "wins next year and stays on the sheet uncut if there is no next " +
+        "year. The running order of the lots, which nobody sees until the " +
+        "cover comes off. And what the money was for, what it buys, and how " +
+        "a bid is settled.",
       voicePiece: "game_rule",
-      quantity: 1,
     },
   ],
 
@@ -2121,7 +2115,7 @@ const FISHBOWL: Game = {
           "Six is the number. Four and the third round is over before it is " +
           "funny; ten and the first round never ends.",
         supplyItem: "Slips of paper",
-        printedPiece: "slip_sheets",
+        printedPiece: "the_sheet",
       },
       {
         step: "make_the_teams",
@@ -2143,7 +2137,7 @@ const FISHBOWL: Game = {
         say: "Six each. Anything a person at this table could guess. Fold them in half.",
         minutes: 6,
         supplyItem: "A bowl",
-        printedPiece: "bowl_label",
+        printedPiece: "the_sheet",
       },
       {
         step: "round_one",
@@ -2153,7 +2147,7 @@ const FISHBOWL: Game = {
           "Guessed slips are kept by the guessing team. Keep going until the " +
           "bowl is empty, then refill it with the SAME slips.",
         minutes: 10,
-        printedPiece: "rules_card",
+        printedPiece: "the_sheet",
       },
       {
         step: "round_two",
@@ -2288,25 +2282,16 @@ const FISHBOWL: Game = {
   ],
   printedMatter: [
     {
-      piece: "slip_sheets",
-      label: "The slips",
-      description: "Perforated, in the destination's face. Six to a guest.",
-      voicePiece: "notice",
-      perGuest: true,
-    },
-    {
-      piece: "bowl_label",
-      label: "The bowl",
-      description: "A label for whatever the bowl actually is.",
-      voicePiece: "heading",
-      quantity: 1,
-    },
-    {
-      piece: "rules_card",
-      label: "The rules",
-      description: "Three rounds, same slips. Short enough to read aloud.",
+      piece: "the_sheet",
+      label: "The sheet",
+      description:
+        "One a head, perforated, in the destination's face. The rules at the " +
+        "head — three rounds, the same slips, short enough to read aloud. " +
+        "Six slips under them, which is the number. And a label along the " +
+        "foot for whatever the bowl actually is; one gets torn off and put " +
+        "on it.",
       voicePiece: "game_rule",
-      quantity: 1,
+      perGuest: true,
     },
   ],
   dependencies: [],
@@ -3107,7 +3092,7 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
           "all three parts: a name, a song, and not your own name.",
         say: "Take a slip. Write somebody else in this room, and under it the song that gets that person up. Not your own name, and do not sign it.",
         minutes: 2,
-        printedPiece: "rules_card",
+        printedPiece: "naming_slips",
       },
       {
         step: "write_and_fold",
@@ -3287,19 +3272,14 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
   ],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole: Everybody names the song that gets them up. " +
-        "Nobody names their own. We play them in order.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "naming_slips",
       label: "The slips",
-      description: "Two lines: a name, and a song. Nothing else on the card.",
-      voicePiece: "notice",
+      description:
+        "One a head. Her sentence, whole, at the head: Everybody names the " +
+        "song that gets them up. Nobody names their own. We play them in " +
+        "order. Under it two lines: a name, and a song. Nothing else on the " +
+        "card.",
+      voicePiece: "game_rule",
       perGuest: true,
     },
   ],
@@ -3438,7 +3418,7 @@ const VEGAS_THE_LATE_SUPPER: Game = {
           "is running a tab.",
         say: "Everybody has the same. Whoever is up at midnight buys the late supper, and the late supper is a round of what we are drinking.",
         minutes: 3,
-        printedPiece: "rules_card",
+        printedPiece: "the_iou",
       },
       {
         step: "teach_it_in_two_minutes",
@@ -3618,22 +3598,16 @@ const VEGAS_THE_LATE_SUPPER: Game = {
   ],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole: Everybody puts in the same. Whoever is up at " +
-        "midnight buys the late supper, and that is the end of it.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "the_iou",
       label: "The card that gets signed",
       description:
-        "One line and a rule for a signature. It sits face up in the middle " +
-        "all evening and leaves with whoever is up at midnight. This is the " +
-        "written stake this room's take-home IOU depends on.",
-      voicePiece: "notice",
+        "Her sentence, whole, at the head: Everybody puts in the same. " +
+        "Whoever is up at midnight buys the late supper, and that is the end " +
+        "of it. Under it one line and a rule for a signature. It sits face " +
+        "up in the middle all evening and leaves with whoever is up at " +
+        "midnight. This is the written stake this room's take-home IOU " +
+        "depends on.",
+      voicePiece: "game_rule",
       quantity: 1,
     },
   ],
@@ -3745,7 +3719,7 @@ const NEW_YORK_THE_LIST: Game = {
           "into homework.",
         say: "There is a bowl by the door. One thing on a slip that will not be repeated, one line, do not sign it. At midnight every one of them gets read out and then they get torn up.",
         minutes: 2,
-        printedPiece: "rules_card",
+        printedPiece: "list_slips",
       },
       {
         step: "let_them_write_all_evening",
@@ -3887,20 +3861,14 @@ const NEW_YORK_THE_LIST: Game = {
   ],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole, propped against the bowl: Each guest names one " +
-        "thing that will not be repeated. The list is read at midnight and " +
-        "then it is destroyed.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "list_slips",
       label: "The slips",
-      description: "One line and no space for a name. Cut so they tear cleanly.",
-      voicePiece: "notice",
+      description:
+        "One a head, cut so they tear cleanly. Her sentence, whole, at the " +
+        "head: Each guest names one thing that will not be repeated. The " +
+        "list is read at midnight and then it is destroyed. Under it one " +
+        "line and no space for a name.",
+      voicePiece: "game_rule",
       perGuest: true,
     },
   ],
@@ -4029,7 +3997,7 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
           "anybody has looked. Say all three parts: their name at the top, " +
           "the weather underneath, and what the winner gets out of.",
         say: "Cards. Your name at the top, and under it what the weather does tomorrow. Whoever is closest does not clear anything until lunch.",
-        printedPiece: "rules_card",
+        printedPiece: "guess_cards",
       },
       {
         step: "under_the_stone",
@@ -4182,21 +4150,15 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
   ],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole: Everybody says what the weather will do " +
-        "tomorrow. Whoever is closest does not have to clear.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "guess_cards",
       label: "The cards",
       description:
-        "A rule for a name and one line under it for the guess. They go face " +
-        "down under something heavy and are read out by name in the morning.",
-      voicePiece: "notice",
+        "One a head. Her sentence, whole, at the head: Everybody says what " +
+        "the weather will do tomorrow. Whoever is closest does not have to " +
+        "clear. Under it a rule for a name and one line for the guess. They " +
+        "go face down under something heavy and are read out by name in the " +
+        "morning.",
+      voicePiece: "game_rule",
       perGuest: true,
     },
   ],
@@ -5095,7 +5057,7 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
           "told no, which is the only enforcement this game has and the " +
           "reason it is quick.",
         say: "A number each on a slip before we go, and it is everything you can see from the step. Do not go and count. Keep your own slip.",
-        printedPiece: "rules_card",
+        printedPiece: "count_slips",
       },
       {
         step: "pockets",
@@ -5223,19 +5185,14 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
   requirements: [{ requirement: "printing" }],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole, by the door: Everybody writes down the boat " +
-        "count before we leave. Whoever is furthest out buys the espresso.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "count_slips",
       label: "The slips",
-      description: "Room for one number and nothing else. Small enough for a pocket.",
-      voicePiece: "notice",
+      description:
+        "One a head, small enough for a pocket. Her sentence, whole, at the " +
+        "head: Everybody writes down the boat count before we leave. Whoever " +
+        "is furthest out buys the espresso. Under it room for one number and " +
+        "nothing else.",
+      voicePiece: "game_rule",
       perGuest: true,
     },
   ],
@@ -5349,7 +5306,7 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
           "The name matters as much as the number, because the slips are " +
           "read out by name at the top and an unsigned one cannot win.",
         say: "Same scale for everybody, say which before you write. Then your name on the slip and the number under it, and hand it in.",
-        printedPiece: "rules_card",
+        printedPiece: "guess_slips",
       },
       {
         step: "no_looking",
@@ -5480,23 +5437,16 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
   requirements: [{ requirement: "printing" }],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole, on the breakfast table: Everybody writes down " +
-        "the temperature at the top before the first car. Whoever is closest " +
-        "reads the map at lunch.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "guess_slips",
       label: "The slips",
       description:
-        "A rule for a name and one for the number, small enough that all of " +
+        "One a head, out on the breakfast table. Her sentence, whole, at the " +
+        "head: Everybody writes down the temperature at the top before the " +
+        "first car. Whoever is closest reads the map at lunch. Under it a " +
+        "rule for a name and one for the number, small enough that all of " +
         "them go in one person's pocket for the morning and are read out by " +
         "name at the top.",
-      voicePiece: "notice",
+      voicePiece: "game_rule",
       perGuest: true,
     },
   ],
@@ -6140,7 +6090,7 @@ const ACAPULCO_THE_LAST_SONG: Game = {
           "late and there is nobody to hear it.",
         say: "Last song. One each, going round from here, and it had better not be on this card.",
         minutes: 2,
-        printedPiece: "rules_card",
+        printedPiece: "the_played_card",
       },
       {
         step: "round_the_room",
@@ -6283,21 +6233,15 @@ const ACAPULCO_THE_LAST_SONG: Game = {
   ],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole: Everybody names the last song. Whoever names " +
-        "one already played goes in the water.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "the_played_card",
       label: "What has played",
       description:
-        "A ruled card that lives by the speaker all night and is written on " +
-        "by whoever changes the music. It is the evidence the forfeit runs on.",
-      voicePiece: "notice",
+        "Her sentence, whole, at the head: Everybody names the last song. " +
+        "Whoever names one already played goes in the water. Under it a " +
+        "ruled card that lives by the speaker all night and is written on by " +
+        "whoever changes the music. It is the evidence the forfeit runs on, " +
+        "and the rule is on the same card so it is held up with it.",
+      voicePiece: "game_rule",
       quantity: 1,
     },
   ],
@@ -6412,11 +6356,13 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
       {
         step: "put_the_meanings_out",
         phase: "before",
-        instruction: "Put the sheet of what the numbers mean in the middle, where two people can reach it.",
+        instruction:
+          "Put a spare card in the middle, meanings side up, where two " +
+          "people can reach it.",
         detail:
           "It gets picked up and read out at volume about nine times an " +
           "hour. That is not a distraction from the game, it is most of it.",
-        printedPiece: "the_meanings_sheet",
+        printedPiece: "number_cards",
       },
       {
         step: "wait_for_dark",
@@ -6428,7 +6374,7 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
           "dark with the lights on it is an event.",
         say: "The numbers are after dark, and it is dark.",
         minutes: 3,
-        printedPiece: "rules_card",
+        printedPiece: "number_cards",
       },
       {
         step: "say_the_three_things_to_win",
@@ -6598,32 +6544,19 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
   ],
   printedMatter: [
     {
-      piece: "rules_card",
-      label: "The rule",
-      description:
-        "Her sentence, whole: The numbers are called after dark. Beans for " +
-        "markers, and whoever is calling is playing too.",
-      voicePiece: "game_rule",
-      quantity: 1,
-    },
-    {
       piece: "number_cards",
       label: "The cards",
       description:
-        "One each, set in the destination's face: fifteen numbers between " +
-        "one and ninety, printed in three rows of five, with room for a bean " +
-        "on every one. The rows are what a line means.",
-      voicePiece: "notice",
-      perGuest: true,
-    },
-    {
-      piece: "the_meanings_sheet",
-      label: "What the numbers mean",
-      description:
-        "One sheet for the middle of the table. It is read out at volume and " +
+        "One a head and two spare, set in the destination's face. Her " +
+        "sentence, whole, at the head: The numbers are called after dark. " +
+        "Beans for markers, and whoever is calling is playing too. Under it " +
+        "fifteen numbers between one and ninety, in three rows of five, with " +
+        "room for a bean on every one — the rows are what a line means. On " +
+        "the back, what the numbers mean; a spare card goes in the middle of " +
+        "the table that side up, to be picked up and read out at volume and " +
         "argued with, which is the point of printing it at all.",
-      voicePiece: "notice",
-      quantity: 1,
+      voicePiece: "game_rule",
+      perGuest: true,
     },
   ],
   dependencies: [],
