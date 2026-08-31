@@ -406,7 +406,9 @@ const WESTHAMPTON_LOOK: Theme = {
 export const WESTHAMPTON_1976: Destination = {
   key: "westhampton-1976",
   name: "WESTHAMPTON, 1976",
-  tagline: "Vintage summer glamour. Very questionable houseguests.",
+  tagline:
+    "Vintage summer glamour. Easy, beachy, no fuss. Tennis at 8 am and " +
+    "cocktails at 5.",
   premise:
     "Dune Road, Labor Day weekend, 1976. A rented house that sleeps six, a " +
     "heat wave that does not break, and a long dinner that turns into " +
