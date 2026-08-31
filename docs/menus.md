@@ -299,3 +299,73 @@ other way round: these two menus and the two drink programmes beside them were
 authored before it had a name. It now has a look, a voice and a plate —
 HAVANA, 1957, `havana` — written to them and not the reverse. Menu
 29's "late supper after dancing" is the fact the whole destination is built on.
+
+---
+
+# THE MENU CARD — the object, not the content
+
+**Founder ruling, 2026-08-30, transcribed in the session it was made** (the
+rule `docs/deliverables-sheets.md` establishes: founder-authored material that
+lives only in conversation is, to every agent that comes after,
+indistinguishable from something an agent made up).
+
+> "it's the printed card, and here's why I'm willing to say so rather than
+> ask you: the content version already exists. db/022 composed the table
+> (appetizer/main/dessert slots per occasion) and the drinks atomization gives
+> the bar its slots — 'which dishes compose a dinner versus a cocktail
+> evening' is the engine's job and it's built. The only thing about menus that
+> 'hasn't been designed' is the object: the menu card in the room's face and
+> palette, printed alongside the game's day_material — and it belongs to the
+> roadmap's guest-facing layer."
+
+## What is NOT missing
+
+The composition. `db/022` places `the_appetizer`, `the_main` and
+`the_dessert` per occasion; the atomised drinks carry their own slots. A
+dinner versus a cocktail evening is already a decided thing. **Nobody needs to
+design what goes on the card.**
+
+## What is missing
+
+The card. Four requirements, all founder-stated:
+
+**1. The room's face and palette.** Same treatment as any other piece — it is
+set in the destination's type on the destination's paper. `look.palette`
+already carries seventeen tokens including a full night set, and
+`voicedHtml` in `src/lib/correspondence/mail.ts` already does exactly this
+for correspondence. The card is the same problem, printed.
+
+**2. It sits alongside the game's printed matter.** One printed object per
+game (2026-08-30 ruling, `src/lib/games.ts`); the menu card is the table's
+equivalent. Same production run, same face.
+
+**3. IT CARRIES THE MIRROR.** Load-bearing, and stated as the reason the
+object exists at all:
+
+> "the card carries the mirror. The sober guest reading her designed drink on
+> the printed menu, same glass, is the feature."
+
+Every atomised drink has a paired mirror. On the card the mirror is not a
+footnote, an asterisk or a section headed alcohol-free — it is **printed as a
+drink, in the same face, in the same list**. A guest who is not drinking reads
+her own drink on the menu, named and designed, and is served it in the same
+glass. That is not an accommodation; it is the thing the card is for.
+
+**4. Editable, and her edit is hers.** The host may change what is on it, and
+a later run never overwrites her change — the same rule
+`scripts/seed-destinations.mjs` follows for a curator's copy: *"NEVER
+overwrite a curator... a weight changed in the tool is a judgement and this
+script has no standing to reverse it."*
+
+## Before it ships
+
+**The standard lexicon pass** — `npm run check:voice-output`, against the
+room's `never` list and house-wide terms. Founder's reason: it is the most
+member-facing object in the product. Everything on it is read by a guest who
+has never heard of us and will judge the evening by it.
+
+## Open
+
+Whether the card is one per evening or one per table, and whether a
+multi-day gathering gets one per day — the same axis the bulletin raises
+(`occasion_shape.days`, `db/009`). Not ruled on.
