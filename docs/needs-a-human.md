@@ -156,6 +156,31 @@ A founder or commission task. Note the silent-failure risk already recorded:
 nothing asserts that the tone codes and the SVG filenames match, so a mark that
 is never cut simply renders nothing.
 
+### 13. The copy of twelve rooms — nineteen verdicts, at `/desk/reconcile`
+`/api/health` reports `copyAgrees: false` and names twelve rooms whose
+`world.tagline` or `world.description` differs from
+`src/lib/destinations.ts` — seven taglines and twelve premises. The database
+is what a member reads, the file is what seeds a fresh database, and
+`scripts/seed-destinations.mjs` never overwrites a row that exists, so
+nothing reconciles them without a person.
+
+The screen puts three facts on each field and no opinion: both texts side by
+side; whether a human ever saved that room at the desk (a
+`destination.updated` row in `staff_action` — no script can write one) or it
+was only ever seeded; and the desk edit's date beside the date that
+registry sentence was last written, so a choice made against text that has
+since been replaced is visible as one. Rows are sorted into those two piles.
+
+Three buttons per field — the registry wins, the database wins, or a merge
+you type. Nothing is pre-selected and nothing is applied until a button is
+pressed. Each verdict writes `copy_reconciliation` (db/055) and a
+`staff_action`, so the next run of the detector compares against a settled
+baseline: `copyUnsettled` in `/api/health` is the number that reaches zero,
+and `copyAgrees` will stay false wherever the database deliberately won.
+
+Re-deciding a field writes another row and keeps the first (rule 14). The
+rows do not move when one is decided (rule 18).
+
 ## 2026-08-26 — THE MENU POOL HAS NO SLOT. **RULED: retired. db/045.**
 
 39 active menus, on the desk, in the registry, and **no package can deliver

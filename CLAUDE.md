@@ -159,6 +159,28 @@ lost, and a deleted argument gets re-made.
 - **For machine-generated content, check single-substitution against what
   exists.** A word-overlap sweep flagged 113 pairs and was useless; "same frame,
   one ingredient swapped" found 8 real duplicates.
+- **A DETECTOR WITH NO WAY TO RECORD A VERDICT BECOMES FURNITURE.**
+  `copyAgrees: false` was correct on the day it shipped and correct every day
+  after, naming the same twelve rooms, and the only available response was to
+  read it again. A tripwire that has been amber since it was installed stops
+  being read — and it is worse than no tripwire, because the amber is now
+  evidence that amber is normal. The fix is not a quieter detector: it is a
+  place to record the decision, so the next run compares against a settled
+  baseline. And the number the detector reports must be one that CAN reach
+  zero. `copyAgrees` cannot — a "the database wins" ruling leaves the file and
+  the row disagreeing forever, on purpose — so demanding it go green would be
+  demanding a decision be reversed to make a light change colour. db/055 and
+  `/desk/reconcile`.
+- **PROVENANCE MUST BE RECORDED AT THE GRAIN IT WILL BE READ AT.**
+  `destination.updated` in `staff_action` is the only evidence in this system
+  that a human, rather than a seeder, chose a room's member-facing copy — and
+  it fires on every save of the destination form, so it proves somebody
+  touched the ROOM and never that she touched the TAGLINE. Rule 23's shape
+  again: the field is not broken, it answers a different question than it
+  appears to. It cost nothing to fix forward (`detail.copy_changed`, one read
+  before the write) and cannot be fixed backwards at any price, which is the
+  general lesson — a ledger's grain is decided the day it is written and
+  audited the day somebody needs it, and those are years apart.
 
 ## Where things live
 
