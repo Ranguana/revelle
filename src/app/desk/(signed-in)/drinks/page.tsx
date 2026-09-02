@@ -9,6 +9,7 @@ import { passHref } from "@/lib/desk/review";
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Status, StatusLegend, rowClass } from "../bits";
 import { setDrinkStatus } from "./actions";
+import { refusePoolRow } from "../refuse";
 
 export const dynamic = "force-dynamic";
 
@@ -154,6 +155,19 @@ export default async function DrinksPage({
                     {row.status === "active" ? "Withdraw" : "Offer it"}
                   </button>
                 </form>
+                  {/* NO — deletes the row AND records the slug, so no seeder
+                      rebuilds it from its document on the next deploy. db/057.
+                      Offered on every row, not only drafts: an issued row is
+                      protected by the database itself (the join tables are
+                      `on delete restrict`) and the action says so rather than
+                      hiding the control. A button that is absent teaches
+                      nothing; one that explains its refusal teaches the rule. */}
+                  <form action={refusePoolRow}>
+                    <input type="hidden" name="entity_table" value="drink" />
+                    <input type="hidden" name="id" value={row.id} />
+                    <input type="hidden" name="back" value="/desk/drinks" />
+                    <button className={styles.filter}>No</button>
+                  </form>
                 <Link
                   href={passHref(
                     `/desk/drinks/${row.id}`,

@@ -26,7 +26,8 @@ import { one, passHref } from "@/lib/desk/review";
 
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Seam, Status, StatusLegend, TableRow } from "../bits";
-import { refuseBankItem, setBankStatus } from "./actions";
+import { setBankStatus } from "./actions";
+import { refusePoolRow } from "../refuse";
 
 /**
  * THE BANK — pool-selected atmosphere, per destination.
@@ -584,8 +585,10 @@ export default async function BankPage({
                       absent rather than disabled: a control that cannot act is
                       worse than no control (rule 23). */}
                   {row.status === "draft" ? (
-                    <form action={refuseBankItem}>
+                    <form action={refusePoolRow}>
+                      <input type="hidden" name="entity_table" value="bank_item" />
                       <input type="hidden" name="id" value={row.id} />
+                      <input type="hidden" name="back" value="/desk/bank" />
                       <button className={styles.filter}>No</button>
                     </form>
                   ) : null}

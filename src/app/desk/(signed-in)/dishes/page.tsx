@@ -21,6 +21,7 @@ import { one, passHref } from "@/lib/desk/review";
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setDishStatus } from "./actions";
+import { refusePoolRow } from "../refuse";
 
 /**
  * The dish pool, six hundred rows deep.
@@ -400,6 +401,19 @@ export default async function DishesPage({
                     <button className={styles.filter}>
                       {row.status === "active" ? "Withdraw" : "Offer it"}
                     </button>
+                  </form>
+                  {/* NO — deletes the row AND records the slug, so no seeder
+                      rebuilds it from its document on the next deploy. db/057.
+                      Offered on every row, not only drafts: an issued row is
+                      protected by the database itself (the join tables are
+                      `on delete restrict`) and the action says so rather than
+                      hiding the control. A button that is absent teaches
+                      nothing; one that explains its refusal teaches the rule. */}
+                  <form action={refusePoolRow}>
+                    <input type="hidden" name="entity_table" value="dish" />
+                    <input type="hidden" name="id" value={row.id} />
+                    <input type="hidden" name="back" value="/desk/dishes" />
+                    <button className={styles.filter}>No</button>
                   </form>
                 </td>
               </TableRow>

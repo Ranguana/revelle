@@ -6,6 +6,7 @@ import { POOL_STATUS, money, stamp } from "@/lib/desk/labels";
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Status, StatusLegend, TableRow } from "../bits";
 import { setProductStatus } from "./actions";
+import { refusePoolRow } from "../refuse";
 
 export const dynamic = "force-dynamic";
 
@@ -138,6 +139,20 @@ export default async function ProductsPage({
                       <button className={styles.filter}>Withdraw</button>
                     </form>
                   )}
+                  {/* NO — deletes the row AND records the slug, so no seeder
+                      rebuilds it from its document on the next deploy. db/057.
+                      Placed after the ternary closes, not inside it: the first
+                      attempt landed between the two branches and broke the
+                      JSX, which the typechecker caught before anything shipped.
+                      Offered on every row — an issued row is protected by the
+                      database itself, and the action explains that rather than
+                      hiding the control. */}
+                  <form action={refusePoolRow}>
+                    <input type="hidden" name="entity_table" value="product" />
+                    <input type="hidden" name="id" value={row.id} />
+                    <input type="hidden" name="back" value="/desk/products" />
+                    <button className={styles.filter}>No</button>
+                  </form>
                 </td>
               </TableRow>
             ))}
