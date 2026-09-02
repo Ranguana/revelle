@@ -131,7 +131,8 @@ Reply as JSON only, no prose around it:
      "confidence": "strong | possible | weak"}
   ],
   "no_room": false,
-  "question": "the one thing a founder would have to decide before this ships"
+  "question": "the one thing a founder would have to decide before this ships",
+  "bank_clause": "the item written in the bank's own syntax: '<lower-case name> — <take-home | table set | take-home and table set | atmosphere>, <what it is in a clause or two>, <one per guest | one per house | quantity>' — no FOUNDER-PENDING, that is added for you. Match the register of: 'the knife you learned on — take-home, a cheap wooden-handled oyster knife, one per person who joined the shucking, kept'"
 }
 If nothing fits, set no_room true and placements to [].`;
 
@@ -235,6 +236,19 @@ for (const f of files) {
         lines.push(`\n- **${p.room}** · ${p.as} · ${p.confidence} — ${p.why}`);
       }
       lines.push(`\n\n(FOUNDER-PENDING — ${r.question})\n`);
+      if (r.bank_clause) {
+        // PASTE-READY, because the step between this sheet and a desk row was a
+        // hand translation and hand translations are where a register slips.
+        // The clause is the bank's syntax exactly: seed-bank splits a GOODS
+        // block on `;`, so this drops into the room's second GOODS block and
+        // becomes a draft row on the next deploy — held, because the marker
+        // rides with it. Still a paste and not a write: what belongs in a room
+        // is the founder's to sign (rule 13).
+        lines.push(
+          `\n<details><summary>bank clause — paste into the room's GOODS block</summary>\n\n` +
+            `\`\`\`\n${r.bank_clause} (FOUNDER-PENDING — ${r.question});\n\`\`\`\n</details>\n`
+        );
+      }
       console.log(`[mood] ${f}  → ${strong.map((p) => p.room).join(", ")}`);
     }
   } catch (err) {
