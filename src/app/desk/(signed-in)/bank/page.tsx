@@ -26,7 +26,7 @@ import { one, passHref } from "@/lib/desk/review";
 
 import styles from "../../desk.module.css";
 import { Chips, Empty, Head, Seam, Status, StatusLegend, TableRow } from "../bits";
-import { setBankStatus } from "./actions";
+import { deleteBankItem, setBankStatus } from "./actions";
 
 /**
  * THE BANK — pool-selected atmosphere, per destination.
@@ -574,6 +574,21 @@ export default async function BankPage({
                       {row.status === "active" ? "Withdraw" : "Offer it"}
                     </button>
                   </form>
+                  {/* NO ON A DRAFT IS A DELETION, AND ONLY ON A DRAFT.
+                      A draft has never been issued — `status = 'active'` is the
+                      issuable predicate — so refusing one destroys nothing
+                      anybody was given. An offered row may have been issued and
+                      the database refuses to delete it out from under a Revelle
+                      (db/002's join is `on delete restrict`); that one is
+                      retired, which keeps its reason. The button is therefore
+                      absent rather than disabled: a control that cannot act is
+                      worse than no control (rule 23). */}
+                  {row.status === "draft" ? (
+                    <form action={deleteBankItem}>
+                      <input type="hidden" name="id" value={row.id} />
+                      <button className={styles.filter}>No</button>
+                    </form>
+                  ) : null}
                 </td>
               </TableRow>
             ))}

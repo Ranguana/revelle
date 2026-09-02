@@ -983,11 +983,7 @@ GOODS: the painted tile — take-home and table set, a single hand-painted
 ceramic tile per guest, from the bright-vessel register rather than the
 stoneware one (FOUNDER-PENDING — cost per tile at crowd scale, and
 whether hand-painted survives that scale or becomes transfer-printed, at
-which point it is a souvenir and the founder should know); the corno —
-take-home, a small red horn charm, the ordinary kind against bad luck,
-one per guest (FOUNDER-PENDING — is this kitsch or is it material
-culture, it is genuinely period and genuinely Neapolitan and it is also
-the most souvenir-shaped object on the sheet); the Smorfia slip —
+which point it is a souvenir and the founder should know); the Smorfia slip —
 take-home, a small printed slip with one number and what it means, one
 per guest, off the same sheet the tomboliere is calling from
 (FOUNDER-PENDING — twee risk, is this a fortune cookie in period dress);
@@ -1007,10 +1003,7 @@ decides and not the sheet); the ticket up — take-home, a reproduction
 cardboard boat ticket, one per guest, since the brief has arrival by
 boat or by steps (FOUNDER-PENDING — the same objection as Nantucket's
 ferry stub, nobody took a boat, is a prop ticket for a crossing that did
-not happen beneath this house); the confetti, in a twist — take-home,
-sugared almonds in a paper twist, a few each (FOUNDER-PENDING — flagged
-against itself as pan-Italian rather than this coast, which is precisely
-the country-not-room failure the matrix exists to catch, probably cut);
+not happen beneath this house); 
 the closer's card — take-home, the lemon-liqueur technique card one per
 guest rather than one per house, with the lead time on it
 (FOUNDER-PENDING — the own-stock ruling makes the per-guest version its
@@ -1112,14 +1105,7 @@ coaster she wrote on — take-home, a heavy paper coaster off the
 threshold tray with something written on it during the night by somebody
 (FOUNDER-PENDING — the slips rule says any object with player-generated
 content ships pre-generated and the member never fills a blank, does
-that rule reach a coaster and does it kill this); the marked cork —
-take-home, THE EVENING SUPPLIES IT (per guest; from the_drinks
-yields_cork), the cork off the loud opening, with the date on it in
-pencil, kept by whoever caught it (FOUNDER-PENDING — the cork is native
-here because the cork is this room's act and St. Moritz gets the wire
-cage instead, is that split right, and the ratio is one cork per bottle
-rather than one per head which per_guest has no way to say, so the
-quantity recorded here is rounder than the content is); the wire cage,
+that rule reach a coaster and does it kill this); the wire cage,
 kept — take-home, THE EVENING SUPPLIES IT (per guest; from the_drinks
 yields_muselet), the muselet from a bottle, taken as it comes off, small
 metal, pocket, done (FOUNDER-PENDING — is a plain unbent cage here worth
@@ -1348,3 +1334,37 @@ schnapps (pre-Red-Bull; no anachronistic bombs), the whiskey line.
 9. Palm Springs: bench needs founder material.
 10. Child-presence question (raised via sparklers): product-level,
     needs its own answer — rooms are written adult.
+
+
+---
+
+## REFUSED, 2026-09-01 — three take-home proposals, by the founder
+
+Her ruling, verbatim: **"no on the following: marked cork, corno,
+confetti/sugar almonds."**
+
+Removed from the sheet rather than left in draft, because a draft row is a
+question still being asked and these are answered. The clauses are preserved
+below with the questions they carried, per rule 14 — a refusal keeps its
+reasoning, and the next person to propose one of these should read why it did
+not survive rather than re-derive it.
+
+Two of the three carried a doubt the drafter had already named, and she
+agreed with the drafter:
+
+- **the corno** — `the corno — take-home, a small red horn charm, the ordinary kind against bad luck, one per guest (FOUNDER-PENDING — is this kitsch or is it material culture, it is genuinely period and genuinely Neapolitan and it is also the most souvenir-shaped object on the sheet);`
+
+- **the confetti, in a twist** — `the confetti, in a twist — take-home, sugared almonds in a paper twist, a few each (FOUNDER-PENDING — flagged against itself as pan-Italian rather than this coast, which is precisely the country-not-room failure the matrix exists to catch, probably cut);`
+
+- **the marked cork** — `the marked cork — take-home, THE EVENING SUPPLIES IT (per guest; from the_drinks yields_cork), the cork off the loud opening, with the date on it in pencil, kept by whoever caught it (FOUNDER-PENDING — the cork is native here because the cork is this room's act and St. Moritz gets the wire cage instead, is that split right, and the ratio is one cork per bottle rather than one per head which per_gu`
+
+**Note the confetti's own clause called it: "probably cut."** The drafter
+flagged it as pan-Italian rather than this coast — "precisely the
+country-not-room failure the matrix exists to catch" — and the founder
+agreed. A proposal that argues against itself and is then refused is the
+FOUNDER-PENDING mechanism working exactly as designed, not a wasted row.
+
+**These will not return on a reseed.** `scripts/seed-bank.mjs` creates rows
+from this document; an item that is not here is not created. Deleting the
+row at the desk without removing it here would have brought it back on the
+next deploy.
