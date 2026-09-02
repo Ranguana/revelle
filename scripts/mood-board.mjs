@@ -46,12 +46,35 @@
  * photographs. Nothing here copies one into the product; the output is a
  * description in the house's own vocabulary, which is the only thing that
  * could ever ship.
+ *
+ * ── AND THE DESK NOW DOES THIS TOO ───────────────────────────────────
+ *
+ * /desk/images is the same reading with the two things this script cannot
+ * have: a place two curators can drop into that is not somebody's laptop, and
+ * a button that puts an accepted placement into the bank as a draft instead of
+ * asking for a paste. This script stays because a folder of a thousand
+ * references is a batch job and a batch job belongs on a command line.
+ *
+ * THE PROMPT MOVED, AND ONLY THE PROMPT. It is now
+ * `placementSystemPrompt()` in src/lib/desk/images.ts, imported below and
+ * unchanged word for word, together with the JSON repair and the media-type
+ * sniff. Two copies of "judge the object, not the styling" would drift, and
+ * the drift would be invisible — both surfaces would go on returning
+ * placements and only the catalogue would slowly disagree with itself
+ * (CLAUDE.md rule 21). The argument for the prompt is still HERE, above,
+ * because this is where it was won.
  */
 import { readdir, readFile, writeFile, access } from "node:fs/promises";
 import { extname, join, basename } from "node:path";
 
-import { DESTINATIONS } from "../src/lib/destinations.ts";
 import { MODEL } from "../src/lib/model.ts";
+import {
+  PLACEMENT_ASK,
+  SNIFF_BYTES,
+  parseReply,
+  placementSystemPrompt,
+  sniffImage,
+} from "../src/lib/desk/images.ts";
 
 const args = process.argv.slice(2);
 const dir = args.find((a) => !a.startsWith("--"));
@@ -73,75 +96,31 @@ if (!KEY) {
   process.exit(1);
 }
 
-/* ── the rooms, as the model will read them ──────────────────────────
+/* ── the rooms, the prompt, and the reply reader ──────────────────────
  *
- * Straight from the registry (rule 19) rather than a list kept here, so a
- * nineteenth room is matchable the day it is authored and nobody edits this.
+ * All three now live in src/lib/desk/images.ts, which the desk imports too.
+ * The rooms still come straight from the registry (rule 19) — that happens
+ * inside `placementSystemPrompt()`, so a nineteenth room is matchable the day
+ * it is authored and nobody edits either file.
  */
-const ROOMS = Object.entries(DESTINATIONS).map(([slug, d]) => ({
-  slug,
-  name: d.name,
-  tagline: d.tagline,
-  premise: d.premise,
-}));
+const SYSTEM = placementSystemPrompt();
 
-const ROOM_BRIEF = ROOMS.map(
-  (r) => `- ${r.slug} — ${r.name}\n    ${r.tagline}\n    ${r.premise}`
-).join("\n");
-
-const SYSTEM = `You place objects from a mood board into a catalogue of eighteen authored
-party destinations. Each room is a specific place in a specific year.
-
-THE ROOMS:
-${ROOM_BRIEF}
-
-HOW TO READ AN IMAGE — this is the part people get wrong.
-
-1. NAME THE OBJECT, NOT THE PHOTOGRAPH. Strip the styling: the backdrop, the
-   props, the lighting, the era of the photography itself. A shell with wax in
-   it photographed on satin with pearls is not a 2024 object; it is a shell
-   with wax in it. Say what the thing IS in plain words, as if describing it to
-   someone holding it.
-
-2. THEN ask whether that OBJECT is plausible in a candidate room's year and
-   place. A modern photograph of an old object is fine. An object that could
-   not exist in the year, or belongs to a different country than the room, is
-   not — a pan-Italian sweet is not an Amalfi-coast object, and a Campanian
-   liqueur is not a Ligurian one. Region matters as much as period.
-
-3. NO ROOM IS A CORRECT AND COMMON ANSWER. Many mood-board images are
-   atmosphere with no object in them at all, or an object no room can claim.
-   Say so. Do not stretch. A forced placement is worse than an empty one,
-   because somebody then has to find it and take it out.
-
-4. NEVER a brand name. If the image shows branded goods, name the generic
-   object or refuse it.
-
-5. Prefer THE EVENING SUPPLIES IT where it is true: an object the party
-   already produces — the cork from a bottle opened anyway, a shell from the
-   oysters served — rather than something bought and shipped in.
-
-Reply as JSON only, no prose around it:
-{
-  "object": "what it is, plainly, styling stripped",
-  "styling_note": "what about the photograph is period-wrong or misleading, if anything",
-  "placements": [
-    {"room": "<slug>", "as": "take_home | table_set | atmosphere | light | act | none",
-     "why": "one sentence tying it to that room's premise or year",
-     "confidence": "strong | possible | weak"}
-  ],
-  "no_room": false,
-  "question": "the one thing a founder would have to decide before this ships",
-  "bank_clause": "the item written in the bank's own syntax: '<lower-case name> — <take-home | table set | take-home and table set | atmosphere>, <what it is in a clause or two>, <one per guest | one per house | quantity>' — no FOUNDER-PENDING, that is added for you. Match the register of: 'the knife you learned on — take-home, a cheap wooden-handled oyster knife, one per person who joined the shucking, kept'"
-}
-If nothing fits, set no_room true and placements to [].`;
-
-const MIME = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".gif": "image/gif" };
+/** Which files in the folder are worth opening. The TYPE comes from the bytes
+ *  (`sniffImage`), never from the extension — an extension is a label. */
+const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
 async function look(file) {
   const bytes = await readFile(file);
-  const media = MIME[extname(file).toLowerCase()];
-  if (!media) return null;
+  // THE BYTES DECIDE, not the extension. Same test /desk/images applies to a
+  // dropped file, from the same module, so a picture this script will read is
+  // exactly a picture that screen will keep.
+  const media = sniffImage(bytes.subarray(0, SNIFF_BYTES));
+  if (!media) {
+    throw new Error(
+      `${basename(file)} is named like an image and its first bytes are not ` +
+        `one. Nothing is guessed here.`
+    );
+  }
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -159,7 +138,7 @@ async function look(file) {
           role: "user",
           content: [
             { type: "image", source: { type: "base64", media_type: media, data: bytes.toString("base64") } },
-            { type: "text", text: "Place this, or refuse it." },
+            { type: "text", text: PLACEMENT_ASK },
           ],
         },
       ],
@@ -175,38 +154,13 @@ async function look(file) {
   return parseReply(text);
 }
 
-/**
- * The model writes prose about objects for a living, and the prose it is best
- * at contains apostrophes, em dashes and quoted phrases — which is exactly
- * what makes hand-written JSON fragile. One image in three failed on the first
- * run with "Expected ',' or ']'", and the reply was otherwise perfect.
- *
- * So: repair the two things that actually go wrong, and re-ask once if the
- * repair does not take. Throwing away a good reading of a photograph over a
- * trailing comma is the wrong trade when the retry costs one call.
- */
-function parseReply(text) {
-  const block = text.match(/\{[\s\S]*\}/);
-  if (!block) throw new Error(`no JSON in reply: ${text.slice(0, 200)}`);
-  const raw = block[0];
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // trailing commas before a close, and literal newlines inside strings
-    const repaired = raw
-      .replace(/,(\s*[}\]])/g, "$1")
-      .replace(/"(?:[^"\\]|\\.)*"/g, (m) => m.replace(/\n/g, " "));
-    return JSON.parse(repaired);
-  }
-}
-
 /* Resume: anything already written up is skipped, so an interrupted run costs
  * nothing and a second board can append to the same sheet. */
 let existing = "";
 try { existing = await readFile(out, "utf8"); } catch {}
 
 const files = (await readdir(dir))
-  .filter((f) => MIME[extname(f).toLowerCase()])
+  .filter((f) => IMAGE_EXTENSIONS.has(extname(f).toLowerCase()))
   .sort();
 
 console.log(`[mood] ${files.length} images in ${dir}`);
