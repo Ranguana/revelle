@@ -1,5 +1,7 @@
 import "server-only";
 
+import { MAX_TOKENS, MODEL } from "../model";
+
 /**
  * THE ONE MODEL CALL IN THE PRODUCT.
  *
@@ -66,7 +68,10 @@ import {
  * wrong about a bill (rule 21). Nothing outside this file may pass either of
  * them to a model.
  */
-export const MODEL = "claude-opus-5";
+// Moved to src/lib/model.ts so a plain node script can read it; the
+// reasoning above is unchanged and still governs. Re-exported here so
+// every existing import of this file keeps working.
+export { MODEL, MAX_TOKENS } from "../model";
 
 /**
  * Room for the piece and for the thinking that reaches it. `max_tokens` caps
@@ -77,7 +82,7 @@ export const MODEL = "claude-opus-5";
  * Exported for the same single reason as MODEL above: one number, quoted where
  * it is spent and where it is displayed.
  */
-export const MAX_TOKENS = 4000;
+
 
 /**
  * `medium`, not `high`.
