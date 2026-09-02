@@ -41,3 +41,59 @@ FOUNDER-PENDING mechanism working exactly as designed, not a wasted row.
 from this document; an item that is not here is not created. Deleting the
 row at the desk without removing it here would have brought it back on the
 next deploy.
+
+---
+
+## 2026-09-02 — two rulings that move objects rather than kill them
+
+### The shell candles are LIGHT, not a take-home
+
+Founder: **"for the shell candles, these would be all over the table or the
+house already as candles."**
+
+So the object is not one-per-guest to carry home. It is many, distributed —
+down the table and through the house — and it belongs to the room's LIGHT
+rather than to its goods. `scripts/mood-board.mjs` reached the same placement
+from the photograph alone, proposing `light` on New York before this ruling
+was made, on the grounds that the oysters are opened on the counter as people
+arrive and the shells are there anyway.
+
+That also settles the question the tool raised — pour from the party's own
+shells, or ship them pre-poured. Light that is *"already all over the house"*
+cannot be a favour bag. It is `THE EVENING SUPPLIES IT`, the mechanism
+seventeen items already use.
+
+### The corno, the painted tile and the rosolio may be PRIZES
+
+Founder: **"i wrote a note about the corno, painted tile and rosolio that
+maybe these would be prizes in games."**
+
+**This supersedes the corno's refusal recorded above** (rule 14 — the refusal
+and its reasoning stay, and this is what beat it). The corno was refused as a
+per-guest take-home. It is not refused as a prize, and the distinction is not
+a technicality: the objection was *"the most souvenir-shaped object on the
+sheet"*, which is a defect in something thirty people carry home and precisely
+the point of a joke prize.
+
+**There is already a game shaped for this.** `amalfi-the-five-prizes`:
+
+> "Five prizes, wrapped, in a row on the table from the start of the evening
+> where everybody can see them. They ascend: the first is a joke and the fifth
+> is genuinely good."
+
+Its `materials` line says "five wrapped prizes" and has never said what they
+are. The prizes were never authored.
+
+Each of the three answers its own pending question by moving:
+
+- **the corno** — souvenir-shaped is a defect in a take-home and the joke at
+  position one.
+- **the painted tile** — "cost per tile at crowd scale, and whether
+  hand-painted survives that scale" stops mattering at one tile.
+- **the rosolio** — "at crowd this is the most expensive thing on the list and
+  it is alcohol, does it survive the guest count" — a prize is one bottle and
+  one winner, so the question does not need answering, it stops applying.
+
+**Not acted on.** Two prizes of five are still unauthored, and whether the
+liqueur can be the fifth prize while also being the room's closer is a real
+question nobody has asked yet. Filed, not built.
