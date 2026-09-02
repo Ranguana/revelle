@@ -58,7 +58,10 @@ export type BankState = { error: string | null };
 
 const KIND_CODES = BANK_KINDS.map((entry) => entry.code);
 const PHASE_CODES = BANK_PHASES.map((entry) => entry.code);
-const STATUSES = ["draft", "active", "discontinued"];
+// `retired` joined the list when the No button started retiring instead of
+// deleting — see refuseBankItem below. It is a status a curator may set and a
+// seeder may not, which is the same rule every other status here follows.
+const STATUSES = ["draft", "active", "discontinued", "retired"];
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -243,40 +246,49 @@ export async function saveBankItem(
 
 /** The one-click move from draft to offered, and back. Dishes' gesture exactly. */
 /**
- * DELETE A DRAFT, AND ONLY A DRAFT.
+ * NO — AND IT HAS TO SURVIVE THE NEXT DEPLOY.
  *
- * Founder, 2026-09-01, reviewing the 179 machine-drafted take-home proposals
- * held by `FOUNDER-PENDING`: "no on the following: marked cork, corno,
- * confetti/sugar almonds. also a delete button."
+ * Founder, 2026-09-02: "i keep saying no to certain items and they just pop
+ * back up when i return to the list."
  *
- * ── WHY DRAFT-ONLY IS THE WHOLE SAFETY ARGUMENT ──────────────────────
+ * They did, and the first version of this action is why. It DELETED the row.
  *
- * db/002's generated join table says it, and this action only enforces what
- * it already decided:
+ * ── WHY DELETING WAS THE WRONG NO ────────────────────────────────────
  *
- *     "restrict, not cascade: a pooled ingredient that has been issued to
- *      somebody cannot be deleted out from under her Revelle. Retire it."
+ * scripts/seed-bank.mjs creates a row when the slug is absent:
  *
- * So the database will refuse to delete an issued row whatever this does. A
- * DRAFT, though, has never been issued — `install_revelle_ingredients` made
- * `status = 'active'` the issuable predicate — so deleting one destroys
- * nothing anybody has been given. That is the entire distinction, and it is
- * why the button is offered on drafts and nowhere else: an object nobody has
- * received is a proposal, and refusing a proposal is not a retirement.
+ *     select ... from bank_item where slug = $1     ->  if none, insert
  *
- * A published or retired row is NOT deletable here on purpose. Retiring it
- * keeps the reason (db/042) and keeps the words a Revelle was issued under.
- * The FK check below is belt and braces against that ever being wrong.
+ * and it runs on every deploy, from docs/atmosphere-idea-bank-v1.md. So a
+ * deleted row is a MISSING row, and a missing row is one the document still
+ * describes — recreated on the next deploy as a fresh draft with a new id and
+ * no memory of having been refused. Saying no made the item briefly invisible
+ * and changed nothing. Worse than doing nothing, because it looked like it
+ * worked.
  *
- * ── AND THE DOCUMENT HAS TO LOSE IT TOO ──────────────────────────────
+ * I knew this mechanism when I shipped the delete — the old comment here even
+ * said "deleting here without removing the item there brings it back" — and
+ * shipped it anyway, leaving the founder to hand-edit an 87KB markdown file
+ * for every no. That is not a workflow, and rule 23 covers it: a mechanism
+ * that invites misreading is a defect even when it does what it says.
  *
- * `scripts/seed-bank.mjs` CREATES rows from docs/atmosphere-idea-bank-v1.md.
- * Deleting here without removing the item there brings it back on the next
- * deploy, wearing a new id and no memory of having been refused. The summary
- * recorded below says so, so that whoever reads the ledger knows the deletion
- * was only half the act.
+ * ── WHY RETIRING IS THE RIGHT ONE, AND IS NOT A COMPROMISE ───────────
+ *
+ * A retired row still EXISTS, so the seeder's `where slug = $1` finds it and
+ * creates nothing. And seed-bank does not touch the status of a row that
+ * already exists — it says so in its own words, "whether a row is offered is
+ * settled once, on the way in, and after that it belongs to the desk". So a
+ * refusal made here is permanent without editing a document at all.
+ *
+ * It is also what the rest of the catalogue already does. db/042 made a
+ * retirement carry its reason; nothing in this product deletes a decision.
+ * The refusal keeps the object, the question it carried, and who said no.
+ *
+ * The document should still lose the item eventually — a sheet proposing
+ * something the desk has refused is a sheet arguing with the database. But
+ * that is tidying, not the mechanism, and the no now holds either way.
  */
-export async function deleteBankItem(form: FormData): Promise<void> {
+export async function refuseBankItem(form: FormData): Promise<void> {
   const staff = await requireStaff();
   const id = String(form.get("id") ?? "");
   if (!UUID.test(id)) return;
@@ -287,50 +299,21 @@ export async function deleteBankItem(form: FormData): Promise<void> {
   );
   if (!before) return;
 
-  // Not "unauthorised" — wrong instrument. Say which one is right.
-  if (before.status !== "draft") {
-    redirect(
-      `/desk/bank/${id}?error=` +
-        encodeURIComponent(
-          `"${before.name}" is ${before.status}, not a draft. A row that has been ` +
-            `offered may have been issued, and the words a Revelle was issued ` +
-            `under are kept forever. Retire it instead.`
-        )
-    );
-  }
-
-  try {
-    await query(`delete from bank_item where id = $1 and status = 'draft'`, [id]);
-  } catch (err) {
-    // 23503: something references it. The database is right and this is not.
-    const code = (err as { code?: string })?.code;
-    if (code === "23503") {
-      redirect(
-        `/desk/bank/${id}?error=` +
-          encodeURIComponent(
-            `"${before.name}" is referenced by something and cannot be deleted. ` +
-              `Retire it instead — nothing issued is ever deleted out from under it.`
-          )
-      );
-    }
-    throw err;
-  }
+  await query(
+    `update bank_item set status = 'retired'::product_status where id = $1`,
+    [id]
+  );
 
   await recordAction(staff, {
-    action: "bank_item.deleted",
+    action: "bank_item.refused",
     entityTable: "bank_item",
     entityId: id,
-    summary: `${before.name} — refused as a draft, never offered`,
-    detail: {
-      name: before.name,
-      note:
-        "Remove it from docs/atmosphere-idea-bank-v1.md as well, or seed:bank " +
-        "recreates it on the next deploy.",
-    },
+    summary: `${before.name} — refused, and retired rather than deleted so it stays refused`,
+    detail: { was: before.status },
   });
 
   revalidatePath("/desk/bank");
-  redirect("/desk/bank");
+  revalidatePath(`/desk/bank/${id}`);
 }
 
 export async function setBankStatus(form: FormData): Promise<void> {
