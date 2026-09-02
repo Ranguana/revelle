@@ -324,6 +324,18 @@ export default async function ImagesPage({
         ones&rdquo; — a machine deciding what belongs in a room is the thing
         this whole screen exists to keep from happening.
       </Seam>
+
+      <Seam title="And two fields it does not fill in">
+        A draft made here arrives as something the house <em>stocks</em>, with
+        no time of day. Both are left where the schema puts them rather than
+        guessed at: <code>supply</code> is written in one place only —{" "}
+        <code>seed-bank</code>, from the marker the bank document carries — so a
+        clause here that says the evening supplies it still needs that set at{" "}
+        <code>/desk/bank</code>. And <code>phase</code> stays{" "}
+        <em>no opinion</em>, which is not &ldquo;every phase&rdquo;: most
+        atmosphere has no hour, and a field that must be filled in for every row
+        gets filled in wrongly.
+      </Seam>
     </>
   );
 }

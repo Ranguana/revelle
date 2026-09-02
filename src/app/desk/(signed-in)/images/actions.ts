@@ -307,6 +307,22 @@ export async function readEverythingUnread(): Promise<void> {
  * placement. db/048 is explicit that a claim carrying a curator's own note is
  * hers and later migrations do not overrule it, so the machine's default is
  * replaced rather than argued with — and the note says who wrote it.
+ *
+ * ── WHAT IT DELIBERATELY DOES NOT SET, SAID OUT LOUD ────────────────
+ *
+ * `supply`. db/044's column comment: "Written only by scripts/seed-bank.mjs,
+ * from the THE EVENING SUPPLIES IT marker the content carries — one writer, so
+ * there is no second implementation to drift from." The prompt's fifth
+ * instruction asks the reading to PREFER an object the evening already
+ * produces, so a clause arriving here can say exactly that — and this action
+ * still leaves `supply` at its `stocked` default.
+ *
+ * That is a real gap and it is named rather than closed. Closing it here means
+ * a second reader of the same marker, in a second language, over a different
+ * input — rule 21's drift, bought to save one field on a draft somebody is
+ * about to open anyway. So the screen SAYS the draft arrives as `stocked` and
+ * points at /desk/bank, which is rule 16's requirement: the thing that was not
+ * honoured is stated where the person is standing.
  */
 export async function approvePlacement(form: FormData): Promise<void> {
   const staff = await requireStaff();
