@@ -1486,3 +1486,192 @@
 .schemaFootBad {
   color: var(--oxblood);
 }
+
+/* ── the image bank ───────────────────────────────────────────────────
+ *
+ * /desk/images. Two curators drop reference photographs here and the founder
+ * reads what came back. Three shapes and no more: the drop zone, the card
+ * grid, and the picture inside a card.
+ *
+ * THE PICTURES ARE OTHER PEOPLE'S PHOTOGRAPHS. Nothing here is styled to be
+ * presented — no lightbox, no gallery, no carousel. They are held at the size
+ * a person needs to recognise an object, in a tool nobody outside
+ * STAFF_EMAILS can open, and the product ships the WORDS about them and never
+ * the pictures.
+ */
+
+.drop {
+  border: 1px dashed var(--rule);
+  background: var(--ground2);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+/* The drag is over the zone. A colour and a solid edge, so "let go here" is
+ * legible without a word moving — a label that changes under a dragged file
+ * is a label nobody reads. */
+.dropOver {
+  border-style: solid;
+  border-color: var(--aqua);
+  background: color-mix(in srgb, var(--aqua) 7%, var(--ground2));
+}
+
+.dropLead {
+  font-family: var(--display);
+  font-size: 1rem;
+  margin: 0 0 0.25rem;
+}
+
+.dropHint {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.625rem;
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+/* The file picker, because some people never drag. It is a real <input
+ * type="file"> inside a <label>: the input itself is off-screen rather than
+ * `display: none`, so it keeps its place in the tab order and a keyboard
+ * reaches it. */
+.dropPick {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* One line per file, appearing as each request returns. Nothing collapses on
+ * its own: a refusal has to stay on screen long enough to be read, and the
+ * page is not reloaded under her. */
+.dropList {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  text-align: left;
+  max-width: 44rem;
+  margin-inline: auto;
+  display: grid;
+  gap: 0.1875rem;
+}
+
+.dropList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.1875rem;
+}
+
+.dropBad {
+  color: var(--oxblood);
+}
+
+.dropDone {
+  color: var(--ink-faint);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--row-mark);
+  background: color-mix(in srgb, var(--row-mark) var(--row-wash), var(--ground2));
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+/* A fixed box, so a column of cards does not jump about as portraits and
+ * landscapes load. `contain` rather than `cover`: cropping a reference
+ * photograph can hide the object, which is the one thing the picture is here
+ * for. */
+.cardPicture {
+  display: block;
+  width: 100%;
+  height: 15rem;
+  object-fit: contain;
+  background: var(--ground);
+  border: 1px solid var(--rule);
+}
+
+.cardMeta {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.cardObject {
+  font-family: var(--display);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.cardClause {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  white-space: pre-wrap;
+  background: var(--ground);
+  border: 1px solid var(--rule);
+  padding: 0.5rem;
+  margin: 0;
+  overflow-x: auto;
+}
+
+/* One candidate room. The button sits with its own sentence, never in a row
+ * of identical buttons — approving is choosing a room, and the room's
+ * reasoning has to be beside the thing that acts on it. */
+.candidate {
+  border-top: 1px solid var(--rule);
+  padding-top: 0.5rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.candidateHead {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.candidateWhy {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* Weak, possible, strong — read, never acted on. All three are the same
+ * weight and the same size on purpose: a `strong` styled as the obvious
+ * answer is a pre-selection wearing a colour. */
+.confidence {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}

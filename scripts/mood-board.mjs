@@ -67,7 +67,7 @@
 import { readdir, readFile, writeFile, access } from "node:fs/promises";
 import { extname, join, basename } from "node:path";
 
-import { MODEL } from "../src/lib/model.ts";
+import { MAX_TOKENS, MODEL } from "../src/lib/model.ts";
 import {
   PLACEMENT_ASK,
   SNIFF_BYTES,
@@ -131,7 +131,10 @@ async function look(file) {
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 1200,
+      // src/lib/model.ts owns both numbers. This file used to carry its own
+      // 1200, which was a second ceiling nobody would have found until a
+      // reading came back truncated on the shortest image of a batch.
+      max_tokens: MAX_TOKENS,
       system: SYSTEM,
       messages: [
         {

@@ -520,9 +520,14 @@ test("NOTHING ON THE SCREEN IS PRE-SELECTED", () => {
         `screen choosing it.`
     );
   }
-  assert.ok(!/\bselected\b/.test(page), "a pre-selected option appeared");
+  // Attribute forms only — the page's own prose says "pre-selected" four
+  // times, which is the opposite of the thing being looked for.
   assert.ok(
-    !/checked(\s*=|\})/.test(page),
+    !/(?<![-\w])selected(\s*=|\s*\/?>)/.test(page),
+    "a pre-selected option appeared on /desk/images"
+  );
+  assert.ok(
+    !/(?<![-\w])checked(\s*=|\s*\/?>)/.test(page),
     "a pre-checked input appeared on /desk/images"
   );
 });

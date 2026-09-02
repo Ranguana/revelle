@@ -32,6 +32,12 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
     { href: "/desk/drinks", label: "Drinks" },
     { href: "/desk/games", label: "Games" },
     { href: "/desk/bank", label: "Atmosphere" },
+    // BESIDE ATMOSPHERE, NOT BESIDE THE THREE GESTURES BELOW. The image bank
+    // is where atmosphere comes FROM: two curators drop reference pictures,
+    // each is read for the object in it, and an approved placement becomes a
+    // draft in the row above. Publish, Stocked and Reconcile are what happens
+    // to a row once it exists; this is where one starts.
+    { href: "/desk/images", label: "Image bank" },
     { href: "/desk/products", label: "Products" },
     // LAST IN THE LIBRARY GROUP, not in "What it does", because publishing is
     // not an instrument for reading the engine — it is the gesture that decides
