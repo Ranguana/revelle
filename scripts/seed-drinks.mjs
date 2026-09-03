@@ -4,11 +4,69 @@
  *
  *   npm run seed:drinks
  *   npm run seed:drinks -- --overwrite   let the file beat the curator's edits
+ *   npm run seed:drinks -- --dry-run     parse and COUNT, touch no database
  *
  * The sibling of scripts/seed-menus.mjs, deliberately: same document shape,
  * same flags, same refusal to guess, same rule that a curator's edit at the
  * desk outranks the file. Read that script's header for the argument; only the
  * differences are written out here.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * THE UNIT CHANGED. THE PARSE MOVED OUT. THIS FILE OWNS THE WRITE.
+ *
+ * docs/drinks.md held twenty-five PROGRAMMES and now holds SEVENTY-SIX atomic
+ * drinks (docs/drink-explosion.md did the conversion, by counting rather than
+ * eyeballing; db/060 is its schema half). The read lives in
+ * scripts/drinks-parse.mjs, as a module rather than a function in here, for one
+ * reason: this script connects to a database at import time and `npm test`
+ * cannot. A parse nothing can exercise is a parse whose first real run is its
+ * first test — CLAUDE.md rule 24's corollary, and this document just changed
+ * shape.
+ *
+ * So: `parseDrinks()` decides what the document says, and every argument about
+ * STATUS, SCOPING, MEAL CLAIMS and the LEDGER is here.
+ *
+ * ── WHAT THIS FILE DELETED, AND THE ARGUMENT IT DELETED IT WITH ─────
+ *
+ * CLAUDE.md rule 14: superseded reasoning is preserved, never deleted. Two
+ * functions are gone from this file and both were RIGHT AT THE PROGRAMME
+ * GRAIN. What beat them is a change of unit, not a change of mind.
+ *
+ *   `contiguous()` — "a gap in the numbering is an entry a bad parse dropped".
+ *     Still true, still enforced, and now enforced ON TWO AXES rather than one:
+ *     the programmes run 1..25 and each programme's drinks run 1..n.
+ *     scripts/drinks-parse.mjs owns it, because the numbering it checks is a
+ *     property of the DOCUMENT and the document has exactly one reader. Two
+ *     copies of that check would be two authorities for one fact (rule 21), and
+ *     the copy in here would have been the broken one: it reads `entry.number`,
+ *     which an atomic record does not have.
+ *
+ *   `collapse()` — "TWO ENTRIES ARE ONE PROGRAMME WHEN SHE WROTE THEM THE SAME
+ *     WAY. The key is the AUTHORED CONTENT — the cocktails line and the
+ *     mocktail line, exactly […] Cross-referencing is HER decision, expressed
+ *     by writing the same thing twice." At the programme grain that is exactly
+ *     right: writing a whole five-bullet record twice, word for word, under two
+ *     headings is a deliberate act nobody performs by accident.
+ *
+ *     AT THE ATOMIC GRAIN IT IS A MATCHER THAT MATCHES BY ACCIDENT, and it was
+ *     COUNTED rather than reasoned about (rule 24). Run unchanged over the
+ *     seventy-six rows, its `cocktails\0mocktails` key collides TWICE — bloody
+ *     marys at Westhampton (3.1) with bloody marys at Vegas (14.2), and cold
+ *     beer at Tahiti (18.3) with cold beer at Havana (20.2) — and BOTH
+ *     collisions are between rows that disagree about the season or the mixing
+ *     level they inherited from their programmes. So the function does not
+ *     quietly merge: IT FAILS THE RUN, with a message built from `drink.number`,
+ *     a field atomic records do not carry, so it fails printing `drink
+ *     undefined`. And in the counterfactual where it did not fail it would fold
+ *     76 rows into 74 and MINT TWO CROSS-ROOM NATIVE CLAIMS NOBODY AUTHORED.
+ *
+ *     A repeated PROGRAMME was her saying "this bar belongs in two houses". A
+ *     repeated drink NAME is two rooms independently pouring a common thing —
+ *     seven names occur verbatim across sixteen rows (whiskey sours, cold beer,
+ *     manhattans, mimosas, bloody marys, champagne, negronis). The parser
+ *     COUNTS those and reports them; nothing acts on them.
+ *
+ *     Sharing therefore has exactly ONE spelling now: the sixth bullet.
  *
  * ─────────────────────────────────────────────────────────────────────
  * A DRINK THIS SCRIPT CREATES IS LIVE, AND USED NOT TO BE
@@ -22,58 +80,85 @@
  * here for the same reason nothing else in this header is: two copies of one
  * argument become two arguments.
  *
- * What it means HERE: a programme this seeder creates is offered on the way in,
+ * What it means HERE: a drink this seeder creates is offered on the way in,
  * `--activate` is refused by name rather than silently ignored, and every one
  * of them lands in `staff_action` under the pool-stocking actor so /desk/stocked
- * can show the run and send any of it back to draft. The mirror rule below is
- * untouched and matters more than ever now that nobody signs off row by row:
- * a drink whose mocktail build is missing still fails the run rather than
- * reaching a table.
+ * can show the run and send any of it back to draft.
+ *
+ * ── EXCEPT THE TWENTY-ONE WHOSE MIRROR IS OWED ──────────────────────
+ *
+ * Those arrive at `draft`, and the hold-back is NOT this script being cautious:
+ * db/060's `drink_live_has_its_mirror` refuses `status = 'active'` on a row
+ * whose `mocktails` is null, so a live owed drink is not a thing the database
+ * will hold. This script writes `draft` so the run reports the truth rather
+ * than meeting a constraint name.
+ *
+ * IT IS DELIBERATELY NOT THE `FOUNDER-PENDING` HOLD-BACK, and the difference
+ * matters enough to write down (rule 23: state the fact where the wrong reading
+ * would be made). That marker means "this row's own TEXT carries the question,
+ * and deleting the question is what publishes it". Here the question is a NULL
+ * COLUMN. Writing the marker into `notes` would invite a curator to delete a
+ * sentence and expect a drink to go out, and what she would get is a check
+ * constraint. So the note beside an owed drink says what is actually owed —
+ * the mirror — and says that writing it is what publishes the row.
  *
  * ─────────────────────────────────────────────────────────────────────
  * THE MIRROR IS THE RECORD, AND THIS SCRIPT IS WHERE IT COULD BE LOST
  *
  * docs/drinks.md carries five bullets per entry and the first two are the two
- * builds of one drink: the cocktails, then the mocktail mirror. They go into
- * two NOT NULL columns of one row (db/017), never two rows, and this script
- * fails rather than writing a drink whose mirror is missing or blank.
+ * builds of one drink: the drink, then its mocktail mirror. They go into two
+ * columns of ONE row (db/017), never two rows, never a mirror table.
  *
  * That is not tidiness. The guarantee the mirror exists to provide is that
  * nobody at the table is visibly not drinking, and it survives exactly as long
- * as the two builds cannot be separated. A seeder that quietly accepted four
- * bullets and left the mirror empty would be the first place it went.
+ * as the two builds cannot be separated.
  *
- * The mirrors also carry craft that must not be flattened — "from the same
- * pitcher fruit", "self-mixed at the table", "in a gimlet glass" — so the line
- * is stored exactly as written, in her punctuation, whole.
+ * WHAT THE ATOMIC GRAIN FOUND, AND WHY `mocktails` IS NULLABLE NOW: twenty-one
+ * of the seventy-six drinks have no twin in their programme's mocktail line.
+ * They are not a parse failure — the mocktail lines are shorter than the
+ * cocktail lines in twenty of the twenty-five programmes. The one thing that
+ * may not happen is INVENTING them, because a weak invented mirror is worse
+ * than a named gap and db/017's guarantee is exactly what it would spend. The
+ * document says `Mirror owed` in the second bullet; this script writes NULL and
+ * `draft`; db/060 §IV makes that unofferable. Read that section before changing
+ * any of it.
+ *
+ * The alternative was to seed 55 and drop 21 authored drinks, which is rule
+ * 16's exact failure: an input absorbed and not honoured, with the catalogue
+ * looking complete from every angle.
+ *
+ * The mirrors that DO exist carry craft that must not be flattened — "from the
+ * same pitcher fruit", "self-mixed at the table", "in a gimlet glass" — so the
+ * line is stored exactly as written, in her punctuation, whole.
  *
  * ─────────────────────────────────────────────────────────────────────
- * A PROGRAMME CAN BELONG TO SEVERAL DESTINATIONS
+ * A DRINK CAN BELONG TO SEVERAL DESTINATIONS
  *
  * The founder: "Drinks need to be destination picked though some can cross
- * reference." So a programme is scoped, as it always was, and it can now be
- * scoped to MORE THAN ONE house — one row with several `native = true`
- * `drink_world` rows, exactly the rule scripts/seed-dishes.mjs follows for the
- * dish pool. One rule between the two pools, which is the point.
+ * reference." So a drink is scoped, as it always was, and it can be scoped to
+ * MORE THAN ONE house — one row with several `native = true` `drink_world`
+ * rows, exactly the rule scripts/seed-dishes.mjs follows for the dish pool.
  *
- * There are two ways to say it and the parser takes both:
+ * There used to be two spellings for that and there is now one: the sixth
+ * bullet, `Also at: Vegas, Catskills`. The other — repeating a whole record
+ * under a second heading — was retired with `collapse()` above, because at this
+ * grain it cannot be told apart from two rooms pouring the same common thing.
  *
- *   REPEAT THE ENTRY under a second `## Heading`, word for word. Two entries
- *     are ONE programme when their cocktails line and their mocktail line MATCH
- *     — the authored content, never a resemblance. A Cap Ferrat kir and a Côte
- *     d'Azur kir royale are different drinks and stay two rows, and inferring a
- *     cross-reference from similarity would quietly merge them. Cross-
- *     referencing is HER decision, expressed by writing the same thing twice.
+ * NOTHING IN docs/drinks.md USES IT TODAY: zero of the seventy-six carry a
+ * sixth bullet, and the run says so rather than assuming it. The `on conflict`
+ * branch of the `drink_world` upsert below has therefore still never fired
+ * against a row that already existed — docs/drink-explosion.md §7.2 books the
+ * scratch-database test that rule 24's corollary requires before the first
+ * sharing line is authored.
  *
- *   ADD A SIXTH BULLET, `Also at: Vegas, Catskills`. Repeating five lines to
- *     name one more destination is tedious authoring, and tedious authoring is
- *     how a catalogue stops being edited. The record shape stays five bullets
- *     or six, position-delimited like everything else she writes, and a sixth
- *     bullet that does not begin "Also at" is an error rather than a guess.
+ * ─────────────────────────────────────────────────────────────────────
+ * --dry-run EXISTS BECAUSE THE DATABASE IS UNREACHABLE
  *
- * NOTHING IN docs/drinks.md USES EITHER TODAY. Seeding the file as it stands
- * produces twenty-five programmes with one destination each, and the run says
- * so. This removes a limitation; it changes no data.
+ * `ipAllowList: []` — no laptop can connect (CLAUDE.md rule 9). So the
+ * document has to be readable BEFORE it is written, and `--dry-run` parses the
+ * file, prints every count db/060 and docs/drink-explosion.md claim, and
+ * contacts nothing. It is the same instrument `npm run check:bank` is for the
+ * bank.
  *
  * Same connection rules as scripts/migrate.mjs. Needs DATABASE_URL.
  */
@@ -83,19 +168,20 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 
 import {
-  DESTINATIONS,
+  HELD,
   LIVE,
-  SEASONS,
   ensureWorld,
   recordAutoPublish,
   refuseActivateFlag,
   stockingRun,
 } from "./catalogue-vocabulary.mjs";
+import { DrinkParseError, drinkCounts, parseDrinks } from "./drinks-parse.mjs";
 
 const SOURCE = fileURLToPath(new URL("../docs/drinks.md", import.meta.url));
 
 refuseActivateFlag("seed-drinks");
 const overwrite = process.argv.includes("--overwrite");
+const dryRun = process.argv.includes("--dry-run");
 
 /** One id for this run, so /desk/stocked can group what it put out. */
 const RUN = stockingRun();
@@ -106,242 +192,105 @@ function needsSsl(url) {
   return !/@(localhost|127\.0\.0\.1|\[::1\])/.test(url);
 }
 
-/**
- * THE THREE AUTHORED VALUES, IN THE BAR'S OWN WORDS.
- *
- * docs/drinks.md: "How much mixing uses the same three positions as the menus,
- * in the bar's own words: actually mixed · half made · bought and poured."
- *
- * ONE AXIS, TWO VOCABULARIES. `bought and poured` is not a fourth position, it
- * is `bought_and_arranged` said at a bar, and it maps onto the same
- * `making_level` value so that one answer from a host governs the whole
- * evening. Nothing downstream can tell the two phrasings apart, which is the
- * point — the words are the bar's and live in src/lib/desk/labels.ts.
- *
- * Matched exactly. A line that is nearly one of these is a malformed entry and
- * fails loudly rather than being truncated into a value.
- */
-const MIXING = new Map([
-  ["Actually mixed", "actually_made"],
-  ["Half made", "half_made"],
-  ["Bought and poured", "bought_and_arranged"],
-]);
-
 function fail(message) {
   console.error(`\n[seed-drinks] FAILED: ${message}`);
   process.exit(1);
 }
 
-/* ── the parser ─────────────────────────────────────────────────────── */
+/* ── the read ───────────────────────────────────────────────────────── */
 
-function parse(text) {
-  const lines = text.split("\n");
-  const drinks = [];
-
-  let destination = null;
-  let current = null;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-
-    const heading = /^##\s+(.+?)\s*$/.exec(line);
-    if (heading) {
-      const name = heading[1];
-      // The document opens and closes with prose sections that are not
-      // destinations. "The mirror is the whole point" is the best thing in the
-      // file and it is not a place.
-      destination = Object.hasOwn(DESTINATIONS, name) ? name : null;
-      current = null;
-      continue;
-    }
-
-    const numbered = /^\*\*(\d+)\.\*\*\s*$/.exec(line);
-    if (numbered) {
-      if (!destination) {
-        fail(
-          `line ${i + 1}: drink ${numbered[1]} is not under a known destination heading`
-        );
-      }
-      current = { number: Number(numbered[1]), destination, bullets: [] };
-      drinks.push(current);
-      continue;
-    }
-
-    if (current && line.startsWith("- ")) {
-      current.bullets.push(line.slice(2).trim());
-    } else if (line === "" || line.startsWith("#") || line.startsWith("---")) {
-      current = null;
-    }
-  }
-
-  for (const drink of drinks) {
-    if (drink.bullets.length !== 5 && drink.bullets.length !== 6) {
-      fail(
-        `drink ${drink.number} has ${drink.bullets.length} lines; the record ` +
-          `shape is five: cocktails, mocktail mirrors, what it's for, season, ` +
-          `how much mixing — with an optional sixth, "Also at: <destination>, ` +
-          `<destination>". A drink without its mirror is not a drink this ` +
-          `house serves — see the top of docs/drinks.md.`
-      );
-    }
-    const [cocktails, mocktails, whatItsFor, season, mixing, alsoAt] =
-      drink.bullets;
-
-    // THE SIXTH BULLET, when there is one. An unrecognised sixth line is an
-    // error rather than a skip, for the reason an unknown heading is: a typo
-    // that silently drops a destination is far worse than a failed run.
-    drink.also = [];
-    if (alsoAt !== undefined) {
-      const match = /^Also at:?\s*(.+)$/i.exec(alsoAt);
-      if (!match) {
-        fail(
-          `drink ${drink.number}: the sixth line is "${alsoAt}". The only ` +
-            `sixth line a drink record has is "Also at: <destination>, ` +
-            `<destination>".`
-        );
-      }
-      for (const raw of match[1].split(",")) {
-        const heading = raw.trim();
-        if (heading.length === 0) continue;
-        if (!Object.hasOwn(DESTINATIONS, heading)) {
-          fail(
-            `drink ${drink.number}: "${heading}" is not a destination this ` +
-              `catalogue knows. Add it to DESTINATIONS in ` +
-              `scripts/catalogue-vocabulary.mjs — docs/new-destination.md §5 ` +
-              `is about exactly this step.`
-          );
-        }
-        if (heading === drink.destination) {
-          fail(
-            `drink ${drink.number}: "Also at" names ${heading}, which is the ` +
-              `heading it already sits under.`
-          );
-        }
-        if (!drink.also.includes(heading)) drink.also.push(heading);
-      }
-    }
-
-    if (mocktails.length === 0) {
-      fail(`drink ${drink.number}: the mocktail mirror is empty.`);
-    }
-    if (mocktails.toLowerCase() === cocktails.toLowerCase()) {
-      fail(
-        `drink ${drink.number}: the mirror is the cocktail line again. A mirror ` +
-          `is the same glass built without the alcohol, not the same sentence.`
-      );
-    }
-
-    if (!Object.hasOwn(SEASONS, season)) {
-      fail(
-        `drink ${drink.number}: season "${season}" is not in the mapping in ` +
-          `scripts/catalogue-vocabulary.mjs. Add it there — a new wording is a ` +
-          `decision, not a default.`
-      );
-    }
-
-    if (!MIXING.has(mixing)) {
-      fail(
-        `drink ${drink.number}: "${mixing}" is not one of the three authored ` +
-          `values (${[...MIXING.keys()].join(" · ")})`
-      );
-    }
-
-    drink.cocktails = cocktails;
-    drink.mocktails = mocktails;
-    drink.name = whatItsFor;
-    drink.seasonNote = season;
-    drink.season = SEASONS[season];
-    drink.making = MIXING.get(mixing);
-  }
-
-  if (drinks.length === 0) fail("no drinks found in docs/drinks.md");
-  contiguous(drinks);
-  return collapse(drinks);
+let drinks;
+try {
+  drinks = parseDrinks(readFileSync(SOURCE, "utf8"));
+} catch (err) {
+  // A parse error is written for the person editing docs/drinks.md, so it is
+  // printed as it was written rather than wrapped in a stack trace.
+  if (err instanceof DrinkParseError) fail(err.message);
+  throw err;
 }
+
+const counts = drinkCounts(drinks);
 
 /**
- * TWO ENTRIES ARE ONE PROGRAMME WHEN SHE WROTE THEM THE SAME WAY.
+ * WHAT THE DOCUMENT SAYS, COUNTED, BEFORE ANY DATABASE IS INVOLVED.
  *
- * The key is the AUTHORED CONTENT — the cocktails line and the mocktail line,
- * exactly — and nothing else. Not a similarity score, not a normalised name,
- * not the "what it's for" line. Martinis at New York and martinis at Vegas are
- * one programme only if the two records match; a Cap Ferrat kir and a Côte
- * d'Azur kir royale differ by a word and stay two rows, which is correct,
- * because they are two drinks.
- *
- * The slug comes from the FIRST occurrence's number, so a cross-referenced
- * programme keeps the identity it already had in the database and a re-seed
- * recognises it. The later numbers are simply not used — which is why
- * contiguous() runs before this, on the raw entries: a gap in her numbering is
- * still a dropped record, and it has to be caught before the collapse hides it.
- *
- * Everything else about the two entries must match as well. A repeated
- * programme whose season or making level differs between the two headings is
- * one of the two being wrong, and it fails rather than picking a winner — the
- * same rule scripts/seed-dishes.mjs applies to a repeated dish's making level.
+ * CLAUDE.md rule 24: "reading the code tells you what it was meant to match,
+ * only counting tells you what it did". These are the numbers
+ * docs/drink-explosion.md §1 reports from its own hand count and db/060 quotes
+ * in its header. They are PRINTED, not asserted, because the document is
+ * allowed to grow — what is asserted is that the database ends up holding what
+ * was read, and that check is at the bottom of this file.
  */
-function collapse(entries) {
-  const byContent = new Map();
-
-  for (const drink of entries) {
-    const key = `${drink.cocktails}\u0000${drink.mocktails}`;
-    const first = byContent.get(key);
-
-    if (!first) {
-      drink.destinations = [drink.destination, ...drink.also];
-      byContent.set(key, drink);
-      continue;
-    }
-
-    for (const [field, label] of [
-      ["name", "what it's for"],
-      ["season", "season"],
-      ["seasonNote", "the season wording"],
-      ["making", "how much mixing"],
-    ]) {
-      if (first[field] !== drink[field]) {
-        fail(
-          `drink ${drink.number} repeats drink ${first.number} word for word ` +
-            `but disagrees about ${label}: "${first[field]}" against ` +
-            `"${drink[field]}". A cross-referenced programme is one record; ` +
-            `two answers for one record is one of the two being wrong.`
-        );
-      }
-    }
-
-    for (const heading of [drink.destination, ...drink.also]) {
-      if (first.destinations.includes(heading)) {
-        fail(
-          `drink ${drink.number}: ${heading} is already claimed by drink ` +
-            `${first.number}, which is the same programme.`
-        );
-      }
-      first.destinations.push(heading);
-    }
+console.log(
+  `[seed-drinks] docs/drinks.md — ${counts.drinks} drink(s) in ` +
+    `${counts.programmes} programme(s) across ${counts.rooms} room(s): ` +
+    `${counts.paired} with the mirror their author wrote, ${counts.owed} ` +
+    `carrying a named debt, ${counts.mirrorSelf} whose two lines agree on ` +
+    `purpose.`
+);
+console.log(
+  `[seed-drinks] ${counts.mealClaims} meal-shape claim(s); ` +
+    `${counts.noMealShape} drink(s) name no shape and claim none. ` +
+    `${counts.shared} carry an "Also at" line.`
+);
+if (counts.repeated.length > 0) {
+  const rows = counts.repeated.reduce((n, entry) => n + entry.rows, 0);
+  console.log(
+    `[seed-drinks] ${counts.repeated.length} drink name(s) occur verbatim in ` +
+      `more than one programme, across ${rows} row(s). COUNTED AND NOT ACTED ` +
+      `ON: two rooms pouring a common thing are two drinks. Sharing is the ` +
+      `"Also at" line and nothing else — see this file's header on collapse().`
+  );
+  for (const entry of counts.repeated) {
+    console.log(`  ${entry.rows} × ${entry.text}`);
   }
-
-  return [...byContent.values()];
 }
 
-/** A gap in the numbering is an entry a bad parse dropped. See seed-menus. */
-function contiguous(entries) {
-  const numbers = entries.map((entry) => entry.number).sort((a, b) => a - b);
-  for (let i = 0; i < numbers.length; i += 1) {
-    if (numbers[i] !== i + 1) {
-      fail(
-        `the drinks are not contiguous from 1: expected ${i + 1} and found ` +
-          `${numbers[i]}. Either the document has a gap or the parser lost one.`
-      );
-    }
-  }
+if (dryRun) {
+  console.log(
+    `\n[seed-drinks] --dry-run: no database was contacted, nothing was written.`
+  );
+  process.exit(0);
+}
+
+/* ── what a row arrives as ──────────────────────────────────────────── */
+
+/**
+ * The sentence an owed drink carries in its own `notes`, at the desk.
+ *
+ * It names the debt, names who can settle it, and says plainly that deleting
+ * the sentence settles nothing — because the thing holding the row back is a
+ * NULL column and a check constraint, not this text. Rule 23: state the fact at
+ * the place the wrong reading would be made.
+ */
+function owedNote(drink) {
+  return (
+    `THE MIRROR IS OWED. Programme ${drink.programme} ("${drink.programmeLine}") ` +
+    `names no mocktail twin for this drink, and nobody may invent one: a weak ` +
+    `invented mirror is worse than a named gap, and db/017's guarantee — ` +
+    `nobody at the table is visibly not drinking — is what an invented one ` +
+    `spends. Held at draft. WRITING THE MIRROR IS WHAT PUBLISHES THIS ROW; ` +
+    `deleting this note does nothing, because db/060's ` +
+    `drink_live_has_its_mirror refuses to offer a drink whose mirror is null. ` +
+    `docs/drinks.md, docs/drink-explosion.md §5 batch B.`
+  );
+}
+
+/** Where the row came from, in the document's own terms. Never member-facing. */
+function sourceNote(drink) {
+  return (
+    `Drink ${drink.programme}.${drink.index} of programme ${drink.programme}, ` +
+    `"${drink.programmeLine}". docs/drinks.md; split out by ` +
+    `docs/drink-explosion.md.`
+  );
 }
 
 /* ── the write ──────────────────────────────────────────────────────── */
 
-const drinks = parse(readFileSync(SOURCE, "utf8"));
-
 const url = process.env.DATABASE_URL;
-if (!url) fail("DATABASE_URL is not set.");
+if (!url) {
+  fail("DATABASE_URL is not set. Use --dry-run to read the counts without one.");
+}
 
 const client = new pg.Client({
   connectionString: url,
@@ -352,73 +301,107 @@ const client = new pg.Client({
 await client.connect();
 
 let created = 0;
+let held = 0;
 let left = 0;
 let updated = 0;
 let scoped = 0;
+let mealsWritten = 0;
+let mealsExtra = 0;
+let mealsDropped = 0;
 const stubbed = [];
+/** Rows the file now gives a mirror and the desk still has at draft. */
+const awaitingPublish = [];
 
 try {
   await client.query("begin");
 
   for (const drink of drinks) {
-    const slug = `drink-${String(drink.number).padStart(2, "0")}`;
-
     const { rows: existing } = await client.query(
       `select id, name, cocktails, mocktails, season::text, season_note,
-              season_strict, making::text, status::text
+              season_strict, making::text, mirror_self, source_note, notes,
+              status::text
          from drink where slug = $1`,
-      [slug]
+      [drink.slug]
     );
+
+    const owed = drink.mirrorOwed;
 
     let drinkId;
     if (existing.length === 0) {
       const { rows } = await client.query(
         `insert into drink (slug, name, cocktails, mocktails, season,
-                            season_note, making, status)
-         values ($1, $2, $3, $4, $5::season_band, $6, $7::making_level, $8)
+                            season_note, making, mirror_self, source_note,
+                            notes, status)
+         values ($1, $2, $3, $4, $5::season_band, $6, $7::making_level, $8, $9,
+                 $10, $11)
          returning id`,
         [
-          slug,
+          drink.slug,
+          // THE NAME IS THE DRINK NOW. It used to be the programme's "what it
+          // is for" line, which was right when a row WAS a programme; at this
+          // grain a gin and tonic is not "a summer dinner or cocktail party",
+          // and that line is provenance (`source_note`) rather than a name.
+          // db/060 §I argues the reversal in full.
           drink.name,
-          drink.cocktails,
-          drink.mocktails,
+          // Both builds of one record. `cocktails` is the drink as she wrote
+          // it; `mocktails` is her mirror, or NULL where it is owed.
+          drink.name,
+          drink.mirror,
           drink.season,
           drink.seasonNote,
           drink.making,
-          // Live on the way in — see the note at the top of this file.
-          LIVE,
+          drink.mirrorSelf,
+          sourceNote(drink),
+          owed ? owedNote(drink) : null,
+          // Live on the way in — see the note at the top of this file — unless
+          // the mirror is owed, which db/060 makes unofferable anyway.
+          owed ? HELD : LIVE,
         ]
       );
       drinkId = rows[0].id;
       created += 1;
-      // In the same transaction as the row, so a programme cannot go out with
-      // nothing in the ledger saying it did.
-      await recordAutoPublish(client, {
-        table: "drink",
-        id: drinkId,
-        name: drink.name,
-        seeder: "seed-drinks",
-        run: RUN,
-        source: "docs/drinks.md",
-      });
-      console.log(`[seed-drinks] created  ${slug} (live) — ${drink.name}`);
+      if (owed) {
+        held += 1;
+        console.log(
+          `[seed-drinks] held     ${drink.slug} (draft) — ${drink.name} — ` +
+            `its mirror is owed`
+        );
+      } else {
+        // In the same transaction as the row, so a drink cannot go out with
+        // nothing in the ledger saying it did. A held row gets no entry,
+        // because nothing went live — the same rule scripts/seed-games.mjs
+        // follows for a game carrying a founder-pending question.
+        await recordAutoPublish(client, {
+          table: "drink",
+          id: drinkId,
+          name: drink.name,
+          seeder: "seed-drinks",
+          run: RUN,
+          source: "docs/drinks.md",
+        });
+        console.log(
+          `[seed-drinks] created  ${drink.slug} (live) — ${drink.name}`
+        );
+      }
     } else {
       drinkId = existing[0].id;
       const row = existing[0];
       const differs =
         row.name !== drink.name ||
-        row.cocktails !== drink.cocktails ||
-        row.mocktails !== drink.mocktails ||
+        row.cocktails !== drink.name ||
+        row.mocktails !== drink.mirror ||
         row.season !== drink.season ||
         row.season_note !== drink.seasonNote ||
-        row.making !== drink.making;
+        row.making !== drink.making ||
+        row.mirror_self !== drink.mirrorSelf ||
+        row.source_note !== sourceNote(drink);
 
       if (!differs) {
-        console.log(`[seed-drinks] same     ${slug}`);
+        console.log(`[seed-drinks] same     ${drink.slug}`);
       } else if (!overwrite) {
         left += 1;
         console.log(
-          `[seed-drinks] differs  ${slug} — left as the desk has it. ` +
+          `[seed-drinks] differs  ${drink.slug} — left as the desk has it. ` +
             `Re-run with --overwrite to let the file win.`
         );
       } else {
@@ -452,27 +435,108 @@ try {
         // has written the wording it reads. A curator's answer at the desk
         // still outranks it: the derivation only ever asserts a gate and never
         // retracts one, without --overwrite.
+        //
+        // `status` is NOT written here either, and that one is a decision
+        // rather than an inheritance: publishing is the desk's act (rule 8),
+        // and a seeder that re-published on every deploy would undo a veto
+        // silently on the next build. A drink whose mirror ARRIVES in the file
+        // while the row is still draft is therefore reported below rather than
+        // published — rule 16, the seeder saying out loud what it did not do.
+        //
+        // `notes` is left alone for the same reason, with one exception: the
+        // sentence THIS SCRIPT wrote about an owed mirror becomes false the
+        // moment the mirror is authored, so that exact string is cleared. Any
+        // other text in that column is somebody's and is not touched.
+        const clearsOwedNote =
+          !owed && row.notes !== null && row.notes.startsWith("THE MIRROR IS OWED.");
         await client.query(
           `update drink set name = $2, cocktails = $3, mocktails = $4,
                   season = $5::season_band, season_note = $6,
-                  making = $7::making_level
+                  making = $7::making_level, mirror_self = $8, source_note = $9,
+                  notes = $10
              where id = $1`,
           [
             drinkId,
             drink.name,
-            drink.cocktails,
-            drink.mocktails,
+            drink.name,
+            drink.mirror,
             drink.season,
             drink.seasonNote,
             drink.making,
+            drink.mirrorSelf,
+            sourceNote(drink),
+            clearsOwedNote ? null : row.notes,
           ]
         );
         updated += 1;
-        console.log(`[seed-drinks] updated  ${slug} — from the file`);
+        console.log(`[seed-drinks] updated  ${drink.slug} — from the file`);
+      }
+
+      if (!owed && row.status === "draft") {
+        awaitingPublish.push(drink.slug);
       }
     }
 
-    // EVERY destination this programme was written under. One row each, all
+    /*
+     * WHICH SHAPES OF TABLE IT CLAIMS — db/060 §V's `drink_meal`.
+     *
+     * NO ROWS MEANS EVERY SHAPE, exactly as `dish_meal` reads, so the six
+     * drinks whose programmes named no shape ("After a day outside", "A boat or
+     * beach day") get no rows and are eligible everywhere. That is the
+     * document refusing to guess, not a claim on all five (rule 3).
+     *
+     * The note is the programme's own "what it is for" line, so the row says
+     * what was read and where it came from — db/060 asks for exactly that.
+     *
+     * INSERTED, NEVER BLIND-DELETED. A claim the document does not make but the
+     * database holds is a curator's, and this seeder's standing rule is that
+     * the desk outranks the file — so an extra claim is REPORTED, and only
+     * `--overwrite`, which is the flag that means "let the file win", removes
+     * it. Reporting rather than silence is the point: an undeleted stale claim
+     * would widen a whitelist with nothing saying so.
+     */
+    const { rowCount: mealRows } = await client.query(
+      `insert into drink_meal (drink_id, meal, note)
+       select $1, m.meal::meal_shape, $3
+         from unnest($2::text[]) as m(meal)
+       on conflict (drink_id, meal) do nothing`,
+      [drinkId, drink.meals, drink.programmeLine]
+    );
+    mealsWritten += mealRows;
+
+    const { rows: extra } = await client.query(
+      `select meal::text as meal
+         from drink_meal
+        where drink_id = $1
+          and not (meal::text = any($2::text[]))
+        order by meal`,
+      [drinkId, drink.meals]
+    );
+    if (extra.length > 0) {
+      const names = extra.map((e) => e.meal).join(", ");
+      if (overwrite) {
+        const { rowCount } = await client.query(
+          `delete from drink_meal
+            where drink_id = $1
+              and not (meal::text = any($2::text[]))`,
+          [drinkId, drink.meals]
+        );
+        mealsDropped += rowCount;
+        console.log(
+          `[seed-drinks] dropped  ${drink.slug} — meal claim(s) ${names}, ` +
+            `which the document does not make (--overwrite)`
+        );
+      } else {
+        mealsExtra += extra.length;
+        console.log(
+          `[seed-drinks] extra    ${drink.slug} — the database claims ${names} ` +
+            `and the document does not. Left as the desk has it; --overwrite ` +
+            `removes it.`
+        );
+      }
+    }
+
+    // EVERY destination this drink was written for. One row each, all
     // `native` — the claim, not a weight. docs/drinks.md: "A drink is scoped to
     // a destination the way a menu is", and the founder: "some can cross
     // reference". See db/019 and scripts/seed-dishes.mjs, which does this
@@ -491,8 +555,8 @@ try {
     // drink is never in the running for. So where a row for this pair already
     // exists as an affinity weight — set at the desk, or staged by a pass that
     // read affinity as sharing — `do nothing` left the claim INERT and the run
-    // reported a destination it had not actually given the programme. On a
-    // fresh database the two are indistinguishable, which is why this survived
+    // reported a destination it had not actually given the drink. On a fresh
+    // database the two are indistinguishable, which is why this survived
     // unnoticed: docs/drinks.md has never carried an `Also at:` line, so this
     // statement has only ever run against empty tables.
     //
@@ -519,18 +583,76 @@ try {
         // `throw`, not `fail()`: this is inside the transaction, and the catch
         // below is what rolls it back and prints the run's own failure line.
         throw new Error(
-          `drink ${drink.number} is written for ${heading}, where it is ` +
-            `already FORBIDDEN. A veto that can be outvoted is not a veto, so ` +
-            `the claim was refused rather than written over it. Remove one of ` +
-            `the two — the heading (or "Also at" line) in docs/drinks.md, or ` +
-            `the forbidden row at the desk.`
+          `drink ${drink.programme}.${drink.index} is written for ${heading}, ` +
+            `where it is already FORBIDDEN. A veto that can be outvoted is not ` +
+            `a veto, so the claim was refused rather than written over it. ` +
+            `Remove one of the two — the heading (or "Also at" line) in ` +
+            `docs/drinks.md, or the forbidden row at the desk.`
         );
       }
       scoped += rowCount;
     }
   }
 
+  /*
+   * COUNT WHAT IT WROTE, FROM THE DATABASE, BEFORE COMMITTING — rule 24, and
+   * rule 20's other half: a report generated from something other than reality
+   * is the most convincing failure this system produces. Counting the
+   * JavaScript objects would prove only that the parser agrees with itself.
+   *
+   * Read inside the transaction so a mismatch ROLLS THE RUN BACK rather than
+   * being noticed after the fact. The only thing that could differ between here
+   * and post-commit is another session writing concurrently, which does not
+   * happen on a deploy.
+   *
+   * WHAT IS ASSERTED IS THE ROW COUNT AND NOTHING ELSE. `drink-NN-M` is a slug
+   * space only this seeder writes, so the number of rows in it is a fact about
+   * this script and can only be wrong if this script is. The paired/owed split
+   * is REPORTED instead: a curator authoring one of the twenty-one missing
+   * mirrors at the desk moves it, legitimately, and a check that goes red on
+   * her doing the right thing is a tripwire that teaches people to ignore
+   * tripwires.
+   */
+  const { rows: back } = await client.query(
+    `select count(*)::int                                as rows,
+            count(mocktails)::int                        as paired,
+            count(*) filter (where mocktails is null)::int as owed,
+            count(*) filter (where mirror_self)::int     as mirror_self,
+            count(*) filter (where status = 'active')::int as live,
+            (select count(*)::int from drink_meal dm
+              where dm.drink_id in (select id from drink
+                                     where slug ~ '^drink-[0-9]{2}-[0-9]+$'))
+                                                         as meal_claims
+       from drink
+      where slug ~ '^drink-[0-9]{2}-[0-9]+$'`
+  );
+  const wrote = back[0];
+
+  if (wrote.rows !== drinks.length) {
+    throw new Error(
+      `the document holds ${drinks.length} drink(s) and the database now holds ` +
+        `${wrote.rows} row(s) in the drink-NN-M slug space. Those two numbers ` +
+        `are the same number or this seeder is wrong about what it wrote ` +
+        `(CLAUDE.md rule 24). Rolled back.`
+    );
+  }
+
   await client.query("commit");
+
+  console.log(
+    `\n[seed-drinks] READ BACK FROM THE DATABASE — ${wrote.rows} row(s), ` +
+      `${wrote.paired} with a mirror, ${wrote.owed} owed, ` +
+      `${wrote.mirror_self} mirror-self, ${wrote.live} offered, ` +
+      `${wrote.meal_claims} meal-shape claim(s).`
+  );
+  if (wrote.paired !== counts.paired || wrote.owed !== counts.owed) {
+    console.log(
+      `[seed-drinks] the file says ${counts.paired} paired and ${counts.owed} ` +
+        `owed. The database differs, which is what a mirror authored at the ` +
+        `desk looks like — not an error, and not something this script ` +
+        `corrects.`
+    );
+  }
 } catch (err) {
   await client.query("rollback");
   console.error(`\n[seed-drinks] FAILED: ${err.message}`);
@@ -543,14 +665,28 @@ const claims = drinks.reduce((n, drink) => n + drink.destinations.length, 0);
 const crossed = drinks.filter((drink) => drink.destinations.length > 1);
 
 console.log(
-  `\n[seed-drinks] ${drinks.length} programme(s) in the file: ${created} ` +
-    `created, ${updated} updated, ${left} left as the desk has them. ` +
+  `\n[seed-drinks] ${drinks.length} drink(s) in the file: ${created} created ` +
+    `(${created - held} live, ${held} held at draft on an owed mirror), ` +
+    `${updated} updated, ${left} left as the desk has them. ` +
     `${claims} destination claim(s) authored, ${scoped} written, ` +
-    `${crossed.length} programme(s) cross-referenced.`
+    `${crossed.length} drink(s) cross-referenced. ` +
+    `${counts.mealClaims} meal-shape claim(s) authored, ${mealsWritten} written` +
+    (mealsDropped > 0 ? `, ${mealsDropped} dropped` : "") +
+    (mealsExtra > 0 ? `, ${mealsExtra} extra left in place` : "") +
+    `.`
 );
 for (const drink of crossed) {
+  console.log(`  ${drink.slug} — ${drink.destinations.join(" · ")}`);
+}
+if (awaitingPublish.length > 0) {
   console.log(
-    `  drink-${String(drink.number).padStart(2, "0")} — ${drink.destinations.join(" · ")}`
+    `\n${awaitingPublish.length} drink(s) have a mirror in the file and are ` +
+      `still DRAFT in the database — either the mirror arrived after the row ` +
+      `did, or somebody sent the row back. This seeder does not publish an ` +
+      `existing row either way: that is the desk's act (CLAUDE.md rule 8), and ` +
+      `a seeder that re-published on every deploy would undo a veto silently. ` +
+      `They are at /desk/drinks:\n  ` +
+      awaitingPublish.join("\n  ")
   );
 }
 if (stubbed.length > 0) {
@@ -563,11 +699,21 @@ if (stubbed.length > 0) {
       `npm run seed:destinations, which completes a stub in place.`
   );
 }
-if (created > 0) {
+if (created - held > 0) {
   console.log(
-    `\n${created} drink(s) went LIVE on this run. The pool stocks itself ` +
-      `(db/036); the desk\nis where that gets vetoed, not where it gets ` +
-      `approved. /desk/stocked lists this run\nand sends one programme or all ` +
-      `${created} back to draft.`
+    `\n${created - held} drink(s) went LIVE on this run. The pool stocks ` +
+      `itself (db/036); the desk\nis where that gets vetoed, not where it gets ` +
+      `approved. /desk/stocked lists this run\nand sends one drink or all ` +
+      `${created - held} back to draft.`
+  );
+}
+if (held > 0) {
+  console.log(
+    `\n${held} drink(s) are HELD AT DRAFT because their mirror is owed. ` +
+      `Nothing can offer one:\ndb/060's drink_live_has_its_mirror refuses it, ` +
+      `and that is the guarantee, not this script.\nEach carries the debt in ` +
+      `its own notes at /desk/drinks. Writing the mirror in\ndocs/drinks.md ` +
+      `and re-running with --overwrite is what settles it — the row is then\n` +
+      `offered at the desk, which this seeder does not do for an existing row.`
   );
 }

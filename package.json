@@ -24,6 +24,7 @@
     "seed:dishes": "node scripts/seed-dishes.mjs",
     "seed:bank": "node scripts/seed-bank.mjs",
     "check:bank": "node scripts/seed-bank.mjs --dry-run",
+    "check:drinks": "node scripts/seed-drinks.mjs --dry-run",
     "tag:catalogue": "node scripts/tag-catalogue.mjs",
     "check:gates": "node scripts/check-gates.mjs",
     "seed:fixtures": "node scripts/seed-fixtures.mjs",
