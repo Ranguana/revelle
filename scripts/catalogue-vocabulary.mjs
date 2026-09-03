@@ -365,6 +365,32 @@ export const MEALS = {
   BR: "brunch",
   L: "lunch",
   LS: "late_supper",
+
+  /* ── docs/drinks.md ────────────────────────────────────────────────
+   *
+   * ONE MAP, TWO DOCUMENTS, exactly as SEASONS above holds "Summer",
+   * "summer", "Warm weather" and "October" and answers `season_band` for all
+   * four. The dishes write a compact letter in a `·`-delimited line; the
+   * drinks write a whole bullet and a letter there would be unreadable. Both
+   * spell the SAME closed enum, and spelling it twice in two files is how a
+   * vocabulary starts to disagree with itself (CLAUDE.md rule 21).
+   *
+   * THE WORDS ARE THE FOUNDER'S OWN, from the meal-shape ruling of
+   * 2026-08-31: "drinks claim what their authors actually wrote (dinner,
+   * brunch, late supper, standing drinks)". src/lib/desk/labels.ts labels the
+   * same five codes for a curator's screen — "A long dinner", "A late supper"
+   * — and the difference is register, not vocabulary: those are read, these
+   * are typed.
+   *
+   * A drink that names no shape writes "Not said" and claims nothing. That
+   * token is NOT in this map on purpose: it is not a shape, it is the absence
+   * of one, and scripts/drinks-parse.mjs is where the absence is read.
+   */
+  Dinner: "long_dinner",
+  "Standing drinks": "cocktails",
+  Brunch: "brunch",
+  Lunch: "lunch",
+  "Late supper": "late_supper",
 };
 
 /**
