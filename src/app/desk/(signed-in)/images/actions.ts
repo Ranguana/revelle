@@ -15,6 +15,7 @@ import {
   parseReply,
   placementSystemPrompt,
   readingFrom,
+  resolveRoomSlug,
   type Placement,
 } from "@/lib/desk/images";
 import { slugify } from "@/lib/desk/labels";
