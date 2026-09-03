@@ -103,6 +103,8 @@ type Row = {
   card_name: string | null;
   /** count(*) is bigint, which node-postgres hands back as a STRING. */
   ingredients: string;
+  /** db/044. NULL when the object is not a take-home at all — it stays. */
+  take_home_quantity: string | null;
 };
 
 type Destination = {
@@ -223,6 +225,7 @@ export default async function BankPage({
             b.kind::text as kind, b.phase::text as phase,
             b.min_lead_days, b.ships,
             b.weight::text as weight, b.status::text as status,
+            b.take_home_quantity::text as take_home_quantity,
             -- Every destination the item claims, not one. db/043 made this an
             -- array; joining them for display rather than showing the first is
             -- the difference between a curator seeing a second home and never
@@ -493,6 +496,20 @@ export default async function BankPage({
               <th>What arrives</th>
               <th>Lead time</th>
               <th>Card</th>
+              {/* WHO KEEPS IT — added because its absence read as a defect in
+                  the CONTENT. The founder, reviewing the held proposals:
+                  "some of the atmosphere ideas are very off - why would we
+                  give away a platter or the tablecloth?" Nobody proposed
+                  giving away a platter. Westhampton's is `table set` and stays
+                  on the table; the corno beside it is `per_guest` and leaves
+                  with everybody. Both are kind `good`, both rendered as "A
+                  good", and take_home_quantity — which is exactly this
+                  distinction, and has been on the row since db/044 — was not
+                  shown anywhere on the screen.
+                  So a list that could not tell "stays" from "thirty of these
+                  go home" made the catalogue look wrong. Rule 23: a mechanism
+                  that invites misreading is a defect even when it works. */}
+              <th>Who keeps it</th>
               <th>Destination</th>
               <th>Status</th>
               <th />
@@ -558,6 +575,13 @@ export default async function BankPage({
                   ) : (
                     "—"
                   )}
+                </td>
+                <td>
+                  {row.take_home_quantity === "per_guest"
+                    ? "Each guest"
+                    : row.take_home_quantity === "single_artifact"
+                      ? "One of them, taken"
+                      : "Stays"}
                 </td>
                 <td>{row.world_name}</td>
                 <td>
