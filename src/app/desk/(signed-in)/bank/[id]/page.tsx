@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
-import { POOL_STATUS, money } from "@/lib/desk/labels";
+import { OCCASIONS, POOL_STATUS, money } from "@/lib/desk/labels";
 import { BANK_PER_PAGE, bankSequence } from "@/lib/desk/lists";
 import {
   requirementVocabulary,
@@ -17,7 +17,9 @@ import BankForm, { type BankValues } from "../BankForm";
 import {
   attachIngredient,
   clearBankRequirement,
+  claimOccasion,
   declareBankRequirement,
+  releaseOccasion,
   detachIngredient,
 } from "../actions";
 
@@ -142,6 +144,17 @@ export default async function BankItemPage({
   // rather than four rows away under an alphabetical sort.
   const declared = new Set(requirements.map((row) => row.code));
   const undeclared = vocabulary.filter((kind) => !declared.has(kind.code));
+
+  // db/043's bank_item_occasion. Read here rather than joined above because a
+  // claim is a small list and the item is one row; a join would repeat every
+  // column of the item once per occasion for no gain.
+  const claims = await query<{ occasion: string; fit: string }>(
+    `select occasion::text as occasion, fit::text as fit
+       from bank_item_occasion where bank_item_id = $1 order by occasion`,
+    [id]
+  );
+  const claimed = new Set(claims.map((row) => row.occasion));
+  const openOccasions = OCCASIONS.filter((code) => !claimed.has(code));
 
   // Asked only when a review is running, and asked LIVE: the sequence is
   // recounted here rather than carried, so a line published off a drafts-only
@@ -334,6 +347,73 @@ export default async function BankItemPage({
               filter that already reads every other pool.
             </p>
           </section>
+
+      {/* WHICH OCCASIONS MAY HAVE IT — db/043's bank_item_occasion.
+          Founder: "so does the atmosphere have a button linking it for only an
+          occassion? It should." It was already in the calculus and there was
+          no way to say so from the desk, so every item defaulted to eligible
+          everywhere and a holiday object could land at a Tuesday dinner. */}
+      <section className={styles.panel}>
+        <h2 className={styles.panelHead}>
+          <span>Which occasions may have it</span>
+        </h2>
+
+        {claims.length === 0 ? (
+          <p className={styles.hint}>
+            No claim, so every occasion may have it. That is the default and it
+            is not a mistake — an unclaimed object is unruled rather than
+            refused. But the FIRST claim below is the consequential one: a
+            native claim is a whitelist, so naming one occasion closes all the
+            others at the same moment.
+          </p>
+        ) : (
+          <ul className={styles.list}>
+            {claims.map((row) => (
+              <li key={row.occasion}>
+                <span>
+                  {row.occasion} — {row.fit}
+                </span>{" "}
+                <form action={releaseOccasion} className={styles.buttonRow}>
+                  <input type="hidden" name="id" value={item.id} />
+                  <input type="hidden" name="occasion" value={row.occasion} />
+                  <button className={styles.buttonQuiet}>Release</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {openOccasions.length > 0 ? (
+          <form action={claimOccasion} className={styles.buttonRow}>
+            <input type="hidden" name="id" value={item.id} />
+            <select
+              name="occasion"
+              aria-label="Which occasion"
+              className={styles.select}
+              defaultValue=""
+            >
+              <option value="">Pick an occasion</option>
+              {openOccasions.map((code) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+            </select>
+            <select
+              name="fit"
+              aria-label="Native or forbidden"
+              className={styles.select}
+              defaultValue="native"
+            >
+              {/* `native` is a whitelist and `forbidden` is a veto — db/009's
+                  two values, offered in her words rather than the enum's. */}
+              <option value="native">may have it</option>
+              <option value="forbidden">may never have it</option>
+            </select>
+            <button className={styles.button}>Claim</button>
+          </form>
+        ) : null}
+      </section>
 
           {/*
             SHOPPABLE ATMOSPHERE — db/031's `bank_item_ingredient`, and its own

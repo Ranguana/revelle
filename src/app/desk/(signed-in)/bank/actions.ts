@@ -346,6 +346,116 @@ export async function setBankStatus(form: FormData): Promise<void> {
 }
 
 /**
+ * WHICH OCCASIONS MAY HAVE IT — `bank_item_occasion`, db/043.
+ *
+ * Founder: "some atmospheres - goods depend on occassion. Is that part of the
+ * calculus? A birthday or holdiday etc" — and then "so does the atmosphere
+ * have a button linking it for only an occassion? It should."
+ *
+ * It was part of the calculus and there was no way to say so. db/043 installed
+ * `bank_item_occasion` and db/009 gave it teeth: `claimEligibility` reads a
+ * `native` row as a WHITELIST, so the first claim on a row closes every
+ * occasion it does not name. Nothing in the desk could write one.
+ *
+ * ── WHICH MEANS SILENCE HAS BEEN SAYING YES ──────────────────────────
+ *
+ * A row with no claim is eligible everywhere. That is the generous default and
+ * it is the right one — an unclaimed object is unruled, not refused — but it
+ * is the OPPOSITE of what db/052 made venue affordances do, and the difference
+ * is worth knowing rather than tripping over: a venue that cannot hold a thing
+ * is a fact about the world, and an occasion that should not have it is a
+ * judgement. Facts fail closed. Judgements wait for a person.
+ *
+ * So the first claim on an item is the consequential one — it is not "also
+ * this occasion", it is "these and no others". The screen says so where the
+ * button is, because a control whose first use behaves differently from its
+ * second is exactly rule 23's shape.
+ *
+ * Its own pair of actions rather than checkboxes on the item form, following
+ * attachIngredient below for the reason stated there: the item's own save can
+ * never silently destroy a claim.
+ */
+export async function claimOccasion(form: FormData): Promise<void> {
+  const staff = await requireStaff();
+  const id = String(form.get("id") ?? "");
+  const occasion = String(form.get("occasion") ?? "");
+  const fit = String(form.get("fit") ?? "native");
+  if (!UUID.test(id) || !occasion) return;
+  if (fit !== "native" && fit !== "forbidden") return;
+
+  const before = await queryOne<{ name: string }>(
+    `select name from bank_item where id = $1`,
+    [id]
+  );
+  if (!before) return;
+
+  try {
+    await query(
+      `insert into bank_item_occasion (bank_item_id, occasion, fit)
+       values ($1, $2::occasion_type, $3::occasion_fit)
+       on conflict (bank_item_id, occasion) do update set fit = excluded.fit`,
+      [id, occasion, fit]
+    );
+  } catch (err) {
+    // An occasion the enum does not carry. Not worth a 500 and not worth
+    // explaining to whoever sent it.
+    if ((err as { code?: string })?.code === "22P02") return;
+    throw err;
+  }
+
+  await recordAction(staff, {
+    action: "bank_item.occasion_claimed",
+    entityTable: "bank_item",
+    entityId: id,
+    summary: `${before.name} — ${fit} at ${occasion}`,
+    detail: { occasion, fit },
+  });
+
+  revalidatePath(`/desk/bank/${id}`);
+  revalidatePath("/desk/bank");
+}
+
+/** Take a claim back. With none left the item is eligible everywhere again. */
+export async function releaseOccasion(form: FormData): Promise<void> {
+  const staff = await requireStaff();
+  const id = String(form.get("id") ?? "");
+  const occasion = String(form.get("occasion") ?? "");
+  if (!UUID.test(id) || !occasion) return;
+
+  const before = await queryOne<{ name: string }>(
+    `select name from bank_item where id = $1`,
+    [id]
+  );
+  if (!before) return;
+
+  await query(
+    `delete from bank_item_occasion where bank_item_id = $1 and occasion = $2::occasion_type`,
+    [id, occasion]
+  );
+
+  const left = await queryOne<{ n: string }>(
+    `select count(*)::text as n from bank_item_occasion where bank_item_id = $1`,
+    [id]
+  );
+
+  await recordAction(staff, {
+    action: "bank_item.occasion_released",
+    entityTable: "bank_item",
+    entityId: id,
+    // The consequence, not the act: releasing the LAST claim reopens every
+    // occasion, which is a much larger change than releasing one of four.
+    summary:
+      Number(left?.n ?? 0) === 0
+        ? `${before.name} — released ${occasion}, and with no claims left it is eligible everywhere again`
+        : `${before.name} — released ${occasion}`,
+    detail: { occasion, claims_left: Number(left?.n ?? 0) },
+  });
+
+  revalidatePath(`/desk/bank/${id}`);
+  revalidatePath("/desk/bank");
+}
+
+/**
  * SHOPPABLE ATMOSPHERE — `bank_item_ingredient`, db/031.
  *
  * Its own pair of actions rather than checkboxes inside the item form, for one
