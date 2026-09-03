@@ -271,6 +271,13 @@ begin
   -- and neither should stop a deploy. Said out loud so the number is read
   -- rather than inferred from silence (rule 23).
   if n_unmatched > 0 then
-    raise notice '[059] unmatched are the two ambiguous names ('the song sheet', 'the swizzle stick') or items the document has since lost';
+    -- Doubled quotes, because these are names inside a plpgsql string literal.
+    -- The first version pasted them with their SQL quotes intact, which closed
+    -- the string early: `syntax error at or near "the"`. Deploy stopped, old
+    -- code kept serving, nothing lost — but the file was still wrong, and the
+    -- generator that wrote it quoted every VALUES entry correctly and then
+    -- interpolated the same list raw into a message. One escaping rule, applied
+    -- in one of the two places it was needed.
+    raise notice '[059] unmatched are the two ambiguous names (''the song sheet'', ''the swizzle stick'') or items the document has since lost';
   end if;
 end $$;
