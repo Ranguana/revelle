@@ -253,6 +253,37 @@ export async function GET(request: Request): Promise<Response> {
   );
   const sitting = pools.reduce((n, p) => n + Number(p.sitting), 0);
 
+  // ── WHAT IS LEFT TO REVIEW, AS OPPOSED TO WHAT IS MERELY NOT LIVE ───
+  //
+  // `sitting` is total minus issuable, which lumps together three different
+  // situations: a draft nobody has looked at, a row she refused, and one
+  // discontinued. The founder asked "i dont see any remaining drafts in
+  // atmosphere" and this route could not answer it — 71 sitting, and no way
+  // to say whether that is 71 decisions owed or 71 already made.
+  //
+  // A number that cannot distinguish work-remaining from work-done is not a
+  // measure of the queue, which is the whole thing `sitting` was added for.
+  const poolStatus = await query<{
+    entity_table: string;
+    status: string;
+    n: string;
+  }>(
+    `select 'bank_item' as entity_table, status::text as status, count(*)::text as n
+       from bank_item group by status
+      union all
+     select 'dish', status::text, count(*)::text from dish group by status
+      union all
+     select 'drink', status::text, count(*)::text from drink group by status
+      union all
+     select 'game', status::text, count(*)::text from game group by status
+      order by 1, 2`
+  );
+
+  const byPoolStatus: Record<string, Record<string, number>> = {};
+  for (const row of poolStatus) {
+    (byPoolStatus[row.entity_table] ??= {})[row.status] = Number(row.n);
+  }
+
   const byStatus = rows.reduce<Record<string, number>>((acc, r) => {
     acc[r.status] = (acc[r.status] ?? 0) + 1;
     return acc;
@@ -288,6 +319,8 @@ export async function GET(request: Request): Promise<Response> {
       // as distinct from the engine's decision queue in /api/desk/digest.
       sitting,
       sittingByPool,
+      // Draft is the only one of these that means "a decision is owed".
+      byPoolStatus,
       // ── WHY THE DOOR IS DESCRIBED HERE ──────────────────────────────
       //
       // The sign-in form returns the SAME response whether the address is
