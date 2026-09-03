@@ -583,9 +583,29 @@ type PoolSpec = {
   seasonStrict: string | null;
   /**
    * The table of meal-shape claims this pool has — `dish_meal`, db/023. Null in
-   * a pool that makes no claim about what kind of table it is for, which is
-   * every pool but dishes: a menu and a drink both say what they are for in a
-   * `name` column, in her own words, and that sentence is richer than an enum.
+   * a pool the engine reads no such claims from.
+   *
+   * WHAT THIS SENTENCE USED TO SAY, AND WHY IT IS NOT SIMPLY CORRECTED
+   * (CLAUDE.md rule 14):
+   *
+   *     "Null in a pool that makes no claim about what kind of table it is
+   *      for, which is every pool but dishes: a menu and a drink both say what
+   *      they are for in a `name` column, in her own words, and that sentence
+   *      is richer than an enum."
+   *
+   * That was db/023's ruling and it was right about a PROGRAMME, whose `name`
+   * held "A summer dinner or cocktail party". db/060 reversed it at the atomic
+   * grain — a gin and tonic is not a summer dinner — and `drink_meal` now
+   * exists and is filled by scripts/seed-drinks.mjs from the document's third
+   * bullet: 89 claims over 76 rows, 6 of which claim nothing.
+   *
+   * So `drink.meals` is null here because THE GATE IS NOT LIVE YET, not because
+   * the claims do not exist. db/060 §VI names the sequencing and it is the
+   * founder's: "the tagging step writes the claims, and the gap reporter must
+   * watch drink coverage per-occasion BEFORE the gate goes live." That watch is
+   * not built. Turning this on first would narrow seventy of seventy-six drinks
+   * with nothing counting what it refused — rule 24 in the direction that ends
+   * in an empty slot on a member's package.
    */
   meals: string | null;
   /** game.shape — db/010. Only the game pool has one. */
@@ -691,6 +711,12 @@ const POOLS: { readonly [P in StockedPool]: PoolSpec } = {
     season: "season",
     seasonStrict: "season_strict",
     making: "making",
+    // `drink_meal` EXISTS AND IS FILLED, AND IS DELIBERATELY NOT READ HERE.
+    // Read the note on `meals` in the type above before changing this to
+    // "drink_meal": the claims are seeded, the per-occasion coverage watch
+    // db/060 §VI requires before the gate goes live is not built, and a gate
+    // that narrows seventy of seventy-six rows with nothing counting what it
+    // refused is how a thin catalogue becomes an empty package.
     meals: null,
     shape: null,
     printed: null,

@@ -18,7 +18,8 @@ type Row = {
   slug: string;
   name: string;
   cocktails: string;
-  mocktails: string;
+  /** NULL means OWED — her author wrote no twin for this drink. db/060 §IV. */
+  mocktails: string | null;
   season: string;
   season_note: string;
   season_strict: boolean;
@@ -120,7 +121,18 @@ export default async function DrinksPage({
                   </div>
                   <div className={styles.fact}>
                     <span className={styles.factLabel}>The mirror</span>
-                    <span className={styles.factValue}>{row.mocktails}</span>
+                    {/*
+                      NULL IS SAID, NOT LEFT BLANK. db/060 made this column
+                      nullable so that the twenty-one drinks whose author wrote
+                      no twin could exist as named gaps rather than being
+                      dropped or invented — and a blank value here would undo
+                      exactly that, showing the reader nothing where the whole
+                      point is that something is missing and whose it is to
+                      write. CLAUDE.md rule 19's loud form.
+                    */}
+                    <span className={styles.factValue}>
+                      {row.mocktails ?? "Mirror owed — nobody may invent one"}
+                    </span>
                   </div>
                   <div className={styles.fact}>
                     <span className={styles.factLabel}>Season</span>

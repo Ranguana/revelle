@@ -17,13 +17,33 @@ import { recordAction, requireStaff } from "@/lib/staff";
  * mixing. There is no recipe box, no quantity and no method on this form, and
  * their absence is deliberate — the glass is already in her sentence.
  *
- * ── THE MIRROR IS NOT OPTIONAL, AND THIS IS THE FORM THAT COULD MAKE IT SO ──
+ * ── THE MIRROR IS NOT OPTIONAL FOR A DRINK THAT CAN REACH A TABLE ──
  *
  * A drink is one record with two builds. The guarantee is that nobody at the
  * table is visibly not drinking, and it survives exactly as long as the two
- * cannot be separated — so a save with an empty mirror is REFUSED here, with
- * the reason, before the database refuses it less legibly. db/017 makes the
- * column NOT NULL for the same reason; this is the sentence a curator reads.
+ * cannot be separated — so a save that OFFERS a drink with an empty mirror is
+ * REFUSED here, with the reason, before the database refuses it less legibly.
+ *
+ * THAT SENTENCE USED TO BE WIDER AND HAD TO NARROW. Kept whole, CLAUDE.md
+ * rule 14:
+ *
+ *     "a save with an empty mirror is REFUSED here, with the reason, before
+ *      the database refuses it less legibly. db/017 makes the column NOT NULL
+ *      for the same reason; this is the sentence a curator reads."
+ *
+ * WHAT BEAT IT: the atomised drinks. Twenty-one of the seventy-six have no
+ * mirror because their author wrote none, and nobody may invent one — so
+ * db/060 moved db/017's NOT NULL to the grain the guarantee is actually about
+ * (`drink_live_has_its_mirror`: not null WHILE LIVE) and those twenty-one land
+ * at `draft`. This form was then STRICTER THAN THE DATABASE, and in the one
+ * direction that matters: it refused every save on exactly those rows, so the
+ * screen db/060 §IV points a curator at to settle the debt would not let her
+ * change anything at all — not the wording, not the status. A form that cannot
+ * save the row it exists to fix is rule 21's failure with the two surfaces
+ * disagreeing about which one is right.
+ *
+ * So the refusal is now the constraint's own sentence: an empty mirror is
+ * allowed, and OFFERING one is not.
  *
  * Season and mixing each appear as one field with two parts where there is
  * something to say: the closed value the selection layer weights on, and her
@@ -53,17 +73,33 @@ export async function saveDrink(
   const cocktails = trimmed(form, "cocktails").replace(/[\r\n]+/g, " ");
   const mocktails = trimmed(form, "mocktails").replace(/[\r\n]+/g, " ");
 
+  const season = trimmed(form, "season");
+  const making = trimmed(form, "making");
+  const status = trimmed(form, "status");
+
   if (name.length === 0) return { error: "Say what it is for." };
   if (cocktails.length === 0) return { error: "A drink needs its cocktails." };
-  if (mocktails.length === 0) {
+  if (!SEASON_CODES.includes(season)) return { error: "Pick a season." };
+  if (!MIXING_CODES.includes(making)) return { error: "Pick how much mixing." };
+  if (!STATUSES.includes(status)) return { error: "Unknown status." };
+
+  // db/060's `drink_live_has_its_mirror`, said in words before it is said as a
+  // constraint name. Not "every drink carries a mirror" — every drink THAT CAN
+  // REACH A TABLE does, and a drink still waiting for one is a draft.
+  if (mocktails.length === 0 && status === "active") {
     return {
       error:
-        "Every drink carries a mirror. The same glass, the same components, " +
-        "arriving at the same time — so nobody at the table is visibly not " +
-        "drinking.",
+        "This drink has no mirror, so it cannot be offered. The mirror is the " +
+        "same glass, the same components, arriving at the same time — it is " +
+        "how nobody at the table is visibly not drinking. Write it and offer " +
+        "the drink, or leave the drink as a draft until it has one. Never " +
+        "invent a weak one to fill the box: a named gap is worth more.",
     };
   }
-  if (cocktails.toLowerCase() === mocktails.toLowerCase()) {
+  if (
+    mocktails.length > 0 &&
+    cocktails.toLowerCase() === mocktails.toLowerCase()
+  ) {
     return {
       error:
         "The mirror is the same line as the cocktails. A mirror is the glass " +
@@ -76,13 +112,6 @@ export async function saveDrink(
     };
   }
 
-  const season = trimmed(form, "season");
-  const making = trimmed(form, "making");
-  const status = trimmed(form, "status");
-  if (!SEASON_CODES.includes(season)) return { error: "Pick a season." };
-  if (!MIXING_CODES.includes(making)) return { error: "Pick how much mixing." };
-  if (!STATUSES.includes(status)) return { error: "Unknown status." };
-
   const slug = slugify(trimmed(form, "slug") || name);
   const facets = await validFacetIds(
     form.getAll("facet").map((value) => String(value))
@@ -92,7 +121,12 @@ export async function saveDrink(
     slug,
     name,
     cocktails,
-    mocktails,
+    // EMPTY IS NULL, NEVER `''`. db/060 gave `mocktails` one meaning for
+    // absence — OWED, her author wrote no twin — and a blank string would be a
+    // second spelling of it that `drink_live_has_its_mirror` does not catch and
+    // that reads as answered on every screen. The same rule the menu form
+    // follows for its retirement note, for the same reason.
+    mocktails.length === 0 ? null : mocktails,
     season,
     trimmed(form, "season_note"),
     form.get("season_strict") !== null,

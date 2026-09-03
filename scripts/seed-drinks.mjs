@@ -643,6 +643,30 @@ console.log(
 for (const drink of crossed) {
   console.log(`  ${drink.slug} — ${drink.destinations.join(" · ")}`);
 }
+/*
+ * NOTHING ABSORBS INPUT IT DOES NOT HONOUR — CLAUDE.md rule 16, said at the
+ * point of use because that is where it has to be said.
+ *
+ * This seeder writes `drink_meal` and THE SELECTION ENGINE DOES NOT READ IT
+ * YET: `POOLS.drink.meals` is null in src/lib/selection/catalogue.ts. That is
+ * not an oversight and it is not this script's decision to reverse. db/060 §VI
+ * carries the founder's sequencing — "the tagging step writes the claims, and
+ * the gap reporter must watch drink coverage per-occasion BEFORE the gate goes
+ * live" — and the watch does not exist. Turning the gate on first would narrow
+ * seventy of these seventy-six rows with nothing counting what it refused.
+ *
+ * So the run SAYS SO, every time, rather than leaving a curator to infer from a
+ * populated table that a gate is working. A claim written and not read looks
+ * honoured from every angle, which is the whole of rule 16.
+ */
+console.log(
+  `\n[seed-drinks] the ${counts.mealClaims} meal-shape claim(s) above are ` +
+    `STORED AND NOT YET READ.\nsrc/lib/selection/catalogue.ts has ` +
+    `POOLS.drink.meals = null, deliberately: db/060 §VI requires the\n` +
+    `per-occasion drink coverage watch to exist BEFORE the gate goes live, and ` +
+    `it does not.\nNothing is gated on these today, and nothing is pretending ` +
+    `to be.`
+);
 if (awaitingPublish.length > 0) {
   console.log(
     `\n${awaitingPublish.length} drink(s) have a mirror in the file and are ` +

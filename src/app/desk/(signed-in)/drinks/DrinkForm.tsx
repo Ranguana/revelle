@@ -32,7 +32,8 @@ export type DrinkValues = {
   slug?: string;
   name?: string;
   cocktails?: string;
-  mocktails?: string;
+  /** NULL means OWED — her author wrote no twin. db/060 §IV. */
+  mocktails?: string | null;
   season?: string;
   season_note?: string;
   season_strict?: boolean;
@@ -91,11 +92,18 @@ export default function DrinkForm({
         <label className={styles.label} htmlFor="mocktails">
           The mirror
         </label>
+        {/*
+          NOT `required`, and that is db/060 §IV rather than a relaxation.
+          Twenty-one of the seventy-six atomic drinks have no mirror because
+          their author wrote none, and a browser-side `required` made those
+          rows unsavable — including their status, on the one screen that
+          exists to settle the debt. An empty mirror is a DRAFT drink; it is
+          `saveDrink` that refuses to OFFER one, with the sentence.
+        */}
         <textarea
           id="mocktails"
           name="mocktails"
           rows={2}
-          required
           defaultValue={values.mocktails ?? ""}
           placeholder="Tonic and lime with cucumber, sour made with lemonade and egg-white foam, fruit punch from the same pitcher fruit"
           className={styles.textarea}
@@ -103,8 +111,18 @@ export default function DrinkForm({
         <span className={styles.hint}>
           The same glass, built from the same components, arriving at the same
           time. Name the glass and the method, so the person holding it has
-          something to do with her hands. Never a tumbler of juice, and never
-          left empty.
+          something to do with her hands. Never a tumbler of juice.
+          {/* `null` is the stored OWED state. `undefined` is the new-drink
+              form, which owes nothing yet and is not told that it does. */}
+          {values.mocktails === null ? (
+            <>
+              {" "}
+              <strong>This drink&rsquo;s mirror is owed.</strong> Leave it empty
+              and the drink stays a draft — nothing can offer it. Write the
+              mirror and it can go out. Never invent a weak one to fill the box:
+              a named gap is worth more.
+            </>
+          ) : null}
         </span>
       </div>
 
