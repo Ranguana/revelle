@@ -122,11 +122,45 @@ function fail(message) {
 }
 
 /**
+ * ONE DRINK, AS THIS FILE HANDS IT OVER.
+ *
+ * Written out as a type rather than left to inference because the record is
+ * built in two passes — the scanner makes it, `readRecord` fills it — so an
+ * inferred type describes the half-built object and every consumer sees a shape
+ * that does not exist. The consumers are scripts/drinks-row.mjs, the seeder and
+ * two test files; `npm test` type-strips TypeScript and `npx tsc --noEmit`
+ * checks it, so a wrong shape here is a build error somewhere else.
+ *
+ * @typedef {object} ParsedDrink
+ * @property {number}   programme     the `###` heading's number, 1..25
+ * @property {number}   index         its place within that programme, from 1
+ * @property {string}   programmeLine her "what it is for" line, verbatim.
+ *                                    PROVENANCE, never the drink's name.
+ * @property {string}   destination   the `##` heading it sits under
+ * @property {string[]} also          the sixth bullet's rooms, if any
+ * @property {string[]} destinations  `destination` followed by `also`
+ * @property {string[]} bullets       the record as read, before interpretation
+ * @property {string}   name          the drink, in her words, whole
+ * @property {string|null} mirror     her mocktail twin, or NULL where OWED
+ * @property {boolean}  mirrorOwed    true where bullet 2 says `Mirror owed`
+ * @property {boolean}  mirrorSelf    true where the two lines are the same line
+ * @property {string[]} meals         db/023 meal_shape codes; empty claims none
+ * @property {string}   mealsNote     bullet 3 as written
+ * @property {string}   season        the season_band code
+ * @property {string}   seasonNote    her season wording, verbatim
+ * @property {string}   making        the making_level code
+ * @property {string}   slug          `drink-NN-M`, the seed key
+ */
+
+/**
  * Read the whole document. Returns one object per DRINK, in document order.
  *
  * Nothing here touches a database and nothing here decides a status. The
  * seeder does both, and `--dry-run` exists so this can be exercised against the
  * committed file with no connection at all.
+ *
+ * @param {string} text
+ * @returns {ParsedDrink[]}
  */
 export function parseDrinks(text) {
   const lines = text.split("\n");
@@ -492,6 +526,8 @@ function agreeWithinProgramme(programmes) {
  * should be adjusted to match the other until somebody has found out which.
  *
  * `repeated` is counted and NOT acted on: see the header on collapsing.
+ *
+ * @param {ParsedDrink[]} drinks
  */
 export function drinkCounts(drinks) {
   const byText = new Map();

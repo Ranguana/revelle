@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
+import { parseDrinks } from "../../../scripts/drinks-parse.mjs";
+
 import {
   matchedOccasionWords,
   occasionClaim,
@@ -28,46 +30,58 @@ import {
  * to look — which is exactly what should happen, because every one of those is
  * a judgement.
  *
- * ── THE READER BELOW IS NOT A SECOND PARSER ──────────────────────────
+ * ── THE READER BELOW USED TO BE A SECOND PARSER, AND IT DRIFTED ──────
  *
- * `scripts/seed-drinks.mjs` owns parsing docs/drinks.md; this pulls two fields
- * out of it for counting and never writes anything. The distinction matters
- * because rule 21 is about duplicated AUTHORITY, not duplicated code: nothing
- * here decides what a drink IS, and a disagreement between this reader and the
- * seeder shows up immediately as a wrong count rather than as a wrong row.
+ * CLAUDE.md rule 14. What this paragraph said, kept whole because the intention
+ * was right and the mechanism is what failed:
+ *
+ *     "THE READER BELOW IS NOT A SECOND PARSER. `scripts/seed-drinks.mjs` owns
+ *      parsing docs/drinks.md; this pulls two fields out of it for counting and
+ *      never writes anything. The distinction matters because rule 21 is about
+ *      duplicated AUTHORITY, not duplicated code: nothing here decides what a
+ *      drink IS, and a disagreement between this reader and the seeder shows up
+ *      immediately as a wrong count rather than as a wrong row."
+ *
+ * WHAT BEAT IT: it was a second parser, and the disagreement did NOT show up as
+ * a wrong count. When `docs/drinks.md` was atomised the records became `**N.M**`
+ * where they had been `**N.**`; this reader matched nothing, and four tests in
+ * this file went red at once — which is the good half. The bad half is that
+ * "found zero programmes" and "the document has no programmes" were the same
+ * value, and only the guard directly below (`all.length === 25`) told them
+ * apart. A reader that can return an empty list is a reader that can report a
+ * clean sheet it has not earned; this file said so about itself and still
+ * shipped one.
+ *
+ * So it reads the document through `scripts/drinks-parse.mjs`, which is the one
+ * reader of that file, and derives the PROGRAMME view from it — because the
+ * three fields these tests count are the programme's answers, inherited by
+ * every drink split out of it, and the parser already refuses a programme whose
+ * drinks disagree about them. Nothing here still decides what a drink is.
  */
 
 const SOURCE = new URL("../../../docs/drinks.md", import.meta.url);
 
 type Programme = { number: number; whatItsFor: string; season: string };
 
-/** The third and fourth bullets of each numbered record. Nothing else. */
+/**
+ * The twenty-five programmes, recovered from the seventy-six drinks.
+ *
+ * `programmeLine` is her "what it is for" line, carried onto every drink as
+ * provenance (it is not their name — db/060 §I), and `seasonNote` is her season
+ * wording. Both are per-programme by construction: `parseDrinks` fails the read
+ * if two drinks under one heading disagree about either.
+ */
 function programmes(): Programme[] {
-  const lines = readFileSync(SOURCE, "utf8").split("\n");
-  const found: Programme[] = [];
-  let current: { number: number; bullets: string[] } | null = null;
-
-  for (const raw of lines) {
-    const line = raw.trim();
-    const numbered = /^\*\*(\d+)\.\*\*\s*$/.exec(line);
-    if (numbered) {
-      current = { number: Number(numbered[1]), bullets: [] };
-      continue;
-    }
-    if (current && line.startsWith("- ")) {
-      current.bullets.push(line.slice(2).trim());
-      if (current.bullets.length === 5) {
-        found.push({
-          number: current.number,
-          whatItsFor: current.bullets[2],
-          season: current.bullets[3],
-        });
-      }
-      continue;
-    }
-    if (line === "" || line.startsWith("#") || line.startsWith("---")) current = null;
+  const byNumber = new Map<number, Programme>();
+  for (const drink of parseDrinks(readFileSync(SOURCE, "utf8"))) {
+    if (byNumber.has(drink.programme)) continue;
+    byNumber.set(drink.programme, {
+      number: drink.programme,
+      whatItsFor: drink.programmeLine,
+      season: drink.seasonNote,
+    });
   }
-  return found;
+  return [...byNumber.values()].sort((a, b) => a.number - b.number);
 }
 
 test("the reader finds every authored programme, or the counts below mean nothing", () => {

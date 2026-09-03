@@ -168,14 +168,13 @@ import { fileURLToPath } from "node:url";
 import pg from "pg";
 
 import {
-  HELD,
-  LIVE,
   ensureWorld,
   recordAutoPublish,
   refuseActivateFlag,
   stockingRun,
 } from "./catalogue-vocabulary.mjs";
 import { DrinkParseError, drinkCounts, parseDrinks } from "./drinks-parse.mjs";
+import { OWED_NOTE_OPENING, drinkRow } from "./drinks-row.mjs";
 
 const SOURCE = fileURLToPath(new URL("../docs/drinks.md", import.meta.url));
 
@@ -253,38 +252,6 @@ if (dryRun) {
   process.exit(0);
 }
 
-/* ── what a row arrives as ──────────────────────────────────────────── */
-
-/**
- * The sentence an owed drink carries in its own `notes`, at the desk.
- *
- * It names the debt, names who can settle it, and says plainly that deleting
- * the sentence settles nothing — because the thing holding the row back is a
- * NULL column and a check constraint, not this text. Rule 23: state the fact at
- * the place the wrong reading would be made.
- */
-function owedNote(drink) {
-  return (
-    `THE MIRROR IS OWED. Programme ${drink.programme} ("${drink.programmeLine}") ` +
-    `names no mocktail twin for this drink, and nobody may invent one: a weak ` +
-    `invented mirror is worse than a named gap, and db/017's guarantee — ` +
-    `nobody at the table is visibly not drinking — is what an invented one ` +
-    `spends. Held at draft. WRITING THE MIRROR IS WHAT PUBLISHES THIS ROW; ` +
-    `deleting this note does nothing, because db/060's ` +
-    `drink_live_has_its_mirror refuses to offer a drink whose mirror is null. ` +
-    `docs/drinks.md, docs/drink-explosion.md §5 batch B.`
-  );
-}
-
-/** Where the row came from, in the document's own terms. Never member-facing. */
-function sourceNote(drink) {
-  return (
-    `Drink ${drink.programme}.${drink.index} of programme ${drink.programme}, ` +
-    `"${drink.programmeLine}". docs/drinks.md; split out by ` +
-    `docs/drink-explosion.md.`
-  );
-}
-
 /* ── the write ──────────────────────────────────────────────────────── */
 
 const url = process.env.DATABASE_URL;
@@ -316,6 +283,11 @@ try {
   await client.query("begin");
 
   for (const drink of drinks) {
+    // The columns this drink becomes, decided once in scripts/drinks-row.mjs
+    // so that `npm test` can drive the decision without a database. Read its
+    // header before changing what an owed mirror lands as.
+    const want = drinkRow(drink);
+
     const { rows: existing } = await client.query(
       `select id, name, cocktails, mocktails, season::text, season_note,
               season_strict, making::text, mirror_self, source_note, notes,
@@ -336,26 +308,17 @@ try {
                  $10, $11)
          returning id`,
         [
-          drink.slug,
-          // THE NAME IS THE DRINK NOW. It used to be the programme's "what it
-          // is for" line, which was right when a row WAS a programme; at this
-          // grain a gin and tonic is not "a summer dinner or cocktail party",
-          // and that line is provenance (`source_note`) rather than a name.
-          // db/060 §I argues the reversal in full.
-          drink.name,
-          // Both builds of one record. `cocktails` is the drink as she wrote
-          // it; `mocktails` is her mirror, or NULL where it is owed.
-          drink.name,
-          drink.mirror,
-          drink.season,
-          drink.seasonNote,
-          drink.making,
-          drink.mirrorSelf,
-          sourceNote(drink),
-          owed ? owedNote(drink) : null,
-          // Live on the way in — see the note at the top of this file — unless
-          // the mirror is owed, which db/060 makes unofferable anyway.
-          owed ? HELD : LIVE,
+          want.slug,
+          want.name,
+          want.cocktails,
+          want.mocktails,
+          want.season,
+          want.seasonNote,
+          want.making,
+          want.mirrorSelf,
+          want.sourceNote,
+          want.notes,
+          want.status,
         ]
       );
       drinkId = rows[0].id;
@@ -387,14 +350,14 @@ try {
       drinkId = existing[0].id;
       const row = existing[0];
       const differs =
-        row.name !== drink.name ||
-        row.cocktails !== drink.name ||
-        row.mocktails !== drink.mirror ||
-        row.season !== drink.season ||
-        row.season_note !== drink.seasonNote ||
-        row.making !== drink.making ||
-        row.mirror_self !== drink.mirrorSelf ||
-        row.source_note !== sourceNote(drink);
+        row.name !== want.name ||
+        row.cocktails !== want.cocktails ||
+        row.mocktails !== want.mocktails ||
+        row.season !== want.season ||
+        row.season_note !== want.seasonNote ||
+        row.making !== want.making ||
+        row.mirror_self !== want.mirrorSelf ||
+        row.source_note !== want.sourceNote;
 
       if (!differs) {
         console.log(`[seed-drinks] same     ${drink.slug}`);
@@ -447,8 +410,10 @@ try {
         // sentence THIS SCRIPT wrote about an owed mirror becomes false the
         // moment the mirror is authored, so that exact string is cleared. Any
         // other text in that column is somebody's and is not touched.
-        const clearsOwedNote =
-          !owed && row.notes !== null && row.notes.startsWith("THE MIRROR IS OWED.");
+        const staleOwedNote =
+          !owed &&
+          row.notes !== null &&
+          row.notes.startsWith(OWED_NOTE_OPENING);
         await client.query(
           `update drink set name = $2, cocktails = $3, mocktails = $4,
                   season = $5::season_band, season_note = $6,
@@ -457,15 +422,15 @@ try {
              where id = $1`,
           [
             drinkId,
-            drink.name,
-            drink.name,
-            drink.mirror,
-            drink.season,
-            drink.seasonNote,
-            drink.making,
-            drink.mirrorSelf,
-            sourceNote(drink),
-            clearsOwedNote ? null : row.notes,
+            want.name,
+            want.cocktails,
+            want.mocktails,
+            want.season,
+            want.seasonNote,
+            want.making,
+            want.mirrorSelf,
+            want.sourceNote,
+            staleOwedNote ? null : row.notes,
           ]
         );
         updated += 1;
