@@ -1428,7 +1428,24 @@ const KILLED_GAMES = [
 const VENUE_TAGS = [
   ["requires_outdoors", "requires_outdoors"],
   ["outdoor_access", "outdoor_access"],
+  // db/058. Two items are about a room a guest sleeps in — Las Vegas's fob
+  // off the door and Portofino's key tag — and neither can exist where nobody
+  // stays. Added here as a word the document says, on the same terms as the
+  // two above: "there is nothing to translate and no judgement to make."
+  ["requires_lodging", "requires_lodging"],
 ];
+
+/**
+ * ONE VENUE REQUIREMENT PER ITEM, and it is the FIRST match that wins.
+ *
+ * The loop below breaks, so an item naming two codes carries only the one
+ * listed earliest here rather than both. That is a real ceiling and it is
+ * fine today — nothing in the document needs two — but an object that is
+ * genuinely outdoors AND needs lodging would lose half its gate silently,
+ * which is the class of failure db/035 spent two months inside. Recorded so
+ * the next person adding a code knows the shape of the thing they are
+ * extending rather than discovering it (rule 20).
+ */
 
 /**
  * The one graded word in the document.

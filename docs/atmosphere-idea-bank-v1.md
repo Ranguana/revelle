@@ -486,7 +486,7 @@ whose job it is, handed over in a card folder before the night ends
 Westhampton's Polaroid, Aspen's camera developed a week later and this
 one, and three is probably one too many); the number off the door —
 take-home, a numbered fob tag matching the room number on the house
-note, handed over on arrival (FOUNDER-PENDING — the sheet marks it thin
+note, handed over on arrival (requires_lodging) (FOUNDER-PENDING — the sheet marks it thin
 and asks to cut it, nothing happened to it and it opens nothing, and the
 own-stock ruling reaches stock rather than quality so the question is
 still open); the IOU for the late supper — take-home, THE EVENING
@@ -519,7 +519,7 @@ off and handed round at the end (FOUNDER-PENDING — does a carbon pad
 breach the slips rule, or is that rule about game content only and a
 guest writing an order outside it); the room's key tag — take-home, a
 plain wooden or brass fob numbered or named for the room a guest slept
-in, not asked for back (FOUNDER-PENDING — does a houseguest object work
+in, not asked for back (requires_lodging) (FOUNDER-PENDING — does a houseguest object work
 when the occasion is a dinner rather than a stay, or does this become a
 getaway-only take-home); breakfast, in wax paper — take-home, focaccia
 col d'oro wrapped in wax paper and pressed on people as they go
