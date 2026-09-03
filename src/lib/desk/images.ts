@@ -615,6 +615,65 @@ export function unread<T extends { stage: Stage }>(images: readonly T[]): T[] {
 export type ApprovalCheck = { ok: true } | { ok: false; refusal: string };
 
 /**
+ * THE ROOM THE READING MEANT.
+ *
+ * Founder, on a reading that could not be approved: the model had named
+ * `dolomites-1956` and `new-york-1938`, and neither is a slug.
+ *
+ * ── THE CAUSE IS OURS, NOT THE MODEL'S ───────────────────────────────
+ *
+ * `DESTINATIONS` does not agree with itself about whether a key carries the
+ * year. Seven do — westhampton-1976, acapulco-1959, amalfi-1953, aspen-1994,
+ * oaxaca-1954, palm-springs-1965, st-moritz-1984 — and eleven do not: havana,
+ * las-vegas, new-york, nantucket, new-orleans, catskills, cote-dazur,
+ * portofino, dolomites, big-sur, tahiti.
+ *
+ * So a model shown "DOLOMITES, 1956" beside a slug list where seven of
+ * eighteen end in a year has no convention to follow, and picks one. It is
+ * not hallucinating a room; it is resolving an ambiguity we left in the data,
+ * and it picked the wrong half of a split that should not exist.
+ *
+ * ── WHY REPAIR HERE RATHER THAN RENAME THE KEYS ──────────────────────
+ *
+ * Renaming eleven keys would touch `world.slug` in production, every
+ * `*_world` join row, every bank and dish claim written against them, and
+ * every slug printed in a document. That is a migration with a long blast
+ * radius to fix a naming inconsistency nobody is otherwise hurt by. The
+ * ambiguity is cheap to absorb and expensive to remove.
+ *
+ * ── AND IT ONLY RESOLVES WHAT IS UNAMBIGUOUS ─────────────────────────
+ *
+ * Both directions are tried — the year stripped off, and the year added back
+ * — and a match counts only if it lands on EXACTLY ONE known room. If a
+ * future catalogue held both `aspen` and `aspen-1994`, this returns null and
+ * the reading stays refused on screen, which is the honest answer. It never
+ * guesses between two rooms (rule 32: symmetry is not evidence).
+ */
+export function resolveRoomSlug(
+  named: string,
+  knownSlugs: readonly string[]
+): string | null {
+  const wanted = named.trim().toLowerCase();
+  if (!wanted) return null;
+
+  const known = new Set(knownSlugs);
+  if (known.has(wanted)) return wanted;
+
+  const candidates = new Set<string>();
+
+  // `dolomites-1956` -> `dolomites`
+  const stripped = wanted.replace(/-\d{4}$/, "");
+  if (stripped !== wanted && known.has(stripped)) candidates.add(stripped);
+
+  // `westhampton` -> `westhampton-1976`, without needing to know the year
+  for (const slug of knownSlugs) {
+    if (slug.replace(/-\d{4}$/, "") === stripped) candidates.add(slug);
+  }
+
+  return candidates.size === 1 ? [...candidates][0] : null;
+}
+
+/**
  * May this candidate be approved into its room?
  *
  * Note what is NOT here. Confidence is not consulted: `weak` is a label she

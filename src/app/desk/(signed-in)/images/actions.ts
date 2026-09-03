@@ -157,7 +157,18 @@ async function readOne(
              from world where slug = any($1::citext[]) and status <> 'retired'`,
           [slugs]
         );
+  // Exact first, then tolerant — the registry does not agree with itself
+  // about whether a key carries the year, so a model shown "DOLOMITES, 1956"
+  // reasonably writes `dolomites-1956`. resolveRoomSlug() absorbs that and
+  // only when it lands on exactly one room. See its note in desk/images.ts.
   const worldBySlug = new Map(rooms.map((room) => [room.slug, room.id]));
+  const knownSlugs = rooms.map((room) => room.slug);
+  const worldFor = (named: string): string | null => {
+    const exact = worldBySlug.get(named);
+    if (exact) return exact;
+    const resolved = resolveRoomSlug(named, knownSlugs);
+    return resolved ? (worldBySlug.get(resolved) ?? null) : null;
+  };
 
   await transaction(async (client) => {
     const { rows } = await client.query<{ id: string }>(

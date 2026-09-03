@@ -3124,6 +3124,8 @@ let attached = 0;
 let heldBack = 0;
 let gesturesWritten = 0;
 const stubbed = [];
+/** Slugs db/057's guard refused to recreate. Reported, never silent. */
+const refusedBySlug = [];
 
 /**
  * SECTION 10 — every second claim this run touched, and what happened to it.
@@ -3240,6 +3242,32 @@ try {
           row.supplyNote,
         ]
       );
+      // ── AN INSERT THAT WROTE NOTHING IS A REFUSAL, NOT A CRASH ──────
+      //
+      // db/057's `refuse_recreated` is a BEFORE INSERT trigger that RETURNS
+      // NULL for a slug in `refused_row`, which skips the row without failing
+      // the statement — deliberately, so a run writing fifty items where one
+      // is refused writes the other forty-nine.
+      //
+      // But a skipped insert returns ZERO ROWS, and this line read
+      // `inserted[0].id` as if one always came back. On the first deploy after
+      // db/059 restored 191 refusals, that was:
+      //
+      //     [seed-bank] FAILED: Cannot read properties of undefined (reading 'id')
+      //
+      // CI CANNOT SEE THIS, and the reason is rule 33 exactly: the scratch
+      // database has an empty refused_row, so the trigger never fires there,
+      // and the guard and the seeder had never met. The one machine where they
+      // do meet is production.
+      //
+      // So: no row means she refused this slug and the guard did its job.
+      // Counted and reported, never silent — a seeder that skips work without
+      // saying so is the shape rule 12's corollary warns about.
+      if (inserted.length === 0) {
+        refusedBySlug.push(row.slug);
+        continue;
+      }
+
       idBySlug.set(row.slug, inserted[0].id);
       recordAlsoAt(
         row,
@@ -3394,6 +3422,20 @@ console.log(
     `as the desk has them; ${attached} technique card(s) attached; ` +
     `${gesturesWritten} gesture(s) written.`
 );
+
+if (refusedBySlug.length > 0) {
+  // Loud on purpose. db/057's guard skipping a row is the system working, but
+  // a seeder that quietly writes less than the document describes is rule 12's
+  // corollary — "the catalogue is just smaller than the repo says" — and the
+  // whole reason that rule exists.
+  console.log(
+    `\n[seed-bank] ${refusedBySlug.length} row(s) NOT recreated because she ` +
+      `refused them (db/057's refused_row):\n  ` +
+      refusedBySlug.join("\n  ") +
+      `\nDelete the row from refused_row to un-refuse one; it returns as an ` +
+      `ordinary draft on the next deploy.`
+  );
+}
 
 if (stubbed.length > 0) {
   console.log(
