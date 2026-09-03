@@ -50,7 +50,13 @@
 -- is a gate with nothing behind it, and it reads exactly like a broken one.
 
 -- ── 1. the code ──────────────────────────────────────────────────────
-insert into structural_requirement (code, label, clause, description, position) values
+--
+-- The third column is `demand`, not `clause`. The first version of this file
+-- named it `clause`, which does not exist — a name inferred from the shape of
+-- db/020's insert rather than read off the table. It failed the deploy with
+-- `column "clause" of relation "structural_requirement" does not exist`, and
+-- CI had already said so on the commit before anyone clicked deploy.
+insert into structural_requirement (code, label, demand, description, position) values
   ('requires_lodging', 'Needs somewhere to stay', 'needs somewhere guests sleep',
    'A room a guest stays the night in, with a number or a name on the door. A '
    'hotel or a house taken for the weekend has them; an evening somewhere does '
