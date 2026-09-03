@@ -696,6 +696,34 @@ export async function gateReport(db: Queryable): Promise<GateReport> {
 
   /* ── the venue gate ─────────────────────────────────────────────── */
 
+  // ── DEMAND IS COUNTED OVER THE ROWS THE TEST ACTUALLY RUNS ──────────
+  //
+  // `holdings.venueRequirements` counts every ingredient_requirement row whose
+  // pool is not retired. The eligibility loop below runs over ISSUABLE rows.
+  // Two populations, one report — so the verdict could say "2 claim it and it
+  // refuses nothing" about a requirement whose only claimants were drafts and
+  // therefore could never be tested. That reads exactly like a broken gate and
+  // is not one.
+  //
+  // It surfaced on `requires_lodging` the day it was added: both claimants are
+  // bank items held by their own FOUNDER-PENDING questions, which is how EVERY
+  // bank item starts. Under the old count, a requirement could not be added
+  // with its claimants — the rule db/035 and db/039 both insist on — without
+  // failing this check until somebody approved them.
+  //
+  // Counted here instead, from `ingredients`, so demand and refusals are
+  // measured against the same rows by construction and cannot disagree (rule
+  // 21). A requirement claimed only by drafts now reads `claimed: 0` and falls
+  // to the authoring-absence exemption below, which is what it is. One claimed
+  // by live rows that still refuses nothing is caught exactly as before.
+  const claimedByIssuable: Record<string, number> = {};
+  for (const ingredient of ingredients) {
+    for (const requirement of ingredient.requirements ?? []) {
+      claimedByIssuable[requirement.code] =
+        (claimedByIssuable[requirement.code] ?? 0) + 1;
+    }
+  }
+
   let venuePrunes = 0;
   const venueByRequirement: Record<string, number> = {};
   const venueByAnswer: Record<string, number> = {};
@@ -766,7 +794,7 @@ export async function gateReport(db: Queryable): Promise<GateReport> {
     return {
       code,
       label: String(row.label ?? code),
-      claimed: holdings.venueRequirements[code] ?? 0,
+      claimed: claimedByIssuable[code] ?? 0,
       affordedBy: affordedBy[code] ?? 0,
       refusals: venueByRequirement[code] ?? 0,
       refusedByAnswers: [...refusedByAnswers[code]].sort(),
