@@ -530,6 +530,57 @@ export async function approvePlacement(form: FormData): Promise<void> {
  * the same place: a later verdict supersedes this one and this one stays
  * readable underneath (db/056 is append-only, CLAUDE.md rules 14 and 18).
  */
+/**
+ * DELETE A PICTURE OUTRIGHT — the wrong-upload case.
+ *
+ * Founder: "should have a delete button next to read it just in case we
+ * upload a wrong photo."
+ *
+ * ── WHY THIS IS NOT `refuseImage` ────────────────────────────────────
+ *
+ * Refusing keeps the image and records that she looked and said no, so the
+ * same picture is never read and proposed at her twice. That is right for a
+ * picture she considered.
+ *
+ * A wrong upload was never considered. Keeping it would leave a permanent
+ * record of a mis-drop in a list she has to read past, which is the opposite
+ * of what refusal is for — and it would report as a refusal she never made.
+ * Two different acts, two buttons.
+ *
+ * ── THE BYTES GO TOO ─────────────────────────────────────────────────
+ *
+ * db/056's readings, candidates and verdicts are all `on delete cascade`, so
+ * one statement takes the picture and everything derived from it. Deliberate,
+ * and safe here in a way it is not for a pool row: a reference image is
+ * PRIVATE REFERENCE that never reaches a member, so nothing was ever issued
+ * from it and nothing can be left pointing at it.
+ *
+ * The ledger keeps the fact, per db/042 — a deletion carries its reason — so
+ * the act is recoverable as a record even though the bytes are not.
+ */
+export async function deleteImage(form: FormData): Promise<void> {
+  const staff = await requireStaff();
+  const id = String(form.get("image_id") ?? "");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return;
+
+  const before = await queryOne<{ filename: string | null }>(
+    `select filename from reference_image where id = $1`,
+    [id]
+  );
+  if (!before) return;
+
+  await query(`delete from reference_image where id = $1`, [id]);
+
+  await recordAction(staff, {
+    action: "reference_image.deleted",
+    entityTable: "reference_image",
+    entityId: id,
+    summary: `${before.filename ?? "a picture"} — deleted as a wrong upload, not refused`,
+  });
+
+  revalidatePath("/desk/images");
+}
+
 export async function refuseImage(form: FormData): Promise<void> {
   const staff = await requireStaff();
 

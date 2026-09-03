@@ -16,11 +16,13 @@ import {
 import { stamp } from "@/lib/desk/labels";
 
 import styles from "../../desk.module.css";
+import { Submit } from "./Submit";
 import { Empty, Head, Seam } from "../bits";
 import DropZone from "./DropZone";
 import {
   approvePlacement,
   readEverythingUnread,
+  deleteImage,
   readImage,
   refuseImage,
 } from "./actions";
@@ -392,12 +394,30 @@ function Card({
       </p>
 
       {stage.state === "unread" ? (
+      <>
+      {/* READ AND DELETE SIT TOGETHER, and only while the picture is unread.
+          Reading is one model call and takes seconds, so the button says so
+          while it works rather than leaving a still page that reads as "the
+          click missed" — the founder pressed it and could not tell. Delete is
+          beside it for the wrong-upload case, which is a different act from
+          refusing: refusing keeps a picture she considered, deleting removes
+          one she never meant to drop. */}
+      <div className={styles.buttonRow}>
         <form action={readImage}>
           <input type="hidden" name="image_id" value={image.id} />
-          <button className={styles.button} type="submit">
-            Read it
-          </button>
+          <Submit idle="Read it" working="Reading…" />
         </form>
+        <form action={deleteImage}>
+          <input type="hidden" name="image_id" value={image.id} />
+          <Submit
+            idle="Delete"
+            working="Deleting…"
+            danger
+            confirm="Delete this picture and anything read from it? This cannot be undone."
+          />
+        </form>
+      </div>
+      </>
       ) : null}
 
       {image.object ? (
