@@ -30,6 +30,7 @@ import "server-only";
  */
 
 import { query, queryOne } from "@/lib/db";
+import { settledSql } from "@/lib/portal/choice";
 
 /** Openable statuses, the same three src/lib/portal/occasions.ts allows. */
 const OPENABLE = ["preview", "delivered", "archived"] as const;
@@ -393,9 +394,15 @@ async function readNeeds(
   revelleId: string
 ): Promise<{ name: string; note: string | null; placed: boolean }[]> {
   return query<{ name: string; note: string | null; placed: boolean }>(
+    // `placed` MEANS RUNS, NOT DELIVERED — db/061. A game she was offered and
+    // did not choose is hers and is not happening, so it cannot be what
+    // satisfies another game's dependency. `settledSql` is the one statement
+    // of that (src/lib/portal/choice.ts); the page and the shopping list read
+    // it from the same place for the same reason.
     `select need.name, d.note,
             exists (select 1 from revelle_game rg
-                     where rg.revelle_id = $2 and rg.game_id = need.id) as placed
+                     where rg.revelle_id = $2 and rg.game_id = need.id
+                       and ${settledSql("rg")}) as placed
        from game_dependency d
        join game need on need.id = d.requires_game_id
       where d.game_id = $1 and d.strength = 'required'

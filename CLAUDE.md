@@ -171,6 +171,23 @@ lost, and a deleted argument gets re-made.
   the row disagreeing forever, on purpose — so demanding it go green would be
   demanding a decision be reversed to make a light change colour. db/055 and
   `/desk/reconcile`.
+- **REMOVING A SLOT ORPHANS THE CLAIMS ON IT, AND CLAIMS ARE WHITELISTS.**
+  db/061 deleted the `occasion_slot` rows for five beats that drew from the
+  game pool. `game_slot` rows are `fit = 'native'`, and `slotEligibility`
+  reads any native row as "these slots and no others" — so ELEVEN OF
+  TWENTY-SEVEN GAMES, every ambient one and every finale one, were left
+  claiming only beats no occasion has. Nothing throws, nothing goes red, and
+  forty-one per cent of the catalogue silently stops being placeable. The
+  near-miss reading was that widening `slot_shape` was enough; it is not,
+  because `game_placement`'s shape fallback fires only for a game with NO
+  claims, and every authored game has them. Rule 23's shape again — the
+  fallback answers a different question than it appears to. **The general
+  form: before deleting a row that other rows point at, count what points at
+  it, and check whether the pointer is a preference or a whitelist.**
+  The repair is two-sided under rule 33: the claim is authored in
+  `src/lib/games.ts` for every future build, and the migration backfills the
+  rows production already holds, because neither half covers both cases.
+
 - **PROVENANCE MUST BE RECORDED AT THE GRAIN IT WILL BE READ AT.**
   `destination.updated` in `staff_action` is the only evidence in this system
   that a human, rather than a seeder, chose a room's member-facing copy — and
