@@ -627,9 +627,27 @@ export function fillSlots(
     cheapest[i] = cheapest[i + 1] + least;
   }
 
+  // ONE GAP PER BEAT, NOT ONE PER CARD — db/061.
+  //
+  // A gap is a WORK ORDER (see the note on CatalogueGap in types.ts): the pool
+  // could not fill a slot her occasion has, and the house must author
+  // something. An offer is three candidates for one beat, all drawing the same
+  // scoped pool, so an empty pool reported once per card would put the same
+  // work order on the list three times — a list that says three things are
+  // missing when one is stops being a count of anything.
+  //
+  // `beatOf` is the offer group where there is one and the unit slot's key
+  // where there is not, so a slot outside an offer is untouched: a maxCount-3
+  // edit still reports three gaps, which is correct, because that slot really
+  // does want three objects.
   const gaps: CatalogueGap[] = [];
+  const reported = new Set<string>();
   for (const entry of order) {
-    if (entry.gap) gaps.push(entry.gap);
+    if (!entry.gap) continue;
+    const beat = beatOf(entry.slot);
+    if (reported.has(beat)) continue;
+    reported.add(beat);
+    gaps.push(entry.gap);
   }
 
   // ── THE TABLE STARTS ON HER DATE ───────────────────────────────────

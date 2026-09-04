@@ -1527,6 +1527,112 @@ function scheduledGames(): Ingredient[] {
   ];
 }
 
+// ── the carousel — db/061 ────────────────────────────────────────────
+//
+// "there shouldnt be more than one ga[m]e" and "give a host three ga[m]es to
+// choose from. as an or not an and." One beat, three candidates, one of them
+// hers. Everything below is the "as an or not an and" half made mechanical.
+
+/** The post-db/061 shape of the one game beat: one item, three candidates. */
+const ONE_GAME_OFFERED: SlotRule[] = [
+  rule({ slotCode: "game", label: "The fun", position: 10, offerCount: 3 }),
+];
+
+test("planSlots: an offer is three unit slots of ONE beat", () => {
+  const slots = planSlots(ONE_GAME_OFFERED, DINNER, SCALE).slots;
+
+  assert.equal(slots.length, 3, "three candidates");
+  assert.equal(
+    new Set(slots.map((s) => s.offerGroup)).size,
+    1,
+    "and one beat — an or, not an and"
+  );
+  assert.deepEqual(
+    slots.map((s) => s.offerIndex),
+    [0, 1, 2],
+    "stamped at planning and never recomputed: the cards must not move"
+  );
+  assert.ok(
+    slots.every((s) => s.slotCode === "game"),
+    "three candidates for one slot, never three slots"
+  );
+});
+
+test("planSlots: only the FIRST candidate of an offer is required", () => {
+  const slots = planSlots(ONE_GAME_OFFERED, DINNER, SCALE).slots;
+  assert.deepEqual(
+    slots.map((s) => s.required),
+    [true, false, false],
+    "which is how a room with one eligible game offers one and reports no gap"
+  );
+});
+
+test("planSlots: offer_count 1 is exactly what every slot did before", () => {
+  const plain = planSlots(
+    [rule({ slotCode: "game", label: "The fun", position: 10 })],
+    DINNER,
+    SCALE
+  ).slots;
+
+  assert.equal(plain.length, 1);
+  assert.equal(plain[0].offerGroup, null, "nothing the house places is an offer");
+  assert.equal(plain[0].key, "game:1:0", "and its key is unchanged");
+});
+
+test("an offer spends ONE block, however many cards are in it", () => {
+  // scheduled_game_max = 1 and all three candidates are scheduled. Before
+  // db/061 taught fill.ts what a beat is, the second card would have been
+  // refused by the first card's own block and she would have been handed one
+  // game with a house note saying the evening was full.
+  const { fill } = gamesFor(DINNER, ONE_GAME_OFFERED, scheduledGames());
+
+  assert.equal(fill.picks.length, 3, "three cards offered");
+  assert.equal(
+    new Set(fill.picks.map((p) => p.ingredient.name)).size,
+    3,
+    "three DIFFERENT games — nothing is padded and nothing repeats"
+  );
+  assert.ok(
+    !fill.dropped.some((d) => d.reason === "scheduled_cap"),
+    "one beat, one block, no refusal"
+  );
+});
+
+test("where fewer than three are eligible, she is offered what exists", () => {
+  const two = scheduledGames().slice(0, 2);
+  const { fill } = gamesFor(DINNER, ONE_GAME_OFFERED, two);
+
+  assert.equal(fill.picks.length, 2, "two, said plainly");
+  assert.equal(
+    fill.gaps.length,
+    0,
+    "AND NOT A GAP. The second and third cards are optional units; a room " +
+      "with two games has two games, which is not a work order for the house"
+  );
+  assert.deepEqual(
+    fill.picks.map((p) => p.ingredient.name).sort(),
+    ["Fishbowl", "The Art Battle"],
+    "nothing is repeated to make up the number"
+  );
+});
+
+test("one eligible game is one card, and still not a gap", () => {
+  const { fill } = gamesFor(DINNER, ONE_GAME_OFFERED, scheduledGames().slice(0, 1));
+
+  assert.equal(fill.picks.length, 1);
+  assert.equal(fill.gaps.length, 0);
+});
+
+test("no eligible game IS a gap — the required first card went unfilled", () => {
+  // The distinction the offer must not blur. A thin room is silence to her
+  // (src/lib/selection/member.ts) and a work order to the house; an EMPTY one
+  // is the pool needing authoring, and that signal has to survive.
+  const { fill } = gamesFor(DINNER, ONE_GAME_OFFERED, []);
+
+  assert.equal(fill.picks.length, 0);
+  assert.equal(fill.gaps.length, 1, "one gap for the beat, not three");
+});
+
 test("the cap binds: a long dinner takes one game, not the three it could", () => {
   const { fill } = gamesFor(DINNER, THREE_GAME_SLOTS, scheduledGames());
 
