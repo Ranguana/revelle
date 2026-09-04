@@ -100,6 +100,18 @@ export type MemberPiece = {
   perGuest: boolean;
   /** 1-based, on an occasion that runs over days. Null on an evening. */
   dayIndex: number | null;
+  /**
+   * WHICH SET OF ALTERNATIVES THIS PIECE IS ONE OF — db/061 — or null for
+   * everything the house simply placed.
+   *
+   * Member-facing for the same reason `pool` and `slug` are: it is a fact
+   * about what she was given, not about how the search arrived at it. She was
+   * handed three games and told to pick one; a page that could not tell which
+   * three belong together could not show her the choice she was promised.
+   */
+  offerGroup: string | null;
+  /** True for the one she has taken. At most one per offer. */
+  chosen: boolean;
 };
 
 /** A section of her Revelle. Only ever built from pieces that exist. */
@@ -183,6 +195,10 @@ export function memberRevelle(candidate: Candidate): MemberRevelle {
       quantity: pick.slot.quantity,
       perGuest: pick.slot.perGuest,
       dayIndex: pick.slot.dayIndex,
+      // db/061. Both null/false on anything the engine has just produced: a
+      // run of the engine delivers an offer and never makes a choice.
+      offerGroup: pick.slot.offerGroup ?? null,
+      chosen: pick.chosen ?? false,
     }));
 
   const sections: MemberSection[] = [];

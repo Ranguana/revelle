@@ -36,6 +36,7 @@ import "server-only";
 import { query, queryOne } from "@/lib/db";
 import { memberRevelle, type MemberRevelle } from "@/lib/selection/member";
 import { candidateFrom, readPicks } from "@/lib/portal/picks";
+import { settledSql } from "@/lib/portal/choice";
 import { readTheme } from "@/lib/portal/theme";
 import type { Theme } from "@/lib/tokens";
 
@@ -46,7 +47,7 @@ import type { Theme } from "@/lib/tokens";
  * her archive is a large part of what membership is (docs/portal-spec.md), and
  * a société that closes its own records is not keeping any.
  */
-const OPENABLE = ["preview", "delivered", "archived"] as const;
+export const OPENABLE = ["preview", "delivered", "archived"] as const;
 
 /** One line on the shelf. Enough to recognise it and reach it. */
 export type OccasionCard = {
@@ -276,10 +277,16 @@ async function readPrep(revelleId: string): Promise<PrepLine[]> {
     per_guest: boolean;
     lead_time_days: number;
   }>(
+    // db/061. `settledSql` is the ONE statement of which rows count toward
+    // what actually happens: the ones the house placed, and the one she took.
+    // A card she has been offered and has not chosen buys nothing — shopping
+    // for three games because she has looked at three is the product acting
+    // on an input she has not given.
     `select s.item, s.detail, s.per_guest, s.lead_time_days
        from revelle_game rg
        join game_supply s on s.game_id = rg.game_id
       where rg.revelle_id = $1
+        and ${settledSql("rg")}
         and s.source <> 'on_hand'
         and s.lead_time_days > 0
       order by s.lead_time_days desc, s.position, s.item`,
@@ -291,7 +298,7 @@ async function readPrep(revelleId: string): Promise<PrepLine[]> {
        from revelle_game rg
        join game_requirement r on r.game_id = rg.game_id
        join game_requirement_kind k on k.code = r.requirement
-      where rg.revelle_id = $1 and k.fragile
+      where rg.revelle_id = $1 and ${settledSql("rg")} and k.fragile
       order by k.position`,
     [revelleId]
   );

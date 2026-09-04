@@ -785,6 +785,21 @@ export type Pick = {
   forced: boolean;
   /** How many other ingredients could have filled this slot. */
   alternatives: number;
+  /**
+   * SHE TOOK THIS ONE — db/061. Only ever meaningful inside an offer.
+   *
+   * NEVER SET BY THE ENGINE, and the absence is the point rather than an
+   * omission: a run of the engine produces an OFFER, and the choice is a thing
+   * that happens after delivery, in the portal, possibly weeks later and more
+   * than once. The only writer is src/lib/portal/picks.ts reading `chosen_at`
+   * off the join row.
+   *
+   * Optional, and absent means the same as false. It is on `Pick` rather than
+   * on `UnitSlot` because it is a fact about the INGREDIENT that was placed —
+   * the slot is the beat, and the beat is not chosen, one of its candidates
+   * is.
+   */
+  chosen?: boolean;
 };
 
 export type DroppedPick = {

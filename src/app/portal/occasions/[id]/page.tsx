@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireMember } from "@/lib/members";
+import { entriesIn, type Offer } from "@/lib/portal/choice";
 import { readOccasion, type Occasion } from "@/lib/portal/occasions";
 import { UnrenderableIngredients } from "@/lib/portal/picks";
 import { inHouseOrder, inWords, longDate } from "@/lib/portal/sections";
 import { themeCss } from "@/lib/tokens";
 
+import { chooseGameAction } from "./actions";
 import styles from "./occasion.module.css";
 
 /**
@@ -187,44 +189,55 @@ export default async function OccasionPage({
               </summary>
 
               <div className={styles.pieces}>
-                {section.items.map((piece) => (
-                  <article
-                    className={styles.piece}
-                    key={`${piece.section}-${piece.heading}-${piece.name}`}
-                  >
-                    {label ? (
-                      <p className={styles.pieceHead}>{piece.heading}</p>
-                    ) : null}
-                    {/*
-                      A GAME IS THE ONE PIECE WITH SOMEWHERE TO GO.
-                      The card here is a teaser and stays one; the instructions
-                      are a page, because a runbook read in a kitchen needs
-                      steps, timings and a place to look when it goes wrong.
-                      Every other piece is complete where it stands and gets no
-                      link, which is why this is a condition on the pool rather
-                      than a link on every heading.
-                    */}
-                    <h3 className={styles.pieceName}>
-                      {piece.pool === "game" ? (
-                        <Link
-                          className={styles.pieceLink}
-                          href={`/portal/occasions/${occasion.id}/games/${piece.slug}`}
-                        >
-                          {piece.name}
-                        </Link>
-                      ) : (
-                        piece.name
-                      )}
-                    </h3>
-                    {piece.description ? (
-                      <div className={styles.pieceBody}>
-                        {paragraphs(piece.description).map((line, index) => (
-                          <p key={index}>{line}</p>
-                        ))}
-                      </div>
-                    ) : null}
-                  </article>
-                ))}
+                {entriesIn(section.items).map((entry) =>
+                  entry.kind === "piece" ? (
+                    <article
+                      className={styles.piece}
+                      key={`${entry.piece.section}-${entry.piece.heading}-${entry.piece.name}`}
+                    >
+                      {label ? (
+                        <p className={styles.pieceHead}>{entry.piece.heading}</p>
+                      ) : null}
+                      {/*
+                        A GAME IS THE ONE PIECE WITH SOMEWHERE TO GO.
+                        The card here is a teaser and stays one; the instructions
+                        are a page, because a runbook read in a kitchen needs
+                        steps, timings and a place to look when it goes wrong.
+                        Every other piece is complete where it stands and gets no
+                        link, which is why this is a condition on the pool rather
+                        than a link on every heading.
+                      */}
+                      <h3 className={styles.pieceName}>
+                        {entry.piece.pool === "game" ? (
+                          <Link
+                            className={styles.pieceLink}
+                            href={`/portal/occasions/${occasion.id}/games/${entry.piece.slug}`}
+                          >
+                            {entry.piece.name}
+                          </Link>
+                        ) : (
+                          entry.piece.name
+                        )}
+                      </h3>
+                      {entry.piece.description ? (
+                        <div className={styles.pieceBody}>
+                          {paragraphs(entry.piece.description).map(
+                            (line, index) => (
+                              <p key={index}>{line}</p>
+                            )
+                          )}
+                        </div>
+                      ) : null}
+                    </article>
+                  ) : (
+                    <Carousel
+                      key={entry.offer.group}
+                      offer={entry.offer}
+                      revelleId={occasion.id}
+                      label={label}
+                    />
+                  )
+                )}
               </div>
             </details>
             );
@@ -354,6 +367,100 @@ export default async function OccasionPage({
  * page could not finish reading, and guessing at it would be the same class of
  * mistake one shade smaller. The house's own tokens are the honest ground.
  */
+/**
+ * THE CAROUSEL — db/061, and the founder's word for it.
+ *
+ * "what i do want to do is give a host three ga[m]es to choose from. as an or
+ * not an and. like a carousel look."
+ *
+ * ── WHAT IT SAYS AND WHAT IT REFUSES TO SAY ─────────────────────────
+ *
+ * CLAUDE.md rule 10 is the test for every line here: does it credit her, or
+ * credit us. "The one you pick is the one that runs" credits her. Anything
+ * about how these three were found — that they were matched, scored, chosen
+ * for her, narrowed from a catalogue — credits the house and is not written.
+ * Offering a choice is the product being an instrument; describing the work
+ * behind the offer would turn it back into a service she is a customer of.
+ *
+ * IT DOES NOT SAY HOW MANY WERE POSSIBLE. Two cards say "two to choose
+ * between", not "only two fit" and not "two of three". A room with two games
+ * has two games; the count is a fact and the apology would be the house
+ * describing its own catalogue to her, which is house business.
+ *
+ * ── NOTHING MOVES ───────────────────────────────────────────────────
+ *
+ * Rule 18. The cards are in delivery order, fixed at approval, and choosing
+ * marks one in place — it does not promote it, does not collapse the other
+ * two, and does not advance the page. The two she did not take keep their
+ * buttons, because the correction for pressing the wrong card is pressing the
+ * right one and that has to still be there.
+ *
+ * A plain `<form>` and a `<button>`, like everything else in the portal: it
+ * works with no JavaScript, is reachable from a keyboard, and cannot get out
+ * of step with the server. She is reading this on a phone, in a kitchen, with
+ * people arriving.
+ */
+function Carousel({
+  offer,
+  revelleId,
+  label,
+}: {
+  offer: Offer;
+  revelleId: string;
+  label: boolean;
+}) {
+  return (
+    <section className={styles.offer} aria-label={offer.heading}>
+      {label ? <p className={styles.pieceHead}>{offer.heading}</p> : null}
+      <p className={styles.offerLead}>
+        {capital(inWords(offer.cards.length))} to choose between.{" "}
+        {offer.settled
+          ? `Change your mind whenever you like.`
+          : `The one you pick is the one that runs.`}
+      </p>
+
+      <div className={styles.offerCards}>
+        {offer.cards.map((card) => (
+          <article
+            className={styles.offerCard}
+            data-chosen={card.chosen ? "yes" : undefined}
+            key={card.slug}
+          >
+            <h3 className={styles.pieceName}>
+              <Link
+                className={styles.pieceLink}
+                href={`/portal/occasions/${revelleId}/games/${card.slug}`}
+              >
+                {card.name}
+              </Link>
+            </h3>
+            {card.description ? (
+              <div className={styles.pieceBody}>
+                {paragraphs(card.description).map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
+              </div>
+            ) : null}
+
+            {card.chosen ? (
+              <p className={styles.offerMark}>Yours</p>
+            ) : (
+              <form action={chooseGameAction}>
+                <input type="hidden" name="revelleId" value={revelleId} />
+                <input type="hidden" name="group" value={offer.group} />
+                <input type="hidden" name="slug" value={card.slug} />
+                <button className={styles.offerChoose} type="submit">
+                  Choose this
+                </button>
+              </form>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Withheld() {
   return (
     <main className={styles.page}>

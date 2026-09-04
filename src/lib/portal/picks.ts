@@ -93,6 +93,7 @@
  */
 
 import { composed, type Ask } from "../desk/publish.ts";
+import { isSettled } from "./choice.ts";
 import type {
   Candidate,
   Ingredient,
@@ -119,6 +120,14 @@ export type PickRow = {
   slot_position: number | null;
   section: string | null;
   position: number | null;
+  /**
+   * db/061. Which set of alternatives this row is one of, or null when the
+   * house simply placed it — which is every row of every pool but the game,
+   * and every game row delivered before the founder's ruling.
+   */
+  offer_group: string | null;
+  /** db/061. When she took this one. Null means she has not. */
+  chosen_at: string | null;
   printed_matter: unknown;
 };
 
@@ -392,6 +401,11 @@ async function readPool(
 
   template +=
     " j.slot_code, j.slot::text as section, j.position," +
+    // db/061. The offer and her choice. Read for every pool, not only the
+    // game: the columns are on every join table because occasion_slot's
+    // offer_count is pool-agnostic, and a read that only looked for them on
+    // one pool would drop an offer the plan legitimately produced.
+    " j.offer_group, j.chosen_at::text as chosen_at," +
     " sk.label as slot_label, sk.section::text as slot_section," +
     " sk.per_guest as slot_per_guest, sk.position as slot_position,";
 
@@ -411,7 +425,13 @@ async function readPool(
     " from %I j" +
     " left join %I t on t.id = j.%I" +
     " left join slot_kind sk on sk.code = j.slot_code" +
-    " where j.revelle_id = $1";
+    " where j.revelle_id = $1" +
+    // AN ORDER, BECAUSE THE CARDS MUST NOT MOVE. CLAUDE.md rule 18: between a
+    // mistake and its fix the thing being corrected stays where it was, and
+    // the three candidates of an offer share a slot_kind position, so without
+    // this the carousel's order would be whatever the planner felt like today.
+    // `j.position` is stamped once at approval and never recomputed.
+    " order by j.position nulls last, t.name, t.id";
   args.push(pool.join_table, pool.entity_table, idColumn);
 
   return ask<RawRow>(await composed(ask, template, args), [revelleId]);
@@ -523,7 +543,20 @@ function toPick(row: PickRow, guestCount: number | null): Pick {
     dayIndex: null,
     position: row.slot_position ?? row.position ?? 0,
     note: "",
+    // db/061. Carried so the page can show her the choice she was given; the
+    // ORDER of the cards is the order this row arrived in, not this number.
+    offerGroup: row.offer_group ?? null,
   };
+
+  // WHAT SHE HAS NOT PICKED PRINTS NOTHING AND BUYS NOTHING.
+  //
+  // The card is hers — db/061 argues the offer is what was delivered — but it
+  // is not yet part of the night, and printing a ballot for a game she has not
+  // chosen would put three games' worth of objects in The Printed Matter and
+  // three games' worth of shopping in The Prep. `readPrep` applies the same
+  // rule in SQL through `settledSql`; both read it off src/lib/portal/choice.ts
+  // so the page and the shopping list cannot come to disagree (rule 21).
+  const settled = isSettled(row.offer_group, row.chosen_at);
 
   const ingredient: Ingredient = {
     pool: row.pool,
@@ -540,7 +573,7 @@ function toPick(row: PickRow, guestCount: number | null): Pick {
     minGuests: null,
     maxGuests: null,
     shape: null,
-    printedMatter: printedMatterFor(row),
+    printedMatter: settled ? printedMatterFor(row) : [],
     isFixture: row.slug.startsWith("fixture-"),
   };
 
@@ -556,6 +589,8 @@ function toPick(row: PickRow, guestCount: number | null): Pick {
     score: 0,
     forced: false,
     alternatives: 0,
+    // Only ever true here. The engine delivers an offer and never chooses.
+    chosen: row.offer_group !== null && row.chosen_at !== null,
   };
 }
 

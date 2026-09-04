@@ -404,3 +404,106 @@
     padding-left: 0;
   }
 }
+
+/* ── the carousel ─────────────────────────────────────────────────────
+ *
+ * db/061. One beat, up to three candidates, one of them hers.
+ *
+ * THE CARDS DO HAVE A BOX, and the note on `.piece` above is the reason it is
+ * worth saying why. A piece is type on the destination's ground because there
+ * is nothing to tell it apart FROM. These three are alternatives to each
+ * other, and a set of alternatives with no edges is a list she has to read
+ * twice to see is a choice. The border is the smallest thing that says "these
+ * three, and one of them".
+ *
+ * NOTHING MOVES WHEN SHE CHOOSES (CLAUDE.md rule 18). The chosen card is
+ * marked where it stands — same order, same size, same column. No promotion to
+ * the top, no dimming of the other two, no collapse. The two she did not take
+ * keep their buttons, because the correction for pressing the wrong one is
+ * pressing the right one.
+ *
+ * The grid is one column on a phone and lets the cards sit side by side only
+ * where there is genuinely room. She is reading this on a phone in a kitchen;
+ * three columns squeezed onto 390px is a carousel look bought at the cost of
+ * being able to read any of them.
+ */
+
+.offer {
+  max-width: 34rem;
+}
+
+.offerLead {
+  margin: 0 0 1rem;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  color: var(--ink-faint);
+}
+
+.offerCards {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 52rem) {
+  .offerCards {
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    align-items: start;
+  }
+}
+
+.offerCard {
+  border: 1px solid var(--rule);
+  padding: 1.1rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* Hers. A rule down the edge rather than a fill: the destination's ground is
+   the destination's, and a highlight colour would look different in every
+   world for no gain. */
+.offerCard[data-chosen="yes"] {
+  border-left-width: 3px;
+  border-left-color: var(--ink);
+}
+
+.offerMark {
+  margin: auto 0 0;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* A real button with a real tap target. 44px, because she is standing up. */
+.offerChoose {
+  margin-top: auto;
+  appearance: none;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.offerChoose:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.offerChoose:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
