@@ -536,6 +536,20 @@ type State = {
   /** Blocks of the evening spent. Ambient and finale games spend none. */
   scheduled: number;
   /**
+   * WHICH BEATS HAVE ALREADY SPENT A BLOCK — db/061.
+   *
+   * An offer is three candidates for ONE beat and one of them runs, so the
+   * three of them together spend one block, not three. Without this the
+   * carousel would trip `scheduled_game_max` on its own second card and hand
+   * her one game with a house note saying the evening was full.
+   *
+   * Keyed on the offer group where there is one and on the unit slot's key
+   * where there is not, so a beat outside an offer behaves exactly as it did.
+   * A Set per state for the same reason `table` is a Map per state: the beam
+   * holds several live states and they have spent different evenings.
+   */
+  blocksSpent: Set<string>;
+  /**
    * WHAT EACH COHERENCE GROUP HAS COMMITTED TO — db/022, and empty in every
    * search that has no such group, which is every occasion until the courses.
    *
@@ -548,6 +562,18 @@ type State = {
 /** Does placing this thing take one of the evening's blocks? */
 function takesABlock(ingredient: Ingredient): boolean {
   return ingredient.shape === "scheduled";
+}
+
+/**
+ * WHICH BEAT OF THE EVENING THIS UNIT SLOT IS — db/061.
+ *
+ * The offer group where there is one, the slot's own key where there is not.
+ * Stated once because two things must agree about it: the cap check refuses a
+ * candidate on it and `extend` spends a block on it, and if those two ever
+ * disagreed a beat would be charged twice or never (CLAUDE.md rule 21).
+ */
+function beatOf(slot: UnitSlot): string {
+  return slot.offerGroup ?? slot.key;
 }
 
 /** STAGE 4. */
@@ -641,6 +667,7 @@ export function fillSlots(
       used: new Set(),
       chosenFacets: [],
       scheduled: 0,
+      blocksSpent: new Set(),
       table: openTable,
     },
   ];
@@ -830,7 +857,16 @@ export function fillSlots(
         // An ambient game runs underneath the evening and a finale ends it;
         // neither takes a block, so neither is counted and neither is ever
         // refused for this reason.
-        if (takesABlock(candidate.ingredient) && state.scheduled >= blocks) {
+        //
+        // AND AN OFFER IS ONE BEAT — db/061. The three candidates she chooses
+        // between are alternatives for one block, so the second and third are
+        // never refused on account of the first. `beatOf` is the one place
+        // that reading lives; see State.blocksSpent.
+        if (
+          takesABlock(candidate.ingredient) &&
+          !state.blocksSpent.has(beatOf(slot)) &&
+          state.scheduled >= blocks
+        ) {
           if (blockedByShape === null) blockedByShape = candidate.ingredient.name;
           continue;
         }
@@ -1093,6 +1129,15 @@ function extend(
     });
   }
 
+  // db/061. A beat spends a block once, however many candidates are offered
+  // for it. The second card of a carousel adds nothing to the evening's load
+  // because only one of the three will ever be played.
+  const beat = beatOf(pick.slot);
+  const spendsABlock = takesABlock(pick.ingredient) && !state.blocksSpent.has(beat);
+  const blocksSpent = spendsABlock
+    ? new Set(state.blocksSpent).add(beat)
+    : state.blocksSpent;
+
   return {
     picks: [...state.picks, pick],
     dropped: state.dropped,
@@ -1100,7 +1145,8 @@ function extend(
     score: state.score + pick.score,
     used,
     chosenFacets: [...state.chosenFacets, facets],
-    scheduled: state.scheduled + (takesABlock(pick.ingredient) ? 1 : 0),
+    scheduled: state.scheduled + (spendsABlock ? 1 : 0),
+    blocksSpent,
     table,
   };
 }

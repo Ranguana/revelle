@@ -252,7 +252,8 @@ export async function persistRun(
        insert into revelle_proposal_pick
          (proposal_id, slot_key, pool, entity_id, slot_code, slot_label,
           section, required, quantity, per_guest, day_index, position,
-          forced, alternatives, unit_cost_cents, line_cost_cents, score)
+          offer_group, forced, alternatives, unit_cost_cents, line_cost_cents,
+          score)
        select m.id,
               p.value ->> 'slotKey',
               p.value ->> 'pool',
@@ -265,6 +266,7 @@ export async function persistRun(
               (p.value ->> 'perGuest')::boolean,
               (p.value ->> 'dayIndex')::integer,
               (p.value ->> 'position')::integer,
+              p.value ->> 'offerGroup',
               (p.value ->> 'forced')::boolean,
               (p.value ->> 'alternatives')::integer,
               (p.value ->> 'unitCostCents')::integer,
@@ -326,6 +328,11 @@ function encode(
       perGuest: pick.slot.perGuest,
       dayIndex: pick.slot.dayIndex,
       position: pick.slot.position,
+      // db/061. Which set of alternatives this pick belongs to, or null when
+      // the beat offered one candidate. Copied, like every other slot fact
+      // here, because it records what the ENGINE decided — occasion_slot's
+      // offer_count may be edited between the run and the approval.
+      offerGroup: pick.slot.offerGroup ?? null,
       forced: pick.forced,
       alternatives: pick.alternatives,
       unitCostCents: pick.unitCost,
@@ -697,7 +704,8 @@ export async function approve(
   const revelleId = str(made[0].id);
 
   const { rows: picks } = await tx.query(
-    `select pool, entity_id, slot_code, section::text as section, position
+    `select pool, entity_id, slot_code, section::text as section, position,
+            offer_group
        from revelle_proposal_pick where proposal_id = $1
       order by position, slot_key`,
     [input.proposalId]
@@ -719,8 +727,8 @@ export async function approve(
       // materialised minus one of its pools is the same silent thinning the
       // portal read was fixed for, one table upstream.
       `insert into revelle_${spec.table}
-         (revelle_id, ${spec.table}_id, slot, slot_code, position)
-       values ($1, $2, $3::section_kind, $4, $5)
+         (revelle_id, ${spec.table}_id, slot, slot_code, position, offer_group)
+       values ($1, $2, $3::section_kind, $4, $5, $6)
        on conflict do nothing`,
       [
         revelleId,
@@ -728,6 +736,10 @@ export async function approve(
         str(pick.section),
         str(pick.slot_code),
         Number(pick.position),
+        // db/061. Null for everything the house places; the beat's key for a
+        // candidate she chooses between. `chosen_at` is deliberately NOT set
+        // here — approval delivers the offer, it does not make the choice.
+        nullable(pick.offer_group),
       ]
     );
   }

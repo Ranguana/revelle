@@ -982,7 +982,8 @@ async function loadSlotRules(
   const { rows } = await db.query(
     `select os.slot_code, sk.label, sk.description, sk.section, sk.per_guest,
             sk.excluded_by, sk.coherence_group,
-            os.pool, os.min_count, os.max_count, os.required, os.per_day,
+            os.pool, os.min_count, os.max_count, os.offer_count,
+            os.required, os.per_day,
             os.position, os.note
        from occasion_slot os
        join slot_kind sk on sk.code = os.slot_code
@@ -1000,6 +1001,10 @@ async function loadSlotRules(
     pool: str(row.pool),
     minCount: Number(row.min_count),
     maxCount: Number(row.max_count),
+    // db/061. How many candidates this beat OFFERS her; 1 is the house
+    // placing it. Read from the column rather than defaulted here so a
+    // curator changing three to four is a single update.
+    offerCount: Number(row.offer_count ?? 1),
     required: Boolean(row.required),
     perDay: Boolean(row.per_day),
     position: Number(row.position),

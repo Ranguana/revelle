@@ -543,6 +543,23 @@ export type SlotRule = {
   pool: string;
   minCount: number;
   maxCount: number;
+  /**
+   * occasion_slot.offer_count — db/061. HOW MANY CANDIDATES THIS BEAT OFFERS
+   * HER, as an OR and never an AND.
+   *
+   * 1 — the default, and what every slot but the game meant before db/061 —
+   * is the house placing it. 3 means she is shown three and one of them is
+   * hers; all three are delivered, because the OFFER is what uniqueness binds
+   * on and a choice made after delivery must never be refusable.
+   *
+   * It does not interact with minCount/maxCount, which still say how many
+   * ITEMS the beat contains. A slot asking for one to three edit items and
+   * offering one candidate each is three objects; the game slot asking for one
+   * and offering three is one game.
+   *
+   * Optional so a snapshot assembled by hand stays valid, and absent means 1.
+   */
+  offerCount?: number;
   required: boolean;
   perDay: boolean;
   position: number;
@@ -642,6 +659,29 @@ export type UnitSlot = {
   guaranteed?: boolean;
   /** slot_kind.coherence_group — db/022. Carried from the rule unchanged. */
   coherenceGroup?: string | null;
+  /**
+   * WHICH SET OF ALTERNATIVES THIS UNIT BELONGS TO — db/061, and null for
+   * everything the house simply places.
+   *
+   * Units sharing an offerGroup are an OR. She receives all of them and one
+   * of them runs, so they must be read as ONE BEAT wherever the count of
+   * beats matters — the scheduled-game cap in fill.ts is the case that
+   * proves it, and the reason this is a field rather than something derived
+   * from the key at each call site (CLAUDE.md rule 21).
+   *
+   * The first unit of a group carries the beat's `required`; the rest are
+   * optional, which is exactly how a room with two eligible games offers two
+   * without a gap, an error, or a repeat.
+   */
+  offerGroup?: string | null;
+  /**
+   * Where this unit sits in the carousel. 0 for anything not in an offer.
+   *
+   * STAMPED AT PLANNING AND NEVER RECOMPUTED, because CLAUDE.md rule 18 says
+   * the UI may not move the target of a correction: the card she wants has to
+   * be where it was the first time she looked, whatever she has clicked since.
+   */
+  offerIndex?: number;
 };
 
 export type Catalogue = {

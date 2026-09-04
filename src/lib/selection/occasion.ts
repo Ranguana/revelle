@@ -260,31 +260,57 @@ export function planSlots(
     // occasion already carries.
     const guaranteed = guaranteedCodes.has(rule.slotCode);
 
+    // db/061. How many candidates this beat offers her. One is the house
+    // placing it, which is every slot but the game and was every slot at all
+    // before the founder's ruling.
+    const offers = Math.max(1, Math.round(rule.offerCount ?? 1));
+
     for (let day = 1; day <= days; day += 1) {
       for (let n = 0; n < rule.maxCount; n += 1) {
-        slots.push({
-          key: `${rule.slotCode}:${day}:${n}`,
-          slotCode: rule.slotCode,
-          label: rule.perDay
-            ? `${rule.label} — day ${day}`
-            : rule.maxCount > 1
-              ? `${rule.label} ${n + 1}`
-              : rule.label,
-          section: rule.section,
-          pool: rule.pool,
-          required: (rule.required || guaranteed) && n < rule.minCount,
-          quantity: rule.perGuest ? Math.max(1, Math.round(guests ?? 1)) : 1,
-          perGuest: rule.perGuest,
-          dayIndex: rule.perDay ? day : null,
-          position: rule.position * 100 + day * 10 + n,
-          note: rule.note,
-          guaranteed: guaranteed && n < rule.minCount,
-          // db/022. Carried through unchanged: which slots have to agree WITH
-          // EACH OTHER is a property of the slot kind, and expanding a rule
-          // into unit slots must not lose it — the three courses of one day
-          // are one table.
-          coherenceGroup: rule.coherenceGroup ?? null,
-        });
+        // THE BEAT. Every unit below is an alternative WITHIN it, not another
+        // item alongside it — an or, not an and.
+        const beat = `${rule.slotCode}:${day}:${n}`;
+        const offered = offers > 1;
+
+        for (let o = 0; o < offers; o += 1) {
+          slots.push({
+            key: offered ? `${beat}:${o}` : beat,
+            slotCode: rule.slotCode,
+            label: rule.perDay
+              ? `${rule.label} — day ${day}`
+              : rule.maxCount > 1
+                ? `${rule.label} ${n + 1}`
+                : rule.label,
+            section: rule.section,
+            pool: rule.pool,
+            // ONLY THE FIRST CANDIDATE OF AN OFFER IS REQUIRED, and that is
+            // the whole of "where fewer than three are eligible, show what
+            // exists". The second and third are ordinary optional units: a
+            // room with one eligible game fills the first and drops the
+            // others the way any optional slot is dropped — no gap, no
+            // error, no padding, and nothing repeated, because the search
+            // already refuses to place one ingredient twice.
+            required:
+              (rule.required || guaranteed) && n < rule.minCount && o === 0,
+            quantity: rule.perGuest ? Math.max(1, Math.round(guests ?? 1)) : 1,
+            perGuest: rule.perGuest,
+            dayIndex: rule.perDay ? day : null,
+            position: rule.position * 1000 + day * 100 + n * 10 + o,
+            note: rule.note,
+            guaranteed: guaranteed && n < rule.minCount && o === 0,
+            // db/022. Carried through unchanged: which slots have to agree WITH
+            // EACH OTHER is a property of the slot kind, and expanding a rule
+            // into unit slots must not lose it — the three courses of one day
+            // are one table.
+            coherenceGroup: rule.coherenceGroup ?? null,
+            // db/061. Null when the house places it; the beat's key when she
+            // chooses. Read by fill.ts, which must count an offer as one beat
+            // and not as three, and by the portal, which renders it as one
+            // carousel.
+            offerGroup: offered ? beat : null,
+            offerIndex: offered ? o : 0,
+          });
+        }
       }
     }
   }
