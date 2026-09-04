@@ -373,8 +373,19 @@ alter table drink
 -- WHY A TWIN TABLE AND NOT A COLUMN ON `drink`: a drink claims one shape or
 -- two. Programme 1 is "A summer dinner or cocktail party" and programme 5 is "A
 -- rainy lunch or cozy dinner" — she named two shapes in each, and a
--- `meal_shape` column would force one of the two to be dropped. Twenty-two of
--- the seventy-six rows claim two shapes.
+-- `meal_shape` column would force one of the two to be dropped.
+--
+-- NINETEEN of the seventy-six rows claim two shapes. This line said TWENTY-TWO
+-- until the seeder was wired and the count was actually taken (CLAUDE.md rule
+-- 24: reading tells you what it was meant to match, only counting tells you
+-- what it did). Six programmes name two shapes and the rows are their drinks:
+-- 1 (Dinner, Standing drinks) ×3, 5 (Lunch, Dinner) ×3, 9 (Lunch, Standing
+-- drinks) ×3, 11 (Dinner, Lunch) ×3, 18 (Dinner, Lunch) ×3, 24 (Standing
+-- drinks, Dinner) ×4 — 19. The remaining split is 51 rows claiming one shape
+-- and 6 claiming none, which sums to 76 and to the 89 claims
+-- `npm run check:drinks` reports. The wrong number is recorded rather than
+-- quietly replaced because it is evidence about the method: 22 was arrived at
+-- by reading the conversion table, 19 by running the parser over it.
 --
 -- THE CLAIMS ARE CONTENT AND ARE NOT WRITTEN HERE. CLAUDE.md rule 22:
 -- migrations own schema, seeders own content, and a migration that derives rows

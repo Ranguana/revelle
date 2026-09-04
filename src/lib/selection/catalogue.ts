@@ -602,10 +602,22 @@ type PoolSpec = {
    * So `drink.meals` is null here because THE GATE IS NOT LIVE YET, not because
    * the claims do not exist. db/060 §VI names the sequencing and it is the
    * founder's: "the tagging step writes the claims, and the gap reporter must
-   * watch drink coverage per-occasion BEFORE the gate goes live." That watch is
-   * not built. Turning this on first would narrow seventy of seventy-six drinks
-   * with nothing counting what it refused — rule 24 in the direction that ends
-   * in an empty slot on a member's package.
+   * watch drink coverage per-occasion BEFORE the gate goes live."
+   *
+   * SAID PRECISELY, because "the watch is not built" is the wrong half. The
+   * watch IS built — `zeros` in src/lib/catalogue/gates.ts, `WATCHED_POOL =
+   * 'drink'`, loading the catalogue through this very file so it measures the
+   * rows a real run would see. What it cannot see is a MEAL-SHAPE gate: it
+   * enumerates room × occasion, and meal shape comes from the host's own answer
+   * (`mealShape()` in ./table.ts), so no occasion the watch iterates carries
+   * one. db/060 §VI added `occasion_meal` to supply exactly that join and
+   * NOTHING READS IT YET. So the order is: teach `zeros` to iterate occasion ×
+   * meal shape through `occasion_meal`, read the zeros, then set this field.
+   *
+   * Turning it on first would narrow seventy of seventy-six drinks with nothing
+   * counting what it refused — rule 24 in the direction that ends in an empty
+   * slot on a member's package, and the founder's own words about it are quoted
+   * at the top of gates.ts.
    */
   meals: string | null;
   /** game.shape — db/010. Only the game pool has one. */
@@ -713,10 +725,11 @@ const POOLS: { readonly [P in StockedPool]: PoolSpec } = {
     making: "making",
     // `drink_meal` EXISTS AND IS FILLED, AND IS DELIBERATELY NOT READ HERE.
     // Read the note on `meals` in the type above before changing this to
-    // "drink_meal": the claims are seeded, the per-occasion coverage watch
-    // db/060 §VI requires before the gate goes live is not built, and a gate
-    // that narrows seventy of seventy-six rows with nothing counting what it
-    // refused is how a thin catalogue becomes an empty package.
+    // "drink_meal": the claims are seeded, and the watch that must see what
+    // this gate refuses cannot see a meal shape yet — `occasion_meal` is the
+    // join db/060 §VI added for it and nothing reads that either. A gate that
+    // narrows seventy of seventy-six rows with nothing counting what it refused
+    // is how a thin catalogue becomes an empty package.
     meals: null,
     shape: null,
     printed: null,
