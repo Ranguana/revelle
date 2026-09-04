@@ -218,6 +218,23 @@ export type GameOccasionClaim = {
   note?: string;
 };
 
+/**
+ * WHICH BEAT A GAME MAY FILL — and since db/061, that is `game` for all of them.
+ *
+ * A claim here is a WHITELIST: `slotEligibility` in src/lib/selection/occasion.ts
+ * reads any `native` row as "these slots and no others". That is why the
+ * collapse had to be authored and not merely migrated. db/061 removed the
+ * `occasion_slot` rows for `the_moment`, `honouring`, `day_material`,
+ * `ambient_game` and `finale`, so eleven games — six ambient, five finale —
+ * were left claiming beats no occasion has. They would not have thrown, gone
+ * red, or reported anything. They would simply have stopped being placeable,
+ * and forty-one per cent of the catalogue would have gone quiet.
+ *
+ * So every game now claims `game`. The claims on the five retired beats are
+ * KEPT (CLAUDE.md rule 14): they are the authored judgement about what kind of
+ * thing each game is, they cost nothing while no occasion asks for those
+ * slots, and they are what a re-enabled beat would be filled from.
+ */
 export type GameSlotClaim = { slotCode: string; fit: GameFit; note?: string };
 
 /**
@@ -1641,6 +1658,11 @@ const SECRET_GAME_CARDS: Game = {
   ],
   slots: [
     {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    {
       slotCode: "ambient_game",
       fit: "native",
       note: "The only slot it can fill, and the only shape that slot accepts.",
@@ -1972,6 +1994,11 @@ const THE_SECRET_AUCTION: Game = {
     },
   ],
   slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
     {
       slotCode: "finale",
       fit: "native",
@@ -2955,7 +2982,14 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
       note: "Two people and a pad is not a tally, it is a conversation with a step in the way.",
     },
   ],
-  slots: [{ slotCode: "ambient_game", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "ambient_game", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -3853,7 +3887,14 @@ const NEW_YORK_THE_LIST: Game = {
       note: "A list of things that will not be repeated, at a shower, reads as a warning.",
     },
   ],
-  slots: [{ slotCode: "finale", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "finale", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -4142,7 +4183,14 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
       note: "Two people, one of whom clears. That is not a game, it is Tuesday.",
     },
   ],
-  slots: [{ slotCode: "ambient_game", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "ambient_game", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -5186,7 +5234,14 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
       note: "It is written before leaving and settled on the way back, and a dinner party does neither.",
     },
   ],
-  slots: [{ slotCode: "ambient_game", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "ambient_game", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -5424,7 +5479,14 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
       note: "It is written at breakfast and settled at the top of a mountain.",
     },
   ],
-  slots: [{ slotCode: "ambient_game", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "ambient_game", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -6227,7 +6289,14 @@ const ACAPULCO_THE_LAST_SONG: Game = {
       note: "Two people naming the last song, one of whom gets thrown in.",
     },
   ],
-  slots: [{ slotCode: "finale", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "finale", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -6805,7 +6874,14 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
       note: "Five prizes and two people. Somebody is opening four of them.",
     },
   ],
-  slots: [{ slotCode: "finale", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "finale", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -7340,7 +7416,14 @@ const ASPEN_THE_NEXT_LINE: Game = {
       note: "It needs something playing that everybody is half-watching, which is not a dinner party.",
     },
   ],
-  slots: [{ slotCode: "ambient_game", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "ambient_game", fit: "native" },
+  ],
 
   supplies: [
     {
@@ -7586,7 +7669,14 @@ const PALM_SPRINGS_THE_BEST_LINE: Game = {
       note: "Two people, neither of whom may repeat their own line.",
     },
   ],
-  slots: [{ slotCode: "finale", fit: "native" }],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "finale", fit: "native" },
+  ],
 
   supplies: [],
   requirements: [{ requirement: "printing" }],
