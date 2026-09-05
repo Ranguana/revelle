@@ -760,8 +760,29 @@ export function fillSlots(
       // candidate at a time — the second-best dish at her rung must beat the
       // best dish one rung off, and a per-candidate test would let score decide
       // that.
-      let rungForThisCourse: string | null = null;
-      if (group !== null && rungHeld !== null) {
+      //
+      // AND THE FALLBACK IS FOR THE BEAT, NOT FOR ITS SPARE CARDS — db/062.
+      //
+      // "A table with a main in it at the wrong rung beats a table with no
+      // main" is the argument, and it is an argument about the beat being
+      // EMPTY. It does not transfer to the second and third cards of an offer,
+      // which is db/061's own rule ("only the first candidate of an offer is
+      // required") arriving on the coherence axis.
+      //
+      // Left unfixed, a room with two dishes at her rung and a third one rung
+      // off deals her that third as a card she may take — so a host who said
+      // she wanted a half-made evening is offered a day of stock, and taking it
+      // is the product handing her the thing she declined. Rule 16: the answer
+      // she gave has to bind at the point she can act on it, and where the
+      // rung leaves nothing, SHE IS OFFERED FEWER. Two cards is the honest
+      // number; a third at the wrong rung is not a richer choice.
+      const spareCard =
+        group !== null &&
+        (slot.offerGroup ?? null) !== null &&
+        (slot.offerIndex ?? 0) > 0;
+      let rungForThisCourse: string | null =
+        spareCard && rungHeld !== null ? rungHeld : null;
+      if (group !== null && rungHeld !== null && !spareCard) {
         for (const rung of rungPreference(rungHeld)) {
           const reachable = entry.candidates.some((candidate) => {
             const axes = axesOf(candidate.ingredient);

@@ -5,221 +5,54 @@
  * do want to do is give a host three ga[m]es to choose from. as an or not an
  * and. like a carousel look."
  *
- * ── WHY THIS READS THE MIGRATIONS ───────────────────────────────────
+ * ── WHERE THE REPLAY WENT ───────────────────────────────────────────
  *
- * `occasion_slot` is a TABLE, and the ruling is a fact about its contents. The
- * honest place to check a fact about contents is a database, and `npm test`
- * has none — the db-gated tests skip without a `*_TEST_DATABASE_URL` and CI's
- * `smoke:seeders` builds a scratch one, which under CLAUDE.md rule 33 is a
- * different question anyway.
+ * The migration replay this file used to carry now lives in
+ * `src/lib/occasion-slot-replay.ts`, unchanged in behaviour and extended to
+ * follow `offer_count`. db/062 made "three per course" a second ruling about
+ * the same table, `src/lib/three-per-course.test.ts` asserts it, and two
+ * replays of one chain would drift in the worst possible way — each green
+ * about a different reading of the same files (CLAUDE.md rule 21).
  *
- * So this replays the migrations' own statements, in the order the runner
- * applies them, and asserts the ruling against the result. That is a strictly
- * weaker claim than reading production and it says so: it proves THE COMMITTED
- * CHAIN produces one game beat per occasion, which is what a future migration
- * would break and what nothing else would catch. It does not prove production
- * holds it; `/api/health` and the deploy log's own count (db/061 section 0) are
- * where that is read. CLAUDE.md rule 31: where a number is read from belongs in
- * the label.
- *
- * ── AND IT REFUSES TO GUESS ─────────────────────────────────────────
- *
- * A replay is only worth anything if it understands every statement it
- * replays. Two `delete from occasion_slot` predicates exist in db/ today and
- * both are handled below; a third one this parser cannot read FAILS THE TEST
- * rather than being skipped. A parser that silently ignored a statement would
- * report a clean chain and mean nothing — CLAUDE.md rule 24, count what it
- * matched.
+ * The argument for replaying migrations at all, and for refusing to guess at a
+ * statement, is written at the top of that module.
  */
 
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const DIR = new URL("../../db/", import.meta.url).pathname;
+import {
+  MIGRATION_CODE,
+  OCCASIONS,
+  replayOccasionSlots,
+  type OccasionSlotRow,
+} from "./occasion-slot-replay.ts";
 
-const FILES = readdirSync(DIR)
-  .filter((name) => name.endsWith(".sql"))
-  .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
-
-const SOURCE = new Map(
-  FILES.map((name) => [name, readFileSync(`${DIR}${name}`, "utf8")] as const)
-);
-
-/**
- * THE STATEMENTS, WITHOUT THE PROSE.
- *
- * Not a nicety. These files argue at length and the arguments contain
- * semicolons and every identifier the assertions below look for, so a regex
- * over the raw text reads a paragraph about `compute_assemblage_fingerprint`
- * as a call to it and stops an insert at a semicolon in a sentence. Both
- * happened before this function existed.
- *
- * A scanner rather than a `replace`, because `--` inside a quoted string is
- * not a comment and `''` inside one is not the end of it. Same shape as
- * `sqlStatements` in src/lib/games.test.ts.
- */
-function code(sql: string): string {
-  let out = "";
-  let i = 0;
-  while (i < sql.length) {
-    const c = sql[i];
-    if (c === "'") {
-      out += c;
-      i += 1;
-      while (i < sql.length) {
-        if (sql[i] === "'" && sql[i + 1] === "'") {
-          out += "''";
-          i += 2;
-        } else if (sql[i] === "'") {
-          out += "'";
-          i += 1;
-          break;
-        } else {
-          out += sql[i];
-          i += 1;
-        }
-      }
-      continue;
-    }
-    if (c === "-" && sql[i + 1] === "-") {
-      const nl = sql.indexOf("\n", i);
-      i = nl === -1 ? sql.length : nl;
-      continue;
-    }
-    out += c;
-    i += 1;
-  }
-  return out;
-}
-
-const CODE = new Map([...SOURCE].map(([name, sql]) => [name, code(sql)] as const));
+const CODE = MIGRATION_CODE;
 
 const DB061 = "061-one-game-and-she-picks-it.sql";
 
-/** db/001's occasion_type, which is the list of occasions there are. */
-const OCCASIONS = [
-  ...(
-    /create type occasion_type as enum \(([^)]*)\)/.exec(
-      CODE.get("001-schema.sql") ?? ""
-    )?.[1] ?? ""
-  ).matchAll(/'([a-z_]+)'/g),
-].map((m) => m[1]);
-
 /* ── replaying occasion_slot ────────────────────────────────────────── */
 
-type Row = { occasion: string; slotCode: string; pool: string };
+type Row = OccasionSlotRow;
 
 /**
- * Every occasion_slot row the committed chain leaves behind.
+ * Every occasion_slot row the committed chain leaves behind, with the counts
+ * that prove the parser matched something.
  *
- * Inserts are read positionally out of the VALUES tuples — every one of the
- * six `insert into occasion_slot` statements in db/ names the same nine
- * columns in the same order, and the parser asserts that rather than assuming
- * it, because a seventh statement with a different column list would otherwise
- * be read as nonsense with total confidence.
+ * Rule 24 in its smallest form: a parser that matched nothing would make every
+ * assertion below pass by having nothing to compare against.
  */
 function occasionSlots(): Map<string, Row> {
-  const rows = new Map<string, Row>();
-  let inserts = 0;
-  let deletes = 0;
+  const replay = replayOccasionSlots();
 
-  for (const name of FILES) {
-    const sql = CODE.get(name) ?? "";
-
-    /*
-      IN THE ORDER THEY APPEAR, WHICH IS THE ORDER POSTGRES RUNS THEM.
-
-      This loop collected every insert and then every delete before it did
-      this, and the bug was invisible in exactly the way rule 24 describes: on
-      the chain as committed, the two happen to commute, so the replay produced
-      the right answer for the wrong reason and the test was GREEN AGAINST A
-      DELIBERATE BREAK. db/061 deletes at its line 286 and inserts at its line
-      300; the delete only removes rows the inserts do not write, so nothing
-      looked wrong until a second game beat was added by hand to see the test
-      go red and it did not.
-
-      Found by breaking it on purpose. CLAUDE.md rule 21's last paragraph is
-      the procedure and this is what it is for.
-    */
-    const statements: { at: number; kind: "insert" | "delete"; m: RegExpMatchArray }[] =
-      [];
-    for (const m of sql.matchAll(
-      /insert into occasion_slot\s*\(([^)]*)\)\s*values([\s\S]*?);/g
-    )) {
-      statements.push({ at: m.index ?? 0, kind: "insert", m });
-    }
-    for (const m of sql.matchAll(/delete from occasion_slot([^;]*);/g)) {
-      statements.push({ at: m.index ?? 0, kind: "delete", m });
-    }
-    statements.sort((a, b) => a.at - b.at);
-
-    for (const statement of statements) {
-      const m = statement.m;
-
-      if (statement.kind === "insert") {
-        const columns = m[1].split(",").map((c) => c.trim());
-        assert.deepEqual(
-          columns.slice(0, 3),
-          ["occasion", "slot_code", "pool"],
-          `db/${name}: this test reads occasion_slot inserts positionally and ` +
-            `this statement's first three columns are ${columns.slice(0, 3)}.`
-        );
-        inserts += 1;
-
-        for (const tuple of m[2].matchAll(
-          /\(\s*'([a-z_]+)'\s*,\s*'([a-z_]+)'\s*,\s*'([a-z_]+)'/g
-        )) {
-          const row = { occasion: tuple[1], slotCode: tuple[2], pool: tuple[3] };
-          // `on conflict do nothing` on every re-insert in db/, so an existing
-          // key wins. Replayed the same way.
-          const key = `${row.occasion}/${row.slotCode}`;
-          if (!rows.has(key)) rows.set(key, row);
-        }
-        continue;
-      }
-
-      deletes += 1;
-      const where = m[1].trim();
-
-      // db/022 — the set menu, retired from selection.
-      const byCode = /^where slot_code = '([a-z_]+)'$/.exec(where);
-      if (byCode) {
-        for (const [key, row] of rows) {
-          if (row.slotCode === byCode[1]) rows.delete(key);
-        }
-        continue;
-      }
-
-      // db/061 — the collapse. Every beat drawing from the game pool except
-      // the game itself.
-      const collapse =
-        /^where pool = '([a-z_]+)' and slot_code <> '([a-z_]+)'$/.exec(where);
-      if (collapse) {
-        for (const [key, row] of rows) {
-          if (row.pool === collapse[1] && row.slotCode !== collapse[2]) {
-            rows.delete(key);
-          }
-        }
-        continue;
-      }
-
-      assert.fail(
-        `db/${name} deletes from occasion_slot with a predicate this test ` +
-          `cannot replay: "${where}". Teach it the predicate — a parser that ` +
-          `skipped a statement would report a chain it never read.`
-      );
-    }
-  }
-
-  // Rule 24 in its smallest form: a parser that matched nothing would make
-  // every assertion below pass by having nothing to compare against.
-  assert.ok(inserts >= 5, `parsed ${inserts} occasion_slot inserts`);
-  assert.ok(deletes >= 2, `parsed ${deletes} occasion_slot deletes`);
-  assert.ok(rows.size >= 40, `replayed ${rows.size} occasion_slot rows`);
+  assert.ok(replay.inserts >= 5, `parsed ${replay.inserts} occasion_slot inserts`);
+  assert.ok(replay.deletes >= 2, `parsed ${replay.deletes} occasion_slot deletes`);
+  assert.ok(replay.rows.size >= 40, `replayed ${replay.rows.size} occasion_slot rows`);
   assert.equal(OCCASIONS.length, 9, `parsed ${OCCASIONS.length} occasions`);
 
-  return rows;
+  return new Map(replay.rows);
 }
 
 /* ── the ruling ─────────────────────────────────────────────────────── */

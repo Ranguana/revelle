@@ -4,8 +4,8 @@ import type { QueryResultRow } from "pg";
 
 import { transaction } from "@/lib/db";
 import { composed } from "@/lib/desk/publish";
+import { chooseStatement } from "@/lib/portal/choice";
 import { OPENABLE } from "@/lib/portal/occasions";
-import { idColumnFor, tablesFor, type EntityTable } from "@/lib/pools/registry";
 
 /**
  * TAKING ONE OF THE CARDS — db/061's write, extended to every pool by db/062.
@@ -124,45 +124,6 @@ export async function chooseInOffer(input: {
     if (err instanceof Rollback) return false;
     throw err;
   });
-}
-
-/**
- * THE STATEMENT, AS A TEMPLATE AND THE THREE NAMES IT NEEDS.
- *
- * Separated from the write so that the composition can be driven by a test on
- * a machine with no database — `npm test` has none, and the shape of this
- * statement is exactly what a second pool would get wrong (CLAUDE.md rule 21's
- * last paragraph: seed the case, drive the surface the way production drives
- * it).
- *
- * Null for anything the registry does not issue.
- *
- * THE `case` IS THE WHOLE OF "AN OR, NOT AN AND": every row of the offer is
- * set in one pass, the pressed card to `now()` and its siblings to null, so
- * there is no instant at which two are chosen and none at which none is.
- */
-export function chooseStatement(
-  pool: string
-): { template: string; identifiers: string[] } | null {
-  const entity = tablesFor(pool);
-  if (!entity?.joinTable) return null;
-
-  const idColumn = idColumnFor(entity.pool as EntityTable);
-
-  return {
-    template:
-      "update %I j" +
-      " set chosen_at = case when t.slug = $4 then now() else null end" +
-      " from %I t, revelle r" +
-      " where t.id = j.%I" +
-      " and r.id = j.revelle_id" +
-      " and j.revelle_id = $2" +
-      " and r.customer_id = $1" +
-      " and r.status = any($5::revelle_status[])" +
-      " and j.offer_group = $3" +
-      " returning j.%I as entity_id, t.slug, j.chosen_at",
-    identifiers: [entity.joinTable, entity.pool, idColumn, idColumn],
-  };
 }
 
 /** Not an error anybody reports. It is how the statement above is undone. */

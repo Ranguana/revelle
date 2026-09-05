@@ -127,6 +127,91 @@ test("pieces outside an offer are untouched, in place", () => {
   );
 });
 
+/* ── and the same page carries four of them — db/062 ────────────────── */
+
+test("three per course: each course is its own offer, in delivery order", () => {
+  // Founder, 2026-09-05: "three per course". Nothing in this module changed
+  // for it — the beats are keyed by `offerGroup` and it has never asked which
+  // pool a piece came from — and that is what this asserts.
+  const entries = entriesIn([
+    piece({ name: "Clams casino", pool: "dish", heading: "The first course", offerGroup: "the_appetizer:1:0" }),
+    piece({ name: "Rumaki", pool: "dish", heading: "The first course", offerGroup: "the_appetizer:1:0" }),
+    piece({ name: "Stuffed celery", pool: "dish", heading: "The first course", offerGroup: "the_appetizer:1:0" }),
+    piece({ name: "Lobster thermidor", pool: "dish", heading: "The main course", offerGroup: "the_main:1:0" }),
+    piece({ name: "Beef Wellington", pool: "dish", heading: "The main course", offerGroup: "the_main:1:0" }),
+    piece({ name: "Baked alaska", pool: "dish", heading: "The last course", offerGroup: "the_dessert:1:0" }),
+    piece({ name: "Peach melba", pool: "dish", heading: "The last course", offerGroup: "the_dessert:1:0" }),
+    piece({ name: "Lemon ice", pool: "dish", heading: "The last course", offerGroup: "the_dessert:1:0" }),
+  ]);
+
+  assert.deepEqual(
+    entries.map((e) => (e.kind === "offer" ? e.offer.group : "piece")),
+    ["the_appetizer:1:0", "the_main:1:0", "the_dessert:1:0"],
+    "three beats, in the order the courses are eaten — one carousel per " +
+      "course and never one carousel of nine"
+  );
+  assert.deepEqual(
+    entries.map((e) => (e.kind === "offer" ? e.offer.cards.length : 0)),
+    [3, 2, 3],
+    "and the main shows the two that exist, with nothing padded to three"
+  );
+  assert.ok(
+    entries.every((e) => e.kind === "offer" && e.offer.pool === "dish"),
+    "the pool is a fact about the beat: occasion_slot.pool is one column"
+  );
+});
+
+test("the game and the courses sit on one page without touching", () => {
+  const entries = entriesIn([
+    piece({ name: "Rumaki", pool: "dish", heading: "The first course", offerGroup: "the_appetizer:1:0" }),
+    piece({ name: "Clams casino", pool: "dish", heading: "The first course", offerGroup: "the_appetizer:1:0" }),
+    piece({ name: "The centrepiece", pool: "product", heading: "The table" }),
+    piece({ name: "Art Battle", offerGroup: "game:1:0" }),
+    piece({ name: "Fishbowl", offerGroup: "game:1:0" }),
+  ]);
+
+  assert.deepEqual(
+    entries.map((e) =>
+      e.kind === "offer" ? `offer:${e.offer.pool}` : `piece:${e.piece.pool}`
+    ),
+    ["offer:dish", "piece:product", "offer:game"],
+    "each beat folds where it sits. A second pool offering a choice does not " +
+      "gather the offers together or move a piece the house placed (rule 18)"
+  );
+});
+
+test("choosing a main leaves the appetizer's cards exactly as they were", () => {
+  // The mix-and-match case, on the side she sees. Her three choices are three
+  // independent beats: taking a main marks one card in one carousel and
+  // touches nothing else on the page.
+  const before = [
+    piece({ name: "Rumaki", pool: "dish", offerGroup: "the_appetizer:1:0" }),
+    piece({ name: "Clams casino", pool: "dish", offerGroup: "the_appetizer:1:0" }),
+    piece({ name: "Lobster thermidor", pool: "dish", offerGroup: "the_main:1:0" }),
+    piece({ name: "Beef Wellington", pool: "dish", offerGroup: "the_main:1:0" }),
+  ];
+  const after = before.map((p) =>
+    p.name === "Beef Wellington" ? { ...p, chosen: true } : p
+  );
+
+  const one = entriesIn(before);
+  const two = entriesIn(after);
+  if (one[0].kind !== "offer" || two[0].kind !== "offer") assert.fail("offers");
+  else {
+    assert.deepEqual(
+      two[0].offer.cards.map((c) => [c.name, c.chosen]),
+      one[0].offer.cards.map((c) => [c.name, c.chosen]),
+      "the first course is untouched — same cards, same order, same marks"
+    );
+    assert.equal(two[0].offer.settled, false, "and still unsettled");
+  }
+  if (two[1].kind !== "offer") assert.fail("the main is an offer");
+  else {
+    assert.deepEqual(two[1].offer.cards.map((c) => c.chosen), [false, true]);
+    assert.equal(two[1].offer.settled, true);
+  }
+});
+
 /* ── where things sit ───────────────────────────────────────────────── */
 
 test("CHOOSING MARKS A CARD IN PLACE AND MOVES NOTHING", () => {

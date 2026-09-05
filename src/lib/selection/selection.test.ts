@@ -3228,6 +3228,272 @@ test("the table: nothing repeats within it", () => {
   assert.equal(new Set(names).size, names.length);
 });
 
+/* ─────────────────────────────────────────────────────────────────────
+ * THREE PER COURSE — db/062
+ *
+ * Founder, 2026-09-05: "lets give 3 menu options (if member wants) like we do
+ * for games", then "three per course".
+ *
+ * The mechanism is db/061's, unchanged and pointed at a second pool, so what
+ * is asserted here is not that the carousel works — selection.test.ts already
+ * proves that against the game beat — but the two things that are TRUE OF
+ * DISHES AND NOT OF GAMES:
+ *
+ *   · a game is one unit; three courses answer each other, so the coherence
+ *     group has to bind the whole OFFER and not merely the pick, or she can
+ *     assemble a table the house would never have set;
+ *   · the dish pool is deep in most rooms and thin in a few, and the thin ones
+ *     must show what exists rather than pad, repeat or fail.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/** The same three courses, each offering three. db/062. */
+const COURSES_OFFERED: SlotRule[] = COURSE_RULES.map((r) => ({
+  ...r,
+  offerCount: 3,
+}));
+
+function offeredTableFor(
+  dishes: Ingredient[],
+  season: string | null = null
+) {
+  const vector = buildVector([stated(COASTAL)], [], [], FACETS, OPTIONS);
+  const slots = planSlots(COURSES_OFFERED, SHAPE, SCALE).slots;
+  const pools = scopePools(
+    slots,
+    dishes,
+    destination("d1", "SOMEWHERE", {}),
+    "dinner_party",
+    vector.weights,
+    vector.dealbreakers,
+    (id) => FACETS[id]?.label ?? id,
+    SCALE,
+    null,
+    OPTIONS,
+    OPTIONS.now!,
+    null,
+    season
+  );
+  return fillSlots(pools, SCALE, SHAPE, OPTIONS, { season });
+}
+
+/**
+ * n dishes of one course, all agreeing with everything.
+ *
+ * TAGGED, and that is not decoration. An optional unit is skipped when nothing
+ * in it scores above zero (fill.ts), and an untagged ingredient scores exactly
+ * zero by construction — so a pool of untagged dishes would offer one card per
+ * course and prove nothing about the carousel. Real dishes carry facets
+ * (db/021's `dish_facet`); these carry one, at descending weights, so the
+ * order of the cards is decided and stable.
+ *
+ * The similarity discount is deliberately in play here rather than designed
+ * around: it is PROPORTIONAL (score.ts) and cannot flip a candidate's sign, so
+ * the second and third cards of a course are worth less than the first and are
+ * still worth offering. That is the property the carousel rests on.
+ */
+function spread(course: string, n: number, making = "half_made"): Ingredient[] {
+  return Array.from({ length: n }, (_, i) =>
+    dish(`${course}-${i}`, `${course} ${i}`, course, making, {
+      facets: { [COASTAL.id]: 1 - i * 0.1 },
+    })
+  );
+}
+
+test("three per course is NINE units of THREE beats — an or, not an and", () => {
+  const slots = planSlots(COURSES_OFFERED, SHAPE, SCALE).slots;
+
+  assert.equal(slots.length, 9, "three candidates at each of three courses");
+  assert.equal(
+    new Set(slots.map((s) => s.offerGroup)).size,
+    3,
+    "and three beats. She eats three dishes and is shown nine"
+  );
+  assert.deepEqual(
+    slots.filter((s) => s.required).map((s) => s.slotCode),
+    ["the_appetizer", "the_main", "the_dessert"],
+    "only the first card of each course is required, which is the whole of " +
+      "'where fewer than three are eligible, show what exists'"
+  );
+  assert.ok(
+    slots.every((s) => s.coherenceGroup === "the_table"),
+    "and all nine are one table — db/022's group survives the expansion, " +
+      "which is what stops her assembling a summer main and a winter dessert"
+  );
+});
+
+test("THE WHOLE OFFER IS ONE TABLE: every card agrees on season", () => {
+  // THE QUESTION DISHES RAISE AND GAMES DO NOT. She mixes and matches after
+  // delivery, so it is not enough for the three courses the house would have
+  // chosen to agree — all NINE have to, or some combination she can assemble
+  // is a table nobody would have set.
+  //
+  // Nothing was added for this. db/022 commits the group's season on the first
+  // card placed and every card after it is refused if it disagrees, offered or
+  // not, which is why db/062 adds no coherence rule of its own.
+  const fill = offeredTableFor(
+    [
+      ...spread("the_appetizer", 3),
+      ...spread("the_main", 2),
+      // Tagged well enough to be offered on every other axis, so the only
+      // thing that can keep it off her table is the season. An untagged dish
+      // would be dropped as a weak match and this test would pass for the
+      // wrong reason (rule 21's last paragraph — proved by making it
+      // year_round and watching this go red).
+      dish("m-winter", "Venison stew", "the_main", "half_made", {
+        season: "winter",
+        facets: { [COASTAL.id]: 1 },
+      }),
+      ...spread("the_dessert", 2),
+      dish("d-winter", "Chestnut cake", "the_dessert", "half_made", {
+        season: "winter",
+        facets: { [COASTAL.id]: 1 },
+      }),
+    ],
+    "summer"
+  );
+
+  const offered = fill.picks.map((p) => p.ingredient.name);
+  assert.ok(
+    !offered.includes("Venison stew") && !offered.includes("Chestnut cake"),
+    `a winter dish was offered at a summer table: ${offered.join(", ")}. ` +
+      `The card she is shown is a card she may take, so a card that cannot ` +
+      `sit at her table must never be dealt.`
+  );
+});
+
+test("THE WHOLE OFFER IS ONE TABLE: every card agrees on the rung", () => {
+  // The same argument on the second coherence axis. Her one making answer
+  // governs every course (db/016), and with three per course it has to govern
+  // all nine cards — otherwise she can pick a bought-and-arranged appetizer
+  // beside a main that wants a day of cooking, on a night she said she wanted
+  // neither.
+  const fill = offeredTableFor(
+    [
+      ...spread("the_appetizer", 3, "half_made"),
+      ...spread("the_main", 2, "half_made"),
+      // Best-scoring main in the pool, so the rung is the only thing that can
+      // refuse it. Same guard as the season test above.
+      dish("m-made", "A day of stock", "the_main", "actually_made", {
+        facets: { [COASTAL.id]: 1 },
+      }),
+      ...spread("the_dessert", 3, "half_made"),
+    ],
+    null
+  );
+
+  const rungs = new Set(fill.picks.map((p) => p.ingredient.making));
+  assert.deepEqual(
+    [...rungs],
+    ["half_made"],
+    "one rung across all nine cards, not one rung across the three she takes"
+  );
+});
+
+test("A SPARE CARD IS NEVER OFFERED AT A RUNG SHE DID NOT ASK FOR", () => {
+  // db/022's rung fallback exists so a REQUIRED course is not empty: "a table
+  // with a main in it at the wrong rung beats a table with no main." That
+  // argument is about the beat being empty and does not reach the beat's
+  // second and third cards — db/061's "only the first candidate of an offer is
+  // required", arriving on the coherence axis.
+  //
+  // Two half-made mains and one that wants a day of stock. Before this was
+  // fixed the third card was dealt at the wrong rung, so a host who said she
+  // wanted a half-made evening could press a button and get the thing she
+  // declined — rule 16, at the one point she can act on it.
+  const fill = offeredTableFor([
+    ...spread("the_appetizer", 3, "half_made"),
+    ...spread("the_main", 2, "half_made"),
+    dish("m-made", "A day of stock", "the_main", "actually_made", {
+      facets: { [COASTAL.id]: 1 },
+    }),
+    ...spread("the_dessert", 3, "half_made"),
+  ]);
+
+  const mains = fill.picks.filter((p) => p.slot.slotCode === "the_main");
+  assert.deepEqual(
+    mains.map((p) => p.ingredient.making),
+    ["half_made", "half_made"],
+    "two cards at her rung, and a third at another rung is not a richer " +
+      "choice — she is offered fewer, and that is the honest number"
+  );
+  assert.equal(
+    fill.gaps.length,
+    0,
+    "and offering two is not a work order for the house"
+  );
+});
+
+test("three per course never repeats a dish, within a course or across them", () => {
+  const fill = offeredTableFor([
+    ...spread("the_appetizer", 5),
+    ...spread("the_main", 5),
+    ...spread("the_dessert", 5),
+  ]);
+
+  assert.equal(fill.picks.length, 9, "nine cards from a pool that has them");
+  const ids = fill.picks.map((p) => p.ingredient.id);
+  assert.equal(
+    new Set(ids).size,
+    9,
+    "nothing is padded out to make up a number and nothing is dealt twice"
+  );
+  for (const course of ["the_appetizer", "the_main", "the_dessert"]) {
+    assert.equal(
+      fill.picks.filter((p) => p.slot.slotCode === course).length,
+      3,
+      `${course} offers three`
+    );
+  }
+});
+
+test("A ROOM WITH ONE DESSERT OFFERS ONE, AND THAT IS NOT A GAP", () => {
+  // St. Moritz has one main and one dessert in docs/dishes.md, and Palm
+  // Springs refuses a main course outright — CLAUDE.md rule 30, founder's
+  // ruling, "the room working, not a gap". So this is not a hypothetical:
+  // the second and third cards are ordinary optional units and are dropped the
+  // way any optional slot is dropped.
+  const fill = offeredTableFor([
+    ...spread("the_appetizer", 3),
+    ...spread("the_main", 2),
+    dish("d-only", "The one dessert", "the_dessert", "half_made", {
+      facets: { [COASTAL.id]: 1 },
+    }),
+  ]);
+
+  assert.deepEqual(
+    fill.picks.filter((p) => p.slot.slotCode === "the_dessert").length,
+    1,
+    "one is what exists, so one is what shows"
+  );
+  assert.deepEqual(
+    fill.picks.filter((p) => p.slot.slotCode === "the_main").length,
+    2,
+    "and two where two exist"
+  );
+  assert.equal(
+    fill.gaps.length,
+    0,
+    "AND NOT A GAP. A room with one dessert is a room with one dessert, not a " +
+      "work order for the house — and one gap per beat, never one per card"
+  );
+});
+
+test("a course with nothing at all is ONE gap, not three", () => {
+  const fill = offeredTableFor([
+    ...spread("the_appetizer", 3),
+    ...spread("the_main", 3),
+  ]);
+
+  const dessert = fill.gaps.filter((g) => g.slotCode === "the_dessert");
+  assert.equal(
+    dessert.length,
+    1,
+    "a gap is a work order — the pool could not fill a beat her occasion has " +
+      "— and a list that says three things are missing when one is has " +
+      "stopped being a count of anything"
+  );
+});
+
 test("what a dish is for: no claim means every shape, any claim is a whitelist", () => {
   const dishes = [
     dish("a1", "Untagged", "the_appetizer", "half_made"),
