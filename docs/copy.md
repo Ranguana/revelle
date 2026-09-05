@@ -7,7 +7,20 @@ Draft. Not committed.
 
 ---
 
-## Hero — still open, see notes
+## Hero — SUPERSEDED 2026-09-05, and the old one is kept below
+
+Founder: *"it shouldnt open with westhampton 1976. just move this line up:
+Westhampton, 1976. Portofino, off-season. Your dining room, Saturday."*
+
+The hero as recorded below opened with one destination's name, in that
+destination's palette. That sells a location, which is the one thing this
+product does not sell — CLAUDE.md rule 2, read from the front of the house.
+What ships now leads with the three settings and ends on her own dining room,
+on the HOUSE ground; the destination's name and its index moved to the worked
+example lower down, where they were already running.
+
+The version below is preserved rather than edited, because the argument for it
+was good and is the argument somebody will make again.
 
 > **Revelle Société**
 >
@@ -44,7 +57,22 @@ it, and it rotates each season without a rewrite.
 
 ---
 
-## The destinations
+## The destinations — CUT 2026-09-05
+
+Founder: *"you have all the destinations on the landing page but they dont
+click anywhere, I think its better we dont show the destinations (except for
+westhampton i guess as an example toward the bottom)."*
+
+Two faults, and the second is the one that matters. None of the plates linked
+anywhere, so a visitor who tried one got nothing. And a menu of named rooms
+asks *which one do I want?*, when she does not pick — the house assigns the
+room from her answers (`docs/selection-spec.md`, "she does not pick"). The
+shelf was quietly teaching the opposite of how the product works.
+
+The section below is the copy as it stood. Nothing was deleted from the
+codebase: `LIBRARY`, `POSTERS` and `DestinationPlates.tsx` are all still there,
+and a route that gives a destination a page of its own is what would bring the
+shelf back.
 
 > **Destination No. 02 — The long dinner**
 > **Destination No. 07 — …**

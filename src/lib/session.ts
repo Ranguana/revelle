@@ -191,6 +191,14 @@ export async function redeemSignInToken(
 
   // Single use and short lived in ONE statement. Not a select followed by an
   // update: two clicks racing on the same link must not both succeed.
+  //
+  // `purpose = 'sign_in'` is the third condition and it is not decoration.
+  // db/063 put a second kind of link in this table — a confirmation, which
+  // proves an applicant's address and opens NOTHING. Without this clause a
+  // confirmation clicked at /login/[token] would be spent here and thrown
+  // away, and she would be told to ask for another note she had never used.
+  // Each purpose has exactly one redeemer, and this is how that is true rather
+  // than merely intended.
   const consumed = await db.query<{
     staff_id: string | null;
     customer_id: string | null;
@@ -198,6 +206,7 @@ export async function redeemSignInToken(
     `update sign_in_token
         set consumed_at = now()
       where token_hash = $1
+        and purpose = 'sign_in'
         and consumed_at is null
         and expires_at > now()
       returning staff_id, customer_id`,
