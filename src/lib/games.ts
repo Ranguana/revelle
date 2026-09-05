@@ -81,6 +81,91 @@
  * name somebody else's game and may not print a card for it.
  *
  * ─────────────────────────────────────────────────────────────────────
+ * THE ANNIVERSARY — SEVENTEEN FORBIDS LIFTED, TWO KEPT
+ *
+ * Founder, ruling on a carousel that was rendering one card at twelve rooms:
+ * "let every room have a game."
+ *
+ * NINETEEN of twenty-seven games forbade `anniversary`, so at an anniversary
+ * the whole catalogue offered Fishbowl and, in six rooms, one room game.
+ * db/061 gives every occasion exactly one game slot and she chooses from
+ * three; at an anniversary there was nothing to choose from.
+ *
+ * THE EVIDENCE, AND IT IS NOT SYMMETRY (rule 32). Every one of the nineteen
+ * notes that carried a reason gave the SAME reason, and it is a headcount
+ * claim: "two people and a quiet room", "a vote between two people is not a
+ * vote", "two people and a dice cup". Not one gave a register reason.
+ *
+ * AND THE HEADCOUNT IS NOT THE OCCASION. `guest_count_band` (db/006) is a
+ * separate quiz answer with eight values, `two` being one of them, and
+ * NOTHING TIES IT TO `occasion`. db/009's own definition of the anniversary
+ * is "One evening, honoured. Quieter than a birthday and marked all the
+ * same" — it says nothing about two people. A twenty-five-person anniversary
+ * is a thing a host may answer for, and half the catalogue was refusing it.
+ *
+ * SO THE FORBID WAS ANSWERING A DIFFERENT QUESTION THAN IT APPEARED TO
+ * (rule 23): it reads as "this game does not suit an anniversary" and means
+ * "this game does not work with two people". That second thing is already
+ * enforced, correctly and at every occasion, by `minGuests` —
+ * src/lib/selection/fill.ts:441 drops any ingredient whose floor is above the
+ * group size, with the reason printed. Art Battle's floor of six keeps it
+ * away from a table of two whether or not an occasion row says so. The
+ * occasion forbid was a duplicate authority (rule 21) over a fact the guest
+ * band already owns, and it was the one of the two that could be wrong.
+ *
+ * THE SEVENTEEN LIFTED, with the argument each one carried, kept per rule 14
+ * because a deleted argument gets re-made:
+ *
+ *   art-battle          "An anniversary is two people and a quiet room, not a
+ *                        room of twenty with wet paint on it."
+ *   reverse-scavenger-hunt   (no note — an absence-graded forbid, rule 3)
+ *   secret-game-cards        (no note)
+ *   imposter                 (no note)
+ *   westhampton…list    "Two people and a pad is not a tally, it is a
+ *                        conversation with a step in the way."
+ *   havana…song         "Two people naming songs for each other is a evening,
+ *                        not a game with a bowl in it."
+ *   las-vegas…supper    "Two people and a dice cup, one of whom buys supper.
+ *                        That was going to happen anyway."
+ *   nantucket…weather   "Two people, one of whom clears. That is not a game,
+ *                        it is Tuesday."
+ *   new-orleans…own     "Two people, and the person on your left is the person
+ *                        on your right."
+ *   catskills…swim      "A vote between two people is not a vote."
+ *   cote-dazur…lying    "One of two people is lying, and both of them know
+ *                        which."
+ *   acapulco…song       "Two people naming the last song, one of whom gets
+ *                        thrown in."
+ *   amalfi…numbers      "Two people, two cards and a bag of numbers."
+ *   amalfi…prizes       "Five prizes and two people. Somebody is opening four
+ *                        of them."
+ *   palm-springs…line   "Two people, neither of whom may repeat their own
+ *                        line."
+ *   oaxaca…year         "Two people correcting each other's years is not a
+ *                        game, it is a marriage."
+ *   st-moritz…light     "Two people paying each other one compliment before
+ *                        dark is an evening, not a round."
+ *
+ * Every one of those sentences is still TRUE of a two-person anniversary and
+ * is still enforced — by the floor, not by the occasion.
+ *
+ * THE TWO KEPT are kept on an argument that survives at any headcount, and
+ * the argument is written onto the row rather than left as a bare forbid:
+ * `lets-make-a-deal` puts a compere and a running order between the room and
+ * the two people the evening honours, and `the-secret-auction` ends the night
+ * on a bidding war where the honouring belongs. Both are the house's reading
+ * and neither is hers; docs/games-need-a-human.md asks her.
+ *
+ * WHAT THIS DOES NOT TOUCH. The dinner-party, getaway, birthday and bridal
+ * forbids are each argued on their own terms — "a dinner party has no
+ * tomorrow to cook for", "it settles tomorrow morning" — and none of them is
+ * a headcount claim. They stay. One consequence is left visible rather than
+ * swept: WESTHAMPTON AT A DINNER PARTY OFFERS TWO GAMES, not three, because
+ * its own room game runs for three days and five house games are argued out
+ * of a long dinner. That is an authoring absence (rule 29), and it is in
+ * docs/games-need-a-human.md as one.
+ *
+ * ─────────────────────────────────────────────────────────────────────
  * THE FACET VOCABULARY, AND WHERE IT IS SHORT
  *
  * Every tag below is an EXISTING facet from db/002 — the vocabulary a host
@@ -688,11 +773,6 @@ const ART_BATTLE: Game = {
       fit: "forbidden",
       note: "Twenty minutes of painting is twenty minutes nobody is at the table.",
     },
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "An anniversary is two people and a quiet room, not a room of twenty with wet paint on it.",
-    },
   ],
   slots: [
     { slotCode: "game", fit: "native" },
@@ -1023,7 +1103,6 @@ const REVERSE_SCAVENGER_HUNT: Game = {
       fit: "forbidden",
       note: "Nobody leaves the table, and everyone at it already has each other's business cards.",
     },
-    { occasion: "anniversary", fit: "forbidden" },
   ],
   slots: [
     { slotCode: "game", fit: "native" },
@@ -1340,7 +1419,18 @@ const LETS_MAKE_A_DEAL: Game = {
   ],
 
   occasions: [
-    { occasion: "anniversary", fit: "forbidden" },
+    {
+      occasion: "anniversary",
+      fit: "forbidden",
+      note:
+        "KEPT WHEN THE OTHER SEVENTEEN WERE LIFTED, and on a register " +
+        "argument rather than a headcount one — see THE ANNIVERSARY at the " +
+        "top of this file. An anniversary is one evening, honoured, and " +
+        "occasion_shape calls it quieter than a birthday. This game puts a " +
+        "compere, a running order and a ticket market between the room and " +
+        "the two people the evening is for. That is true at forty guests as " +
+        "much as at two.",
+    },
     {
       occasion: "getaway",
       fit: "forbidden",
@@ -1654,7 +1744,6 @@ const SECRET_GAME_CARDS: Game = {
       fit: "forbidden",
       note: "There is no underneath at one table. Everyone is already in the only conversation.",
     },
-    { occasion: "anniversary", fit: "forbidden" },
   ],
   slots: [
     {
@@ -1986,7 +2075,17 @@ const THE_SECRET_AUCTION: Game = {
       fit: "forbidden",
       note: "A long dinner ends with dessert at midnight, which is the opposite of an auction.",
     },
-    { occasion: "anniversary", fit: "forbidden" },
+    {
+      occasion: "anniversary",
+      fit: "forbidden",
+      note:
+        "KEPT WHEN THE OTHER SEVENTEEN WERE LIFTED, and on a register " +
+        "argument rather than a headcount one — see THE ANNIVERSARY at the " +
+        "top of this file. This is the pool's loudest ending and it ends a " +
+        "night on a bidding war. An anniversary is one evening, honoured, " +
+        "and the thing it ends on is the two people. A finale that replaces " +
+        "the honouring with a transaction is wrong here at any headcount.",
+    },
     {
       occasion: "getaway",
       fit: "forbidden",
@@ -2514,7 +2613,7 @@ const IMPOSTER: Game = {
     { dimension: "group_fun", code: "perform", weight: 0.5 },
   ],
 
-  occasions: [{ occasion: "anniversary", fit: "forbidden" }],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "day_material", fit: "native" },
@@ -2976,11 +3075,6 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
       fit: "forbidden",
       note: "It runs for three days. One evening cannot hold a secret long enough for it to be one.",
     },
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people and a pad is not a tally, it is a conversation with a step in the way.",
-    },
   ],
   slots: [
     {
@@ -3278,13 +3372,7 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people naming songs for each other is a evening, not a game with a bowl in it.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -3599,13 +3687,7 @@ const VEGAS_THE_LATE_SUPPER: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people and a dice cup, one of whom buys supper. That was going to happen anyway.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -4177,11 +4259,6 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
       fit: "forbidden",
       note: "It settles tomorrow morning, and a dinner party does not have one.",
     },
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people, one of whom clears. That is not a game, it is Tuesday.",
-    },
   ],
   slots: [
     {
@@ -4439,13 +4516,7 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people, and the person on your left is the person on your right.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -4698,13 +4769,7 @@ const CATSKILLS_THE_SWIM_TEST: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "A vote between two people is not a vote.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "day_material", fit: "native" },
@@ -4971,13 +5036,7 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "One of two people is lying, and both of them know which.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -6282,13 +6341,7 @@ const ACAPULCO_THE_LAST_SONG: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people naming the last song, one of whom gets thrown in.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -6586,13 +6639,7 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people, two cards and a bag of numbers.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -6867,13 +6914,7 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Five prizes and two people. Somebody is opening four of them.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -7662,13 +7703,7 @@ const PALM_SPRINGS_THE_BEST_LINE: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people, neither of whom may repeat their own line.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -7910,13 +7945,7 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people correcting each other's years is not a game, it is a marriage.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -8162,13 +8191,7 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note: "Two people paying each other one compliment before dark is an evening, not a round.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "day_material", fit: "native" },
