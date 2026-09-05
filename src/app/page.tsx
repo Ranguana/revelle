@@ -206,8 +206,10 @@ export default function Home() {
 
           {/*
             The handoff's hero, structurally: masthead over a hairline, then two
-            columns set to a common baseline — the destination on the left, the
-            4:5 framed collage on the right. The collage is a sibling of the
+            columns set to a common baseline — the words on the left, the 4:5
+            framed collage on the right. The left column held a destination
+            when the handoff was drawn and holds the range now; the composition
+            is unchanged. The collage is a sibling of the
             type and never a layer behind it, which is the whole reason nothing
             can land on top of anything here at any width.
           */}
