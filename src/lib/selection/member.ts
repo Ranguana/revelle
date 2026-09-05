@@ -182,6 +182,19 @@ export function memberRevelle(candidate: Candidate): MemberRevelle {
     );
   }
 
+  // AND THE SORT'S STABILITY IS LOAD-BEARING — db/061, db/062.
+  //
+  // The cards of one offer share a slot position: read back from the portal,
+  // `slot.position` is `slot_kind.position`, which is 31 for all three
+  // appetizers. What separates them is the order the rows arrived in, which
+  // src/lib/portal/picks.ts fixes with `order by j.position` — the number
+  // stamped once at approval and never recomputed.
+  //
+  // So this comparator returns 0 for the three cards of a course, and what
+  // keeps them in delivery order is that Array#sort is STABLE (guaranteed
+  // since ES2019, not a V8 accident). CLAUDE.md rule 18 rests on it: if these
+  // three could swap between two loads of the same page, the card she is
+  // reaching for would move under her hand.
   const pieces: MemberPiece[] = candidate.picks
     .slice()
     .sort((a, b) => a.slot.position - b.slot.position)
