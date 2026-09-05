@@ -266,7 +266,12 @@ begin
   -- offered courses and one placed one would hand a host a choice of appetizer,
   -- a choice of dessert, and a main the house simply gave her — which reads as
   -- a bug in the page rather than as the ruling half-applied.
-  select string_agg(occasion || ' (' || n || ')', ', ' order by occasion)
+  -- `occasion` is an enum (db/001), so it is cast rather than concatenated
+  -- directly: `||` against text works for an enum by accident of the
+  -- anynonarray operator and is not a thing to rely on in a file that has to
+  -- run once, in production, inside somebody's deploy.
+  select string_agg(occasion::text || ' (' || n::text || ')', ', '
+                    order by occasion)
     into v_bad
     from (select occasion, count(*) as n
             from occasion_slot
