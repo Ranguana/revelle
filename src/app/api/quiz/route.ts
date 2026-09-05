@@ -1,3 +1,6 @@
+import { cookies } from "next/headers";
+
+import { APPLICATION_COOKIE, readPass } from "@/lib/application";
 import { pool, transaction } from "@/lib/db";
 import { EmailNotConfiguredError, sendQuizConfirmation } from "@/lib/email";
 import { enqueueJobOn } from "@/lib/jobs";
@@ -27,6 +30,24 @@ import {
  * Validation uses the SAME functions the client uses (src/lib/quiz.ts), so a
  * hand-rolled POST is held to exactly the rules the UI enforces — no second,
  * subtly different copy of the rules to drift.
+ *
+ * ── IT NOW REQUIRES A CONFIRMED ADDRESS ──────────────────────────────
+ *
+ * db/063 put a sign-up and a confirmation note in front of the questions, and
+ * this is where that stops being a screen and becomes a rule. A submission
+ * carries a pass cookie; the pass names a customer; that customer's address
+ * must be confirmed. Without all three the row is not written.
+ *
+ * REQUIRING IT IS THE POINT, not a side effect. CLAUDE.md rule 16: a
+ * confirmation that could be skipped by posting straight here would be an
+ * input absorbed and not honoured — theatre on a screen, with the old
+ * anybody-can-name-anybody's-inbox behaviour still live one layer down.
+ *
+ * AND THE ADDRESS WRITTEN IS THE PASS'S, NOT THE PAYLOAD'S. The two are
+ * compared and a disagreement is REFUSED rather than silently resolved.
+ * Quietly substituting the proved address would store an answer she did not
+ * give; quietly accepting the payload's would make the proof decorative. The
+ * only honest third option is to say so, which is what it does.
  *
  * IDEMPOTENCY. `submissionKey` is generated once per draft in the browser and
  * survives a retry. A dropped connection after the insert therefore replays as
@@ -91,6 +112,43 @@ export async function POST(request: Request): Promise<Response> {
   if (!isEmail(email)) return bad(["That does not look like an email address."]);
 
   /*
+   * ── THE PASS ───────────────────────────────────────────────────────
+   *
+   * Before the throttle, because a submission from a browser that never
+   * signed up is not an application at all and should not spend anybody's
+   * allowance — the same argument the throttle's own comment makes for
+   * sitting below validation.
+   *
+   * Every failure below is 403 with a sentence she can act on. None of them
+   * says whether the address is known to us, because none of them looks: the
+   * pass is a secret this browser either holds or does not.
+   */
+  const passToken = (await cookies()).get(APPLICATION_COOKIE)?.value ?? "";
+  const applicant = await readPass(pool(), passToken);
+  if (!applicant) {
+    return bad(
+      [
+        "Your answers are saved. Give us your address again and we will send " +
+          "a note to open.",
+      ],
+      403
+    );
+  }
+  if (!applicant.confirmed) {
+    return bad(
+      ["Open the note we sent you, and this will go straight through."],
+      403
+    );
+  }
+  if (applicant.email !== email) {
+    // Neither substituted nor accepted. See the header.
+    return bad(
+      ["That is not the address this application was started from."],
+      403
+    );
+  }
+
+  /*
    * ── THE THROTTLE ───────────────────────────────────────────────────
    *
    * Last, deliberately: a malformed or stale submission should not spend
@@ -139,15 +197,14 @@ export async function POST(request: Request): Promise<Response> {
         return { id: existing.rows[0].id, replay: true };
       }
 
-      // One statement so the lookup and the insert share a snapshot: two
-      // quizzes from the same address at the same moment cannot both insert.
-      const customer = await client.query<{ id: string }>(
-        `insert into customer (email) values ($1)
-         on conflict (email) do update set updated_at = now()
-         returning id`,
-        [email]
-      );
-      const customerId = customer.rows[0].id;
+      // HER ROW ALREADY EXISTS. It was created when she signed up, which is
+      // the change db/063 makes to the shape of an application: an applicant
+      // exists from the moment she gives her address, not from the moment she
+      // finishes. So this reads the id off the pass rather than upserting by
+      // address — the upsert that used to be here would now be a second way to
+      // create a customer, and the two could disagree about which row an
+      // application belongs to.
+      const customerId = applicant.customerId;
 
       // The place her future taste profile will land, created empty now so no
       // later code has to ask whether she has one. Nothing is inferred yet.

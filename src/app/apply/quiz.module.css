@@ -570,3 +570,50 @@
     width: 104vw;
   }
 }
+
+/* ── the waiting panel ───────────────────────────────────────────────
+   The screen between signing up and being asked anything. It borrows .done's
+   ground and arc because it is the same kind of beat, and needs its own row of
+   actions: .go is hard-right by design and belongs only to the sticky foot,
+   and .back is drawn in ink for a light ground. */
+
+.waitingActions {
+  margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem 1.5rem;
+}
+
+/* .back's twin, for the night ground. The quiet action must stay quiet: what
+   this screen wants of her is opening the note, and a second loud button would
+   argue with the first. */
+.waitingQuiet {
+  background: none;
+  border: 0;
+  padding: 0.6rem 0;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--night-soft);
+  cursor: pointer;
+}
+
+.waitingQuiet:hover:not(:disabled) {
+  color: var(--night-ink);
+}
+
+.waitingQuiet:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── the interstitial ────────────────────────────────────────────────
+   /apply/[token]: a button and nothing else, because a link scanner issues
+   GETs and does not submit forms. Same panel, centred, no arc — there is
+   nothing on this screen to sit beside it. */
+
+.gateForm {
+  margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+}

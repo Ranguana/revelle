@@ -12,7 +12,7 @@ import {
   updateDraft,
 } from "@/lib/quiz-draft";
 import {
-  QUIZ_STEPS,
+  ASKED_STEPS,
   QUIZ_VERSION,
   fieldsInvalidatedBy,
   isFieldActive,
@@ -39,28 +39,46 @@ import { TONE_MARKS } from "./tone-marks";
  * Validation calls the same functions the route handler calls
  * (src/lib/quiz.ts), so the button is never enabled for something the API will
  * reject, and there is no second copy of the rules to drift.
+ *
+ * ── IT WALKS ASKED_STEPS, NOT QUIZ_STEPS ─────────────────────────────
+ *
+ * One question is already answered by the time this renders: her address,
+ * given at the sign-up and proved by the note. ASKED_STEPS is QUIZ_STEPS minus
+ * that step (src/lib/quiz.ts), so she is not asked a second time for something
+ * the server already holds. The address arrives here as a prop and is carried
+ * into the submission — the answers jsonb records what she actually gave, and
+ * the route refuses a submission whose address is not the one on the pass.
+ *
+ * ── AN OLD DRAFT IS NOT LOST BY THIS ─────────────────────────────────
+ *
+ * A draft written before the sign-up existed holds a stepIndex into the old
+ * list, where the email step was LAST. Removing it from the front leaves every
+ * other screen at the index it had, so the position still points at the same
+ * question; only a draft that stopped ON the email screen is out of range, and
+ * `Math.min` puts her on the final screen instead. Her answers are untouched
+ * in every case — QUIZ_VERSION did not change, because no question did.
  */
 
 type Phase = "asking" | "sending" | "done";
 
 const NO_ANSWERS: QuizAnswers = {};
 
-export default function QuizFlow() {
+export default function QuizFlow({ email }: { email: string }) {
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const draft = useMemo(() => parseDraft(raw), [raw]);
 
   const answers = draft?.answers ?? NO_ANSWERS;
-  const stepIndex = Math.min(draft?.stepIndex ?? 0, QUIZ_STEPS.length - 1);
+  const stepIndex = Math.min(draft?.stepIndex ?? 0, ASKED_STEPS.length - 1);
 
   const [phase, setPhase] = useState<Phase>("asking");
   const [showErrors, setShowErrors] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState("");
 
-  const step = QUIZ_STEPS[stepIndex];
+  const step = ASKED_STEPS[stepIndex];
   const errors = useMemo(() => stepErrors(step, answers), [step, answers]);
   const canAdvance = errors.length === 0;
-  const isLast = stepIndex === QUIZ_STEPS.length - 1;
+  const isLast = stepIndex === ASKED_STEPS.length - 1;
 
   const setValue = useCallback((fieldId: string, value: string) => {
     setShowErrors(false);
@@ -108,7 +126,6 @@ export default function QuizFlow() {
     if (!draft) return;
     setPhase("sending");
     setFailure(null);
-    const email = String(draft.answers.email ?? "");
 
     try {
       const res = await fetch("/api/quiz", {
@@ -117,7 +134,12 @@ export default function QuizFlow() {
         body: JSON.stringify({
           submissionKey: draft.submissionKey,
           quizVersion: QUIZ_VERSION,
-          answers: draft.answers,
+          // The address is added at the moment of sending rather than written
+          // into the draft, so there is one copy of it and it is the server's.
+          // A draft written before the sign-up existed may still carry an
+          // `email` of its own; this overrides it, and the route refuses
+          // anything that is not the address on the pass either way.
+          answers: { ...draft.answers, email },
         }),
       });
       const body = (await res.json().catch(() => null)) as
@@ -143,7 +165,7 @@ export default function QuizFlow() {
       setPhase("asking");
       setFailure("No connection. Your answers are saved — try again.");
     }
-  }, [draft]);
+  }, [draft, email]);
 
   const next = useCallback(() => {
     if (!canAdvance) {
@@ -212,12 +234,13 @@ export default function QuizFlow() {
               ) : null
             )}
 
-            {isLast ? (
-              <p className={styles.fine}>
-                One email when your destination is ready, and nothing else. No
-                list, no drip, no forwarding it on.
-              </p>
-            ) : null}
+            {/* "One email when your destination is ready, and nothing else.
+                No list, no drip, no forwarding it on." stood here, on the last
+                screen, because the last screen was where she typed her
+                address. It moved to the sign-up with the question it answers —
+                a promise about what an address is used for belongs beside the
+                moment she gives it, not sixteen screens later. It is not
+                deleted; see SignUp.tsx. */}
           </div>
         </div>
       </main>

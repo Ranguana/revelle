@@ -3,6 +3,16 @@ import "server-only";
 import { cookies, headers } from "next/headers";
 import { cache } from "react";
 
+import {
+  APPLICATION_COOKIE,
+  PASS_TTL_DAYS,
+  beginApplication,
+  confirmApplication,
+  readPass,
+  type Applicant,
+  type BeginOutcome,
+  type ConfirmOutcome,
+} from "@/lib/application";
 import { pool, transaction } from "@/lib/db";
 import { EmailNotConfiguredError, sendEmail } from "@/lib/email";
 import {
@@ -151,6 +161,101 @@ export const currentSubject = cache(async (): Promise<Subject | null> => {
 
   return subject;
 });
+
+/* ── applying ───────────────────────────────────────────────────────── */
+
+/**
+ * THE OTHER DOOR, and it is not a door at all.
+ *
+ * Applying is not signing in and nothing below opens a session. The three
+ * functions here are the same thin framework layer as the three above them —
+ * headers in, pool opened, cookie set, mailer handed over — and every decision
+ * they carry is in src/lib/application.ts where `node --test` can reach it.
+ *
+ * The cookie is APPLICATION_COOKIE, deliberately not COOKIE. A browser may
+ * hold both: a member who is signed in and is also part way through applying
+ * for a second occasion is an ordinary case, and one cookie holding either
+ * meaning would be a bug waiting for that person.
+ */
+
+/**
+ * Begin an application, or ask for the note again.
+ *
+ * One function for both, because they are the same act: the second is the
+ * first with an address she has already given. It returns the outcome and
+ * SETS THE PASS COOKIE on the way, so the browser she typed into can carry on
+ * to the questions the moment the address is confirmed anywhere.
+ */
+export async function beginApplying(email: string): Promise<BeginOutcome> {
+  const head = await headers();
+  const outcome = await beginApplication(
+    pool(),
+    {
+      email,
+      ip: clientAddress(head.get("x-forwarded-for")),
+      userAgent: head.get("user-agent"),
+    },
+    deliverByEmail
+  );
+
+  if (outcome.ok) await setPassCookie(outcome.pass);
+  return outcome;
+}
+
+/**
+ * Press the button in the note.
+ *
+ * Wrapped in a transaction for the reason `spendLink` is: consuming the note,
+ * marking the address and minting the pass are one fact, and a failure between
+ * them would burn her note and give her nothing back. The cookie is set after
+ * the commit, because a cookie for a pass that got rolled back is a cookie
+ * that fails on every request until it expires.
+ */
+export async function confirmApplying(token: string): Promise<ConfirmOutcome> {
+  const head = await headers();
+  const context = {
+    ip: clientAddress(head.get("x-forwarded-for")),
+    userAgent: head.get("user-agent"),
+  };
+
+  const outcome = await transaction((client) =>
+    confirmApplication(client, token, context)
+  );
+  if (!outcome.ok) return outcome;
+
+  await setPassCookie(outcome.pass);
+  return outcome;
+}
+
+/**
+ * Whose application this browser is carrying, or null.
+ *
+ * `cache` deduplicates within one request, as `currentSubject` does — the page
+ * asks, and so does any Server Action it renders.
+ *
+ * Whether her address is CONFIRMED is re-read from the customer row on every
+ * call and never cached on the pass. That is what lets the browser holding her
+ * answers come good the moment the note is opened somewhere else.
+ */
+export const currentApplicant = cache(async (): Promise<Applicant | null> => {
+  const raw = (await cookies()).get(APPLICATION_COOKIE)?.value;
+  if (!raw) return null;
+  return readPass(pool(), raw);
+});
+
+async function setPassCookie(pass: string): Promise<void> {
+  const store = await cookies();
+  store.set(APPLICATION_COOKIE, pass, {
+    httpOnly: true,
+    // The note is opened from a mail client, which is a cross-site top-level
+    // navigation. 'strict' would drop the cookie on exactly that request —
+    // the same reason the session cookie is 'lax'.
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: PASS_TTL_DAYS * 24 * 60 * 60,
+  });
+}
 
 /* ── leaving ────────────────────────────────────────────────────────── */
 

@@ -189,6 +189,18 @@ export type QuizStep = {
   /** One line of guidance under the title. Optional. */
   help?: string;
   fields: readonly QuizField[];
+  /**
+   * Asked BEFORE the rest of them, on its own screen, and answered by signing
+   * up rather than by tapping through the flow.
+   *
+   * Exactly one step carries this. It is not a rendering hint: the step it
+   * marks is still a real step with real fields, still in QUIZ_STEPS, and
+   * still validated by `allErrors` — which is the whole reason the flag exists
+   * rather than the step being lifted out of the array. A submission is
+   * complete or it is not, and the server must be able to say so by reading
+   * one list. What the flag decides is only WHERE it is asked.
+   */
+  signUp?: boolean;
 };
 
 const OCCASIONS: readonly QuizOption[] = [
@@ -1012,6 +1024,38 @@ const MUSIC_SERVICES: readonly QuizOption[] = [
 ];
 
 export const QUIZ_STEPS: readonly QuizStep[] = [
+  // ── THE SIGN-UP, AND IT USED TO BE LAST ──────────────────────────────
+  //
+  // Founder, 2026-09-05: "when they apply for membership, need a fun page
+  // where they sign up and confirm email not just to the quiz." This step is
+  // that page. Its eyebrow and its title are unchanged and unmoved as words —
+  // only their position in the flow moved, from the seventeenth screen to the
+  // first, which is what makes signing up a moment rather than a footer.
+  //
+  // THE HELP LINE IS THE ONE THING THAT HAD TO CHANGE, and the original is
+  // kept here because rule 14 says a superseded line is preserved rather than
+  // deleted:
+  //
+  //     "The only thing we ask you for."
+  //
+  // It was true as the LAST screen — everything else had been asked by then,
+  // and the address was the only thing left that was hers rather than her
+  // party's. As the FIRST screen it is simply false: a whole flow follows it.
+  // A line that became untrue by being moved has to move with the truth, so
+  // what stands there now says what actually happens next.
+  //
+  // Nothing else about the step changed. It has the same key, the same single
+  // email field, the same maxLength, and it is still in this array — so
+  // `FIELDS` still knows about `email` and `allErrors` still refuses a
+  // submission without one. See ASKED_STEPS below for the half the flow walks.
+  {
+    key: "email",
+    eyebrow: "The delivery",
+    title: "Where should we send it?",
+    help: "A note goes there first, so we know it reaches you.",
+    fields: [{ id: "email", type: "email", maxLength: 254 }],
+    signUp: true,
+  },
   {
     key: "occasion",
     eyebrow: "The occasion",
@@ -1283,18 +1327,49 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
     help: "It runs in order, from the door to the last song. This is how it reaches the room.",
     fields: [{ id: "music_service", type: "single", options: MUSIC_SERVICES }],
   },
-  {
-    key: "email",
-    eyebrow: "The delivery",
-    title: "Where should we send it?",
-    help: "The only thing we ask you for.",
-    fields: [{ id: "email", type: "email", maxLength: 254 }],
-  },
 ];
 
 /** Field id -> field, across every step. Built once. */
 export const FIELDS: Readonly<Record<string, QuizField>> = Object.fromEntries(
   QUIZ_STEPS.flatMap((step) => step.fields.map((f) => [f.id, f] as const))
+);
+
+/**
+ * The one step that is answered by signing up. Null would be a bug, and the
+ * type says so rather than making every caller check.
+ */
+export const SIGN_UP_STEP: QuizStep = (() => {
+  const marked = QUIZ_STEPS.filter((step) => step.signUp);
+  if (marked.length !== 1) {
+    // Not a soft failure. A second marked step would silently vanish from the
+    // walked flow AND from the sign-up screen, which renders only the first —
+    // a question absorbed and never asked, and nothing would go red.
+    throw new Error(
+      `exactly one QUIZ_STEP may carry signUp; found ${marked.length}`
+    );
+  }
+  return marked[0];
+})();
+
+/**
+ * WHAT THE FLOW WALKS. Everything except the step she has already answered.
+ *
+ * QUIZ_STEPS is the QUESTION SET — what a complete submission must contain,
+ * and what `allErrors` checks. This is the SCREENS, in order. Keeping them as
+ * two readings of one array rather than two arrays is deliberate: a second
+ * list is a second authority, and the day somebody adds a question to one of
+ * them it would be asked and never validated, or validated and never asked.
+ *
+ * The order is also why an application half-finished under the old flow
+ * survives this change. The sign-up step moved to the FRONT of QUIZ_STEPS, so
+ * removing it leaves the remaining screens in exactly the positions they had
+ * when the email step was last — an old draft's `stepIndex` still points at
+ * the same question. The single exception is a draft that stopped ON the email
+ * screen, whose index is now out of range and is clamped to the last screen by
+ * the flow. She loses no answer either way.
+ */
+export const ASKED_STEPS: readonly QuizStep[] = QUIZ_STEPS.filter(
+  (step) => !step.signUp
 );
 
 export type QuizAnswers = Record<string, string | string[] | undefined>;
