@@ -107,6 +107,42 @@ export const APPLY_BY_IP: Limit = {
   windowSeconds: 60 * 60,
 };
 
+/**
+ * ── SIGNING UP ───────────────────────────────────────────────────────
+ *
+ * db/063 put a sign-up and a confirmation note in front of the questions, so
+ * there is now an unauthenticated endpoint whose whole input is an address and
+ * whose whole output is a message sent by us, from our domain, at our cost, to
+ * whoever was named. That is the mail-cannon shape the sign-in door has, and
+ * it gets the sign-in door's numbers: three per address and twelve per IP in a
+ * quarter of an hour, for the reasons written above them.
+ *
+ * ── AND WHY THEY ARE NOT THE APPLY_* BUCKETS ─────────────────────────
+ *
+ * Because sharing them would refuse a genuine application. APPLY_BY_EMAIL is
+ * three an HOUR, tuned for the submission at the end. A host who signs up,
+ * mistypes, asks for the note again, and then sends her answers would spend
+ * all three on the sign-up and be refused at the moment that matters — a
+ * throttle firing on the one request it was never aimed at. Two moments, two
+ * counters, and the submission's allowance stays untouched by anything that
+ * happens before it.
+ *
+ * They are not the REQUEST_BY_* buckets either, for the mirror reason: an
+ * applicant confirming her address must not spend a member's ability to sign
+ * in, and the same person may honestly be doing both in the same quarter hour.
+ */
+export const CONFIRM_BY_EMAIL: Limit = {
+  bucket: "confirm_email",
+  max: 3,
+  windowSeconds: 15 * 60,
+};
+
+export const CONFIRM_BY_IP: Limit = {
+  bucket: "confirm_ip",
+  max: 12,
+  windowSeconds: 15 * 60,
+};
+
 /** Longest window in use. Anything older than this is swept. */
 const KEEP_SECONDS = 60 * 60;
 

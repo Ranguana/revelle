@@ -1,5 +1,13 @@
 import "server-only";
 
+import {
+  FOOTER,
+  eyebrow,
+  heading,
+  line,
+  shell,
+} from "./house-mail";
+
 /**
  * Outbound email via Resend.
  *
@@ -112,18 +120,23 @@ export async function sendEmail(
  * promises nothing about timing, and it says nothing about who or what reads
  * an application. The house does not introduce its staff (docs/copy-brief.md),
  * and the opposite claim would be worse — so the question goes unanswered.
+ *
+ * The frame is src/lib/house-mail.ts, which this file used to hold its own
+ * copy of. Rule 21: the house's mail has one look, and three files each with
+ * their own hex values is duplicated authority, not duplicated code.
  */
 export async function sendQuizConfirmation(to: string): Promise<SendEmailResult> {
-  const html = `<!doctype html>
-<html><body style="margin:0;padding:32px 24px;background:#EFE3D2;color:#2A2018;font-family:Georgia,'Times New Roman',serif;line-height:1.6">
-  <div style="max-width:34rem;margin:0 auto">
-    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8E8173;margin:0 0 28px">Revelle Soci&eacute;t&eacute;</p>
-    <p style="font-size:26px;line-height:1.2;margin:0 0 24px">We have your answers.</p>
-    <p style="margin:0 0 18px;color:#5E5245">Nothing else is needed from you. Your destination will follow.</p>
-    <p style="margin:0 0 18px;color:#5E5245">If you think of the thing you forgot to tell us, reply to this email.</p>
-    <p style="margin:32px 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#8E8173">Est. for people who host</p>
-  </div>
-</body></html>`;
+  const html = shell(
+    [
+      eyebrow("Revelle Soci&eacute;t&eacute;"),
+      heading("We have your answers."),
+      line("Nothing else is needed from you. Your destination will follow."),
+      line(
+        "If you think of the thing you forgot to tell us, reply to this email."
+      ),
+    ].join("\n"),
+    FOOTER
+  );
 
   const text = [
     "REVELLE SOCIÉTÉ",
@@ -134,7 +147,7 @@ export async function sendQuizConfirmation(to: string): Promise<SendEmailResult>
     "",
     "If you think of the thing you forgot to tell us, reply to this email.",
     "",
-    "Est. for people who host",
+    FOOTER,
   ].join("\n");
 
   return sendEmail({

@@ -2346,6 +2346,35 @@ const FISHBOWL: Game = {
     "Folk game. No owner, no rights, no attribution owed — which is why it " +
     "may be printed. Known as the noun game, Salad Bowl, Celebrity and a " +
     "dozen other names.",
+  notes:
+    "READ AGAINST THE PUBLISHED VERSIONS, 2026-09-05, because it is the one " +
+    "game here whose rules exist outside this house and can therefore be " +
+    "checked. Three findings, and the first is the one that matters.\n\n" +
+    "THE ROUND ORDER HERE IS THE MINORITY READING. This file runs anything " +
+    "except the word, then act it out, then one word. The majority of " +
+    "published descriptions — and the only commercially codified version, " +
+    "and the encyclopaedia entry for Celebrity — run anything except the " +
+    "word, then ONE WORD, then act it out, with the charades last. Both " +
+    "orders are played by real rooms and both are defensible; the argument " +
+    "written into the runbook here (the third round is funny because of the " +
+    "first two, and round two is faster because everybody half-remembers " +
+    "the bowl) is true either way round. NOTHING WAS CHANGED, because the " +
+    "order of the rounds is what the game IS and swapping it is not a " +
+    "clarification. docs/games-need-a-human.md asks her.\n\n" +
+    "THE SKIP RULE IS UNSETTLED EVERYWHERE. Published versions run the " +
+    "whole range — no skips at all, one a turn, one a round, unlimited in " +
+    "the first two rounds and none in the last, unlimited always — and " +
+    "every one of them says it is a thing the table agrees BEFORE the first " +
+    "turn. So the house states it as a default a room may overrule rather " +
+    "than as a rule: one skip a turn, and the slip goes back in the bowl. " +
+    "Also hers to settle.\n\n" +
+    "SIX SLIPS A HEAD IS THE HOUSE'S NUMBER. Published versions cluster on " +
+    "three to five each and think in terms of a total bowl of forty to " +
+    "fifty slips rather than a per-head count. Six a head reaches the " +
+    "published total at eight people and passes it badly at thirty, which " +
+    "is what the running-long contingency is for — cut the bowl, never a " +
+    "round. Left as six: the runbook argues the number (four and the third " +
+    "round is over before it is funny) and that is an authored judgement.",
 
   runbook: {
     hostRole: "plays_too",
@@ -2623,7 +2652,16 @@ const IMPOSTER: Game = {
   notes:
     "The one game in the pool the house does not control. If it disappears, " +
     "the slot is refilled from the provided games and nothing else changes — " +
-    "which is the argument for never letting a recommended game be required.",
+    "which is the argument for never letting a recommended game be " +
+    "required.\n\n" +
+    "THE LINK, CHECKED 2026-09-05, and the date is the point: the caveat " +
+    "says this can be pulled or paywalled, so a check with no date on it is " +
+    "a check nobody can tell the age of. Live and reachable. It plays in a " +
+    "browser with no install and no account, and there are also iOS and " +
+    "Android apps, both free to install with paid upgrades inside them. " +
+    "Nothing about how it is played was read, recorded or reproduced here, " +
+    "and nothing about it should be: db/010 grants the house two rights " +
+    "over somebody else's game and this is the second one being exercised.",
 
   /**
    * THE ONE RUNBOOK THAT IS ALLOWED TO BE THIN, AND THE DATABASE ENFORCES IT.

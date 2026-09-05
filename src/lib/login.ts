@@ -46,6 +46,18 @@
  * above rather than assert them in a comment.
  */
 
+import {
+  FOOTER,
+  NOTHING_HAPPENED,
+  aside,
+  button,
+  eyebrow,
+  heading,
+  line,
+  shell,
+  type Deliver,
+  type Mail,
+} from "./house-mail.ts";
 import { isEmail } from "./quiz.ts";
 import {
   destinationFor,
@@ -66,20 +78,15 @@ import {
 
 /* ── the mail ───────────────────────────────────────────────────────── */
 
-export type Mail = {
-  to: string;
-  subject: string;
-  html: string;
-  text: string;
-};
-
 /**
- * How a message leaves. Injected rather than imported so this module stays
- * framework-free (src/lib/email.ts is "server-only") and so a test can watch
- * what would have been sent without a network, an API key, or a real inbox.
- * src/lib/auth.ts supplies the real one.
+ * Re-exported, not redeclared. `Mail` and `Deliver` moved to
+ * src/lib/house-mail.ts when a third file needed to compose a message in the
+ * house's frame — rule 21, one owner. The names stay importable from here
+ * because src/lib/auth.ts and the tests have always asked this module for
+ * them, and moving a type is not a reason to make every caller learn a new
+ * path. src/lib/auth.ts supplies the real `Deliver`.
  */
-export type Deliver = (mail: Mail) => Promise<void>;
+export type { Deliver, Mail } from "./house-mail.ts";
 
 /* ── asking ─────────────────────────────────────────────────────────── */
 
@@ -357,7 +364,17 @@ export async function stillAllowed(db: Db, subject: Subject): Promise<boolean> {
 
 /* ── where the link points ──────────────────────────────────────────── */
 
-function appUrl(): string {
+/**
+ * Where a link points.
+ *
+ * Exported because src/lib/application.ts mints links too, and "what is this
+ * app's public address" is exactly rule 21's test: two surfaces MUST agree
+ * about it, so it has one owner. A second reader of APP_URL with its own
+ * trailing-slash handling is how a confirmation link and a sign-in link end up
+ * pointing at two different hosts on the day somebody sets the variable with a
+ * slash on the end.
+ */
+export function appUrl(): string {
   const url = process.env.APP_URL;
   if (!url) {
     throw new Error(
@@ -386,44 +403,6 @@ function appUrl(): string {
  * "quiz".
  */
 
-const GROUND = "#EFE3D2";
-const INK = "#2A2018";
-const INK_SOFT = "#5E5245";
-const INK_FAINT = "#8E8173";
-const OXBLOOD = "#B4522C";
-
-/**
- * The frame every message shares, matching the confirmation mail in
- * src/lib/email.ts: house tokens inlined, one column, a serif, no images.
- * Image-heavy and link-heavy mail is likelier to be filtered, and this is mail
- * somebody is waiting on.
- */
-function shell(body: string, footer: string): string {
-  return `<!doctype html>
-<html><body style="margin:0;padding:32px 24px;background:${GROUND};color:${INK};font-family:Georgia,'Times New Roman',serif;line-height:1.6">
-  <div style="max-width:34rem;margin:0 auto">
-${body}
-    <p style="margin:32px 0 0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${INK_FAINT}">${footer}</p>
-  </div>
-</body></html>`;
-}
-
-function eyebrow(text: string): string {
-  return `    <p style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_FAINT};margin:0 0 28px">${text}</p>`;
-}
-
-function heading(text: string): string {
-  return `    <p style="font-size:26px;line-height:1.2;margin:0 0 24px">${text}</p>`;
-}
-
-function line(text: string): string {
-  return `    <p style="margin:0 0 18px;color:${INK_SOFT}">${text}</p>`;
-}
-
-function button(href: string, label: string): string {
-  return `    <p style="margin:0 0 22px"><a href="${href}" style="color:${OXBLOOD}">${label}</a></p>`;
-}
-
 /** Internal. Two people, a tool, and the minutes said out loud. */
 function deskLink(to: string, link: string): Mail {
   return {
@@ -435,7 +414,7 @@ function deskLink(to: string, link: string): Mail {
         heading("Your link to the desk"),
         button(link, "Open the desk"),
         line(`It works once and expires in ${SIGN_IN_TTL_MINUTES} minutes.`),
-        `    <p style="margin:0;color:${INK_FAINT};font-size:13px">If you did not ask for this, nothing has happened and you can ignore it.</p>`,
+        aside(`${NOTHING_HAPPENED} You can ignore it.`),
       ].join("\n"),
       "Internal"
     ),
@@ -446,7 +425,7 @@ function deskLink(to: string, link: string): Mail {
       link,
       "",
       `It works once and expires in ${SIGN_IN_TTL_MINUTES} minutes.`,
-      "If you did not ask for this, nothing has happened.",
+      NOTHING_HAPPENED,
     ].join("\n"),
   };
 }
@@ -462,9 +441,9 @@ function memberLink(to: string, link: string): Mail {
         heading("Your way in."),
         button(link, "Sign in"),
         line("It works once, and only for a short while."),
-        `    <p style="margin:0;color:${INK_FAINT};font-size:13px">If you did not ask for this, nothing has happened.</p>`,
+        aside(NOTHING_HAPPENED),
       ].join("\n"),
-      "Est. for people who host"
+      FOOTER
     ),
     text: [
       "REVELLE SOCIÉTÉ",
@@ -473,9 +452,9 @@ function memberLink(to: string, link: string): Mail {
       link,
       "",
       "It works once, and only for a short while.",
-      "If you did not ask for this, nothing has happened.",
+      NOTHING_HAPPENED,
       "",
-      "Est. for people who host",
+      FOOTER,
     ].join("\n"),
   };
 }
@@ -499,9 +478,9 @@ function applicantNote(to: string): Mail {
           "There is nothing to sign in to yet. When there is, this address is " +
             "where it arrives."
         ),
-        `    <p style="margin:0;color:${INK_FAINT};font-size:13px">If you did not ask for this, nothing has happened.</p>`,
+        aside(NOTHING_HAPPENED),
       ].join("\n"),
-      "Est. for people who host"
+      FOOTER
     ),
     text: [
       "REVELLE SOCIÉTÉ",
@@ -510,9 +489,9 @@ function applicantNote(to: string): Mail {
       "",
       "There is nothing to sign in to yet. When there is, this address is where it arrives.",
       "",
-      "If you did not ask for this, nothing has happened.",
+      NOTHING_HAPPENED,
       "",
-      "Est. for people who host",
+      FOOTER,
     ].join("\n"),
   };
 }
