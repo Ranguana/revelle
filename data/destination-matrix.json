@@ -294,6 +294,17 @@
       "afternoon",
       "crowd",
       "nothing"
+    ],
+    "tokyo-1964": [
+      "assigned",
+      "posted",
+      "overlapping",
+      "plain",
+      "bought",
+      "clean_stop",
+      "evening",
+      "few",
+      "nothing"
     ]
   },
   "authored": [
@@ -316,13 +327,15 @@
     "aspen-1994",
     "oaxaca-1954",
     "palm-springs-1965",
-    "st-moritz-1984"
+    "st-moritz-1984",
+    "tokyo-1964"
   ],
   "blocked": {
     "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`.",
     "cap-ferrat": "RETIRED, AND RESERVED. Folded into Cote d'Azur on 2026-08-22 and retired in the database by db/028. It does NOT re-enter the single-evening catalogue — its register lives inside Cote d'Azur, which absorbed its menus, drinks and dishes. But the room is RESERVED as the founding destination of a DURATION TIER — multi-day residencies — if that tier is ever built. The villa taken for a month, the schedule that is very slow and entirely fixed, and a house that reassembles every July are a POOR fit for one evening and the natural centre of a week. That is why the fold was correct and the retirement is not a deletion: world_status is 'retired' rather than gone, the slug stays claimed, and its voice and facet tags stay attached to it rather than being merged into Cote d'Azur's mouth."
   },
   "founderPending": {
+    "tokyo-1964": "THE WHOLE ROW IS AN AGENT PROPOSAL, NOT THE FOUNDER'S. Unlike the other six in `proposed`, this room was not specified by her — a subagent placed it on 2026-09-05 into the one (ending, starts) cell no room occupies, `clean_stop` + `evening`, and wrote the room to the row. Nothing else in the repository has been touched: no entry in src/lib/destinations.ts, DESTINATION_TONES, food-identity, library.ts or the four content documents. The complete proposal, with the writing, the tones, the palette, the food and the drinks, is docs/proposed-tokyo-1964.md. IF SHE DECLINES IT, DELETE THE ROW AND THIS ENTRY AND NOTHING ELSE BREAKS. Two cells carry the argument that will be argued with first, and both are stated there rather than defended here: `arrival = assigned` (a second claimant for a level Catskills held alone, on the ground that a role really is handed over at the door) and `food = bought` (provenance, not identity — the room is a table room whose table mostly came from the shop).",
     "palm-springs-1965.schedule": "provisional `anchored` under the four-level split — founder decides",
     "nantucket.ending": "FOUNDER DECIDES. `dissolves` is CC's pass-1 reading; `clean_stop` was the original. See flipLog.",
     "nantucket.starts": "FOUNDER DECIDES. `evening` is CC's pass-1 reading; `afternoon` was the original. See flipLog.",

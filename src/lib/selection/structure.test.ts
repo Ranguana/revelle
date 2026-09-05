@@ -183,10 +183,24 @@ test("ending sorts the rooms the audit says it sorts", () => {
   const i = facetNames.indexOf("ending" as StructuralFacet);
   const by = (level: string) =>
     Object.keys(rows).filter((slug) => rows[slug][i] === level).length;
-  // The most even split any column has: 7 / 7 / 4 over eighteen rows.
+  // The most even split any column has: 7 / 7 / 5 over nineteen rows.
+  //
+  // WAS 7 / 7 / 4 over eighteen (CLAUDE.md rule 14, the numbers kept rather
+  // than overwritten). The fifth `clean_stop` is the PROPOSED tokyo-1964 row,
+  // which is the only row in the matrix that is an agent's proposal rather than
+  // the founder's — see `founderPending` in data/destination-matrix.json. If
+  // she declines it, the row goes and these three numbers go back.
+  //
+  // AND THE GENERAL POINT, because this constant will be edited again: a
+  // catalogue-size number written into a test has to be hand-edited by every
+  // room that lands, forever, and this file is one of five that hold one
+  // (`food-identity.test.ts` holds 18 and the 12/4/2 identity split,
+  // `games.test.ts` holds 20, `drinks-seed.test.ts` holds nine corpus counts).
+  // None of them is wrong; all of them are per-room manual work that scales
+  // linearly with a catalogue meant to reach hundreds.
   assert.equal(by("until_morning"), 7);
   assert.equal(by("dissolves"), 7);
-  assert.equal(by("clean_stop"), 4);
+  assert.equal(by("clean_stop"), 5);
 });
 
 test("the Vegas / New York pair turns on ending", () => {

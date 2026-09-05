@@ -138,6 +138,37 @@ if (M.founderPending && Object.keys(M.founderPending).length) {
   console.log(`\nPROVISIONAL — not the founder's, and every distance touching them is soft:`);
   for (const [cell, why] of Object.entries(M.founderPending)) console.log(`   ${cell}: ${why}`);
 }
+// ONE ROOM AGAINST EVERY OTHER, because a full pair list stops being readable
+// long before the catalogue stops growing. At 19 rooms this file prints 171
+// pairs; at 200 it would print 19,900, and the question an author actually asks
+// — "what is my room's nearest neighbour?" — would be unanswerable from the
+// output of the only instrument allowed to answer it. Same owner, same
+// arithmetic (src/lib/matrix.ts), narrower question.
+//
+//   npm run check:matrix -- --room tokyo-1964
+if (arg === "--room") {
+  const room = process.argv[3];
+  if (!M.rows[room]) {
+    console.error(`\nNo row for "${room}". Rows: ${keys.join(", ")}`);
+    process.exit(1);
+  }
+  const others = keys
+    .filter((k) => k !== room)
+    .map((k) => ({ k, d: dist(room, k), twin: declared.has(twinKey(room, k)) }))
+    .sort((a, b) => a.d - b.d || a.k.localeCompare(b.k));
+  const min = others[0].d;
+  console.log(`\n${room} AGAINST EVERY OTHER ROW (gate ${M.gate})`);
+  for (const o of others)
+    console.log(
+      `   ${o.d}  ${o.k}${o.d < M.gate ? (o.twin ? "   [declared twin]" : "   FAILS THE GATE") : ""}` +
+        (o.d === M.gate ? "   [zero margin]" : "")
+    );
+  console.log(
+    `\n   nearest ${min} (${others.filter((o) => o.d === min).map((o) => o.k).join(", ")}) · ` +
+      `mean ${(others.reduce((s, o) => s + o.d, 0) / others.length).toFixed(2)}`
+  );
+}
+
 if (arg === "--rows") {
   console.log(`\n${"destination".padEnd(19)}${FACETS.map((f) => f.slice(0, 9).padEnd(11)).join("")}`);
   for (const k of keys) console.log(`${k.padEnd(19)}${M.rows[k].map((v) => v.slice(0, 9).padEnd(11)).join("")}`);
