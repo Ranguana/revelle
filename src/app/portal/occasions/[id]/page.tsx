@@ -198,23 +198,12 @@ export default async function OccasionPage({
                       {label ? (
                         <p className={styles.pieceHead}>{entry.piece.heading}</p>
                       ) : null}
-                      {/* Where a piece links to, if anywhere: `pieceHref`. */}
-                      <h3 className={styles.pieceName}>
-                        {(() => {
-                          const href = pieceHref(
-                            entry.piece.pool,
-                            occasion.id,
-                            entry.piece.slug
-                          );
-                          return href ? (
-                            <Link className={styles.pieceLink} href={href}>
-                              {entry.piece.name}
-                            </Link>
-                          ) : (
-                            entry.piece.name
-                          );
-                        })()}
-                      </h3>
+                      <PieceName
+                        pool={entry.piece.pool}
+                        revelleId={occasion.id}
+                        slug={entry.piece.slug}
+                        name={entry.piece.name}
+                      />
                       {entry.piece.description ? (
                         <div className={styles.pieceBody}>
                           {paragraphs(entry.piece.description).map(
@@ -364,7 +353,7 @@ export default async function OccasionPage({
  * mistake one shade smaller. The house's own tokens are the honest ground.
  */
 /**
- * WHERE A PIECE LINKS TO, IF ANYWHERE — the one owner of that question.
+ * A PIECE'S NAME, AND WHERE IT LINKS TO IF ANYWHERE — one owner.
  *
  * A GAME IS THE ONE PIECE WITH SOMEWHERE TO GO. Its card is a teaser and stays
  * one; the instructions are a page, because a runbook read in a kitchen needs
@@ -379,10 +368,31 @@ export default async function OccasionPage({
  * would 404, which is at least loud; the version that does not 404 is the one
  * where somebody "fixes" it by inventing a dish page.
  */
-function pieceHref(pool: string, revelleId: string, slug: string): string | null {
-  return pool === "game"
-    ? `/portal/occasions/${revelleId}/games/${slug}`
-    : null;
+function PieceName({
+  pool,
+  revelleId,
+  slug,
+  name,
+}: {
+  pool: string;
+  revelleId: string;
+  slug: string;
+  name: string;
+}) {
+  return (
+    <h3 className={styles.pieceName}>
+      {pool === "game" ? (
+        <Link
+          className={styles.pieceLink}
+          href={`/portal/occasions/${revelleId}/games/${slug}`}
+        >
+          {name}
+        </Link>
+      ) : (
+        name
+      )}
+    </h3>
+  );
 }
 
 /**
@@ -470,30 +480,25 @@ function Carousel({
       </p>
 
       <div className={styles.offerCards}>
-        {offer.cards.map((card) => {
-          const href = pieceHref(card.pool, revelleId, card.slug);
-          return (
-            <article
-              className={styles.offerCard}
-              data-chosen={card.chosen ? "yes" : undefined}
-              key={card.slug}
-            >
-              <h3 className={styles.pieceName}>
-                {href ? (
-                  <Link className={styles.pieceLink} href={href}>
-                    {card.name}
-                  </Link>
-                ) : (
-                  card.name
-                )}
-              </h3>
-              {card.description ? (
-                <div className={styles.pieceBody}>
-                  {paragraphs(card.description).map((line, index) => (
-                    <p key={index}>{line}</p>
-                  ))}
-                </div>
-              ) : null}
+        {offer.cards.map((card) => (
+          <article
+            className={styles.offerCard}
+            data-chosen={card.chosen ? "yes" : undefined}
+            key={card.slug}
+          >
+            <PieceName
+              pool={card.pool}
+              revelleId={revelleId}
+              slug={card.slug}
+              name={card.name}
+            />
+            {card.description ? (
+              <div className={styles.pieceBody}>
+                {paragraphs(card.description).map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
+              </div>
+            ) : null}
 
               {card.chosen ? (
                 <p className={styles.offerMark}>Yours</p>
@@ -513,10 +518,9 @@ function Carousel({
                     Choose this
                   </button>
                 </form>
-              )}
-            </article>
-          );
-        })}
+            )}
+          </article>
+        ))}
       </div>
     </section>
   );
