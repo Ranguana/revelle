@@ -1463,8 +1463,8 @@ const LETS_MAKE_A_DEAL: Game = {
       fit: "forbidden",
       note:
         "KEPT WHEN THE OTHER SEVENTEEN WERE LIFTED, and on a register " +
-        "argument rather than a headcount one — see THE ANNIVERSARY at the " +
-        "top of this file. An anniversary is one evening, honoured, and " +
+        "argument rather than a headcount one — the whole argument is under " +
+        "THE ANNIVERSARY at the top of src/lib/games.ts. An anniversary is one evening, honoured, and " +
         "occasion_shape calls it quieter than a birthday. This game puts a " +
         "compere, a running order and a ticket market between the room and " +
         "the two people the evening is for. That is true at forty guests as " +
@@ -2187,8 +2187,8 @@ const THE_SECRET_AUCTION: Game = {
       fit: "forbidden",
       note:
         "KEPT WHEN THE OTHER SEVENTEEN WERE LIFTED, and on a register " +
-        "argument rather than a headcount one — see THE ANNIVERSARY at the " +
-        "top of this file. This is the pool's loudest ending and it ends a " +
+        "argument rather than a headcount one — the whole argument is under " +
+        "THE ANNIVERSARY at the top of src/lib/games.ts. This is the pool's loudest ending and it ends a " +
         "night on a bidding war. An anniversary is one evening, honoured, " +
         "and the thing it ends on is the two people. A finale that replaces " +
         "the honouring with a transaction is wrong here at any headcount.",

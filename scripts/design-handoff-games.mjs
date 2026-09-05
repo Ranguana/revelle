@@ -159,8 +159,11 @@ const occasionLine = (game) => {
     .filter((o) => o.fit === "forbidden" && o.note)
     .map((o) => `  - not at **${OCCASION_LABELS.get(o.occasion)?.label ?? o.occasion}** — ${o.note}`)
     .join("\n");
+  // Lower-cased: db/009 writes them as headings ("The birthday") and here they
+  // are items in a sentence.
+  const lower = (t) => t.charAt(0).toLowerCase() + t.slice(1);
   return (
-    `${yes.map((o) => OCCASION_LABELS.get(o).label).join(", ")}.\n\n` +
+    `${yes.map((o) => lower(OCCASION_LABELS.get(o).label)).join(", ")}.\n\n` +
     (why ? `${why}\n` : "")
   );
 };
@@ -243,6 +246,7 @@ ${
     ? `## What the room has to have
 
 ${game.requirements.map((r) => `- \`${r.requirement}\`${r.note ? ` — ${r.note}` : ""}`).join("\n")}
+
 `
     : ""
 }${
