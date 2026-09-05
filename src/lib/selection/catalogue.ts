@@ -1060,6 +1060,23 @@ async function loadShape(
  */
 async function loadIssuedFingerprints(db: Queryable): Promise<string[]> {
   const { rows } = await db.query(
+    // EVERY ROW, INCLUDING THE CARDS SHE HAS NOT CHOSEN — db/061, db/062, and
+    // this is the one place in the codebase where that is right.
+    //
+    // `settledSql` (src/lib/portal/choice.ts) governs what HAPPENS: what she
+    // shops for, what prints, what satisfies a dependency. This governs what
+    // was GIVEN, and db/061's load-bearing decision is that the OFFER is what
+    // was given — all three games and all nine dishes are inside
+    // `compute_assemblage_fingerprint`, which is precisely why her choice can
+    // never be refused and can be changed forever.
+    //
+    // So a filter here would be a bug of the opposite sign: two members whose
+    // trios overlapped in the two cards neither took would read as distinct
+    // assemblages, and the promise db/003 makes — delivered once, to one
+    // person, for good — would be quietly weaker than it says. Written down
+    // because "add the settled filter, like everywhere else" is the obvious
+    // move and it is wrong (CLAUDE.md rule 23: state the fact where the wrong
+    // reading would be made).
     `select i.revelle_id, i.entity_table, i.entity_id
        from revelle_ingredient i
        join revelle r on r.id = i.revelle_id
