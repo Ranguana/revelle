@@ -19,7 +19,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { MemberPiece } from "../selection/member.ts";
-import { entriesIn, isSettled, settledSql } from "./choice.ts";
+import { entriesIn, isSettled, offerLead, settledSql } from "./choice.ts";
 
 function piece(over: Partial<MemberPiece> & { name: string }): MemberPiece {
   return {
@@ -210,6 +210,65 @@ test("choosing a main leaves the appetizer's cards exactly as they were", () => 
     assert.deepEqual(two[1].offer.cards.map((c) => c.chosen), [false, true]);
     assert.equal(two[1].offer.settled, true);
   }
+});
+
+/* ── the line above the cards ───────────────────────────────────────── */
+
+function offerOf(pool: string, n: number, settled = false) {
+  const entries = entriesIn(
+    Array.from({ length: n }, (_, i) =>
+      piece({ name: `Card ${i}`, pool, offerGroup: "beat:1:0", chosen: settled && i === 0 })
+    )
+  );
+  if (entries[0].kind !== "offer") throw new Error("an offer");
+  return entries[0].offer;
+}
+
+test("the lead line names the beat's own verb, and credits HER", () => {
+  // CLAUDE.md rule 10 is the test for every word: does the line credit her, or
+  // credit us. Both verbs put her at the centre of the act.
+  assert.equal(
+    offerLead(offerOf("game", 3)),
+    "Three to choose between. The one you pick is the one that runs."
+  );
+  assert.equal(
+    offerLead(offerOf("dish", 3)),
+    "Three to choose between. The one you pick is the one you serve."
+  );
+  // A pool nobody has ruled on gets the flattest true thing rather than an
+  // invented verb (rule 32).
+  assert.equal(
+    offerLead(offerOf("drink", 3)),
+    "Three to choose between. The one you pick is the one that happens."
+  );
+});
+
+test("the lead line says how many exist and never how many were possible", () => {
+  assert.match(
+    offerLead(offerOf("dish", 2)),
+    /^Two to choose between\./,
+    "two is what exists, so two is what it says — not 'only two fit' and not " +
+      "'two of three'. The apology would be the house describing its own " +
+      "catalogue to her, which is house business"
+  );
+
+  const lead = offerLead(offerOf("dish", 3));
+  for (const wrong of [/match/i, /score/i, /chose (for|you)/i, /we /i, /narrow/i, /select/i]) {
+    assert.doesNotMatch(
+      lead,
+      wrong,
+      "nothing about how the cards were found. That credits the house"
+    );
+  }
+});
+
+test("once she has taken one, the line is about changing her mind", () => {
+  assert.equal(
+    offerLead(offerOf("dish", 3, true)),
+    "Three to choose between. Change your mind whenever you like.",
+    "db/061 made the offer the thing that binds so that this sentence could " +
+      "be true without limit and without a refusal"
+  );
 });
 
 /* ── where things sit ───────────────────────────────────────────────── */

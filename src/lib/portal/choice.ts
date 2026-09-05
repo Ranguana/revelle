@@ -60,6 +60,7 @@
  */
 
 import { idColumnFor, tablesFor, type EntityTable } from "../pools/registry.ts";
+import { inWords } from "./sections.ts";
 import type { MemberPiece } from "../selection/member.ts";
 
 /* ── the rule, for TypeScript ───────────────────────────────────────── */
@@ -175,6 +176,53 @@ export type Offer = {
 export type Entry =
   | { kind: "piece"; piece: MemberPiece }
   | { kind: "offer"; offer: Offer };
+
+/* ── the line above the cards ───────────────────────────────────────── */
+
+/**
+ * WHAT SHE READS ABOVE A CAROUSEL — one owner, two surfaces.
+ *
+ * Her occasion page renders it and so does the desk's preview of her occasion
+ * page, and the preview exists precisely so that staff can see WHAT SHE SEES.
+ * Two copies of this sentence would make the preview a page about a different
+ * product the day either was edited (CLAUDE.md rule 21).
+ *
+ * ── RULE 10 IS THE TEST FOR EVERY WORD OF IT ────────────────────────
+ *
+ * Does the line credit her, or credit us? "The one you pick is the one that
+ * runs" credits her. Anything about how these cards were found — matched,
+ * scored, chosen for her, narrowed from a catalogue — credits the house and is
+ * not written. Offering a choice is the instrument working; describing the
+ * work behind the offer turns it back into a service she is a customer of.
+ *
+ * IT DOES NOT SAY HOW MANY WERE POSSIBLE. Two cards say "two to choose
+ * between", never "only two fit" and never "two of three". A room with two
+ * desserts has two desserts; the count is a fact and the apology would be the
+ * house describing its own catalogue to her, which is house business.
+ *
+ * ── AND THE VERB IS THE BEAT'S OWN ──────────────────────────────────
+ *
+ * A game RUNS. A course is one she SERVES. Both put her at the centre of the
+ * act. The fallback is deliberately the flattest true thing rather than a
+ * guess at a third pool's verb: a pool that starts offering a choice and reads
+ * "happens" has a line that is correct and dull, which is the right failure —
+ * inventing "the one you pick is the one that's poured" for a pool nobody has
+ * ruled on would be the house authoring her evening (rule 32).
+ */
+export function offerLead(offer: Offer): string {
+  const count = inWords(offer.cards.length);
+  const opening = `${count.charAt(0).toUpperCase()}${count.slice(1)} to choose between.`;
+  if (offer.settled) return `${opening} Change your mind whenever you like.`;
+
+  switch (offer.pool) {
+    case "game":
+      return `${opening} The one you pick is the one that runs.`;
+    case "dish":
+      return `${opening} The one you pick is the one you serve.`;
+    default:
+      return `${opening} The one you pick is the one that happens.`;
+  }
+}
 
 /**
  * A SECTION'S PIECES, WITH THE OFFERS FOLDED UP — in delivery order.

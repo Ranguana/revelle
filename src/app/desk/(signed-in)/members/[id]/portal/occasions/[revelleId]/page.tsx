@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { entriesIn, offerLead, type Offer } from "@/lib/portal/choice";
 import { readOccasion } from "@/lib/portal/occasions";
 import { inHouseOrder, inWords, longDate } from "@/lib/portal/sections";
 import { themeCss } from "@/lib/tokens";
@@ -43,6 +44,13 @@ import frame from "../../../../preview.module.css";
  *   · a game    → NOT rendered as a link. The runbook is a screen this preview
  *                 does not carry, and the name is printed with a line saying
  *                 so. See below for why it is not carried.
+ *   · a card    → the CAROUSEL is rendered, and its buttons are not. db/061
+ *                 gave the game beat three candidates and db/062 gave each
+ *                 course three, so this page would otherwise show nine dishes
+ *                 and three games as twelve things the house placed — a
+ *                 preview describing a Revelle nobody was sent. Choosing is
+ *                 hers alone: staff see which card she took, and there is no
+ *                 button here to take one for her.
  *   · the post  → NOT rendered as a link, and for a stronger reason: her guest
  *                 list and her letters are about other people who never agreed
  *                 to be read at the desk.
@@ -140,38 +148,60 @@ export default async function MemberOccasionPreview({
                   </summary>
 
                   <div className={occasion.pieces}>
-                    {section.items.map((piece) => (
-                      <article
-                        className={occasion.piece}
-                        key={`${piece.section}-${piece.heading}-${piece.name}`}
-                      >
-                        {label ? (
-                          <p className={occasion.pieceHead}>{piece.heading}</p>
-                        ) : null}
-                        {/*
-                          A GAME IS THE ONE PIECE WITH SOMEWHERE TO GO, and
-                          here it goes nowhere. The name is set as plain text
-                          in the same element the portal uses, so the page
-                          reads the same; the line under it says what she has
-                          that this does not.
-                        */}
-                        <h3 className={occasion.pieceName}>{piece.name}</h3>
-                        {piece.description ? (
-                          <div className={occasion.pieceBody}>
-                            {paragraphs(piece.description).map((line, index) => (
-                              <p key={index}>{line}</p>
-                            ))}
-                          </div>
-                        ) : null}
-                        {piece.pool === "game" ? (
-                          <Stopped>
-                            She can open this one — the runbook is a screen of
-                            its own and is not in the preview. It is authored
-                            house writing, and it is readable at /desk/games.
-                          </Stopped>
-                        ) : null}
-                      </article>
-                    ))}
+                    {/*
+                      `entriesIn` is the portal's own read (src/lib/portal/
+                      choice.ts), not a second one. A beat she chooses in
+                      arrives as several rows sharing an offer group, and a
+                      preview that rendered them flat would show nine dishes
+                      and three games as twelve things the house placed —
+                      a page describing a Revelle nobody was sent.
+                    */}
+                    {entriesIn(section.items).map((entry) =>
+                      entry.kind === "piece" ? (
+                        <article
+                          className={occasion.piece}
+                          key={`${entry.piece.section}-${entry.piece.heading}-${entry.piece.name}`}
+                        >
+                          {label ? (
+                            <p className={occasion.pieceHead}>
+                              {entry.piece.heading}
+                            </p>
+                          ) : null}
+                          {/*
+                            A GAME IS THE ONE PIECE WITH SOMEWHERE TO GO, and
+                            here it goes nowhere. The name is set as plain text
+                            in the same element the portal uses, so the page
+                            reads the same; the line under it says what she has
+                            that this does not.
+                          */}
+                          <h3 className={occasion.pieceName}>
+                            {entry.piece.name}
+                          </h3>
+                          {entry.piece.description ? (
+                            <div className={occasion.pieceBody}>
+                              {paragraphs(entry.piece.description).map(
+                                (line, index) => (
+                                  <p key={index}>{line}</p>
+                                )
+                              )}
+                            </div>
+                          ) : null}
+                          {entry.piece.pool === "game" ? (
+                            <Stopped>
+                              She can open this one — the runbook is a screen of
+                              its own and is not in the preview. It is authored
+                              house writing, and it is readable at /desk/games.
+                            </Stopped>
+                          ) : null}
+                        </article>
+                      ) : (
+                        <PreviewOffer
+                          key={entry.offer.group}
+                          offer={entry.offer}
+                          label={label}
+                        />
+                      )
+                    )}
                   </div>
                 </details>
               );
@@ -271,6 +301,58 @@ export default async function MemberOccasionPreview({
         </div>
       </Inert>
     </div>
+  );
+}
+
+/**
+ * A CAROUSEL AS STAFF SEE IT: every card, the one she took marked, no buttons.
+ *
+ * The same classes and the same lead line as her page — `offerLead` is
+ * exported from src/lib/portal/choice.ts precisely so this cannot drift into a
+ * preview of a different sentence. What is missing is the only thing that
+ * should be: the form.
+ *
+ * CHOOSING IS HERS AND THE HOUSE DOES NOT GET A BUTTON FOR IT. db/061 made the
+ * offer the thing that binds so that her choice could be changed without limit
+ * and never refused; a member of staff able to press it from a preview would
+ * be a mind changed by somebody who is not her, with nothing on the page to
+ * say it had happened. The preview shows the state and stops there.
+ *
+ * A card she has not taken is left unmarked rather than labelled. "Not chosen"
+ * on two of three cards would read as a verdict on the cards; the absence of a
+ * mark reads as what it is, which is a decision she has not made yet.
+ */
+function PreviewOffer({ offer, label }: { offer: Offer; label: boolean }) {
+  return (
+    <section className={occasion.offer} aria-label={offer.heading}>
+      {label ? <p className={occasion.pieceHead}>{offer.heading}</p> : null}
+      <p className={occasion.offerLead}>{offerLead(offer)}</p>
+
+      <div className={occasion.offerCards}>
+        {offer.cards.map((card) => (
+          <article
+            className={occasion.offerCard}
+            data-chosen={card.chosen ? "yes" : undefined}
+            key={card.slug}
+          >
+            <h3 className={occasion.pieceName}>{card.name}</h3>
+            {card.description ? (
+              <div className={occasion.pieceBody}>
+                {paragraphs(card.description).map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
+              </div>
+            ) : null}
+            {card.chosen ? <p className={occasion.offerMark}>Yours</p> : null}
+          </article>
+        ))}
+      </div>
+
+      <Stopped>
+        She chooses here, and only she does. The preview shows which card she
+        has taken and carries no button to take one for her.
+      </Stopped>
+    </section>
   );
 }
 

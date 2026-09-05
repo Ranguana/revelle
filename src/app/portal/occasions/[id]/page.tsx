@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireMember } from "@/lib/members";
-import { entriesIn, type Offer } from "@/lib/portal/choice";
+import { entriesIn, offerLead, type Offer } from "@/lib/portal/choice";
 import { readOccasion, type Occasion } from "@/lib/portal/occasions";
 import { UnrenderableIngredients } from "@/lib/portal/picks";
 import { inHouseOrder, inWords, longDate } from "@/lib/portal/sections";
@@ -396,30 +396,6 @@ function PieceName({
 }
 
 /**
- * WHAT THE BEAT'S OWN VERB IS — rule 10's test, applied per pool.
- *
- * A game RUNS. A course is one she SERVES. Both sentences put her at the
- * centre of the act, which is the whole test: does the line credit her, or
- * credit us. Neither says anything about how the cards were found.
- *
- * The fallback is deliberately the flattest true thing rather than a guess at
- * a third pool's verb. A pool that starts offering a choice and reads
- * "happens" here has a line that is correct and dull, which is the right
- * failure — inventing "the one you pick is the one that's poured" for a pool
- * nobody has ruled on would be the house authoring her evening (rule 32).
- */
-function offerVerb(pool: string): string {
-  switch (pool) {
-    case "game":
-      return "The one you pick is the one that runs.";
-    case "dish":
-      return "The one you pick is the one you serve.";
-    default:
-      return "The one you pick is the one that happens.";
-  }
-}
-
-/**
  * THE CAROUSEL — db/061, and the founder's word for it; db/062 for the courses.
  *
  * "what i do want to do is give a host three ga[m]es to choose from. as an or
@@ -430,17 +406,9 @@ function offerVerb(pool: string): string {
  *
  * ── WHAT IT SAYS AND WHAT IT REFUSES TO SAY ─────────────────────────
  *
- * CLAUDE.md rule 10 is the test for every line here: does it credit her, or
- * credit us. "The one you pick is the one that runs" credits her. Anything
- * about how these three were found — that they were matched, scored, chosen
- * for her, narrowed from a catalogue — credits the house and is not written.
- * Offering a choice is the product being an instrument; describing the work
- * behind the offer would turn it back into a service she is a customer of.
- *
- * IT DOES NOT SAY HOW MANY WERE POSSIBLE. Two cards say "two to choose
- * between", not "only two fit" and not "two of three". A room with two games
- * has two games; the count is a fact and the apology would be the house
- * describing its own catalogue to her, which is house business.
+ * The line above the cards is `offerLead` in src/lib/portal/choice.ts, with
+ * rule 10's argument written beside it — one owner, because the desk's preview
+ * of her occasion renders the same sentence and exists to show WHAT SHE SEES.
  *
  * AND IT SAYS NOTHING ABOUT WHETHER THE COURSES GO TOGETHER. They do — db/022's
  * coherence group binds all nine dishes to one season and one rung, so every
@@ -472,12 +440,7 @@ function Carousel({
   return (
     <section className={styles.offer} aria-label={offer.heading}>
       {label ? <p className={styles.pieceHead}>{offer.heading}</p> : null}
-      <p className={styles.offerLead}>
-        {capital(inWords(offer.cards.length))} to choose between.{" "}
-        {offer.settled
-          ? `Change your mind whenever you like.`
-          : offerVerb(offer.pool)}
-      </p>
+      <p className={styles.offerLead}>{offerLead(offer)}</p>
 
       <div className={styles.offerCards}>
         {offer.cards.map((card) => (
