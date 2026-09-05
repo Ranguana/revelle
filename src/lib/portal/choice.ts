@@ -18,6 +18,24 @@
  * bought supplies for all three is not a cosmetic disagreement — it is a host
  * arriving on the night with the wrong things.
  *
+ * ── AND THEN THE COURSES — db/062 ───────────────────────────────────
+ *
+ * Founder, 2026-09-05: "lets give 3 menu options (if member wants) like we do
+ * for games", and then "three per course". So `the_appetizer`, `the_main` and
+ * `the_dessert` each offer three, and a host's page carries four beats she
+ * chooses in rather than one.
+ *
+ * NOTHING BELOW CHANGED FOR THAT, and that is the fact worth recording. Every
+ * function here reads `offerGroup` and `chosen` off a `MemberPiece` and has
+ * never asked which pool it came from, because db/061 put `offer_count` on
+ * `occasion_slot` and `offer_group`/`chosen_at` on every join table rather than
+ * on the game's. A second pool arriving and finding the mechanism already fits
+ * is what a pool-agnostic column was for.
+ *
+ * The one thing added is `Offer.pool`, so that a surface can say the true thing
+ * about the beat — a game runs, a course is eaten — without a page inferring it
+ * from a heading.
+ *
  * ── WHAT COUNTS: SETTLED ────────────────────────────────────────────
  *
  * A row is SETTLED when the house simply placed it (`offer_group` null — every
@@ -92,7 +110,17 @@ export type OfferCard = {
 export type Offer = {
   /** `occasion_slot`'s beat key — 'game:1:0'. Stable, and the form's handle. */
   group: string;
-  /** The beat's own name, from slot_kind. "The fun". */
+  /**
+   * WHICH POOL THE BEAT DRAWS — 'game', 'dish'.
+   *
+   * A property of the OFFER and not of a card, because `occasion_slot.pool` is
+   * one column: a beat draws one pool and every card in it came out of that
+   * pool. It is carried here so the page can say the true thing about what she
+   * is choosing between — a game runs, a course is eaten — and so the write
+   * knows which join table holds her choice (db/062).
+   */
+  pool: string;
+  /** The beat's own name, from slot_kind. "The fun". "The main course". */
   heading: string;
   /** In delivery order, always. See rule 18 above. */
   cards: OfferCard[];
@@ -154,6 +182,7 @@ export function entriesIn(pieces: readonly MemberPiece[]): Entry[] {
       kind: "offer",
       offer: {
         group,
+        pool: siblings[0].pool,
         heading: siblings[0].heading,
         cards: siblings.map((member) => ({
           slug: member.slug,

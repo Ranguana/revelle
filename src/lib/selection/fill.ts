@@ -568,12 +568,45 @@ function takesABlock(ingredient: Ingredient): boolean {
  * WHICH BEAT OF THE EVENING THIS UNIT SLOT IS — db/061.
  *
  * The offer group where there is one, the slot's own key where there is not.
- * Stated once because two things must agree about it: the cap check refuses a
- * candidate on it and `extend` spends a block on it, and if those two ever
- * disagreed a beat would be charged twice or never (CLAUDE.md rule 21).
+ * Stated once because three things must agree about it: the cap check refuses a
+ * candidate on it, `extend` spends a block on it, and `whatRuns` below counts
+ * one course per beat for the chooser — and if any two disagreed a beat would
+ * be charged twice or never (CLAUDE.md rule 21).
  */
 function beatOf(slot: UnitSlot): string {
   return slot.offerGroup ?? slot.key;
+}
+
+/**
+ * WHAT IS ACTUALLY ON THIS TABLE — db/062, and the reading `revelle_game_load`
+ * already applies one layer down.
+ *
+ * An offer is several candidates for ONE beat and exactly one of them happens.
+ * Three offered appetizers are not three appetizers; they are one appetizer not
+ * yet picked. So anything that answers "what is already on the table" must
+ * count a beat once, and the stand-in for an undecided beat is its FIRST card —
+ * the top of the carousel, which is a count and not a claim about her taste.
+ *
+ * WHY THIS EXISTS AT ALL, since it fixes nothing that is broken today: it feeds
+ * `CourseRequest.placed`, whose own comment reads "already on this table, in
+ * the order they were placed". With three per course that sentence would become
+ * false the moment a chooser is configured — a model asked for a main would be
+ * shown three appetizers as if she were eating all three, and would compose
+ * against a table nobody is sitting at. Nothing would throw and nothing would
+ * go red; the prompt would simply be describing a different dinner. That is
+ * CLAUDE.md rule 23's shape exactly, and rule 23 says to fix it at the point
+ * the wrong reading would be made rather than to wait for the misreading.
+ */
+function whatRuns(picks: readonly Pick[]): Pick[] {
+  const seen = new Set<string>();
+  const runs: Pick[] = [];
+  for (const pick of picks) {
+    const beat = beatOf(pick.slot);
+    if (seen.has(beat)) continue;
+    seen.add(beat);
+    runs.push(pick);
+  }
+  return runs;
 }
 
 /** STAGE 4. */
@@ -790,9 +823,13 @@ export function fillSlots(
               season: seasonHeld,
               making: rungForThisCourse,
               slot,
-              placed: state.picks
-                .filter((pick) => groupOf(pick.slot) === group)
-                .map((pick, index) => courseOption(pick.ingredient, index)),
+              // ONE COURSE PER BEAT — db/062. See whatRuns above: three
+              // offered appetizers are one appetizer not yet picked, and a
+              // chooser shown all three would be composing against a table
+              // nobody is sitting at.
+              placed: whatRuns(
+                state.picks.filter((pick) => groupOf(pick.slot) === group)
+              ).map((pick, index) => courseOption(pick.ingredient, index)),
               survivors,
               exemplars: table.exemplars ?? [],
             },

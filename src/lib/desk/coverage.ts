@@ -253,12 +253,32 @@ type PoolSlot = {
   /** `slot_kind.label`, in the founder's words, rendered as the heading. */
   label: string;
   /**
-   * The most any one occasion draws into this slot — `max(occasion_slot
-   * .max_count)`. 1 for the three named slots, 2 for the general bucket, and
-   * read rather than assumed because db/043 chose those numbers against
+   * The most any one occasion PULLS OUT OF THE POOL for this slot —
+   * `max(occasion_slot.max_count * occasion_slot.offer_count)`. Read rather
+   * than assumed because db/043 chose those numbers against
    * `ingredient_pool.typical_draw` and a later migration may choose others.
    *
    * It is the floor the cell judges against: see `atmosphereCell`.
+   *
+   * ── WHY offer_count IS IN THIS PRODUCT — db/061, db/062 ────────────
+   *
+   * A beat that offers three DELIVERS three: all three are written into
+   * `revelle_<pool>` at approval and are inside the assemblage fingerprint,
+   * and only one of them runs. What this cell is judging is whether the room
+   * can VARY — whether the second member to be sent this room gets a repeat —
+   * and that question is answered by how many rows leave the pool, not by how
+   * many of them she eventually eats.
+   *
+   * On `max_count` alone the board would call a room with two authored
+   * desserts `filled` while every member sent that room received the same two
+   * cards, differing in nothing. It would not be broken; it would be answering
+   * a different question than the column heading asks (CLAUDE.md rule 23), and
+   * the whole argument for this board is that it must not claim certainty it
+   * does not have.
+   *
+   * It corrects the game column too, which has been reading `1` since db/061
+   * made the one game beat offer three yesterday — rule 23's other half: audit
+   * what was already built on the misreading rather than only fixing forward.
    */
   draw: number;
 };
@@ -423,7 +443,9 @@ async function slotsFor(entity: StockedPool): Promise<PoolSlot[]> {
   }
 
   const rows = await query<{ code: string; label: string; draw: number }>(
-    `select k.code, k.label, max(s.max_count)::int as draw
+    // `max_count * offer_count` — what the beat takes OUT OF THE POOL, which
+    // is the number this board's floor is about. See PoolSlot.draw.
+    `select k.code, k.label, max(s.max_count * s.offer_count)::int as draw
        from occasion_slot s
        join slot_kind k on k.code = s.slot_code
       where s.pool = $1
