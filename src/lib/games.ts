@@ -1173,9 +1173,13 @@ const REVERSE_SCAVENGER_HUNT: Game = {
       piece: "point_list",
       label: "The list",
       description:
-        "One a head. The two rules at the head — nothing is taken, " +
-        "everything is given, forty-five minutes — and under them the ten " +
-        "lines and what each is worth.",
+        "One sheet a head and three spare, because people arrive who were " +
+        "not on the list and still want to play. One side only. The two " +
+        "rules at the head, set large enough to be read across a room — " +
+        "nothing is taken, everything is given, forty-five minutes — and " +
+        "under them the ten lines with what each is worth against it, " +
+        "ruled so a stranger scoring somebody else's sheet can tick down " +
+        "the column and total it at the foot.",
       voicePiece: "game_rule",
       perGuest: true,
     },
@@ -6004,8 +6008,13 @@ const BIG_SUR_THE_LONG_WAY: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: One story each, told the long way, with the " +
-        "detours. Nobody may hurry anybody and nobody can check a single fact.",
+        "One card, one side, propped in the middle of the circle against " +
+        "the bowl the phones went into — the only object this game has, " +
+        "and the reason the card has somewhere to stand. Her sentence, " +
+        "whole: One story each, told the long way, with the detours. " +
+        "Nobody may hurry anybody and nobody can check a single fact. The " +
+        "second half is the half the room enforces on itself, so it is " +
+        "set to be read from any seat in the circle rather than from one.",
       voicePiece: "game_rule",
       quantity: 1,
     },
@@ -6254,9 +6263,12 @@ const TAHITI_THE_LAST_NIGHT: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: Everybody says what they would want on the " +
-        "last night. Whoever names something already on the table cooks " +
-        "tomorrow.",
+        "One card, one side, standing in the middle of a table that " +
+        "already has the food on it — so it is set to survive being " +
+        "moved, splashed and put back. Her sentence, whole: Everybody " +
+        "says what they would want on the last night. Whoever names " +
+        "something already on the table cooks tomorrow. The forfeit is " +
+        "the half people check twice, so it never falls below a fold.",
       voicePiece: "game_rule",
       quantity: 1,
     },
@@ -7415,8 +7427,11 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: Everybody does somebody's voice. Whoever gets " +
-        "guessed first picks the next episode.",
+        "One card, one side, that stands on top of the screen or leans " +
+        "against it — where the room is already looking, because there is " +
+        "no table in this one. Her sentence, whole: Everybody does " +
+        "somebody's voice. Whoever gets guessed first picks the next " +
+        "episode.",
       voicePiece: "game_rule",
       quantity: 1,
     },
@@ -7677,8 +7692,12 @@ const ASPEN_THE_NEXT_LINE: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: Say the next line before it happens. Miss it " +
-        "and you're on garlic bread.",
+        "One card, one side, and it lives on the kitchen counter beside " +
+        "the oven rather than in the room the game is played in — the " +
+        "forfeit is paid in the kitchen four or five times a night and " +
+        "the card is what somebody reads while it heats. Her sentence, " +
+        "whole: Say the next line before it happens. Miss it and you're " +
+        "on garlic bread.",
       voicePiece: "game_rule",
       quantity: 1,
     },
@@ -8157,8 +8176,13 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: The story is told the long way. Anybody may " +
-        "correct the year, and somebody always does.",
+        "One card, one side, on the table from before the first story and " +
+        "still there for the second — the game is two stories and the " +
+        "card is not moved between them. Her sentence, whole: The story " +
+        "is told the long way. Anybody may correct the year, and somebody " +
+        "always does. Nothing else on it: the year is the only thing that " +
+        "may be corrected, and a card listing the other corrections would " +
+        "license them.",
       voicePiece: "game_rule",
       quantity: 1,
     },
@@ -8409,8 +8433,12 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: Everyone pays one compliment out loud, to a " +
-        "face, before the light goes.",
+        "One card, one side, small enough to go in a pocket and be " +
+        "carried outside — this one does not happen indoors and the card " +
+        "leaves the house with whoever starts it. Her sentence, whole: " +
+        "Everyone pays one compliment out loud, to a face, before the " +
+        "light goes. It has to be legible in the last of the daylight, " +
+        "which is the one real constraint on this piece.",
       voicePiece: "game_rule",
       quantity: 1,
     },
