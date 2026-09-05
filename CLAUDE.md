@@ -188,6 +188,40 @@ lost, and a deleted argument gets re-made.
   `src/lib/games.ts` for every future build, and the migration backfills the
   rows production already holds, because neither half covers both cases.
 
+  **AND THE TOOL BUILT TO CHECK IT WAS ITSELF MISREADING THE FILES.**
+  `one-game.test.ts` found its inserts with `values([\s\S]*?);`, which stops
+  at the first semicolon — INCLUDING ONE INSIDE A STRING LITERAL. db/022 has
+  one, in a note reading "a table is offered, not insisted on", so the replay
+  read SIXTEEN of the composed table's twenty-seven course rows. It was green
+  for a day and correct about every row anybody had asked it for, because the
+  test only ever queried `pool = 'game'` and all of those are inserted above
+  the truncation. Found the next day by expecting 27 and getting 16 — rule 24
+  working exactly as written, and the second time in this file that a guard
+  turned out to be answering a narrower question than its name. Statements are
+  split by a scanner now (`src/lib/occasion-slot-replay.ts`), which knows
+  strings, quoted identifiers and dollar-quoted bodies.
+
+- **A FALLBACK WRITTEN SO A SLOT IS NOT EMPTY MUST NOT REACH THE SPARE
+  CARDS OF AN OFFER.** db/022 lets a course fall back one rung of the making
+  axis when nothing at the table's rung can fill it, on an argument that is
+  entirely about EMPTINESS — "a table with a main in it at the wrong rung
+  beats a table with no main". db/062 gave each course three candidates, and
+  the fallback fired for the second and third as readily as for the first: a
+  room with two mains at her rung and one a rung off dealt that third one as a
+  card she could press, so a host who said she wanted a half-made evening was
+  offered a day of stock AND COULD TAKE IT. Nothing threw. The table stayed
+  coherent by the letter of the rule, because the rule was satisfied one
+  course at a time.
+  **The general form: when a mechanism starts offering N of something, every
+  rule written to keep ONE of it from being missing has to be re-read, because
+  "rather this than nothing" is false of a card that is not needed.** The
+  sibling case was already found and fixed on the same axis — db/061's
+  `blocksSpent`, where the evening's block cap refused the carousel's own
+  second card. Two instances, one shape: a rule about the beat applied to the
+  beat's alternatives. `required` was already correct on this (only the first
+  card of an offer carries it), which is what made the rung fallback look
+  handled when it was not.
+
 - **PROVENANCE MUST BE RECORDED AT THE GRAIN IT WILL BE READ AT.**
   `destination.updated` in `staff_action` is the only evidence in this system
   that a human, rather than a seeder, chose a room's member-facing copy — and
