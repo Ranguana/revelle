@@ -22,6 +22,20 @@ import styles from "./landing.module.css";
  *
  * There is no deselect and no empty state: the panel is never blank, so the
  * section reads the same on a first glance as after a click.
+ *
+ * ── NOT RENDERED ANYWHERE, AS OF 2026-09-05 ──────────────────────────
+ *
+ * The landing page dropped the shelf: none of the plates linked anywhere, and
+ * a menu of eighteen rooms asks "which one do I want?" when the house assigns
+ * the room from her answers. The argument is written out in src/app/page.tsx
+ * where the section used to be. This file is kept, not deleted, because the
+ * component is correct and a destination route is the thing that would bring
+ * it back.
+ *
+ * IF IT IS RENDERED AGAIN, RESTORE ITS TOKEN BLOCK. `.plateFrame` is pinned to
+ * the house palette by a `themeCss(HOUSE, ...)` block that page.tsx used to
+ * emit and no longer does, so the frame would otherwise inherit whatever
+ * palette it lands inside.
  */
 export default function DestinationPlates() {
   const [chosen, setChosen] = useState(0);

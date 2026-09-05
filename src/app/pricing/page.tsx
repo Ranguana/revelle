@@ -7,8 +7,10 @@ import styles from "./pricing.module.css";
 
 export const metadata: Metadata = {
   title: "Membership",
-  description:
-    "Apply once. Dues annually. Or commission a single Revelle without joining.",
+  // "Or commission a single Revelle without joining." was the second sentence
+  // here and went with the offer it described. What is left is her line,
+  // unaltered, which was always the first half.
+  description: "Apply once. Dues annually.",
 };
 
 /**
@@ -27,7 +29,11 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default function PricingPage() {
-  const { duesCents, commissionCents, foundingMembers, trialDays } = pricing();
+  // `commissionCents` is deliberately not read. Founder, 2026-09-05: the
+  // single Revelle is gone, so membership is the only door. Rule 15's shape —
+  // an instrument that is not consumed does not get to sit in the file looking
+  // wired. See the note beside the field in src/lib/pricing.ts.
+  const { duesCents, foundingMembers, trialDays } = pricing();
 
   return (
     <main className={styles.page}>
@@ -36,8 +42,11 @@ export default function PricingPage() {
           <Link className={styles.wordmark} href="/">
             Revelle Société
           </Link>
+          {/* The label was "The destinations", for a shelf of plates the
+              landing page no longer carries. It points at the front door,
+              so it now says what is actually there. */}
           <Link className={styles.back} href="/">
-            The destinations
+            The société
           </Link>
         </div>
 
@@ -84,14 +93,18 @@ export default function PricingPage() {
                 </p>
               )}
               {/*
-                What membership adds over a single commission, and every line
-                is something a one-off structurally CANNOT have rather than
-                something withheld from it. A member does not get a better
-                Revelle — she gets a house that remembers. Withholding craft to
-                force an upgrade would poison the thing being sold.
+                What membership IS. The three paragraphs below are hers,
+                verbatim, and were written when there was a cheaper offer
+                beside them — they read as the terms of the only door now,
+                which is stronger and needed no edit to become so. Every claim
+                is about what the house remembers and what stays hers.
 
-                No feature list, no ticks, no comparison table: a société
-                states its terms and does not argue for itself.
+                THEY USED TO BE READ AS A COMPARISON: "what membership adds
+                over a single commission". That framing goes with the offer it
+                compared against, and nothing replaces it. A société states its
+                terms and does not argue for itself — so no feature list, no
+                ticks, no comparison table, and above all nothing added here to
+                make up for the option that was removed.
               */}
               <p className={styles.termBody}>
                 Apply once, then dues annually. Membership is continuity: the
@@ -117,21 +130,24 @@ export default function PricingPage() {
             </div>
           </div>
 
-          <div className={styles.term}>
-            <h2 className={styles.termName}>A single Revelle</h2>
-            <div>
-              {commissionCents === null ? (
-                <p className={styles.amountUnset}>On application</p>
-              ) : (
-                <p className={styles.amount}>{formatPrice(commissionCents)}</p>
-              )}
-              <p className={styles.termBody}>
-                One occasion, commissioned without joining. Designed the same
-                way and issued the same once — what it does not do is remember
-                you afterwards.
-              </p>
-            </div>
-          </div>
+          {/* ── the single Revelle: REMOVED, 2026-09-05 ───────────────────
+              Founder: "get rid of A single Revelle $30 / One occasion,
+              commissioned without joining. Designed the same way and issued
+              the same once — what it does not do is remember you afterwards."
+
+              One occasion bought without joining was the second of two
+              products (docs/build-checklist.md still lists both, and is a
+              founder document, so it is reported rather than edited here).
+              Removing it makes membership the only way in, and her own copy
+              above already carries that argument: membership is CONTINUITY,
+              and the third occasion is sharper than the first. That reads
+              stronger with nothing cheaper beside it, so nothing was added to
+              compensate.
+
+              PRICE_SINGLE_COMMISSION is now read by nothing. The variable is
+              left set on Render — an unread variable is harmless and clearing
+              it is not this change's decision — but it is INERT, and this is
+              the note that stops it looking live. */}
         </section>
 
         <div className={styles.foot}>

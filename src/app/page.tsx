@@ -8,22 +8,50 @@ import {
   NOT_THIS,
   OCCASIONS,
 } from "@/lib/library";
-import { HOUSE, themeCss } from "@/lib/tokens";
+import { themeCss } from "@/lib/tokens";
 
-import DestinationPlates from "./DestinationPlates";
 import { OCCASION_ICONS } from "./plates";
 import styles from "./landing.module.css";
 
 /**
  * The front door.
  *
- * The page is EVIDENCE, in this order: a destination you are standing in, the
- * occasions it comes in, the shelf it came off, one of them worked through in
- * full, what actually arrives, the two lists, and the way in. Nothing on it
- * explains the service, because a house that explains itself is a house nobody
- * wanted to visit. See docs/copy.md for the approved words and
- * docs/copy-brief.md for the rules behind them — the words here are theirs and
- * are not to be improved.
+ * The page is EVIDENCE, in this order: the range the product covers, the
+ * occasions it comes in, one destination worked through in full, what actually
+ * arrives, the two lists, and the way in. Nothing on it explains the service,
+ * because a house that explains itself is a house nobody wanted to visit. See
+ * docs/copy.md for the approved words and docs/copy-brief.md for the rules
+ * behind them — the words here are theirs and are not to be improved.
+ *
+ * ── TWO THINGS THIS PAGE NO LONGER DOES, AND WHY ─────────────────────
+ *
+ * IT DOES NOT OPEN WITH ONE ROOM. The H1 was WESTHAMPTON, 1976 and the hero
+ * was painted in that room's palette. Founder, 2026-09-05: "it shouldnt open
+ * with westhampton 1976. just move this line up." That is rule 2 read from the
+ * front of the house — "Havana in a Brooklyn apartment isn't a compromise, it's
+ * the pitch." A single destination as the headline sells a location, and
+ * leading with Westhampton tells a visitor this is for people who have a house
+ * in Westhampton. HERO_LINE leads instead: two destinations and then the room
+ * she already owns, which is the actual product. The hero is now painted in the
+ * HOUSE palette for the same reason — with eighteen genuinely distinct grounds,
+ * seven of them dark, wearing one room's colours at the front door is the same
+ * claim in paint.
+ *
+ * IT DOES NOT SHELVE THE DESTINATIONS. A grid of named rooms ran here, and
+ * none of the plates linked anywhere. Founder, same day: "you have all the
+ * destinations on the landing page but they dont click anywhere, I think its
+ * better we dont show the destinations (except for westhampton i guess as an
+ * example toward the bottom)." A dead grid promises a page that does not exist
+ * — and worse, a menu of eighteen rooms invites "which one do I want?", which
+ * is the wrong question: she does not pick, the house assigns from her answers
+ * (docs/selection-spec.md, "she does not pick"). So the shelf is gone and
+ * Westhampton stays as the one worked example, low on the page, where the
+ * reader knows what she is looking at.
+ *
+ * Nothing was deleted to do either. `LIBRARY` still holds every plate's
+ * authored caption, tagline and rows, `POSTERS` still holds the artwork, and
+ * DestinationPlates.tsx still renders them — it is simply not called from here.
+ * Rule 14: the argument is kept so the next person does not re-make it.
  *
  * ── What is deliberately absent ──────────────────────────────────────
  *
@@ -60,25 +88,6 @@ import styles from "./landing.module.css";
 const WESTHAMPTON = WESTHAMPTON_1976;
 
 /**
- * The hero line, and it is NOT a destination tagline.
- *
- * WESTHAMPTON.tagline — "Vintage summer glamour. Very questionable
- * houseguests." — describes one destination, and it still runs on the worked
- * plate below and on the library card, where that is exactly its job. It was
- * the wrong thing to open with, because it sells a house rather than the
- * product.
- *
- * This line is the thesis, in the founder's words: two destinations and then
- * the room the reader actually owns. It is the same argument
- * src/lib/selection/destination.ts makes in code — "Venue never touches the
- * destination… Havana in a Brooklyn apartment isn't a compromise, it's the
- * pitch." The third clause is the one doing the work. Do not "improve" it by
- * making the third place exotic too.
- *
- * The forms are deliberately unlike each other — a year, a season, a weekday —
- * so the three land as a range rather than a list.
- */
-/**
  * The plain-English explainer, for the reader who wants the service named
  * before she reads a plate. The founder's words, with two fixes she can revert:
  *
@@ -102,8 +111,40 @@ const EXPLAINER =
   "us with a moment — a birthday, a girls' weekend, a dinner, a holiday, a " +
   "getaway — and you throw the night you meant to, made yours and made real.";
 
+/**
+ * THE HEADLINE. It is not a destination tagline and it never was.
+ *
+ * WESTHAMPTON.tagline — "Vintage summer glamour. Very questionable
+ * houseguests." — describes one destination, and it still runs on the worked
+ * plate below and on the library card, where that is exactly its job. It was
+ * the wrong thing to open with, because it sells a house rather than the
+ * product; so was the room's NAME, which is what the H1 held until
+ * 2026-09-05.
+ *
+ * This line is the thesis, in the founder's words: two destinations and then
+ * the room the reader actually owns. It is the same argument
+ * src/lib/selection/destination.ts makes in code — "Venue never touches the
+ * destination… Havana in a Brooklyn apartment isn't a compromise, it's the
+ * pitch." The third clause is the one doing the work. Do not "improve" it by
+ * making the third place exotic too.
+ *
+ * The forms are deliberately unlike each other — a year, a season, a weekday —
+ * so the three land as a range rather than a list.
+ *
+ * ── WHY IT IS SPLIT FOR SETTING, AND WHY THAT IS SAFE ────────────────
+ *
+ * The constant above is the copy and the only authority for it. The split is
+ * typography: three sentences authored as a range are set as three lines, so
+ * the range is visible at a glance instead of depending on where a measure
+ * happens to wrap. `split` on a lookbehind cannot drop or alter a character —
+ * if the pattern ever fails to match, the result is the whole string in one
+ * span, which still renders every word. There is no arrangement of this code
+ * that can lose her line.
+ */
 const HERO_LINE =
   "Westhampton, 1976. Portofino, off-season. Your dining room, Saturday.";
+
+const HERO_CLAUSES = HERO_LINE.split(/(?<=\.)\s+/);
 
 /** "Labor Day. Six friends. A rented house." and the rest — docs/copy.md. */
 const WORKED_NARRATIVE =
@@ -127,15 +168,19 @@ export default function Home() {
         dangerouslySetInnerHTML={{
           __html: [
             themeCss(WESTHAMPTON.look, `.${styles.westhampton}`),
-            themeCss(HOUSE, `.${styles.plateFrame}`),
             themeCss(WESTHAMPTON.look, `.${styles.specimen}`),
           ].join("\n\n"),
         }}
       />
 
-      {/* ── the hero: a destination, set like a plate ──────────────── */}
+      {/* ── the hero: the range, on the house's own ground ─────────────
+          NOT painted in a destination's palette. It was, and that was the
+          same claim as the old H1 made in colour: one room's ground at the
+          front door tells a visitor the house has one look. There are
+          eighteen, seven of them dark, and the page's one room wears its own
+          colours further down where it means something. */}
 
-      <header className={`${styles.hero} ${styles.westhampton}`}>
+      <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.masthead}>
             <div className={styles.mastheadName}>
@@ -168,12 +213,18 @@ export default function Home() {
           */}
           <div className={styles.heroGrid}>
             <div className={styles.heroPlate}>
-              <p className={styles.plateIndex}>Destination No. 07</p>
-              <h1 className={styles.heroName}>{WESTHAMPTON.name}</h1>
-              {/* No ornament between the name and the line under it. The
+              {/* The index and the destination's name were here, above this
+                  line. Neither was deleted: both still run on the worked plate
+                  further down, which is now the page's one destination and the
+                  only place it is claimed. */}
+              <h1 className={styles.heroName}>
+                {HERO_CLAUSES.map((clause) => (
+                  <span key={clause}>{clause}</span>
+                ))}
+              </h1>
+              {/* No ornament between the headline and the line under it. The
                   handoff sets those two as one unit, and the page's single
                   ornament belongs to the worked plate further down. */}
-              <p className={styles.heroTagline}>{HERO_LINE}</p>
               <p className={styles.heroSociete}>A société for people who host.</p>
               <p className={styles.heroExplainer}>{EXPLAINER}</p>
 
@@ -240,16 +291,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── the destinations ───────────────────────────────────────── */}
+      {/* ── the destinations: CUT, and the argument kept ────────────────
+          A shelf of eighteen plates ran here, under the eyebrow "The
+          destinations", rendered by DestinationPlates. Founder, 2026-09-05:
+          "you have all the destinations on the landing page but they dont
+          click anywhere". Two faults, and the second is the one that matters:
 
-      <section className={styles.library}>
-        <div className={styles.wrap}>
-          <h2 className={`eyebrow ${styles.eyebrowDark}`}>The destinations</h2>
-          <DestinationPlates />
-        </div>
-      </section>
+            · none of the plates linked anywhere, so a visitor who tried one
+              got nothing — a promise of a page that does not exist;
+            · a menu of named rooms asks "which one do I want?", and she does
+              not pick. The house assigns the room from her answers, and
+              docs/selection-spec.md has a whole section saying so. The shelf
+              was teaching the opposite of how the product works.
 
-      {/* ── one of them, in full ───────────────────────────────────── */}
+          The plates, their captions, taglines and rows are all still authored
+          in src/lib/library.ts and drawn in ./plates.tsx, and
+          DestinationPlates.tsx still renders them — nothing was deleted, and a
+          route that gives a destination its own page is the thing that would
+          bring the shelf back. Rule 14: the argument stays so it is not
+          re-made from scratch. */}
+
+      {/* ── the one destination, worked through ─────────────────────
+          It was already here and it stays here, which is exactly what the
+          founder asked for: "except for westhampton i guess as an example
+          toward the bottom". This is now the page's only room, and the only
+          block wearing a destination's palette. */}
 
       <section className={`${styles.worked} ${styles.westhampton}`}>
         <div className={styles.wrap}>

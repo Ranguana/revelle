@@ -39,7 +39,17 @@ function count(name: string, fallback: number): number {
 export type Pricing = {
   /** Annual dues, in cents. Null until decided. */
   duesCents: number | null;
-  /** One Revelle, bought without joining, in cents. Null until decided. */
+  /**
+   * One Revelle, bought without joining, in cents. Null until decided.
+   *
+   * READ BY NOTHING SINCE 2026-09-05. The founder removed the single Revelle
+   * from the pricing page, so membership is the only door and this figure has
+   * no surface. The field and `PRICE_SINGLE_COMMISSION` are both left in place
+   * — an unread variable costs nothing and clearing it is a separate decision
+   * — but rule 15 says an instrument that feeds nothing does not get to sit
+   * here looking wired, so it says here what it is. If the offer returns, the
+   * page is src/app/pricing/page.tsx and the block it lost is quoted in it.
+   */
   commissionCents: number | null;
   /**
    * How many founding memberships exist. The offer is a standing, not a

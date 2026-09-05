@@ -157,19 +157,32 @@
   border-bottom: 1px solid var(--rule);
 }
 
-/* The handoff's H1, at the largest size that still sets WESTHAMPTON, on one
-   line: 11.6% of the column, since the word measures 8.26em in this face and
-   capitals. So it fills the measure at every width and never breaks a word.
+/* The H1. It used to hold one word — WESTHAMPTON — and was sized to fill the
+   column with it: 11.6% of the column width, since the word measures 8.26em in
+   this face and capitals. It now holds three sentences, so that arithmetic is
+   retired with the thing it measured; the size is set to the longest clause
+   instead, which is roughly 26 characters of mixed case.
+
    The first declaration is the fallback for a browser without container units;
-   the second wins everywhere it is understood. */
+   the second wins everywhere it is understood. Sized against the COLUMN and
+   never against the viewport, for the reason .heroPlate states: the grid goes
+   to two columns at about 830px, so the column narrows while the viewport
+   widens and any vw-based size overruns exactly there. */
 .heroName {
   font-family: var(--display);
   font-weight: 400;
-  font-size: clamp(2.25rem, 1.15rem + 3vw, 4rem);
-  font-size: min(4.25rem, 11.6cqi);
-  line-height: 1.06;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.75rem, 1.1rem + 2.1vw, 2.75rem);
+  font-size: min(2.75rem, 7.4cqi);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
   margin: 0;
+}
+
+/* One line per sentence. The three settings are a RANGE — a year, a season, a
+   weekday — and a range read as one wrapped paragraph is a list. Blocks rather
+   than a <br>, so the copy in page.tsx stays one authored string. */
+.heroName > span {
+  display: block;
 }
 
 /* The one ornament: a brass hairline with a rotated square on it. It replaces
@@ -196,8 +209,14 @@
   transform: rotate(45deg);
 }
 
-/* The handoff's hero destination line: display type, a third of the H1, set to
-   a 34ch measure so it breaks where a sentence would. */
+/* UNUSED SINCE 2026-09-05, and left in place deliberately.
+
+   The handoff's hero destination line: display type, a third of the H1, set to
+   a 34ch measure so it breaks where a sentence would. It held HERO_LINE while
+   the H1 held a destination's name; the two swapped jobs when the page stopped
+   opening with one room, and the line it carried is now the headline. Kept, as
+   .count and .track are kept in quiz.module.css, so nobody re-derives a hero
+   subtitle from finding an orphaned class. */
 .heroTagline {
   font-family: var(--display);
   font-size: clamp(1.25rem, 1.05rem + 1.1vw, 2rem);
@@ -216,7 +235,10 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-soft);
-  margin: clamp(1.25rem, 3vw, 1.75rem) 0 0;
+  /* It follows the headline directly now that the destination line above it is
+     gone, so it inherits that line's opening gap rather than its own smaller
+     one. Without this the house label crowds the last clause. */
+  margin: clamp(1.5rem, 4vw, 2.25rem) 0 0;
 }
 
 .heroActions {

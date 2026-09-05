@@ -490,8 +490,12 @@ const ART_BATTLE: Game = {
     "The twist, and the reason to run it: the winners do not keep their " +
     "work. Every winning piece goes to a guest drawn at random.",
   materials:
-    "Small canvases or thick paper, paint and markers, something to collage " +
-    "with, a timer, and a wall or a row of easels to put the finished work on.",
+    "THE HOUSE PRINTS one sheet a head: the rules, the ballot and five " +
+    "prompt tabs, on one perforated page. YOU SUPPLY one identical canvas " +
+    "each and two spare, acrylics in the primaries and black, a handful " +
+    "of fat markers, a stack of old magazines to collage from, a sheet of " +
+    "small numbered stickers, a bowl, a timer, and a wall or a row of " +
+    "easels the work can all be looked at from at once.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -866,13 +870,40 @@ const REVERSE_SCAVENGER_HUNT: Game = {
     "Nothing is hidden and nothing may be taken. Everything on the list has " +
     "to be given to you.",
   howItWorks:
-    "Everyone gets the same list. Forty-five minutes to collect as much of " +
-    "it as possible, and the only way to get anything is to persuade " +
-    "somebody to hand it over.\n\n" +
-    "Nothing may be taken. Negotiating and trading are the game. Anything " +
-    "genuinely unusual is worth a bonus at the host's discretion.\n\n" +
-    "Highest score at the end wins.",
-  materials: "The printed list, a pen each, and a timer.",
+    "Everybody gets the same printed list of ten things and forty-five " +
+    "minutes to collect as much of it as possible. Nothing on the list " +
+    "is hidden anywhere, and nothing on it may be taken: every item has " +
+    "to be GIVEN to you by somebody else in the room, which means every " +
+    "point on the sheet is a conversation you talked your way into.\n\n" +
+    "The ten lines and what each is worth are printed on the list. A " +
+    "business card and a signature are five. A handwritten compliment, " +
+    "a photograph with three strangers and a party hat are ten. A " +
+    "recipe, a drawing on a napkin and somebody singing Happy Birthday " +
+    "to you are fifteen. A foreign coin and a childhood story are " +
+    "twenty. Negotiating and trading are the game — a coin for a " +
+    "compliment, two signatures for a hat — and nothing stops one " +
+    "person giving the same thing away four times.\n\n" +
+    "The host does not play this one. She referees, stays where people " +
+    "can find her, and rules on things as they happen, and she settles " +
+    "one number before anybody arrives: the bonus, for anything " +
+    "genuinely unusual somebody talked their way into. Ten points, " +
+    "twenty-five at the most, three of them all night. A bonus with no " +
+    "ceiling is an argument at the scoring table; written down " +
+    "beforehand it is a ruling.\n\n" +
+    "At forty-five minutes she calls everybody in and the lists are " +
+    "scored in pairs — each person scores somebody else's, never their " +
+    "own and never a partner they hunted with, which takes five minutes " +
+    "where one host scoring ten lists takes twenty. Then the three " +
+    "bonuses are awarded out loud with the object held up. Highest " +
+    "total wins. On a tie, the two hold up the strangest thing they got " +
+    "and the room decides by noise.\n\n" +
+    "The whole block is an hour: four minutes to call the room, two to " +
+    "say the two rules twice, forty-five for the hunt, and the rest to " +
+    "score it and pay the winner.",
+  materials:
+    "THE HOUSE PRINTS the list, one a head: the two rules at the head, " +
+    "the ten lines under them, and what each one is worth. YOU SUPPLY a " +
+    "pen each and a timer with a face, somewhere the room can see it.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -1185,8 +1216,12 @@ const LETS_MAKE_A_DEAL: Game = {
     "everything they hold on one giant mystery box — the first person to say " +
     "yes takes it, it is opened in front of them, and the night stops there.",
   materials:
-    "Real prizes and ridiculous ones, three doors or screens, envelopes, and " +
-    "one box big enough to be a problem.",
+    "THE HOUSE PRINTS one perforated sheet, cut up before anybody " +
+    "arrives: three door cards, five Door C slips, and the tickets that " +
+    "are the currency — print the sheet again for more tickets. YOU " +
+    "SUPPLY three doors, screens or curtained corners, five plain " +
+    "envelopes for the Door C slips, the real prizes and the ridiculous " +
+    "ones, and one box big enough to be a problem.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -1518,8 +1553,13 @@ const SECRET_GAME_CARDS: Game = {
     "One card each, at the door. Nobody says what is on theirs, and " +
     "everybody spends the night wondering.",
   howItWorks:
-    "Every guest draws one card on arrival and must complete it without " +
-    "telling anyone what it says.\n\n" +
+    "One card each, drawn face down out of a bowl by the door as people " +
+    "arrive, and it is yours for the whole night. The deck is printed one a " +
+    "head with spares, and every card is a thing to make happen to somebody " +
+    "else without ever saying that you are doing it.\n\n" +
+    "Nobody says what is on theirs. There is no enforcement of that and none " +
+    "is needed: telling somebody is obviously worse than not, and the secret " +
+    "is the game — take it out and the deck is a list of chores.\n\n" +
     "The easy ones: three selfies with strangers. Get complimented on your " +
     "outfit. Get somebody to tell you a childhood story. Make five people " +
     "laugh. Teach somebody a dance move.\n\n" +
@@ -1532,8 +1572,28 @@ const SECRET_GAME_CARDS: Game = {
     "Wicked cards are mixed into the deck and are not marked: trade cards " +
     "with somebody without either of you speaking. Give away a drink ticket. " +
     "Lose everything you have completed unless you persuade somebody to lie " +
-    "for you. Make somebody else do your challenge. Swap scorecards.",
-  materials: "The deck, a scorecard each, and something to draw from.",
+    "for you. Make somebody else do your challenge. Swap scorecards. The " +
+    "host never says these exist, and being made to swap scorecards in the " +
+    "middle of the kitchen at eleven is the design working.\\n\\n" +
+    "YOU MARK YOUR OWN. A card completed is ticked by the guest on their " +
+    "own scorecard, and nobody audits it. There is no proof and none is " +
+    "asked for: somebody who lies about a conga line has done more work " +
+    "than somebody who told the truth about a compliment.\\n\\n" +
+    "It takes no block and costs the evening nothing — it runs underneath " +
+    "everything else from the door until the end. HOW IT FINISHES DEPENDS " +
+    "ON WHAT ELSE IS RUNNING. Where the auction is on, a completed card is " +
+    "worth twenty Party Bucks, counted by the guest at the auction and " +
+    "never before, because a deck counted at nine o'clock is a scoreboard " +
+    "and a scoreboard stops people attempting the hard ones. Where there is " +
+    "no auction, it ends near midnight with everybody reading their card " +
+    "out loud, going round the room — the only time the deck is ever heard, " +
+    "and half of it is people finding out what was being done to them all " +
+    "night.",
+  materials:
+    "THE HOUSE PRINTS one sheet a head, perforated into a challenge card " +
+    "and a scorecard and torn apart before anybody arrives. YOU SUPPLY a " +
+    "bowl or a hat to draw the cards from, and a pencil or two beside it " +
+    "for the scorecards.",
 
   shape: "ambient",
   sourcing: "provided",
@@ -1761,6 +1821,14 @@ const SECRET_GAME_CARDS: Game = {
   supplies: [
     { item: "The deck", source: "printed", perGuest: true, leadTimeDays: 2 },
     { item: "A bowl or a hat to draw from", source: "on_hand", quantity: 1 },
+    {
+      item: "Pencils",
+      detail:
+        "Two or three beside the bowl. A scorecard nobody can mark is a " +
+        "scorecard nobody marks, and the twenty a card is the whole reason " +
+        "to complete one.",
+      source: "on_hand",
+    },
   ],
   requirements: [
     { requirement: "mixed_room" },
@@ -1801,16 +1869,51 @@ const THE_SECRET_AUCTION: Game = {
     "Nobody knows what is for sale until the end. Everyone has been earning " +
     "the money for it all night without being told what it buys.",
   howItWorks:
-    "Party Bucks are earned across the whole evening and nobody is shown the " +
-    "lots until the auction opens.\n\n" +
-    "What has gone under the hammer: good wine, restaurant gift cards, " +
-    "trophies that are jokes, the artwork made earlier in the night, mystery " +
-    "boxes, and a Golden Ticket — an automatic win in the first game of next " +
-    "year.\n\n" +
+    "THE MONEY COMES FIRST AND MOST OF THE GAME HAPPENS BEFORE THE BLOCK " +
+    "DOES. Party Bucks are paid out in cash by the host across the whole " +
+    "evening, on the spot, out of her own pocket and never as a tally " +
+    "settled later — fifty for winning the art battle, seventy-five for the " +
+    "scavenger hunt, twenty for every secret card completed, whatever the " +
+    "game show paid out, and ten to thirty at her discretion for party " +
+    "spirit. Nobody is told what the money buys. That last payment is the " +
+    "mechanism rather than a kindness: it is what keeps a guest who has won " +
+    "nothing all night in the room at midnight, and it only works paid out " +
+    "loud, where people can see it.\n\n" +
+    "The lots sit on a table under a cloth from the start of the night and " +
+    "nobody sees one before the auction opens. Eight to ten of them is what " +
+    "the half hour is written for. They are put in order beforehand: " +
+    "something small and stupid first, the Golden Ticket second to last, " +
+    "the best thing last. What has gone under the hammer — good wine, " +
+    "restaurant gift cards, trophies that are jokes, mystery boxes, the " +
+    "paintings from the art battle that nobody won, and the Golden Ticket, " +
+    "which is an automatic win in the first game of next year's party and " +
+    "names that game on its face.\n\n" +
+    "The cloth comes off once, and that is the reveal. The host says what " +
+    "the money was for, flat, and then sells the first lot — small and " +
+    "stupid on purpose, because it teaches the room what its money is " +
+    "worth.\n\n" +
+    "HOW A BID WORKS. Out loud, with numbered paddles, one a head. The host " +
+    "says a number and the room goes up from it; there is no sealed bid and " +
+    "nothing is written down. Highest paddle takes the lot — she counts " +
+    "three and it is done — and the money is handed over BEFORE the lot " +
+    "leaves her hand, every time, which is the one rule that stops the last " +
+    "twenty minutes of the night becoming an accounting dispute. There are " +
+    "no ties at an auction: two people on the same number keep going up, " +
+    "and if two paddles genuinely land together she takes the one she heard " +
+    "first and means it.\n\n" +
+    "The best thing is sold last and the gavel is the end of the night. " +
+    "Nothing goes after it — a speech, a round of thanks, one more lot " +
+    "somebody found, is the evening ending twice, which means it did not " +
+    "end the first time.\n\n" +
     "It is a currency and not a raffle, which is the point: a guest who has " +
     "won nothing all evening still has money and is still in it at midnight.",
   materials:
-    "The lots, the printed money, and something to bang on a table with.",
+    "THE HOUSE PRINTS one perforated sheet, cut up before anybody " +
+    "arrives: numbered paddles, one a head; the money, in the " +
+    "destination's own face, and the sheet is printed again for more of " +
+    "it; the Golden Ticket; and the running order of the lots. YOU SUPPLY " +
+    "the lots themselves — the real ones, the joke trophies, the mystery " +
+    "boxes — and something to bang on a table with.",
 
   shape: "finale",
   sourcing: "provided",
@@ -2201,18 +2304,31 @@ const FISHBOWL: Game = {
   howItWorks:
     "Everybody writes six names or nouns on slips and folds them into the " +
     "bowl. Two teams, counted off round the table.\n\n" +
-    "A turn is one minute. One person draws slips and clues them to their " +
-    "own team, one after another, and the team keeps every slip it gets. " +
-    "When the minute is up the bowl goes to the other team. The round is " +
-    "over when the bowl is empty, and then every slip goes back in for the " +
-    "next one.\n\n" +
+    "Two teams, and a turn is one minute. One person draws slips and clues " +
+    "them to their own team, one after another, and the team keeps every " +
+    "slip it gets right. When the minute is up the bowl goes to the other " +
+    "team and the next person on that side clues. The round is over when " +
+    "the bowl is empty, and then EVERY slip goes back in — the same slips, " +
+    "never rewritten — for the next round.\n\n" +
+    "TWO THINGS THE ROOM ASKS IN THE FIRST MINUTE, so settle both out loud " +
+    "before anybody starts. First, whether a clue-giver may skip a slip she " +
+    "cannot get. This genuinely varies wherever the game is played — from " +
+    "no skips at all to unlimited — and every version of it agrees on one " +
+    "thing, which is that the table settles it BEFORE the first turn rather " +
+    "than during one. The house's default is one skip a turn, and a skipped " +
+    "slip goes straight back in the bowl. Second, the seconds left over " +
+    "when the bowl empties mid-turn: they carry, and the same person picks " +
+    "up the next round with them still running.\n\n" +
     "First round, you may say anything except the word itself. Second round, " +
     "same slips, and you may only act it out. Third round, same slips again, " +
     "and you get one word. Most slips across the three wins.\n\n" +
     "The third round is funny because of the first two. That is the whole " +
     "design, and it is why the bowl is refilled between rounds rather than " +
     "rewritten.",
-  materials: "Paper, a bowl, a pen each, a timer.",
+  materials:
+    "THE HOUSE PRINTS one sheet a head: the rules at the head, six slips " +
+    "under them, and a label along the foot for the bowl. YOU SUPPLY the " +
+    "bowl, a pen each, and a timer.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -2449,9 +2565,28 @@ const IMPOSTER: Game = {
     "A phone game. Everyone gets the same word except one person, who has to " +
     "get through the round without ever having heard it.",
   howItWorks:
-    "The app runs it and explains itself. Revelle points at it and does not " +
-    "reprint it.",
-  materials: "A phone each.",
+    "THIS ONE IS NOT OURS. It is somebody else's product, it explains " +
+    "itself, and the house names it and points at it rather than " +
+    "reproducing a word of it. The link on this page is the whole of what " +
+    "Revelle provides, and nothing is printed, because printing a card for " +
+    "somebody else's game is precisely what the house may not do.\n\n" +
+    "WHAT THE HOST DOES IS EVERYTHING AROUND IT. Open the link in the week " +
+    "before and check it is still there and still costs what it cost — an " +
+    "app can be pulled, paywalled or renamed between the night a party is " +
+    "planned and the night it is run, and that is the one failure here " +
+    "nobody can fix at nine o'clock. Check the room has signal that holds " +
+    "where people will actually be sitting. Ask everybody playing to have " +
+    "it open before you start, because installing an app in a circle of " +
+    "eight is what kills this. And say at the door that phones stay out for " +
+    "this one, which matters where the rest of the evening has been putting " +
+    "them in a bowl.\n\n" +
+    "Twenty to thirty minutes is what to plan the block against, at four to " +
+    "twelve people. The host plays like everybody else; there is nothing " +
+    "here for her to run.",
+  materials:
+    "Nothing is printed and nothing ships. Every player needs a phone " +
+    "with the app on it, and it is theirs to install rather than ours to " +
+    "send.",
 
   shape: "scheduled",
   sourcing: "recommended",
@@ -2844,7 +2979,10 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
     "says the winning name once, with no count and no runners-up, and then " +
     "tears the page up in front of everybody. Nobody wins anything and there " +
     "is nothing to collect.",
-  materials: "A pad kept somewhere nobody wanders, and a pencil.",
+  materials:
+    "THE HOUSE PRINTS one card, for the door. YOU SUPPLY a small pad that " +
+    "lives in a drawer in a room the party is not in, and a pencil kept " +
+    "with it so writing a name is never a search.",
 
   shape: "ambient",
   sourcing: "provided",
@@ -3162,8 +3300,9 @@ const HAVANA_THE_SONG_THAT_GETS_YOU_UP: Game = {
     "which nobody sits down, whichever comes first, and then the music goes " +
     "back to being ordinary music.",
   materials:
-    "A speaker and something to play from, a bowl, and a slip and a pencil " +
-    "for each person.",
+    "THE HOUSE PRINTS the slips, one a head. YOU SUPPLY the bowl, a blunt " +
+    "pencil each, and a speaker with something to play from — both within " +
+    "reach of a seat, because you will change the song eleven times.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -3466,8 +3605,11 @@ const VEGAS_THE_LATE_SUPPER: Game = {
     "nothing carries to tomorrow, which is what the last clause of her rule " +
     "is for: every counter goes back in the bag before anybody stands up.",
   materials:
-    "Two dice cups with five dice each, a stake of identical counters for " +
-    "everybody, and one card for the winner to sign.",
+    "THE HOUSE PRINTS one card, the one that gets signed at midnight, and " +
+    "it sits face up in the middle all evening. YOU SUPPLY two dice cups " +
+    "with five dice each, an identical stake of counters at every place — " +
+    "chips, matches, almonds, anything nobody would mistake for money — " +
+    "and a bag to put them back in.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -3779,7 +3921,10 @@ const NEW_YORK_THE_LIST: Game = {
     "and the evening is over. That is the part that makes the first part " +
     "possible: everybody writes a truer slip when they have watched last " +
     "year's go.",
-  materials: "A bowl, a slip and a pencil for each person, and nothing to write with afterwards.",
+  materials:
+    "THE HOUSE PRINTS the slips, one a head, cut so they tear cleanly. " +
+    "YOU SUPPLY a wide bowl for the middle of the table and pencils in " +
+    "three places, so writing one is never a search.",
 
   shape: "finale",
   sourcing: "provided",
@@ -4054,7 +4199,10 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
     "Whoever wins does not clear: not the breakfast plates, not the supper " +
     "ones from the night before, not anything until the next meal. That is " +
     "the whole prize. Nothing is scored and nothing carries to the next day.",
-  materials: "A card and a pencil each, and something heavy to put them under.",
+  materials:
+    "THE HOUSE PRINTS the cards, one a head, and they go out at each " +
+    "place before supper. YOU SUPPLY a pencil at each place and something " +
+    "heavy to keep the collected cards under overnight.",
 
   shape: "ambient",
   sourcing: "provided",
@@ -4339,7 +4487,10 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
     "gets one sentence — one — to say what actually happened in theirs. Some " +
     "of them do not use it, which is the best outcome the game has. Nothing " +
     "is scored and nobody wins.",
-  materials: "Nothing. A table, and something to tap when a minute is up.",
+  materials:
+    "THE HOUSE PRINTS one card, which is everything it prints. YOU SUPPLY " +
+    "a table and a spoon and a glass, or anything else that makes a noise " +
+    "the table already knows.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -4539,8 +4690,12 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: Everybody starts a story. Nobody finishes " +
-        "their own. The person on your left finishes it and gets it wrong.",
+        "One card, standing in the middle of the table for the whole round, " +
+        "printed one side only. Her sentence, whole: Everybody starts a " +
+        "story. Nobody finishes their own. The person on your left finishes " +
+        "it and gets it wrong. Nothing else on it — no order of play, no " +
+        "clock — because the rule is the only thing the table has to hold " +
+        "and the minute is called by somebody tapping a glass.",
       voicePiece: "game_rule",
       quantity: 1,
     },
@@ -4586,7 +4741,10 @@ const CATSKILLS_THE_SWIM_TEST: Game = {
     "from the record. Then the ledger is put away unopened. That is the " +
     "whole design: the winner is the biggest liar and there is no way to " +
     "prove anybody wrong, so nobody has to defend anything.",
-  materials: "A ledger or a hardback notebook, kept shut, and nothing else.",
+  materials:
+    "THE HOUSE PRINTS one card, propped against the book. YOU SUPPLY the " +
+    "book: a hardback that looks like a record of something, and it stays " +
+    "shut all evening.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -4845,7 +5003,10 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
     "that, including exactly half, and the liar wins.\n\n" +
     "The liar turns their card over. Nothing is scored and nothing is " +
     "awarded, and nobody goes back through who said what.",
-  materials: "A pack of cards with one marked on the back, and a table.",
+  materials:
+    "THE HOUSE PRINTS one card. YOU SUPPLY an ordinary pack of playing " +
+    "cards, counted down to exactly one card per person, with a crease " +
+    "put in the corner of one of them.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -5061,8 +5222,12 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
       piece: "rules_card",
       label: "The rule",
       description:
-        "Her sentence, whole: Everybody tells the story of this afternoon. " +
-        "One of them is lying, and it is not the one you think.",
+        "One card, propped in the middle of the table where the dealing " +
+        "happens, printed one side only. Her sentence, whole, and nothing " +
+        "else on it: Everybody tells the story of this afternoon. One of " +
+        "them is lying, and it is not the one you think. It is read by the " +
+        "table rather than aloud by the host, so it is set to be legible " +
+        "upside down from across a table of twelve.",
       voicePiece: "game_rule",
       quantity: 1,
     },
@@ -5107,7 +5272,10 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
     "no second place, nobody keeps a record from one day to the next, and if " +
     "the group is not going anywhere with a bar in it, the forfeit is the " +
     "coffee at the house and the loser makes it.",
-  materials: "A slip and a pencil each, and something to count.",
+  materials:
+    "THE HOUSE PRINTS the slips, one a head, small enough to go in a " +
+    "pocket. YOU SUPPLY two pencils by the door, and something out there " +
+    "worth counting.",
 
   shape: "ambient",
   sourcing: "provided",
@@ -5362,7 +5530,11 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
     "If two are equally close, both of them read it and lunch goes wherever " +
     "the two of them agree. Nothing else is won and nothing carries to the " +
     "next morning.",
-  materials: "A slip and a pencil each, and whatever number the top actually has.",
+  materials:
+    "THE HOUSE PRINTS the slips, one a head, out on the breakfast table. " +
+    "YOU SUPPLY two pencils, the map the day is actually planned from, " +
+    "and a number at the top to settle it against — the posted reading, " +
+    "the dial in the station, or a thermometer somebody carries up.",
 
   shape: "ambient",
   sourcing: "provided",
@@ -5627,7 +5799,9 @@ const BIG_SUR_THE_LONG_WAY: Game = {
     "HAS GONE ROUND ONCE, and the gap after the last story is left alone " +
     "until it turns into ordinary conversation. Nobody wins and nothing is " +
     "voted on.",
-  materials: "Somewhere to sit round, and no phones out.",
+  materials:
+    "THE HOUSE PRINTS one card. YOU SUPPLY somewhere everybody can sit in " +
+    "a circle and a bowl for the phones, and yours goes in it first.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -5878,7 +6052,10 @@ const TAHITI_THE_LAST_NIGHT: Game = {
     "a failed one.\n\n" +
     "Somebody writes the answers down while the round goes, because they are " +
     "the next three days of eating and nobody remembers them in the morning.",
-  materials: "Nothing. A table with food already on it.",
+  materials:
+    "THE HOUSE PRINTS one card. YOU SUPPLY a full table with the food " +
+    "already on it, and the back of anything to write the answers down on " +
+    "— they are what the house cooks for the rest of the week.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -6127,7 +6304,11 @@ const ACAPULCO_THE_LAST_SONG: Game = {
     "named by whoever went in the water.\n\n" +
     "The swim happens first and the song second. Then it plays, and nothing " +
     "goes on after it. Nobody wins anything.",
-  materials: "A card by the speaker, a pencil, and whatever has been playing.",
+  materials:
+    "THE HOUSE PRINTS one card: the rule at the head and the ruled list " +
+    "under it, and it lives by the speaker all night. YOU SUPPLY a pencil " +
+    "beside it that will still be there at midnight, the music, and the " +
+    "water the forfeit needs.",
 
   shape: "finale",
   sourcing: "provided",
@@ -6427,8 +6608,10 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
     "what the numbers mean is where most of the shouting comes from all " +
     "evening.",
   materials:
-    "A bag of numbered tokens, a card each, dried beans for markers, and the " +
-    "sheet of what the numbers mean.",
+    "THE HOUSE PRINTS the cards, one a head and two spare: fifteen " +
+    "numbers in three rows of five on the front, what the numbers mean on " +
+    "the back. YOU SUPPLY ninety numbered wooden tokens, a cloth bag " +
+    "nobody can see into, and a handful of dried beans for every person.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -6735,8 +6918,10 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
     "obviously worth having from the moment it went on the table. After the " +
     "last one there is no speech and nothing else happens.",
   materials:
-    "Five wrapped prizes in ascending order, and a clear length of table to " +
-    "line them up on.",
+    "THE HOUSE PRINTS one card, propped at the end of the row. YOU SUPPLY " +
+    "five prizes ascending from a joke to something somebody would " +
+    "actually keep, the paper and string to wrap them the day before, and " +
+    "a clear length of table to line them up on.",
 
   shape: "finale",
   sourcing: "provided",
@@ -7012,7 +7197,10 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
     "somebody everybody knows is funnier than a good one, and a room that " +
     "has watched the same thing all week can identify a character from four " +
     "syllables and a posture.",
-  materials: "Whatever is already playing, and the remote.",
+  materials:
+    "THE HOUSE PRINTS one card. YOU SUPPLY whatever is already on and " +
+    "everybody has watched eleven times, and the remote, which is the " +
+    "prize and is down the side of the sofa.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -7274,7 +7462,10 @@ const ASPEN_THE_NEXT_LINE: Game = {
     "there is ever anything to eat after ten o'clock.\n\n" +
     "It ends when the freezer is empty or when the screen goes off, " +
     "whichever comes first, and nobody announces either.",
-  materials: "Garlic bread in the freezer, and an oven somebody is willing to turn on.",
+  materials:
+    "THE HOUSE PRINTS one card. YOU SUPPLY more garlic bread than the " +
+    "evening could need, in the freezer, and an oven somebody is willing " +
+    "to turn on four or five times.",
 
   shape: "ambient",
   sourcing: "provided",
@@ -7535,7 +7726,10 @@ const PALM_SPRINGS_THE_BEST_LINE: Game = {
     "Nothing is scored, nothing is voted on and nobody wins. It takes about " +
     "a quarter of an hour and it is the last thing before people start " +
     "finding their coats.",
-  materials: "Nothing at all.",
+  materials:
+    "THE HOUSE PRINTS one card and that is the whole of it. YOU SUPPLY " +
+    "nothing: no object, no list, nothing bought and nothing written down " +
+    "beforehand.",
 
   shape: "finale",
   sourcing: "provided",
@@ -7770,7 +7964,9 @@ const OAXACA_CORRECT_THE_YEAR: Game = {
     "that would take four minutes takes twenty, three people have produced " +
     "evidence, one person has been wrong in public about something that " +
     "happened to them, and nothing has been resolved.",
-  materials: "Nothing. A table and a story everybody has heard.",
+  materials:
+    "THE HOUSE PRINTS one card. YOU SUPPLY a table and a story half the " +
+    "room was in, chosen before the evening starts.",
 
   shape: "scheduled",
   sourcing: "provided",
@@ -8011,7 +8207,10 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
     "one instead and the chain carries on without comment. Anybody who " +
     "arrives while it is running joins the pool and can be picked. Nothing " +
     "is scored and nobody wins.",
-  materials: "Nothing. The last of the light.",
+  materials:
+    "THE HOUSE PRINTS one card. YOU SUPPLY nothing else, and somebody who " +
+    "will notice the light going ten minutes before they think they need " +
+    "to.",
 
   shape: "scheduled",
   sourcing: "provided",
