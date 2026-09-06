@@ -88,7 +88,7 @@ test("the reader finds every authored programme, or the counts below mean nothin
   const all = programmes();
   assert.equal(
     all.length,
-    25,
+    28,  // was 25; Hong Kong's three programmes, db-less insert 2026-09-06
     `docs/drinks.md reads as ${all.length} programmes and the document says ` +
       `twenty-five. Every count in this file is a count over this list, so a ` +
       `reader that has lost records reports a clean sheet it has not earned — ` +
@@ -97,8 +97,8 @@ test("the reader finds every authored programme, or the counts below mean nothin
   const numbers = all.map((p) => p.number);
   assert.deepEqual(
     numbers,
-    Array.from({ length: 25 }, (_, i) => i + 1),
-    "the programme numbers are not 1..25 — the reader dropped or doubled one."
+    Array.from({ length: 28 }, (_, i) => i + 1),
+    "the programme numbers are not 1..28 — the reader dropped or doubled one."
   );
 });
 
@@ -118,14 +118,14 @@ test("every authored season wording maps, and nothing is guessed", () => {
   );
 });
 
-test("fourteen of twenty-five drinks gate on their season, and eleven lean", () => {
+test("fifteen of twenty-eight drinks gate on their season, and thirteen lean", () => {
   const all = programmes();
   const strict = all.filter((p) => seasonStrictClaim(p.season).strict);
   const lean = all.filter((p) => !seasonStrictClaim(p.season).strict);
 
   assert.equal(
     strict.length,
-    14,
+    15,  // was 14 of 25; Hong Kong's programme 27 is Summer, 26 and 28 are Year-round
     `${strict.length} of ${all.length} drinks derive as season-gated, not 14. ` +
       `Before this derivation existed the number was ZERO — the column defaults ` +
       `false and no seeder ever wrote it — so a February party was offered the ` +
@@ -133,13 +133,15 @@ test("fourteen of twenty-five drinks gate on their season, and eleven lean", () 
       `wording changed or SEASON_NARROWED did, and both are judgements:\n  ` +
       strict.map((p) => `${p.number}: ${p.season}`).join("\n  ")
   );
-  assert.equal(lean.length, 11);
+  assert.equal(lean.length, 13);  // was 11 of 25
 
-  // The eleven are seven year-round programmes and four two-season wordings.
-  // Named rather than counted, because "eleven" would still pass if the two
-  // groups traded members.
+  // The thirteen are nine year-round programmes and four two-season wordings.
+  // Named rather than counted, because "thirteen" would still pass if the two
+  // groups traded members. Was seven year-round of eleven; Hong Kong's 26 and
+  // 28 are year-round because she seasoned only one of her nine drinks, and
+  // docs/drinks.md records that the value is the house's rather than hers.
   const yearRound = lean.filter((p) => seasonStrictClaim(p.season).band === "year_round");
-  assert.equal(yearRound.length, 7, "seven programmes make no claim about the calendar");
+  assert.equal(yearRound.length, 9, "nine programmes make no claim about the calendar");  // was 7
   const narrowed = lean.filter((p) => seasonStrictClaim(p.season).band !== "year_round");
   assert.deepEqual(
     narrowed.map((p) => p.season).sort(),

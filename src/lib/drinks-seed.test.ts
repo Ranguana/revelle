@@ -56,39 +56,39 @@ const MEAL_SHAPES = ["brunch", "lunch", "cocktails", "long_dinner", "late_supper
 
 /* ── the counts, before anything else means anything ─────────────────── */
 
-test("the document reads as seventy-six drinks: fifty-five paired, twenty-one owed", () => {
+test("the document reads as eighty-five drinks: sixty-one paired, twenty-four owed", () => {
   const counts = drinkCounts(drinks);
 
   assert.equal(
     counts.drinks,
-    76,
+    85,  // was 76
     `docs/drinks.md reads as ${counts.drinks} drinks and the conversion says ` +
       `seventy-six. Every assertion in this file is made over that list, so a ` +
       `reader that has lost records reports a clean sheet it has not earned.`
   );
-  assert.equal(counts.paired, 55, "55 drinks have the mirror their author wrote");
+  assert.equal(counts.paired, 61, "61 drinks have the mirror their author wrote");  // was 55 before Hong Kong
   assert.equal(
     counts.owed,
-    21,
-    "21 drinks have no twin in their programme's mocktail line. They are not " +
+    24,  // was 21
+    "24 drinks have no twin in their programme's mocktail line. They are not " +
       "a parse failure — the mocktail lines are shorter than the cocktail " +
       "lines in twenty of the twenty-five programmes."
   );
-  assert.equal(counts.paired + counts.owed, counts.drinks, "76 = 55 + 21");
-  assert.equal(counts.programmes, 25, "twenty-five programmes were split");
-  assert.equal(counts.rooms, 12, "twelve rooms have drinks");
+  assert.equal(counts.paired + counts.owed, counts.drinks, "85 = 61 + 24");
+  assert.equal(counts.programmes, 28, "twenty-eight programmes were split");  // was 25
+  assert.equal(counts.rooms, 13, "thirteen rooms have drinks");  // was 12
 
   assert.equal(rows.length, drinks.length, "every drink maps to exactly one row");
 });
 
 /* ── the conjunction this file exists for ────────────────────────────── */
 
-test("an owed mirror lands as NULL and draft, on every one of the twenty-one", () => {
+test("an owed mirror lands as NULL and draft, on every one of the twenty-four", () => {
   const owed = drinks
     .map((drink, at) => ({ drink, row: rows[at] }))
     .filter(({ drink }) => drink.mirrorOwed);
 
-  assert.equal(owed.length, 21, "twenty-one mirrors are owed");
+  assert.equal(owed.length, 24, "twenty-four mirrors are owed");  // was 21; Hong Kong adds the Martini, Manhattan and Sidecar
 
   for (const { drink, row } of owed) {
     assert.equal(
@@ -140,7 +140,7 @@ test("a paired drink lands live, with its mirror, carrying no debt", () => {
     .map((drink, at) => ({ drink, row: rows[at] }))
     .filter(({ drink }) => !drink.mirrorOwed);
 
-  assert.equal(paired.length, 55);
+  assert.equal(paired.length, 61);  // was 55
   for (const { drink, row } of paired) {
     assert.equal(
       row.status,
@@ -262,12 +262,12 @@ test("every row satisfies db/017's shape checks for a slug and a drinks line", (
     }
     assert.ok(row.name.trim().length > 0, `${row.slug} has a blank name`);
   }
-  assert.equal(seen.size, 76);
+  assert.equal(seen.size, 85);  // was 76
 });
 
 /* ── the claims table ────────────────────────────────────────────────── */
 
-test("eighty-nine meal-shape claims, and six drinks that claim none", () => {
+test("eighty-nine meal-shape claims, and fifteen drinks that claim none", () => {
   const counts = drinkCounts(drinks);
   assert.equal(
     counts.mealClaims,
@@ -276,11 +276,13 @@ test("eighty-nine meal-shape claims, and six drinks that claim none", () => {
   );
   assert.equal(
     counts.noMealShape,
-    6,
-    'six drinks come from programmes 17 and 25 — "After a day outside" and ' +
+    15,
+    'WAS SIX, from programmes 17 and 25 — "After a day outside" and ' +
       '"A boat or beach day" — which name no shape. NO ROWS MEANS EVERY ' +
       "SHAPE, which is claimEligibility()'s own default, and it is the " +
-      "document refusing to guess rather than a claim on all five (rule 3)."
+      "document refusing to guess rather than a claim on all five (rule 3). " +
+      "Hong Kong's nine take it to fifteen: she wrote the drinks and no meal " +
+      "shapes, so all nine say `Not said` rather than have one inferred."
   );
 
   for (const drink of drinks) {
