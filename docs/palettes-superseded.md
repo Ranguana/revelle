@@ -80,3 +80,30 @@ registry, where they would have described colours that are gone:
 
 - **portofino** — Harbour water under cloud, ochre and rose plaster, shutters green with the paint gone. Cooler and greyer than the other Mediterranean plates, because the season is over and that is the whole proposition.
 
+
+---
+
+## 2026-09-06 — Havana and Acapulco keep their shared night
+
+The games pass measured the palettes live and found that while all eighteen
+rooms have distinct DAY grounds, only seventeen dark grounds are distinct:
+**`havana` and `acapulco-1959` share `#0E1B18`.**
+
+Put to the founder. Her ruling: **"let havana and acapulco use what they have."**
+
+So the shared night ground STANDS. Recorded here because it is exactly the
+kind of thing a later reader — or a later agent — will find and try to fix,
+having read the argument three sections above that two rooms sharing a ground
+are one room twice.
+
+**Why that argument does not reach this case.** It was made about DAY grounds,
+where two rooms rendered identically in the light a member reads them in, and
+where the duplicate was accidental — nobody chose it. This one is neither
+accidental nor invisible: the two rooms are the founder's own declared twins
+in the matrix, they are separated on every other axis the house measures, and
+she looked at the collision and kept it.
+
+**`src/lib/palette.test.ts` checks day grounds only, and that is now
+deliberate rather than an oversight.** Extending it to night grounds would
+fail on a ruling. If it is ever extended, this pair is the exception and this
+paragraph is why.
