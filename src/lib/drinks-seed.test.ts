@@ -56,17 +56,17 @@ const MEAL_SHAPES = ["brunch", "lunch", "cocktails", "long_dinner", "late_supper
 
 /* ── the counts, before anything else means anything ─────────────────── */
 
-test("the document reads as eighty-five drinks: sixty-one paired, twenty-four owed", () => {
+test("the document reads as one hundred and twenty-eight drinks: one hundred and four paired, twenty-four owed", () => {
   const counts = drinkCounts(drinks);
 
   assert.equal(
     counts.drinks,
-    85,  // was 76
+    128,  // was 76, then 85
     `docs/drinks.md reads as ${counts.drinks} drinks and the conversion says ` +
       `seventy-six. Every assertion in this file is made over that list, so a ` +
       `reader that has lost records reports a clean sheet it has not earned.`
   );
-  assert.equal(counts.paired, 61, "61 drinks have the mirror their author wrote");  // was 55 before Hong Kong
+  assert.equal(counts.paired, 104, "104 drinks have the mirror their author wrote");  // 55 -> 61 -> 104  // was 55 before Hong Kong
   assert.equal(
     counts.owed,
     24,  // was 21
@@ -75,7 +75,7 @@ test("the document reads as eighty-five drinks: sixty-one paired, twenty-four ow
       "lines in twenty of the twenty-five programmes."
   );
   assert.equal(counts.paired + counts.owed, counts.drinks, "85 = 61 + 24");
-  assert.equal(counts.programmes, 28, "twenty-eight programmes were split");  // was 25
+  assert.equal(counts.programmes, 49, "forty-nine programmes were split");  // 25 -> 28 -> 49  // was 25
   assert.equal(counts.rooms, 13, "thirteen rooms have drinks");  // was 12
 
   assert.equal(rows.length, drinks.length, "every drink maps to exactly one row");
@@ -140,7 +140,7 @@ test("a paired drink lands live, with its mirror, carrying no debt", () => {
     .map((drink, at) => ({ drink, row: rows[at] }))
     .filter(({ drink }) => !drink.mirrorOwed);
 
-  assert.equal(paired.length, 61);  // was 55
+  assert.equal(paired.length, 104);  // 55 -> 61 -> 104
   for (const { drink, row } of paired) {
     assert.equal(
       row.status,
@@ -180,12 +180,18 @@ test("the two builds are one row, and they differ unless the row says why", () =
   const selves = rows.filter((row) => row.mirrorSelf);
   assert.equal(
     selves.length,
-    1,
-    `${selves.length} rows claim mirror_self, not one. The one is Vegas 14's ` +
-      `black coffee: no alcohol in it, so the same glass goes to everybody. ` +
-      `Three other drinks look similar and are NOT flagged, because their ` +
-      `author wrote a different sentence in the mirror column (CLAUDE.md ` +
-      `rule 32).`
+    44,  // was 1
+    `${selves.length} rows claim mirror_self, not forty-four. It WAS one — ` +
+      `Vegas 14's black coffee, no alcohol in it, so the same glass goes to ` +
+      `everybody — and that single row turned out to be the shape a whole ` +
+      `class needed. The founder ruled on 2026-09-06 that a mocktail derived ` +
+      `from a cocktail "doesn't have to mirror" it, which makes it a ` +
+      `FREE-STANDING drink rather than a pairing; a free-standing mocktail is ` +
+      `exactly a row whose two lines agree on purpose, so the forty-three ` +
+      `derived ones join black coffee here and no schema change was needed. ` +
+      `Three other drinks still look similar and are NOT flagged, because ` +
+      `their author wrote a different sentence in the mirror column ` +
+      `(CLAUDE.md rule 32).`
   );
 
   for (const row of rows) {
@@ -262,21 +268,21 @@ test("every row satisfies db/017's shape checks for a slug and a drinks line", (
     }
     assert.ok(row.name.trim().length > 0, `${row.slug} has a blank name`);
   }
-  assert.equal(seen.size, 85);  // was 76
+  assert.equal(seen.size, 128);  // 76 -> 85 -> 128
 });
 
 /* ── the claims table ────────────────────────────────────────────────── */
 
-test("eighty-nine meal-shape claims, and fifteen drinks that claim none", () => {
+test("one hundred and thirty-seven meal-shape claims, and drinks that claim none", () => {
   const counts = drinkCounts(drinks);
   assert.equal(
     counts.mealClaims,
-    89,
+    137,  // was 89; the derived mocktails inherit their base's meal shape
     "the third bullet, summed. db/060 §V's drink_meal is where these land."
   );
   assert.equal(
     counts.noMealShape,
-    15,
+    23,  // 6 -> 15 (Hong Kong) -> 23 (its derived mocktails inherit `Not said`)
     'WAS SIX, from programmes 17 and 25 — "After a day outside" and ' +
       '"A boat or beach day" — which name no shape. NO ROWS MEANS EVERY ' +
       "SHAPE, which is claimEligibility()'s own default, and it is the " +

@@ -945,3 +945,442 @@ are marked as the house's proposals and are vetoable.
 - Not said
 - Year-round
 - Half made
+
+
+---
+
+# THE MOCKTAILS — free-standing, derived from the bar
+
+**Founder, 2026-09-06: *"also look at every cocktail we have and use them as a
+base for mocktails to produce more mocktails."* And, when asked whether these
+had to pair with their base: *"just use them to come up with mocktails, they
+dont have to mirror them."***
+
+**SO THESE ARE NOT MIRRORS.** A mirror is a pairing — one per live drink, what
+the host hands the person not drinking at that table that night, enforced by
+`drink_live_has_its_mirror`. **The twenty-four named debts above are untouched
+by this section and are still debts.** These are supply: free-standing drinks
+the catalogue's own bar suggested.
+
+**NO SCHEMA CHANGE WAS NEEDED, and that is worth recording** because the
+opposite was assumed. A free-standing mocktail is a drink whose two lines agree
+on purpose — the shape `14.3 Black coffee` has carried alone since the drinks
+landed. It satisfies the mirror constraint by being its own mirror, it carries a
+room, a season and a meal like any drink, and it needs no second pool, no
+multi-valued column and no migration.
+
+**THE YIELD RULE, applied mechanically rather than case by case, and it is the
+house's line to be argued with:** a base yields when, after removing every
+alcoholic component, WHAT REMAINS IS ALREADY A DRINK SOMEBODY WOULD POUR. Neat
+spirits, plain wine, plain beer and all-alcohol builds do not. That is a
+deliberately conservative reading of her ruling — she said the base only has to
+*suggest* something, which is a much wider licence — because inventing forty
+drinks in her register is authoring and authoring is hers.
+
+**Counted both directions: 85 bases in, 43 mocktails out, across 21 programmes
+and 12 of the 13 rooms with drinks. 42 bases yielded nothing mechanically.**
+No base yielded more than one here; the cap of 1:1 is not in the schema, it is
+in the conservative rule above, and she can lift it by widening the rule.
+
+**NEW YORK, 1938 YIELDS NOTHING AT ALL** — every drink in it is a Manhattan, a
+martini, a sidecar, a brandy, a red wine or a champagne. That is a fact about
+the room rather than a gap in this pass, and it is the room's own argument
+showing up in its bar.
+
+
+## Westhampton
+
+### 29 · HOUSE — mocktails derived from Westhampton: 1.1, 1.2, 1.3
+
+**29.1**
+- Bitter lemon over ice with a wide lime peel
+- Bitter lemon over ice with a wide lime peel
+- Dinner, Standing drinks
+- Summer
+- Half made
+
+**29.2**
+- Pressed lemon and honey, shaken until it foams
+- Pressed lemon and honey, shaken until it foams
+- Dinner, Standing drinks
+- Summer
+- Half made
+
+**29.3**
+- Red grape and orange in a pitcher, the cut fruit left in
+- Red grape and orange in a pitcher, the cut fruit left in
+- Dinner, Standing drinks
+- Summer
+- Half made
+
+
+
+### 30 · HOUSE — mocktails derived from Westhampton: 2.2
+
+**30.1**
+- Orange juice with a vanilla float, in a tall glass
+- Orange juice with a vanilla float, in a tall glass
+- Dinner
+- Fall
+- Actually mixed
+
+
+
+### 31 · HOUSE — mocktails derived from Westhampton: 3.1, 3.2
+
+**31.1**
+- Tomato, lemon and plenty of pepper, celery in the glass
+- Tomato, lemon and plenty of pepper, celery in the glass
+- Brunch
+- Summer
+- Bought and poured
+
+**31.2**
+- Cold orange juice in the same flute, poured to the same line
+- Cold orange juice in the same flute, poured to the same line
+- Brunch
+- Summer
+- Bought and poured
+
+
+## Nantucket
+
+### 32 · HOUSE — mocktails derived from Nantucket: 4.1, 4.3
+
+**32.1**
+- Cranberry and lime over crushed ice
+- Cranberry and lime over crushed ice
+- Dinner
+- Summer
+- Bought and poured
+
+**32.2**
+- Ginger beer with lime, very cold, in a tall glass
+- Ginger beer with lime, very cold, in a tall glass
+- Dinner
+- Summer
+- Bought and poured
+
+
+
+### 33 · HOUSE — mocktails derived from Nantucket: 5.1, 5.3
+
+**33.1**
+- Hot spiced butter and brown sugar, stirred into water
+- Hot spiced butter and brown sugar, stirred into water
+- Lunch, Dinner
+- Shoulder season and fall
+- Half made
+
+**33.2**
+- Mulled cider on its own, the spices left in the pot
+- Mulled cider on its own, the spices left in the pot
+- Lunch, Dinner
+- Shoulder season and fall
+- Half made
+
+
+## Côte d'Azur
+
+### 34 · HOUSE — mocktails derived from Côte d'Azur: 9.1, 9.2
+
+**34.1**
+- Blackcurrant and cold water, long, in a wine glass
+- Blackcurrant and cold water, long, in a wine glass
+- Lunch, Standing drinks
+- Summer
+- Bought and poured
+
+**34.2**
+- Anise cordial and water, clouding the same way
+- Anise cordial and water, clouding the same way
+- Lunch, Standing drinks
+- Summer
+- Bought and poured
+
+
+
+### 35 · HOUSE — mocktails derived from Côte d'Azur: 11.1, 11.2
+
+**35.1**
+- Blackcurrant topped with cold sparkling water, in a flute
+- Blackcurrant topped with cold sparkling water, in a flute
+- Dinner, Lunch
+- Spring and summer
+- Half made
+
+**35.2**
+- Lemon and sparkling water, sugared, in a flute
+- Lemon and sparkling water, sugared, in a flute
+- Dinner, Lunch
+- Spring and summer
+- Half made
+
+
+
+### 36 · HOUSE — mocktails derived from Côte d'Azur: 12.2
+
+**36.1**
+- Chocolate and cream, cold, grated nutmeg on top
+- Chocolate and cream, cold, grated nutmeg on top
+- Late supper
+- Winter
+- Actually mixed
+
+
+## Vegas
+
+### 37 · HOUSE — mocktails derived from Vegas: 13.3, 13.4
+
+**37.1**
+- Lemon sour with egg white, shaken hard, in a coupe
+- Lemon sour with egg white, shaken hard, in a coupe
+- Dinner
+- Year-round
+- Actually mixed
+
+**37.2**
+- Lime cordial and soda, straight up in a gimlet glass
+- Lime cordial and soda, straight up in a gimlet glass
+- Dinner
+- Year-round
+- Actually mixed
+
+
+
+### 38 · HOUSE — mocktails derived from Vegas: 14.1, 14.2
+
+**38.1**
+- Orange juice and cold sparkling water, separately or together
+- Orange juice and cold sparkling water, separately or together
+- Late supper
+- Year-round
+- Bought and poured
+
+**38.2**
+- Tomato with lemon and celery salt, over ice
+- Tomato with lemon and celery salt, over ice
+- Late supper
+- Year-round
+- Bought and poured
+
+
+## Catskills
+
+### 39 · HOUSE — mocktails derived from Catskills: 15.1, 15.2
+
+**39.1**
+- Lemon, sugar and club soda, built in the tall glass
+- Lemon, sugar and club soda, built in the tall glass
+- Dinner
+- Summer
+- Half made
+
+**39.2**
+- Lemon and honey sour, foamed, over one big cube
+- Lemon and honey sour, foamed, over one big cube
+- Dinner
+- Summer
+- Half made
+
+
+
+### 40 · HOUSE — mocktails derived from Catskills: 16.1, 16.2
+
+**40.1**
+- Hot cider with cloves and a strip of orange
+- Hot cider with cloves and a strip of orange
+- Dinner
+- Fall
+- Half made
+
+**40.2**
+- Honey, lemon and hot water, a clove in it
+- Honey, lemon and hot water, a clove in it
+- Dinner
+- Fall
+- Half made
+
+
+## Dolomites
+
+### 41 · HOUSE — mocktails derived from Dolomites: 17.1, 17.2
+
+**41.1**
+- Hot spiced grape juice with orange and cinnamon
+- Hot spiced grape juice with orange and cinnamon
+- Not said
+- Winter
+- Half made
+
+**41.2**
+- Warm egg custard and cream, whipped, dusted with cocoa
+- Warm egg custard and cream, whipped, dusted with cocoa
+- Not said
+- Winter
+- Half made
+
+
+## Tahiti
+
+### 42 · HOUSE — mocktails derived from Tahiti: 18.1, 18.2
+
+**42.1**
+- Fruit punch in the same pitcher, ice at the top
+- Fruit punch in the same pitcher, ice at the top
+- Dinner, Lunch
+- Warm weather
+- Half made
+
+**42.2**
+- Lime, orange and almond syrup over crushed ice, mint on top
+- Lime, orange and almond syrup over crushed ice, mint on top
+- Dinner, Lunch
+- Warm weather
+- Half made
+
+
+## Havana
+
+### 43 · HOUSE — mocktails derived from Havana: 19.1, 19.2, 19.3
+
+**43.1**
+- Lime and sugar shaken hard, very cold, in a coupe
+- Lime and sugar shaken hard, very cold, in a coupe
+- Dinner
+- Year-round
+- Actually mixed
+
+**43.2**
+- Mint, lime and sugar, soda, plenty of ice
+- Mint, lime and sugar, soda, plenty of ice
+- Dinner
+- Year-round
+- Actually mixed
+
+**43.3**
+- Cola over ice with a lime wedge squeezed in
+- Cola over ice with a lime wedge squeezed in
+- Dinner
+- Year-round
+- Actually mixed
+
+
+## Big Sur
+
+### 44 · HOUSE — mocktails derived from Big Sur: 21.1, 21.3
+
+**44.1**
+- Lime and agave, shaken, salt on half the rim
+- Lime and agave, shaken, salt on half the rim
+- Dinner
+- Year-round
+- Half made
+
+**44.2**
+- Honey and lemon in hot water, when the fog comes in
+- Honey and lemon in hot water, when the fog comes in
+- Dinner
+- Year-round
+- Half made
+
+
+## New Orleans
+
+### 45 · HOUSE — mocktails derived from New Orleans: 23.1, 23.2, 23.3
+
+**45.1**
+- Cold milk with vanilla and nutmeg, sweetened
+- Cold milk with vanilla and nutmeg, sweetened
+- Brunch
+- Any
+- Actually mixed
+
+**45.2**
+- Cream, citrus and orange-flower water, shaken long and soda'd
+- Cream, citrus and orange-flower water, shaken long and soda'd
+- Brunch
+- Any
+- Actually mixed
+
+**45.3**
+- Orange juice, cold, in the flute it would have been in
+- Orange juice, cold, in the flute it would have been in
+- Brunch
+- Any
+- Actually mixed
+
+
+## Portofino
+
+### 46 · HOUSE — mocktails derived from Portofino: 24.1, 24.4
+
+**46.1**
+- Bitter orange and soda over ice, an olive on the side
+- Bitter orange and soda over ice, an olive on the side
+- Standing drinks, Dinner
+- Summer
+- Half made
+
+**46.2**
+- Iced lemon, very sweet and very cold, in the small glass
+- Iced lemon, very sweet and very cold, in the small glass
+- Standing drinks, Dinner
+- Summer
+- Half made
+
+
+## Hong Kong
+
+### 47 · HOUSE — mocktails derived from Hong Kong: 26.1, 26.5
+
+**47.1**
+- Pineapple, grapefruit and lime with almond syrup, over crushed ice
+- Pineapple, grapefruit and lime with almond syrup, over crushed ice
+- Not said
+- Year-round
+- Actually mixed
+
+**47.2**
+- Pineapple and cherry with lime and soda, tall
+- Pineapple and cherry with lime and soda, tall
+- Not said
+- Year-round
+- Actually mixed
+
+
+
+### 48 · HOUSE — mocktails derived from Hong Kong: 27.1
+
+**48.1**
+- Cold fruit punch from the same bowl, nutmeg on top
+- Cold fruit punch from the same bowl, nutmeg on top
+- Not said
+- Summer
+- Actually mixed
+
+
+
+### 49 · HOUSE — mocktails derived from Hong Kong: 28.1, 28.2, 28.3
+
+**49.1**
+- Lime cordial and soda in a gimlet glass
+- Lime cordial and soda in a gimlet glass
+- Not said
+- Year-round
+- Half made
+
+**49.2**
+- Lemonade with cucumber, mint and cut fruit in it
+- Lemonade with cucumber, mint and cut fruit in it
+- Not said
+- Year-round
+- Half made
+
+**49.3**
+- Lemon, sugar and club soda, in the Collins glass
+- Lemon, sugar and club soda, in the Collins glass
+- Not said
+- Year-round
+- Half made
+

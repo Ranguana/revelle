@@ -88,7 +88,7 @@ test("the reader finds every authored programme, or the counts below mean nothin
   const all = programmes();
   assert.equal(
     all.length,
-    28,  // was 25; Hong Kong's three programmes, db-less insert 2026-09-06
+    49,  // 25 -> 28 (Hong Kong) -> 49 (the derived mocktails)
     `docs/drinks.md reads as ${all.length} programmes and the document says ` +
       `twenty-five. Every count in this file is a count over this list, so a ` +
       `reader that has lost records reports a clean sheet it has not earned — ` +
@@ -97,8 +97,8 @@ test("the reader finds every authored programme, or the counts below mean nothin
   const numbers = all.map((p) => p.number);
   assert.deepEqual(
     numbers,
-    Array.from({ length: 28 }, (_, i) => i + 1),
-    "the programme numbers are not 1..28 — the reader dropped or doubled one."
+    Array.from({ length: 49 }, (_, i) => i + 1),
+    "the programme numbers are not 1..49 — the reader dropped or doubled one."
   );
 });
 
@@ -118,14 +118,14 @@ test("every authored season wording maps, and nothing is guessed", () => {
   );
 });
 
-test("fifteen of twenty-eight drinks gate on their season, and thirteen lean", () => {
+test("twenty-six of forty-nine drinks gate on their season, and the rest lean", () => {
   const all = programmes();
   const strict = all.filter((p) => seasonStrictClaim(p.season).strict);
   const lean = all.filter((p) => !seasonStrictClaim(p.season).strict);
 
   assert.equal(
     strict.length,
-    15,  // was 14 of 25; Hong Kong's programme 27 is Summer, 26 and 28 are Year-round
+    26,  // 14 of 25 -> 15 of 28 -> 26 of 49; the mocktails inherit their base's season
     `${strict.length} of ${all.length} drinks derive as season-gated, not 14. ` +
       `Before this derivation existed the number was ZERO — the column defaults ` +
       `false and no seeder ever wrote it — so a February party was offered the ` +
@@ -133,21 +133,30 @@ test("fifteen of twenty-eight drinks gate on their season, and thirteen lean", (
       `wording changed or SEASON_NARROWED did, and both are judgements:\n  ` +
       strict.map((p) => `${p.number}: ${p.season}`).join("\n  ")
   );
-  assert.equal(lean.length, 13);  // was 11 of 25
+  assert.equal(lean.length, 23);  // 11 of 25 -> 13 of 28 -> 23 of 49
 
-  // The thirteen are nine year-round programmes and four two-season wordings.
+  // The twenty-three are sixteen year-round programmes and the same four
+  // two-season wordings, each now doubled by its derived-mocktail programme.
   // Named rather than counted, because "thirteen" would still pass if the two
   // groups traded members. Was seven year-round of eleven; Hong Kong's 26 and
   // 28 are year-round because she seasoned only one of her nine drinks, and
   // docs/drinks.md records that the value is the house's rather than hers.
   const yearRound = lean.filter((p) => seasonStrictClaim(p.season).band === "year_round");
-  assert.equal(yearRound.length, 9, "nine programmes make no claim about the calendar");  // was 7
+  assert.equal(yearRound.length, 16, "sixteen programmes make no claim about the calendar");  // 7 -> 9 -> 16
   const narrowed = lean.filter((p) => seasonStrictClaim(p.season).band !== "year_round");
   assert.deepEqual(
     narrowed.map((p) => p.season).sort(),
-    ["Shoulder season and fall", "Spring and summer", "Warm weather", "Winter or spring"],
-    "the four wordings a band only partly covers. Gating on any of these would " +
-      "delete a month she named — the whole reason SEASON_NARROWED exists."
+    [
+      "Shoulder season and fall", "Shoulder season and fall",
+      "Spring and summer", "Spring and summer",
+      "Warm weather", "Warm weather",
+      "Winter or spring",
+    ],
+    "the four wordings a band only partly covers, each now doubled by its " +
+      "derived-mocktail programme — except `Winter or spring`, because New " +
+      "Orleans 22 is a sazerac and a vieux carre and yields no mocktail " +
+      "mechanically. Gating on any of these would delete a month she named — " +
+      "the whole reason SEASON_NARROWED exists."
   );
 });
 
