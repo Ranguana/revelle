@@ -157,7 +157,11 @@ export const STRUCTURAL_SUPPLIERS: Readonly<
   arrival: null,
   schedule: null,
   volume: null,
-  dress: null,
+  // FED by db/070. The third column a host actually states, and the first one
+  // added since the block below was written. See `fedBy.dress` in
+  // data/destination-matrix.json for the argument; this is the machine's copy
+  // of it and structure.test.ts asserts the two agree.
+  dress: { field: "what_they_wear", dimension: "evening_dress" },
   food: null,
   ending: { field: "how_it_ends", dimension: "evening_ending" },
   starts: { field: "meal_time", dimension: "evening_start" },

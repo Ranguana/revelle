@@ -70,8 +70,9 @@
       "why": "UNFED. `anti_preferences/loud` vetoes one end and `group_fun` describes HER PEOPLE, which rule 1 forbids as a source for a cell about the evening. docs/destination-contrasts.md keeps this facet on the argument that size and hour genuinely constrain it — that is an argument for the facet existing, not evidence of which level a given host is at."
     },
     "dress": {
-      "field": null,
-      "why": "UNFED. `group_fun/dress_up` is 'commit to an outfit', which is a thing her people enjoy rather than a rule this evening has, and `anti_preferences/costumes` vetoes a costume rule, which is not the same claim as `plain`. The weakest discriminator of the seven unfed and the most legible question that could be asked, which is the contrast doc's own note on it."
+      "field": "what_they_wear",
+      "dimension": "evening_dress",
+      "why": "FED by db/070. Two options, asked of everyone, no activeWhen. The option codes ARE these levels, so the bridge is an identity and there is no translation to get wrong — the same property `how_it_ends` has and the hour does not. THE ENTRY THIS REPLACED said `group_fun/dress_up` is 'commit to an outfit', which is a thing her people enjoy rather than a rule this evening has (rule 14, kept): that reading was correct and is the reason this is a NEW QUESTION rather than a bridge onto an existing tile. Bridging `dress_up` would have broken rule 1 — a guest property travels unchanged to every party they attend — and would have DOUBLE-COUNTED, since those tiles already feed the tone vector. Founder, 2026-09-06: \"Dress — 'this evening, jackets or not.' Weakest separator, most legible question, not group_fun/dress_up (that is her people).\" Weakest is right and is why it went first: 84 of 190 pairs, eighth of nine, two levels, one screen — the cheap one, proving the wiring before `schedule`."
     },
     "food": {
       "field": null,

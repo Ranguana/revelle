@@ -129,6 +129,11 @@ test("THE RULE 15 INVARIANT: the columns ranked are exactly the columns fed", ()
   const everything = [
     said("how_it_ends", "evening_ending", "dissolves"),
     said("meal_time", "evening_start", "evening"),
+    // db/070. A third fed column, and this fixture is where a new one has to be
+    // declared — the invariant is "every fed field answered, at once", so
+    // adding a supplier without adding its answer here fails LOUDLY rather
+    // than silently ranking on a column the fixture never states.
+    said("what_they_wear", "evening_dress", "dressed"),
     // Noise from the rest of the application, which must not produce a column.
     said("meal_time", "meal_shape", "long_dinner"),
     said("event_month", "season", "high_summer"),

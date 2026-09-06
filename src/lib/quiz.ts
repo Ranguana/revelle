@@ -903,6 +903,47 @@ const ENDINGS: readonly QuizOption[] = [
 ];
 
 /**
+ * WHAT THEY WEAR — A FACT ABOUT THIS EVENING, NEVER ABOUT HER FRIENDS.
+ *
+ * Founder, 2026-09-06: *"Dress — 'this evening, jackets or not.' Weakest
+ * separator, most legible question, not `group_fun`/`dress_up` (that is her
+ * people)."*
+ *
+ * THE TRAP IS NAMED IN HER OWN SENTENCE and it is the reason this question
+ * exists as its own screen rather than being read off one that already ships.
+ * `group_fun` carries `dress_up` — "commit to an outfit" — and a host whose
+ * friends love dressing up has told you about HER FRIENDS. That travels
+ * unchanged to every party they will ever attend, which is exactly what rule 1
+ * forbids a facet from being sorted on, and it is the failure that killed
+ * `no_speeches` and `teasing`. It would also DOUBLE-COUNT: those tiles already
+ * feed the tone vector, so reading them here would let one tap move a room
+ * twice, once as taste and once as shape.
+ *
+ * The matrix's own `fedBy` note put it precisely before this question existed:
+ * "`group_fun/dress_up` is 'commit to an outfit', which is a thing her people
+ * enjoy rather than a rule this evening has."
+ *
+ * TWO LEVELS, WHICH IS WHY IT WENT FIRST. `dress` separates 84 of 190 pairs —
+ * second-weakest of the nine, ahead only of `spectacle` — and it is the most
+ * legible question that can be asked of a host. It is the cheap one, and it
+ * proves the wiring before `schedule`, which is the expensive one.
+ *
+ * Codes ARE the matrix levels, so the bridge in db/070 is an identity.
+ */
+const WHAT_THEY_WEAR: readonly QuizOption[] = [
+  {
+    code: "dressed",
+    label: "Everyone dresses",
+    hint: "Somebody asks what to wear, and there is a real answer",
+  },
+  {
+    code: "plain",
+    label: "Nobody changes",
+    hint: "People come from wherever they were, and that is the point",
+  },
+];
+
+/**
  * WHERE GAMES SIT — appetite, and it can be an outright no.
  *
  * Distinct from "what would ruin it", where `forced_fun` lives, and the
@@ -1302,6 +1343,22 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
     title: "How does it end?",
     help: "You already know this one.",
     fields: [{ id: "how_it_ends", type: "single", options: ENDINGS }],
+  },
+  // Beside the ending because both are the SHAPE of the evening rather than its
+  // taste, and the facts come first — the same rule the four screens above
+  // follow. It is one line of the same sentence: what the night does with its
+  // last hour, and what everybody has on while it does it.
+  //
+  // NOT beside "what do they actually play?", which is the screen that carries
+  // `group_fun` and therefore `dress_up`. Putting them together would invite
+  // exactly the reading this question exists to refuse — that how her friends
+  // like to dress and whether this evening has jackets are one subject.
+  {
+    key: "dress",
+    eyebrow: "What they wear",
+    title: "Jackets, or not?",
+    help: "About this evening. Not about your friends.",
+    fields: [{ id: "what_they_wear", type: "single", options: WHAT_THEY_WEAR }],
   },
   {
     key: "taste",

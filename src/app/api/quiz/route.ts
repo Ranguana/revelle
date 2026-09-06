@@ -228,7 +228,8 @@ export async function POST(request: Request): Promise<Response> {
            food_plan, play_appetite, how_made,
            event_month, meal_time,
            how_it_ends,
-           indoor_outdoor, water_access, water_use
+           indoor_outdoor, water_access, water_use,
+           what_they_wear
          ) values (
            $1, $2::jsonb, $3, $4,
            $5::occasion_type, $6, $7::environment_type,
@@ -239,7 +240,8 @@ export async function POST(request: Request): Promise<Response> {
            $17::food_plan, $18::play_appetite, $19::making_level,
            $20::event_month, $21::meal_shape,
            $22::evening_ending,
-           $23::indoor_outdoor, $24::water_access, $25::water_use
+           $23::indoor_outdoor, $24::water_access, $25::water_use,
+           $26::evening_dress
          )
          returning id`,
         [
@@ -323,6 +325,12 @@ export async function POST(request: Request): Promise<Response> {
           answers.indoor_outdoor,
           answers.water_access,
           answers.water_use,
+          // ── db/070. THE THIRD FED COLUMN ──────────────────────────────
+          //
+          // Written here in the same commit as the migration and the view,
+          // because the comment twenty lines above is what it cost to learn
+          // that this list is the place that gets forgotten.
+          answers.what_they_wear,
         ]
       );
 
