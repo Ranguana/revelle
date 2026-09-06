@@ -229,7 +229,7 @@ export async function POST(request: Request): Promise<Response> {
            event_month, meal_time,
            how_it_ends,
            indoor_outdoor, water_access, water_use,
-           what_they_wear
+           what_they_wear, how_it_keeps_time
          ) values (
            $1, $2::jsonb, $3, $4,
            $5::occasion_type, $6, $7::environment_type,
@@ -241,7 +241,7 @@ export async function POST(request: Request): Promise<Response> {
            $20::event_month, $21::meal_shape,
            $22::evening_ending,
            $23::indoor_outdoor, $24::water_access, $25::water_use,
-           $26::evening_dress
+           $26::evening_dress, $27::evening_schedule
          )
          returning id`,
         [
@@ -331,6 +331,8 @@ export async function POST(request: Request): Promise<Response> {
           // because the comment twenty lines above is what it cost to learn
           // that this list is the place that gets forgotten.
           answers.what_they_wear,
+          // ── db/071. THE STRONGEST COLUMN, AND THE ONE NOT FED FROM A VETO ─
+          answers.how_it_keeps_time,
         ]
       );
 

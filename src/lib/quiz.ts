@@ -903,6 +903,68 @@ const ENDINGS: readonly QuizOption[] = [
 ];
 
 /**
+ * HOW IT KEEPS TIME — and this is the one that could have been faked.
+ *
+ * Founder, 2026-09-06: *"Schedule — a scene question in the idiom of
+ * `how_it_ends`, not the veto 'I hate a schedule that runs the day.' That veto
+ * is one level unwanted; it does not choose among posted / anchored /
+ * standing. Schedule is the facet that already splits the most pairs.
+ * Fake-wiring it is the worst cheat."*
+ *
+ * SHE IS RIGHT ABOUT THE NUMBER — 145 of 190 pairs, the strongest separator of
+ * the nine — WHICH IS EXACTLY WHY THE CHEAP ANSWER WOULD HAVE BEEN A LIE. The
+ * material already in the quiz is `anti_preferences/schedule`, "A schedule that
+ * runs the day". That is NEGATIVE EVIDENCE ABOUT ONE LEVEL: it says `posted` is
+ * unwanted and says nothing whatever about which of `anchored`, `standing` or
+ * `unplanned` this evening is. Bridging it would have populated the
+ * catalogue's most powerful column from a dislike, and the reveal would then
+ * claim a column it cannot honestly use — worse than leaving it unfed, because
+ * an unfed column is visibly unfed.
+ *
+ * THE QUESTION IS THE MATRIX'S OWN CLOSING SENTENCE. `facetNotes.schedule`
+ * ends: "A named hour and an unnamed habit are different answers to 'does
+ * anything happen at a time?'" That is the question, and the four options are
+ * that note's four glosses turned into scenes:
+ *
+ *   posted     the invitation names the hours
+ *   anchored   ONE thing happens at its hour and the rest finds its own —
+ *              Westhampton's drinks hour, New Orleans' second wind at midnight
+ *   standing   the house's own unannounced rhythms; nothing is named, but the
+ *              night has always gone this way — Nantucket, Cote d'Azur's lunch
+ *   unplanned  nobody decided anything; it became a party
+ *
+ * ANCHORED AND STANDING WERE BRIEFLY ONE LEVEL, on the argument that a host
+ * cannot tell them apart, and the matrix records that this was wrong and how it
+ * was caught. The options below therefore have to land the distinction a host
+ * CAN state: whether the thing that happens at an hour is NAMED to anybody.
+ * "Drinks at six" is named. "It always goes this way" is not.
+ *
+ * Codes ARE the matrix levels, so the bridge in db/071 is an identity.
+ */
+const HOW_IT_KEEPS_TIME: readonly QuizOption[] = [
+  {
+    code: "posted",
+    label: "The hours are on the invitation",
+    hint: "People know when to come and when to sit down before they arrive",
+  },
+  {
+    code: "anchored",
+    label: "One thing has an hour",
+    hint: "Drinks at six, or something at midnight. The rest finds its own time",
+  },
+  {
+    code: "standing",
+    label: "Nothing is announced, and it always goes the same way",
+    hint: "Nobody is told the order. Everybody somehow knows it",
+  },
+  {
+    code: "unplanned",
+    label: "Nobody decided anything",
+    hint: "It became a party. There was never a plan to keep",
+  },
+];
+
+/**
  * WHAT THEY WEAR — A FACT ABOUT THIS EVENING, NEVER ABOUT HER FRIENDS.
  *
  * Founder, 2026-09-06: *"Dress — 'this evening, jackets or not.' Weakest
@@ -1359,6 +1421,25 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
     title: "Jackets, or not?",
     help: "About this evening. Not about your friends.",
     fields: [{ id: "what_they_wear", type: "single", options: WHAT_THEY_WEAR }],
+  },
+  // The third of the shape questions, and last of them, because it is the one
+  // that asks her to look at the whole evening at once. The two before it are
+  // single facts — the last hour, the clothes. This one is the night's whole
+  // relationship to the clock.
+  //
+  // NOT beside "what would ruin it", which carries the veto this question is
+  // deliberately not built on. Reading the two as a pair would invite exactly
+  // the collapse the matrix warns about: a host who hates a schedule running
+  // the day has ruled out `posted` and has still not said whether her evening
+  // is anchored, standing or unplanned.
+  {
+    key: "schedule",
+    eyebrow: "The clock",
+    title: "Does anything happen at a time?",
+    help: "The hours themselves, not how strictly you keep them.",
+    fields: [
+      { id: "how_it_keeps_time", type: "single", options: HOW_IT_KEEPS_TIME },
+    ],
   },
   {
     key: "taste",

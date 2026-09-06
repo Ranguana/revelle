@@ -134,6 +134,7 @@ test("THE RULE 15 INVARIANT: the columns ranked are exactly the columns fed", ()
     // adding a supplier without adding its answer here fails LOUDLY rather
     // than silently ranking on a column the fixture never states.
     said("what_they_wear", "evening_dress", "dressed"),
+    said("how_it_keeps_time", "evening_schedule", "anchored"),
     // Noise from the rest of the application, which must not produce a column.
     said("meal_time", "meal_shape", "long_dinner"),
     said("event_month", "season", "high_summer"),

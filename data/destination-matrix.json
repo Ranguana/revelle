@@ -62,8 +62,9 @@
       "why": "UNFED. No question asks how people come through the door. `assigned` is Catskills alone and is a fingerprint level, which makes this the most delicate of the seven to wire: a single question reaching it would name a room in one tap. Wiring it needs a scene question in the idiom of `how_it_ends`, not a tag borrowed from somewhere else."
     },
     "schedule": {
-      "field": null,
-      "why": "UNFED. The nearest answer is `anti_preferences/schedule` — 'a schedule that runs the day' — and it is a VETO. It says one level is unwanted; it does not say which of the remaining three the evening is, and `anchored` against `standing` is precisely the distinction it cannot make (see facetNotes). Negative evidence about one level is not a stated cell. It is also the facet carrying the most separation in the audit, which makes it the strongest candidate for the next question and the worst one to fake."
+      "field": "how_it_keeps_time",
+      "dimension": "evening_schedule",
+      "why": "FED by db/071, and it is the strongest column in the matrix — 145 of 190 pairs, first of nine, and twenty pairs would drop below the gate without it. THE ENTRY THIS REPLACED is kept because it named the trap and the trap was real (rule 14): 'The nearest answer is `anti_preferences/schedule` — a schedule that runs the day — and it is a VETO. It says one level is unwanted; it does not say which of the remaining three the evening is, and `anchored` against `standing` is precisely the distinction it cannot make. It is also the facet carrying the most separation in the audit, which makes it the strongest candidate for the next question and the worst one to fake.' That is exactly what was refused: bridging the veto was one INSERT and would have ranked the catalogue's most powerful column on a dislike, which is worse than leaving it unfed because an unfed column is visibly unfed. The question instead is the matrix's own closing sentence — facetNotes.schedule ends 'A named hour and an unnamed habit are different answers to does anything happen at a time?' — and the four options are that note's four glosses written as scenes. Founder, 2026-09-06: \"a scene question in the idiom of how_it_ends, not the veto... Fake-wiring it is the worst cheat.\""
     },
     "volume": {
       "field": null,

@@ -155,7 +155,10 @@ export const STRUCTURAL_SUPPLIERS: Readonly<
   Record<StructuralFacet, { field: string; dimension: string } | null>
 > = {
   arrival: null,
-  schedule: null,
+  // FED by db/071. The strongest separator in the matrix, and the one that had
+  // a cheap wrong answer sitting next to it — `anti_preferences/schedule` is a
+  // veto on `posted` and chooses among none of the four. See `fedBy.schedule`.
+  schedule: { field: "how_it_keeps_time", dimension: "evening_schedule" },
   volume: null,
   // FED by db/070. The third column a host actually states, and the first one
   // added since the block below was written. See `fedBy.dress` in
