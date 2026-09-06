@@ -4628,7 +4628,10 @@ const CATSKILLS_WHAT_HAPPENED_TODAY: Game = {
     "One slip each, written before dinner. Something that actually happened " +
     "today, to these people, that at least two of you saw. Six words at " +
     "most. Folded once and into the tin by the door.\n\n" +
-    "The office deals them out after dinner, face down, one each. Nobody " +
+    "After dinner the office splits the table where it is already sitting. " +
+    "The two halves of it are the two sides. Nobody is picked and nobody " +
+    "picks, and if the number is odd the office takes the short side.\n\n" +
+    "Then the slips are dealt out, face down, one each. Nobody " +
     "draws for herself. Anybody holding her own says so and swaps with the " +
     "person on her left, once, and neither of them explains why. You will " +
     "not find out whose slip you had and you do not ask afterwards.\n\n" +
@@ -4636,23 +4639,34 @@ const CATSKILLS_WHAT_HAPPENED_TODAY: Game = {
     "up and act it. No words and no mouthing. Two more rules, and they are " +
     "the ones that stop it being over in a single gesture: you may not point " +
     "at the person it happened to, and you may not pick up anything that is " +
-    "on the table. Everybody guesses at once, out loud, over each other.\n\n" +
-    "THERE IS NO CLOCK. A turn ends when somebody says it near enough that " +
-    "you nod, or when you sit down, and you may sit down whenever you like " +
-    "and nobody argues about it. Then the next person stands up.\n\n" +
-    "Nobody wins. There are no teams and nothing is counted. Every slip that " +
-    "got guessed is read out at the end and written into the ledger, in the " +
-    "order it was acted, with the name of whoever acted it. Then the ledger " +
-    "goes back in the drawer and is never read again.\n\n" +
+    "on the table. YOUR SIDE guesses, out loud, over each other. The other " +
+    "side has worked it out by now and says nothing, which is most of the " +
+    "difficulty.\n\n" +
+    "THERE IS NO CLOCK. A turn ends when somebody on your side says it near " +
+    "enough that you nod, and the slip is yours — or when you sit down, and " +
+    "you may sit down whenever you like and nobody argues about it. A slip " +
+    "you sat down on crosses to the other side for one guess, made together " +
+    "and said once. If they have it, it is theirs. If they do not, it " +
+    "belongs to the evening and to nobody. Then the next person stands " +
+    "up.\n\n" +
+    "The side holding more slips at the end of it wins the night. If the two " +
+    "finish level, it goes to whichever of them guessed the first slip of " +
+    "the evening; they were ahead once and that is enough.\n\n" +
+    "Every slip that got guessed is read out at the end and written into the " +
+    "ledger, in the order it was acted, with the name of whoever acted it " +
+    "and the side that took it, and the count at the foot of the page. Then " +
+    "the ledger goes back in the drawer until next year, when the last page " +
+    "is read out before the first slip is written.\n\n" +
     "The last slip is the office's own and it is written before anybody " +
     "arrives: the bell, rung once, just to test it. It is the first thing " +
-    "that happened today and every single person saw it. It gets guessed in " +
-    "about four seconds, which is how the game ENDS rather than merely " +
-    "stops.\n\n" +
+    "that happened today and every single person saw it. Both sides say it " +
+    "at once, in about four seconds, so it counts for both and changes " +
+    "nothing — which is how the game ENDS rather than merely stops.\n\n" +
     "The reason it works is that nothing in the tin is trivia. The room is " +
     "not being tested on anything — it is being handed back an afternoon it " +
     "has just had, in the wrong person's handwriting, and the good part is " +
-    "how differently two people noticed the same twenty minutes.",
+    "how differently two people noticed the same twenty minutes. The side " +
+    "that wins is the side that noticed it the same way.",
   materials:
     "THE HOUSE PRINTS one sheet a head, perforated across the middle: the " +
     "rules at the head and one slip to tear off underneath. YOU SUPPLY a " +
@@ -4669,16 +4683,33 @@ const CATSKILLS_WHAT_HAPPENED_TODAY: Game = {
   maxGuests: 20,
 
   scoring:
-    "Nothing is scored and nobody wins. Every slip that was guessed goes " +
-    "into the ledger with the name of whoever acted it, in order, and the " +
-    "ledger is put away and never read again.",
+    "TWO SIDES, split along the table where it already sits. A slip guessed " +
+    "by the actor's own side counts for that side. A slip she sits down on " +
+    "crosses to the other side for one shared guess and counts for them if " +
+    "they have it, and for nobody if they do not. The bell counts for both " +
+    "and moves nothing. The higher count wins the night; a level night goes " +
+    "to whichever side guessed the first slip. The result is written into " +
+    "the ledger under the slips and read out the following year.",
 
   sourceNote:
     "Founder ruling, 2026-09-06: \"give charades to catskills.\" Charades is " +
     "a folk game with no owner, so the house may print the rules in full. " +
     "The form is nobody's; everything below it — the dealt slips, the day " +
     "as the only subject, the missing clock, the ledger — is the house's, " +
-    "authored to this room and separable from her instruction.",
+    "authored to this room and separable from her instruction.\n\n" +
+    "SECOND RULING, same day: \"groups do win charades.\" The first draft of " +
+    "this game said \"Nobody wins. There are no teams and nothing is " +
+    "counted.\" She overruled it, and rule 14 keeps the reasoning that lost " +
+    "rather than deleting it: the unscored design was argued from Catskills' " +
+    "own never-line, \"never make the swim test a competition, and never " +
+    "write a rule that somebody could fail.\" That was an over-reading in " +
+    "two ways. The competition half is about the swim test, a game deleted " +
+    "the same day. The failure half survives intact and this rewrite is " +
+    "built to it: the sides are the table split where it already sits, so " +
+    "nobody is picked and nobody picks, and a side that loses a night of " +
+    "charades has not failed anything. Teams and a count are the change; " +
+    "the slips, the deal, the missing clock, the ledger and the bell are " +
+    "all carried through.",
   notes:
     "NO RULE OF HERS: the founder assigned this room a game — \"give charades " +
     "to catskills\" — and did not write the rule, so there is no sentence to " +
@@ -4872,8 +4903,8 @@ const CATSKILLS_WHAT_HAPPENED_TODAY: Game = {
     {
       dimension: "group_fun",
       code: "compete",
-      weight: -0.4,
-      note: "A NEGATIVE ON PURPOSE, and it is the sign arithmetic in score.ts working: nothing is counted and nobody wins, so a room that says it gets genuinely competitive should be offered something else.",
+      weight: 0.5,
+      note: "FLIPPED FROM -0.4 ON 2026-09-06 by the founder's \"groups do win charades.\" The negative was correct arithmetic against the unscored first draft — nothing counted, so a host who says she wants to compete was steered elsewhere. There are two sides and a count now, so the same arithmetic has to point the other way or the engine hides a competitive game from the person who asked for one. Positive but not maximal: the sides are the seating, there is no clock, and the prize is a line in a ledger.",
     },
     { dimension: "affinity", code: "one_moment", weight: 0.7 },
     { dimension: "affinity", code: "wit", weight: 0.5 },

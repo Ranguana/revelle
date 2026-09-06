@@ -320,15 +320,74 @@ Three decisions in it are the house's and each is arguable in one line:
    people.** This is what makes it the camp's game and not charades with a
    name on it — and it is also the constraint that makes it unplayable by a
    room that was not together all afternoon.
-2. **Nothing is scored and nobody wins.** The guessed slips go in the ledger
-   and the ledger is never read again. The room's own voice says *"never write
-   a rule that somebody could fail"*, so a score looked like the one thing it
-   must not have — but a charades with no winner is a real departure from what
-   people expect when they hear the word.
+2. **Nothing is scored and nobody wins.** — **ANSWERED, AND OVERRULED.**
+   See below.
 3. **There is no clock.** A turn ends when it is got or when the actor sits
-   down, whenever she likes.
+   down, whenever she likes. **Still the house's, still standing.**
 
-**The question: is a charades that nobody wins still the game she meant?**
+**The question was: is a charades that nobody wins still the game she meant?**
+
+**Founder, 2026-09-06: *"groups do win charades."* The answer is no.**
+
+The house's reasoning is preserved rather than deleted (rule 14), because the
+way it was wrong is the useful part. It argued from Catskills' own never-line,
+*"never make the swim test a competition, and never write a rule that somebody
+could fail"*, and read it as a ban on scoring. That is an over-reading in two
+separate ways:
+
+- **The competition half is about the swim test**, a game refused in db/065 the
+  same day. It was never a general rule against games having a result.
+- **The failure half survives and is not the same claim.** A side that loses a
+  night of charades has not failed anything. The line forbids a rule a *person*
+  can be measured against and found short — which is what a swim test is, and
+  is not what a score is.
+
+So the rewrite is built to the surviving half rather than around it: the two
+sides are the table split where it is already sitting, **nobody is picked and
+nobody picks**, and if the number is odd the office takes the short side. The
+one place a person could have been made to fail is team selection, and the
+design removes it.
+
+What carried through unchanged: the slips written before dinner, six words,
+two witnesses; the deal that stops anyone acting her own; no words and no
+mouthing; no pointing and nothing picked up off the table; no clock; the
+ledger; and the bell as the last slip, guessed in four seconds, which is how
+the game ends rather than merely stops. The bell is now said by both sides at
+once and counts for both, so the ending stays exactly as authored and moves
+nothing.
+
+One consequence beyond the prose, because it is the kind of thing that goes
+unnoticed: the game carried a **`compete` facet at weight −0.4**, a deliberate
+negative whose note said *"nothing is counted and nobody wins, so a room that
+says it gets genuinely competitive should be offered something else."* That
+arithmetic was correct against the old draft and is backwards against this one.
+It is now **+0.5** — positive, but not maximal, since the sides are the seating,
+there is no clock, and the prize is a line in a ledger. Left at −0.4 it would
+have hidden a competitive game from the one host who asked for one.
+
+### 14b. The field day — the part of her ruling a migration cannot fill
+
+**Founder, same day:** *"re catskills multi day event gets all the field day
+games."*
+
+The structural half is done: `db/067` puts the multi-day occasions back on
+`per_day`, so a three-day getaway draws a game **each day**, three different
+ones, each offered as three candidates. (Finding recorded there: `per_day` was
+dead in production — the only rows that ever carried it were the three
+`day_material` rows db/061 deleted — so this restores the mechanism as well as
+the count.)
+
+**What it cannot do is supply the games.** Catskills has exactly **one** native
+game today, `catskills-what-happened-today`, after the swim test was refused in
+db/065. A multi-day Catskills fills its other days from the world-agnostic pool,
+which works and is not nothing. But *"all the field day games"* read literally —
+**a named set, authored to this room, played in an afternoon, in the plural** —
+is an authoring order, and rule 3 forbids inventing it from four words.
+
+**The question: is the field day a set of Catskills games you want authored —
+and if so, is it a set of separate games, or one game with events inside it?**
+The distinction matters before anything is written: a field day with four
+events is one slot, and four field day games is four.
 
 ---
 

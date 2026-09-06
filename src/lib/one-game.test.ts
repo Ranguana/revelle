@@ -25,6 +25,7 @@ import test from "node:test";
 import {
   MIGRATION_CODE,
   OCCASIONS,
+  OCCASION_DAYS,
   replayOccasionSlots,
   type OccasionSlotRow,
 } from "./occasion-slot-replay.ts";
@@ -57,59 +58,104 @@ function occasionSlots(): Map<string, Row> {
 
 /* ── the ruling ─────────────────────────────────────────────────────── */
 
-test("THERE IS NOT MORE THAN ONE GAME: one game beat per occasion", () => {
-  const rows = [...occasionSlots().values()].filter((r) => r.pool === "game");
+/*
+ * ── THE RULING, AS IT STANDS AFTER db/068 ───────────────────────────
+ *
+ * THE SUPERSEDED READING, KEPT PER CLAUDE.md RULE 14 BECAUSE IT IS THE ONE A
+ * LATER AGENT WILL RE-DERIVE. This file used to assert that each occasion drew
+ * from the game pool EXACTLY ONCE, full stop — one row, `slot_code = 'game'`,
+ * and every other beat that had ever drawn a game deleted. That was the right
+ * assertion for db/061 as db/061 was briefed, and the briefing was wrong.
+ *
+ * WHAT BEAT IT: the founder's "there shouldnt be more than one ga[m]e" was
+ * said about a Westhampton DINNER PARTY that came out carrying Art Battle and
+ * Fishbowl on one night, and it means ONE GAME PER EVENING. It was implemented
+ * as one game per REVELLE, which deleted `day_material` — a beat about the
+ * DAYTIME of an occasion that runs longer than an evening — and orphaned ten
+ * authored claims on it. Founder, 2026-09-06: "day_material should come back
+ * for multi-day occasions only."
+ *
+ * So the invariant SPLITS rather than loosening, which is the shape CLAUDE.md
+ * prescribes for exactly this (an exception a checker derives is an exception
+ * that silently widens):
+ *
+ *   the evening    exactly one `game` beat per occasion, every occasion, and
+ *                  it is never multiplied per day. UNCHANGED by db/068.
+ *   the day        `day_material`, on the occasions that have days and on no
+ *                  others. One per day, and the count comes from
+ *                  occasion_shape rather than from a list of occasion names.
+ *
+ * Both halves are counted below, in both directions, because "the day beat is
+ * missing" and "the day beat is everywhere" look identical from outside.
+ */
 
-  const byOccasion = new Map<string, string[]>();
-  for (const row of rows) {
-    byOccasion.set(row.occasion, [
-      ...(byOccasion.get(row.occasion) ?? []),
-      row.slotCode,
-    ]);
-  }
+test("ONE GAME PER EVENING: exactly one `game` beat per occasion", () => {
+  const rows = [...occasionSlots().values()].filter((r) => r.slotCode === "game");
 
-  const wrong = [...byOccasion]
-    .filter(([, codes]) => codes.length !== 1)
-    .map(([occasion, codes]) => `${occasion}: ${codes.sort().join(", ")}`);
+  const wrong = rows.filter((r) => r.pool !== "game").map((r) => r.occasion);
+  assert.deepEqual(wrong, [], "the game beat draws from the game pool");
 
   assert.deepEqual(
-    wrong,
-    [],
-    `these occasions draw from the game pool more than once. Before db/061 ` +
-      `every one of them did — a birthday drew five times — and a Westhampton ` +
-      `dinner party delivered Art Battle AND Fishbowl, which is what the ` +
-      `founder saw. Adding a second game beat needs her, not a migration.`
-  );
-
-  assert.deepEqual(
-    [...byOccasion.keys()].sort(),
+    rows.map((r) => r.occasion).sort(),
     [...OCCASIONS].sort(),
-    "and every occasion has one. An occasion with none gets no game at all"
-  );
-
-  assert.deepEqual(
-    [...new Set(rows.map((r) => r.slotCode))],
-    ["game"],
-    "and it is the `game` beat, not one of the five db/061 retired"
+    `every occasion has exactly one game beat. Before db/061 seven of nine ` +
+      `drew from the game pool more than once in one evening — a birthday ` +
+      `drew five times — and a Westhampton dinner party delivered Art Battle ` +
+      `AND Fishbowl, which is what the founder saw. Adding a second beat to ` +
+      `the EVENING needs her, not a migration.`
   );
 });
 
-test("the five collapsed beats draw from nothing at all", () => {
+test("THE DAY BEAT IS BACK, ON MULTI-DAY OCCASIONS AND ON NO OTHERS", () => {
+  // Founder, 2026-09-06: "day_material should come back for multi-day
+  // occasions only." Counted in both directions (rule 24) off
+  // occasion_shape.days, never off a list of occasion names (rule 19) — a
+  // hand-written list here would be correct until a tenth multi-day occasion
+  // is admitted and then wrong without being broken.
+  const rows = [...occasionSlots().values()].filter(
+    (r) => r.slotCode === "day_material"
+  );
+
+  assert.ok(OCCASION_DAYS.size >= 9, `parsed ${OCCASION_DAYS.size} occasion shapes`);
+  const multiDay = [...OCCASION_DAYS].filter(([, days]) => days > 1).map(([o]) => o);
+  assert.ok(multiDay.length >= 2, `${multiDay.length} occasions run more than one day`);
+
+  assert.deepEqual(
+    rows.map((r) => r.occasion).sort(),
+    [...multiDay].sort(),
+    `the day beat belongs to the occasions that have days. Too few and a ` +
+      `weekend gets one game for three days; too many and an evening has been ` +
+      `given a daytime it does not have.`
+  );
+
+  for (const row of rows) {
+    assert.equal(row.pool, "game", `${row.occasion}'s day beat draws from the game pool`);
+    assert.equal(
+      row.offerCount,
+      1,
+      `${row.occasion}'s day beat offers ${row.offerCount}. db/061 gave the ` +
+        `carousel to the EVENING's game; nothing she has said extends it to ` +
+        `the day, and "she chooses which field day games run" is a different ` +
+        `mechanism entirely — see docs/itinerary.md.`
+    );
+  }
+});
+
+test("the four beats db/061 collapsed still draw from nothing at all", () => {
   const rows = [...occasionSlots().values()];
-  const collapsed = [
-    "the_moment",
-    "honouring",
-    "day_material",
-    "ambient_game",
-    "finale",
-  ];
+  // `day_material` WAS THE FIFTH AND HAS BEEN RESTORED BY db/068. The other
+  // four stay gone for db/061's own per-beat reasons, which are not about
+  // counting: a moment is staged and never announced, an honouring is a ritual
+  // and not a party game, and an ambient deck and a finale are unmistakably
+  // games and so belong to the one beat she gets.
+  const collapsed = ["the_moment", "honouring", "ambient_game", "finale"];
 
   for (const code of collapsed) {
     assert.equal(
       rows.filter((r) => r.slotCode === code).length,
       0,
-      `${code} still has an occasion_slot row. db/061 removed them all: they ` +
-        `are structural beats, not games, and were never re-pointed at a ` +
+      `${code} still has an occasion_slot row. db/061 removed it: these are ` +
+        `structural beats, not games, and were never re-pointed at a ` +
         `replacement pool invented to keep the shape tidy (rule 32).`
     );
   }
