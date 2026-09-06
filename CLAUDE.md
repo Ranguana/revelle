@@ -280,6 +280,37 @@ lost, and a deleted argument gets re-made.
   divergence rule 33 exists to refuse, arriving through the version control
   system rather than through the seed order.
 
+- **A GUARD MAY ASSERT A PROPERTY OF THE ROWS THAT EXIST. IT MAY NOT ASSERT
+  THAT ROWS EXIST.** Rule 33's sharpest form, and the one that has now wedged
+  two deploys. `db/069` raised when a beat it had just created had no claimant,
+  guarded by `v_games > 0` — "only complain if the pool is populated", which
+  looks exactly like a pre-seed guard and is not one.
+
+  **THE PRECONDITION IS THE TRAP, NOT THE CHECK.** A POPULATED POOL PROVES THE
+  SEEDERS RAN ONCE. IT SAYS NOTHING ABOUT WHETHER THEY HAVE RUN SINCE THE
+  CATALOGUE GAINED THE ROWS BEING ASKED AFTER. Migrations run before seeders,
+  so at that instant production holds the PREVIOUS catalogue: the table is
+  full, the precondition passes, and rows the migration itself introduces have
+  never been written. Zero was the correct answer and the guard called it a
+  catastrophe; eight seeders never ran and production stayed a migration
+  behind.
+
+  The two kinds are easy to tell apart once named. "No game claims only beats
+  no occasion has" is a PROPERTY — vacuous on an empty table, true of the old
+  catalogue, true of the new one, safe in every order. "Something claims this
+  beat" is an EXISTENCE claim and has no honest reading at migration time at
+  all. The first may raise. The second belongs after the seeding it depends on,
+  and moving it is not dropping it — say in the migration where it went.
+
+  **db/068 IS THE WORKED EXAMPLE OF SURVIVING BY LUCK**, which is why this rule
+  needed a checker rather than a paragraph: it carries the same shape and
+  passed only because the claims it counted PREDATED it. Both wedges were
+  written by somebody who had read rule 33 that morning.
+  `src/lib/migration-guards.test.ts` now fails any migration raising on a
+  seed-owned count of zero, with exemptions DECLARED and counted from both ends
+  — and it was proved by restoring the statement that wedged the deploy and
+  watching it go red, never by a clean tree.
+
 - **THE KNOB IS NOT THE RULE. WHEN A SECOND RULING ARRIVES, FIND WHAT
   ACTUALLY ENCODED THE FIRST ONE.** db/061 built the carousel and the visible
   parameter was `offer_count` — three candidates, one runs. So when the founder
