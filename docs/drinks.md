@@ -826,3 +826,122 @@ file, so the axis lands with them:
 A genuinely occasion-specific drink — champagne claiming Something Bridal
 regardless of meal — gets **a narrow additive field, later, on evidence**. Not
 now, and not by symmetry.
+
+## Hong Kong
+
+### 26 · FOUNDER DECIDES — she wrote nine drinks and no programme line
+
+**The nine drinks below are hers, verbatim, from 2026-09-06.** The headings are
+NOT. Every other `###` in this file is one of the twenty-five programmes she
+wrote, by number and in her own words; she wrote no programme line for Hong
+Kong, and inventing one would put a sentence in her voice at the top of her own
+drinks. The house is declining to guess, out loud, where a reader looks.
+
+**THE GROUPING IS FORCED, NOT CHOSEN — and this is the interesting part.** A
+programme's meal shape, season and mixing level are the programme's answers and
+are INHERITED by every drink split out of it; the seeder refuses a programme
+that disagrees with itself. So nine drinks at two mixing levels and two seasons
+cannot be one programme, and the split below falls out of her own field values
+rather than out of a judgement:
+
+  26 · actually mixed, year-round   five spirit-and-syrup builds
+  27 · actually mixed, summer       the Planter's Punch, which she seasoned
+  28 · half made, year-round        the three built in the glass
+
+I had drafted a two-scene proposal — the long fruit-forward ones on the roof at
+their hour, the spirit-forward ones at dinner, to make the drink list say what
+`schedule = anchored` says. **It is withdrawn.** The programme structure is not
+free, and a grouping invented on top of one the schema already determines would
+be a second claim wearing the first one's clothes. Her row can still be read in
+these drinks; it did not need me to arrange them.
+
+**SEASON IS HOUSE-SUPPLIED FOR EIGHT OF THE NINE, AND THE SCHEMA IS WHY.** She
+seasoned exactly one — the Planter's Punch, "popular in the humid summer
+months" — and said nothing about the other eight. There is no way to record
+that. `drink.season` is `season_band NOT NULL` (db/017), and the seeder refuses
+an unmapped word in as many words: *"season 'Not said' is not in the mapping in
+scripts/catalogue-vocabulary.mjs. Add it there — a new wording is a decision,
+not a default."*
+
+**That asymmetry is worth naming.** MEAL SHAPE has exactly the absence value
+season lacks: `Not said` is deliberately kept out of the `MEALS` map — *"it is
+not a shape, it is the absence of one"* — and the parser reads the absence.
+Season has no such path, so a drink she did not season cannot say so.
+`Year-round` is the minimum claim the column permits, it is what an untagged
+dish and an untagged destination already default to, and for an indoor hotel
+evening it is also plausibly true. **It is the house's and she may strike it.**
+
+**MIRRORS: six derived, three owed.** Verified against this file's own
+standard rather than assumed — "the same glass, built from the same
+components", and its warning that "beer, a neat spirit and a poured wine are
+the tempting ones, because 'juice' always looks like an answer". The three
+owed are the three whose components are mostly spirit, so nothing survives
+removing it: the Dry Martini, the Manhattan and the Sidecar. The six derived
+are marked as the house's proposals and are vetoable.
+
+**26.1**
+- Captain's Orders (a blend of white and dark rum, pineapple, grapefruit, lime, and almond syrup)
+- Pineapple, grapefruit and lime with almond syrup, in the same glass
+- Not said
+- Year-round
+- Actually mixed
+
+**26.2**
+- The Dry Martini: Served bone-dry and ice-cold, often with a twist of lemon or an olive.
+- Mirror owed
+- Not said
+- Year-round
+- Actually mixed
+
+**26.3**
+- The Manhattan: Made with rye whiskey, sweet vermouth, and bitters
+- Mirror owed
+- Not said
+- Year-round
+- Actually mixed
+
+**26.4**
+- The Sidecar: A sophisticated option featuring cognac, Cointreau, and fresh lemon juice.
+- Mirror owed
+- Not said
+- Year-round
+- Actually mixed
+
+**26.5**
+- The Singapore Sling: Originating just down the coast, this gin, cherry brandy, Cointreau, and pineapple mix was a staple across Southeast Asian British colonies
+- Pineapple and cherry with lime and soda, in the same tall glass
+- Not said
+- Year-round
+- Actually mixed
+
+### 27 · FOUNDER DECIDES — the one drink she seasoned
+
+**27.1**
+- The Planter's Punch: A cold, fruit-forward dark rum punch popular in the humid summer months
+- The same fruit punch, cold, from the same bowl
+- Not said
+- Summer
+- Actually mixed
+
+### 28 · FOUNDER DECIDES — the three built in the glass
+
+**28.1**
+- The Gimlet: Deeply tied to British maritime history, this was made with gin (or vodka) and Rose's Lime Juice
+- Lime cordial and soda, in the same gimlet glass
+- Not said
+- Year-round
+- Half made
+
+**28.2**
+- pimms cup
+- Lemonade with the same cucumber, mint and fruit in it
+- Not said
+- Year-round
+- Half made
+
+**28.3**
+- The Tom Collins: Gin, lemon juice, sugar, and club soda
+- Lemon, sugar and club soda, in the same Collins glass
+- Not said
+- Year-round
+- Half made
