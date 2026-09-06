@@ -233,6 +233,37 @@ lost, and a deleted argument gets re-made.
   general lesson — a ledger's grain is decided the day it is written and
   audited the day somebody needs it, and those are years apart.
 
+- **RETIRING A QUESTION'S OPTION UN-FEEDS EVERY TAG THAT CARRIED IT, AND THE
+  TAGS DO NOT GO RED.** Rule 23's near-miss from the other end: db/061's
+  lesson was to count what points at a row before deleting it, and this is
+  the case where NOTHING IS DELETED and the damage happens anyway. Nine
+  `group_fun` options left the offer on 2026-09-06. Every code survived —
+  facet row, bridge row, stored answer, all intact — and thirty of the
+  hundred `game_facet` tags written from `src/lib/games.ts` became
+  unreachable in the same breath, because no host can state the term any
+  more and a term nobody can state scores zero for everybody. That is rule
+  15's DEFAULT-ONLY arriving through a door rule 15 does not watch: the
+  instrument is fed by a QUESTION, and the question is the thing that moved.
+  Two games were left with no reachable tag at all and would have ranked
+  identically for every applicant forever.
+  **The procedure: before retiring an option, join it against the pool it
+  scores and count in BOTH directions — how many tags lose their only
+  supplier, and how many rows are left with no reachable tag at all.** The
+  second number is the one that matters and it is not the one you go looking
+  for. `src/lib/play-appetite.test.ts` holds both.
+
+- **AN EXCEPTION A CHECKER DERIVES IS AN EXCEPTION THAT SILENTLY WIDENS.**
+  `games.test.ts` asserted one native game per `piece: "game_rule"`, in both
+  directions, which was exactly true until the founder said "give charades to
+  catskills" — a room that writes no rule. The tempting repair is to let a
+  native game with no quotable rule pass, which would also let a game that
+  quietly STOPPED quoting hers pass, and those two are indistinguishable from
+  inside the checker. So the exception is DECLARED on the row (`NO RULE OF
+  HERS:`, read by the test) and counted, and the invariant splits into two
+  counts instead of loosening into one. Same shape as rule 30's declared
+  identity: the row declares, the guard enforces, and a guard that infers the
+  category it is checking has stopped checking it.
+
 ## Where things live
 
 | | |
