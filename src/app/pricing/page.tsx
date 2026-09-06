@@ -156,11 +156,15 @@ export default function PricingPage() {
                 in src/lib/pricing.ts so the next reader of this page does not
                 assume the enforcement exists.
               */}
+              {/* One expression, not text-then-expression: JSX inserts a
+                  space at the line break, which put a gap before the comma
+                  on the live page. */}
               <p className={styles.termBody}>
-                Dues cover {spellCount(includedRevelles)} Revelles a year
-                {extraCents === null
-                  ? "."
-                  : `, and each one after is ${formatPrice(extraCents)}.`}{" "}
+                {`Dues cover ${spellCount(includedRevelles)} Revelles a year${
+                  extraCents === null
+                    ? "."
+                    : `, and each one after is ${formatPrice(extraCents)}.`
+                }`}{" "}
                 There is no calendar on them: two in a month and two ten months
                 apart are the same two.
               </p>
