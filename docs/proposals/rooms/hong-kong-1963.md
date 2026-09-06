@@ -73,6 +73,80 @@ summarised, not paraphrased into a clause. Nothing below is edited.
 
 ---
 
+## HER CORRECTION TO HER OWN WORKED EXAMPLE — 2026-09-06, verbatim
+
+Filed in the session it was given. **This supersedes the inference in
+`docs/room-structure.md`'s Hong Kong section**, which is her file and is not
+edited here. An agent reading only that file would draw the conclusion she has
+just refused.
+
+> *"If Hong Kong 1963 is a real evening — new hotel, jackets, roof drinks then
+> dinner, bought food, a table, the night ends — that night either is or isn't
+> New York. A drought is color. It should not be the third bit that keeps the
+> file legal. If deleting "they counted the glasses" drops you under the gate,
+> you do not have a new room. You have New York with a harbor view and a
+> research note.*
+>
+> *Same for Tokyo's `few`. If the weeknight is six people, `few` is true and
+> d=4 to HK. If someone later writes it as a proper table so it "sits better,"
+> that is editing the party to protect the packing. Backwards.*
+>
+> *So: nothing important hangs on whether the water is needed. If it is needed,
+> the snapshot failed the only test that matters — is this a different evening?
+> — and we dressed the failure up as load-bearing."*
+
+### What it overturns
+
+`docs/room-structure.md`, "Worked correction — Hong Kong 1963", reads:
+
+> Load-bearing against New York: `schedule`, `volume`, `ending`.
+> **Strike `ending` and New York is at 2 — so the water sentence has to stand.**
+
+**That last inference is now refused by its author.** The arithmetic is right and
+the conclusion drawn from it was backwards:
+
+| the strike test was read as | it actually reads |
+|---|---|
+| this cell is doing important work, so defend the sentence | without this detail you are looking at a room you already have |
+
+**The strike test is a DIAGNOSTIC, not a licence.** Falling under the gate when a
+cell is struck is evidence about the ROOM, not evidence about the CELL.
+
+### The rule underneath, which outlives both rooms
+
+**THE ROW IS A SNAPSHOT OF A REAL EVENING. YOU NEVER EDIT THE EVENING TO FIX THE
+PACKING.**
+
+- A cell is right because it is **true of the night**, never because it improves
+  a distance.
+- **`d` is measured, not targeted.** An honest row that lands under the gate
+  means the room is refused. You do not re-describe the party until it clears.
+- Colour is colour. A researched detail may enrich a room and may not be the
+  thing holding it legal.
+
+### The question this leaves open — REPORTED, NOT RESOLVED
+
+Hers to answer, and it is the only one that matters here:
+
+> **Strip the drought. New hotel, jackets, roof drinks then dinner, bought food,
+> a table, the night ends. Is that New York?**
+
+If yes, it is not a room, and the answer is NOT to find a better third detail.
+If no, what makes it not-New-York has to be nameable in the night itself, and
+the drought becomes what she calls it: colour.
+
+An earlier relay of hers — *"the water isnt the issue - instead there is a
+missing atmosphere or design or menu item"* — was passed to me as an authoring
+gap to be filled. **That framing is superseded by the message above.** The
+missing content is not a patch that makes the water unnecessary; her point is
+that the drought was never load-bearing in the first place, and if it is, the
+room fails.
+
+Nothing in this file's row has been changed. The row is hers and it stands as
+she left it.
+
+---
+
 ## The revised row — hers, still a draft
 
 Her format, and it is the format every row should arrive in from here: **a cell

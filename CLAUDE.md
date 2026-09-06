@@ -910,3 +910,49 @@ seeded database for the first time.
 BACKFILL before it constrains, in the same migration, and must NAME what it
 cannot repair rather than invent a value for it (rule 32). `db/053` is the
 worked example in both halves.
+
+---
+
+**34. THE ROW IS A SNAPSHOT OF A REAL EVENING. NEVER EDIT THE EVENING TO FIX
+THE PACKING.** Founder ruling, 2026-09-06, given in full and transcribed
+verbatim in `docs/proposals/rooms/hong-kong-1963.md`:
+
+> "If Hong Kong 1963 is a real evening — new hotel, jackets, roof drinks then
+> dinner, bought food, a table, the night ends — that night either is or isn't
+> New York. A drought is color. It should not be the third bit that keeps the
+> file legal. If deleting 'they counted the glasses' drops you under the gate,
+> you do not have a new room. You have New York with a harbor view and a
+> research note."
+
+**THE STRIKE TEST IS A DIAGNOSTIC, NOT A LICENCE, AND IT WAS BEING READ
+BACKWARDS** — including by `docs/room-structure.md`'s own worked example, which
+concludes "strike `ending` and New York is at 2 — so the water sentence has to
+stand." Her correction: falling under the gate when a cell is struck is evidence
+about the ROOM, not evidence about the CELL. It does not mean the cell is
+precious. It means that without that one detail you are looking at a room the
+catalogue already has.
+
+Three consequences, and the third is the one that will be violated first:
+
+1. A cell is right because it is TRUE OF THE NIGHT, never because it improves a
+   distance.
+2. **`d` IS MEASURED, NOT TARGETED.** An honest row that lands under the gate
+   means the room is refused. You do not go back and re-describe the party until
+   it clears. "The honest answer was no room" is a result, not a failure.
+3. Colour is colour. A researched period detail may enrich a room and may still
+   not be the thing holding it legal — and the more expensive the research was,
+   the more it will feel load-bearing. That feeling is the defect.
+
+THE PAIR OF RULINGS THAT LOOK LIKE THEY COLLIDE AND DO NOT, because both were
+given the same day and an agent reading one will misapply it. She said *"i dont
+want any destination TO BE LIMITED BY GUEST COUNT"* and, an hour later, *"if the
+weeknight is six people, `few` is true."* Both hold, and the distinction is
+DESCRIPTION versus GATE: a `size` cell may be true of a night and say so, and it
+may never narrow, penalise or reorder what a host is offered because of her
+headcount. The mechanism is the thing under audit; the cell is not the problem.
+And the move she named and refused by name — writing Tokyo as "a proper table"
+so it sits better against Hong Kong — is rule 34 exactly: *"that is editing the
+party to protect the packing. Backwards."*
+
+Rule 32's sibling. That one says symmetry is not evidence; this one says
+ARITHMETIC IS NOT ARGUMENT.
