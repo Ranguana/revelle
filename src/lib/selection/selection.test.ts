@@ -2994,6 +2994,336 @@ test("a destination nobody has tagged is not eliminated by its own silence", () 
 });
 
 /* ─────────────────────────────────────────────────────────────────────
+ * THE STRUCTURAL MATRIX, IN THE RANKING
+ *
+ * `rankByStructure` was written, tested and never called: the ranking stage
+ * scored the aesthetic half of her vector and stopped, so a host's
+ * `how_it_ends` and `meal_time` were recorded, resolved, carried — and moved
+ * nothing. These tests are the other end of that wire.
+ *
+ * WHAT THEY ARE BUILT TO CATCH, because a test that cannot fail is worse than
+ * no test (CLAUDE.md rule 24): every case below gives the room that STRUCTURE
+ * SHOULD REFUSE the better look, so a ranking that ignored the matrix, read the
+ * wrong column, or blended the two numbers into one comes out in the opposite
+ * order and goes red. And each fed column is driven in BOTH directions against
+ * the same pair of rooms, so a scrambled cell — either room's, either way —
+ * fails one of the two halves.
+ *
+ * THE ROOMS ARE REAL. Their slugs are the keys of data/destination-matrix.json,
+ * which is what the ranker joins on; a fixture with an invented slug is
+ * unrowed, and the last test in the section is about exactly that.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/** Her two structural answers, as the quiz actually resolves them (db/037). */
+const ENDS_UNTIL_MORNING = facet("f-end-until-morning", "evening_ending", "until_morning");
+const ENDS_DISSOLVES = facet("f-end-dissolves", "evening_ending", "dissolves");
+const ENDS_CLEAN_STOP = facet("f-end-clean-stop", "evening_ending", "clean_stop");
+const STARTS_EVENING = facet("f-start-evening", "evening_start", "evening");
+const STARTS_MORNING = facet("f-start-morning", "evening_start", "morning");
+const STARTS_LATE = facet("f-start-late", "evening_start", "late");
+
+/**
+ * One answer, on the QUIZ FIELD it was given on.
+ *
+ * `stated()` defaults `field` to the dimension, which is true of most answers
+ * and false of these two: `meal_time` resolves onto `evening_start` AND onto
+ * `meal_shape`, and `structureOf` reads the pair. Getting the field wrong here
+ * would make every test below silently structure-free, which is the failure
+ * they exist to catch — so they say the field out loud.
+ */
+function askedOn(f: Facet, field: string): StatedFacet {
+  return { ...stated(f), field };
+}
+
+/**
+ * A REAL ROOM, by its matrix slug, wearing the voice she asked for.
+ *
+ * Both rooms in every pair below carry her tones at full weight, so both clear
+ * the voice bar comfortably and the tier has already done its work before
+ * structure is asked anything. `look` is the only thing that separates them
+ * aesthetically.
+ */
+function matrixRoom(slug: string, look: number): Destination {
+  return destination(slug, slug.toUpperCase(), {
+    [SENTIMENTAL.id]: 1,
+    [ALL_AT_ONCE.id]: 1,
+    [COASTAL.id]: look,
+  });
+}
+
+/** Her vector for these tests: the tones that clear the bar, plus a look. */
+function structuralVector() {
+  return buildVector([stated(COASTAL), ...HER_TONES], [], [], FACETS, OPTIONS);
+}
+
+function rankOf(result: ReturnType<typeof chooseDestinations>, slug: string) {
+  const entry = result.shortlist.find((s) => s.destination.slug === slug);
+  assert.ok(entry, `${slug} is not in the shortlist at all`);
+  return entry;
+}
+
+function chooseWith(rooms: Destination[], hers: StructuralRow) {
+  return chooseDestinations(
+    rooms,
+    structuralVector(),
+    "dinner_party",
+    FACETS,
+    OPTIONS,
+    rng(1),
+    OPTIONS.now!,
+    hers
+  );
+}
+
+test("THE FOUNDER'S CASE: an until-morning host does not get the Dolomites over New Orleans", () => {
+  // She said the night runs until morning and begins in the evening.
+  // NEW ORLEANS is that night exactly (until_morning, evening); the DOLOMITES
+  // are its opposite on both columns (clean_stop, morning). So the Dolomites
+  // are given the better LOOK, and must still lose.
+  const dolomites = matrixRoom("dolomites", 1);
+  const newOrleans = matrixRoom("new-orleans", 0.1);
+
+  const result = chooseWith([dolomites, newOrleans], {
+    ending: "until_morning",
+    starts: "evening",
+  });
+
+  const nola = rankOf(result, "new-orleans");
+  const dol = rankOf(result, "dolomites");
+
+  // Both cleared the voice bar, so this is a ranking question and not a filter
+  // question — which is the condition the case was stated under.
+  assert.equal(result.shortlist.length, 2);
+  for (const entry of result.shortlist) {
+    assert.ok(
+      (entry.toneMatch ?? 0) >= OPTIONS.toneThreshold,
+      `${entry.destination.slug} did not clear the voice bar, so this test is ` +
+        `measuring the filter and not the ranking`
+    );
+  }
+
+  assert.equal(nola.structuralDistance, 0, "she described New Orleans");
+  assert.equal(dol.structuralDistance, 2, "both columns disagree with the Dolomites");
+  assert.ok(
+    nola.rank < dol.rank,
+    `the Dolomites (clean_stop, morning) outranked New Orleans (until_morning, ` +
+      `evening) for a host who said until_morning and evening. Structure is a ` +
+      `sort key over the voice survivors; it is not a decoration.`
+  );
+
+  // AND NOTHING WAS AVERAGED. The look still prefers the room structure
+  // refused, and its aesthetic number is untouched by the distance — a blended
+  // `0.6 · aesthetic + 0.4 · (1 − distance)` would have moved this the other way.
+  assert.ok(
+    dol.score > nola.score,
+    "the aesthetic score must still say what it said; structure orders, it does not add"
+  );
+});
+
+test("A WRONG `ending` CELL LOSES THIS — the column decides, in both directions", () => {
+  // NEW ORLEANS (until_morning, evening) against NEW YORK (dissolves, evening).
+  // They agree on `starts`, so `ending` is the only fed column that can
+  // separate them, and the room she did NOT describe is given the better look
+  // every time.
+  for (const [answer, nearer, farther] of [
+    ["until_morning", "new-orleans", "new-york"],
+    ["dissolves", "new-york", "new-orleans"],
+  ] as const) {
+    const result = chooseWith(
+      [matrixRoom(farther, 1), matrixRoom(nearer, 0.1)],
+      { ending: answer, starts: "evening" }
+    );
+
+    assert.equal(rankOf(result, nearer).structuralDistance, 0);
+    assert.equal(rankOf(result, farther).structuralDistance, 1);
+    assert.equal(
+      rankOf(result, nearer).rank,
+      1,
+      `she said the evening ${answer} and ${farther} won anyway. The ` +
+        `${nearer} row and the ${farther} row differ on \`ending\` and on ` +
+        `nothing else a host feeds, so this is that cell or it is nothing.`
+    );
+  }
+});
+
+test("A WRONG `starts` CELL LOSES THIS — the column decides, in both directions", () => {
+  // CATSKILLS (dissolves, morning) against NANTUCKET (dissolves, evening).
+  // They agree on `ending`, so `starts` is the only fed column left.
+  for (const [answer, nearer, farther] of [
+    ["morning", "catskills", "nantucket"],
+    ["evening", "nantucket", "catskills"],
+  ] as const) {
+    const result = chooseWith(
+      [matrixRoom(farther, 1), matrixRoom(nearer, 0.1)],
+      { ending: "dissolves", starts: answer }
+    );
+
+    assert.equal(rankOf(result, nearer).structuralDistance, 0);
+    assert.equal(rankOf(result, farther).structuralDistance, 1);
+    assert.equal(
+      rankOf(result, nearer).rank,
+      1,
+      `she said the evening starts in the ${answer} and ${farther} won anyway. ` +
+        `These two rows differ on \`starts\` and on nothing else a host feeds.`
+    );
+  }
+});
+
+test("THE EPSILON: a quarter-point near miss is not a verdict, and a full column is", () => {
+  // A host who names a late supper that ends cleanly. Against her:
+  //
+  //   HAVANA      (until_morning, evening)  ending +1.00, starts cancelled  1.00
+  //   NEW YORK    (dissolves,     evening)  ending +1.00, starts near +0.25 1.25
+  //   CATSKILLS   (dissolves,     morning)  ending +1.00, starts +1.00      2.00
+  //
+  // Havana and New York are 0.25 apart — one near miss, the whole of what
+  // `structureEpsilon` is set to — so structure has not distinguished them and
+  // the look decides. Havana and the Catskills are 1.00 apart, which is a
+  // column she actually disagreed on, and there the look does not get a vote.
+  const hers: StructuralRow = { ending: "clean_stop", starts: "late" };
+
+  const withinBand = chooseWith(
+    [matrixRoom("havana", 0.1), matrixRoom("new-york", 1)],
+    hers
+  );
+  assert.equal(rankOf(withinBand, "havana").structuralDistance, 1);
+  assert.equal(rankOf(withinBand, "new-york").structuralDistance, 1.25);
+  assert.equal(
+    rankOf(withinBand, "new-york").rank,
+    1,
+    `a 0.25 near miss overturned the look. Four near misses cost what one ` +
+      `mismatch costs (structure.ts), so one of them is not a verdict — it is ` +
+      `the tie the aesthetic score is there to break.`
+  );
+
+  const beyondBand = chooseWith(
+    [matrixRoom("havana", 0.1), matrixRoom("catskills", 1)],
+    hers
+  );
+  assert.equal(rankOf(beyondBand, "catskills").structuralDistance, 2);
+  assert.equal(
+    rankOf(beyondBand, "havana").rank,
+    1,
+    `a full column of disagreement did NOT overturn the look. Wider than ` +
+      `epsilon and the structural order stands, or the epsilon is a way of ` +
+      `switching the matrix off.`
+  );
+});
+
+test("silence sorts nothing: a host who stated no column gets the aesthetic order", () => {
+  // The same two rooms as the founder's case, and the same looks. With no
+  // structural answer the Dolomites win, because nothing is charged against
+  // anybody and the look is all there is (CLAUDE.md rule 3).
+  const result = chooseWith(
+    [matrixRoom("dolomites", 1), matrixRoom("new-orleans", 0.1)],
+    NO_STRUCTURE
+  );
+
+  assert.equal(rankOf(result, "dolomites").rank, 1);
+  for (const entry of result.shortlist) {
+    assert.equal(
+      entry.structuralDistance,
+      null,
+      "a room she stated nothing against is UNMEASURED, and 0 would read as a match"
+    );
+  }
+});
+
+test("a room with no matrix row is unmeasured, and unmeasured is never distant", () => {
+  // An authored room she disagrees with on both columns, against a fixture
+  // nobody has given a row. The fixture must not be pushed below the room she
+  // contradicted — an absence in the matrix is the catalogue being unfinished,
+  // never a property of the room (CLAUDE.md rule 29).
+  assert.equal(
+    matrixRow("d-no-row-here"),
+    undefined,
+    "this test needs a slug the matrix does not know"
+  );
+
+  const result = chooseWith(
+    [matrixRoom("dolomites", 1), matrixRoom("d-no-row-here", 0.9)],
+    { ending: "until_morning", starts: "evening" }
+  );
+
+  const unrowed = rankOf(result, "d-no-row-here");
+  assert.equal(
+    unrowed.structuralDistance,
+    null,
+    "an unrowed room must be carried as unmeasured, not as 0 and not as far"
+  );
+  assert.equal(unrowed.structuralRow, null);
+  assert.equal(
+    unrowed.rank,
+    1,
+    "the Dolomites are 2.00 from the evening she described and the unrowed " +
+      "room is nothing from it. Charging a room for a cell nobody has written " +
+      "would rank the catalogue's authoring backlog."
+  );
+});
+
+test("the explanation names the cells, not the vibes", () => {
+  // Two real rooms, her two structural answers on their real quiz fields, and
+  // an account that has to name what it used. "If the explanation cannot name a
+  // fed facet, the ranker used a ghost."
+  const run = runSelection(
+    inputFor(
+      {
+        destinations: [
+          matrixRoom("new-orleans", 0.9),
+          matrixRoom("dolomites", 0.2),
+        ],
+      },
+      {
+        stated: [
+          stated(COASTAL),
+          ...HER_TONES,
+          askedOn(ENDS_UNTIL_MORNING, "how_it_ends"),
+          askedOn(STARTS_EVENING, "meal_time"),
+        ],
+      }
+    ),
+    { seed: 5 }
+  );
+
+  const nola = run.candidates.find(
+    (c) => c.destination.slug === "new-orleans"
+  );
+  assert.ok(nola, "New Orleans should be the first candidate for this host");
+  const said = nola.explanation.destination.join(" ");
+
+  assert.match(said, /ending=until_morning/);
+  assert.match(said, /starts=evening/);
+  assert.match(
+    said,
+    /0\.00 from the evening/,
+    "the distance that moved the rank has to be in the account"
+  );
+
+  // AND THE SILENT ZERO, SAID OUT LOUD. Nothing in the library is tagged in a
+  // dimension her aesthetic answers use, so the look half of this rank decided
+  // nothing — and an explanation that let that pass as a low score would be
+  // the same silence one layer up (CLAUDE.md rule 16).
+  const dolomites = run.candidates.find(
+    (c) => c.destination.slug === "dolomites"
+  );
+  assert.ok(dolomites);
+  assert.match(
+    dolomites.explanation.destination.join(" "),
+    /(NOT ONE aesthetic key|ranked on mood=faded_coastal)/
+  );
+});
+
+test("the explanation says so when structure abstained", () => {
+  // The default fixtures have invented slugs, so no room has a row and no host
+  // answer reaches a column. Both silences are stated rather than skipped.
+  const run = runSelection(inputFor(), { seed: 5 });
+  const said = run.candidates[0].explanation.destination.join(" ");
+  assert.match(said, /STRUCTURE ABSTAINED/);
+  assert.match(said, /ending/, "the column names are what a curator acts on");
+});
+
+
+/* ─────────────────────────────────────────────────────────────────────
  * THE COMPOSED TABLE — db/021, db/022, db/023
  *
  * The set menu is no longer the unit of selection. A table is three dishes,
