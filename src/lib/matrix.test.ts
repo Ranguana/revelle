@@ -177,10 +177,13 @@ test("unrowed slugs are unmeasured, not at distance zero", () => {
   // The reading this file's header already refuses for matrixDistance, asserted
   // for the derived readings too: a room with no row is not identical to
   // everything.
-  assert.equal(matrixDistance("hong-kong-1963", "havana"), null);
-  assert.equal(sameKind("hong-kong-1963", "havana"), null);
-  assert.equal(fingerprintDrop("hong-kong-1963"), null);
-  assert.deepEqual(differingFacets("hong-kong-1963", "havana"), []);
+  assert.equal(matrixDistance("no-such-room-1999", "havana"), null);
+  assert.equal(sameKind("no-such-room-1999", "havana"), null);
+  assert.equal(fingerprintDrop("no-such-room-1999"), null);
+    assert.deepEqual(differingFacets("no-such-room-1999", "havana"), []);
+  // hong-kong-1963 was the example here until her row was transcribed. A test
+  // whose fixture is a real slug stops testing what it names the moment that
+  // slug gets a row, so the fixture is now one that cannot ever exist.
 });
 
 test("authored and proposed are disjoint, and every row is in one of them", () => {

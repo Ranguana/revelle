@@ -295,6 +295,17 @@
       "crowd",
       "nothing"
     ],
+    "hong-kong-1963": [
+      "ceremony",
+      "anchored",
+      "overlapping",
+      "dressed",
+      "bought",
+      "clean_stop",
+      "evening",
+      "one_table",
+      "nothing"
+    ],
     "tokyo-1978": [
       "assigned",
       "posted",
@@ -328,13 +339,15 @@
     "oaxaca-1954",
     "palm-springs-1965",
     "st-moritz-1984",
-    "tokyo-1978"
+    "tokyo-1978",
+    "hong-kong-1963"
   ],
   "blocked": {
     "rio-1947": "No row. Streetward it lands at 1 from New Orleans; toward the Copacabana Palace it converges on St. Moritz. Released by a proper Havana/New Orleans separation or by adopting `spectacle`.",
     "cap-ferrat": "RETIRED, AND RESERVED. Folded into Cote d'Azur on 2026-08-22 and retired in the database by db/028. It does NOT re-enter the single-evening catalogue — its register lives inside Cote d'Azur, which absorbed its menus, drinks and dishes. But the room is RESERVED as the founding destination of a DURATION TIER — multi-day residencies — if that tier is ever built. The villa taken for a month, the schedule that is very slow and entirely fixed, and a house that reassembles every July are a POOR fit for one evening and the natural centre of a week. That is why the fold was correct and the retirement is not a deletion: world_status is 'retired' rather than gone, the slug stays claimed, and its voice and facet tags stay attached to it rather than being merged into Cote d'Azur's mouth."
   },
   "founderPending": {
+    "hong-kong-1963": "HERS, TRANSCRIBED, NOT SIGNED. Unlike tokyo-1978 this row is not an agent's — she wrote it in docs/room-structure.md as the revised Hong Kong row and it is transcribed here verbatim, cell for cell, so that check:matrix and check:voices can read it. It had been sitting UNCOMMITTED, which meant every distance quoted about this room was unreproducible and the voice test applied the STRICT ceiling to all nineteen pairs on the ground that the room had no row at all. Transcribing it does not admit it: admission is a signature (rule 13) and the slug is not on `authored`. Her own open question stands and is recorded in docs/proposals/rooms/hong-kong-1963.md — strip the drought and is this New York? Her answer, 2026-09-06, is that it is neither a register nor a room needing a third structural difference: it is a room that needs a different MOUTH, on the Havana/New Orleans mechanism (distance 1, affinity 0.172). The voice is written to that ruling. Delete this row and the entry to withdraw it.",
     "tokyo-1978": "THE WHOLE ROW IS AN AGENT PROPOSAL, NOT THE FOUNDER'S. Unlike the other six in `proposed`, this room was not specified by her — a subagent placed it on 2026-09-05 into the one (ending, starts) cell no room occupies, `clean_stop` + `evening`, and wrote the room to the row. Nothing else in the repository has been touched: no entry in src/lib/destinations.ts, DESTINATION_TONES, food-identity, library.ts or the four content documents. The complete proposal, with the writing, the tones, the palette, the food and the drinks, is docs/proposed-tokyo-1978.md. IF SHE DECLINES IT, DELETE THE ROW AND THIS ENTRY AND NOTHING ELSE BREAKS. Two cells carry the argument that will be argued with first, and both are stated there rather than defended here: `arrival = assigned` (a second claimant for a level Catskills held alone, on the ground that a role really is handed over at the door) and `food = bought` (provenance, not identity — the room is a table room whose table mostly came from the shop).",
     "palm-springs-1965.schedule": "provisional `anchored` under the four-level split — founder decides",
     "nantucket.ending": "FOUNDER DECIDES. `dissolves` is CC's pass-1 reading; `clean_stop` was the original. See flipLog.",

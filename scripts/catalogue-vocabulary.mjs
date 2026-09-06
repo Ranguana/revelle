@@ -50,6 +50,7 @@
  */
 export const DESTINATIONS = {
   Westhampton: "westhampton-1976",
+  "Hong Kong": "hong-kong-1963",
   Nantucket: "nantucket",
   "New York": "new-york",
   "Côte d'Azur": "cote-dazur",
@@ -124,6 +125,7 @@ export const ROOM_HEADINGS = {
   "CATSKILLS, 1963": "Catskills",
   "PALM SPRINGS, 1965": "Palm Springs",
   "BIG SUR, 1971": "Big Sur",
+  "HONG KONG, 1963": "Hong Kong",
   "NANTUCKET, 1972": "Nantucket",
   "AMALFI COAST, 1953": "Amalfi Coast",
   "OAXACA, 1954": "Oaxaca",

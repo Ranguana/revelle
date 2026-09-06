@@ -50,8 +50,9 @@ function room(slug: string): Room {
   return d;
 }
 
-test("all eighteen authored rooms are reachable by the checker", () => {
-  assert.equal(ALL.length, 18, "eighteen rooms are authored; the checker must reach every one");
+test("all nineteen authored rooms are reachable by the checker", () => {
+  // WAS 18 (rule 14). hong-kong-1963 is the nineteenth.
+  assert.equal(ALL.length, 19, "nineteen rooms are authored; the checker must reach every one");
   const notKeyed = ALL.filter((d) => !isKeyed(d)).map((d) => d.key).sort();
   // KEPT PER RULE 14. THIS LIST WAS FIVE — `amalfi-1953`, `aspen-1994`,
   // `oaxaca-1954`, `palm-springs-1965`, `st-moritz-1984` — and the comment
@@ -123,7 +124,7 @@ test("splitting lists did not turn the checker into a substring matcher", () => 
 test("`voice.banned` is read, and it is the largest channel", () => {
   let banned = 0;
   for (const d of ALL) banned += d.voice.banned.length;
-  assert.equal(banned, 397, "the banned terms this file now enforces");
+  assert.equal(banned, 420, "the banned terms this file now enforces");
 
   // Every room must have at least one banned word that fires on its own.
   for (const d of ALL) {
@@ -213,9 +214,10 @@ test("the rooms' own refused example lines are caught more often than they were"
       all++; if (r.old) old++; if (r.new) now++;
     }
   }
-  assert.equal(all, 117);
-  assert.equal(old, 49, "what the old pipeline caught");
-  assert.equal(now, 65, "what this one catches");
+  // WAS 117 over eighteen rooms. hong-kong-1963 adds six refused lines.
+  assert.equal(all, 123);
+  assert.equal(old, 50, "what the old pipeline caught");  // was 49 over eighteen rooms
+  assert.equal(now, 67, "what this one catches");  // was 65 over eighteen rooms
   // Not a target to game: the remaining 52 are refused SHAPES, which no lexical
   // channel can reach. They are what the shape-proximity report is for.
 });
@@ -235,7 +237,7 @@ test("punctuation rules are declared everywhere and enforced nowhere", () => {
   let marks = 0;
   for (const d of ALL)
     marks += (refusalAudit(d).declared as { shape: string }[]).filter((x) => x.shape === "MARK").length;
-  assert.equal(marks, 41, "declared refusal terms that name a mark rather than a word");
+  assert.equal(marks, 44, "declared refusal terms that name a mark rather than a word");  // was 41 over eighteen rooms
 });
 
 test("term shapes are classified, not guessed at", () => {

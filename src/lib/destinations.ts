@@ -10166,6 +10166,376 @@ export const ST_MORITZ_1984_TONES: readonly ToneWeight[] = [
  * a route handler, and a seed, and so a missing key is a compile error rather
  * than a runtime undefined.
  */
+/**
+ * HONG KONG, 1963 — THE SPLIT-TWIN CASE, AND THE MOUTH IS THE WHOLE ARGUMENT.
+ *
+ * Founder ruling, 2026-09-06, `docs/voice-space.md`: "Split twins. Same evening
+ * shape, different world. Havana vs New Orleans is the proof: distance 1 on the
+ * matrix, affinity 0.172. That is the mechanism HK/NY should use instead of a
+ * drought cell."
+ *
+ * ── WHAT THIS ROOM IS NOT ALLOWED TO DO ──────────────────────────────
+ *
+ * It is not allowed to be kept legal by a researched detail. Water was counted
+ * in Hong Kong in 1963 and the drought is real, and for a while it was carrying
+ * `ending = clean_stop` on its own. She refused that twice: rule 34 ("if
+ * deleting 'they counted the glasses' drops you under the gate, you do not have
+ * a new room") and again in voice-space ("Do not park the only unique fact here
+ * while the row scrapes a gate you have already decided is the wrong test").
+ *
+ * SO THE DROUGHT IS NOWHERE IN THIS OBJECT. It is not the speaker, not a
+ * lexicon term, not a formula, not an exemplar. It stays in the copy as colour,
+ * which is where she put it. The temptation this file is most exposed to was to
+ * be told "voice is the answer" and then load the drought into the voice; that
+ * move is pre-refused and it is not made here.
+ *
+ * ── WHERE THE MOUTH ACTUALLY COMES FROM ──────────────────────────────
+ *
+ * New York and Hong Kong throw the same SHAPE of evening: ceremony, dressed,
+ * bought, a table, an ending. The difference is not a fact about a city, it is
+ * a fact about WHO IS SPEAKING.
+ *
+ *   NEW YORK'S HOST LAID THE TABLE. HONG KONG'S HOST BOOKED IT.
+ *
+ * New York's speaker is "the table, and the two people who laid it" — an
+ * apartment, oysters opened on their own counter, a plan of the table made on
+ * paper in advance. Every line is proprietary because the room is theirs.
+ *
+ * Hong Kong's host owns nothing in the room. The kitchen is the hotel's, the
+ * lift is the hotel's, the bar afterwards has other people's evenings going on
+ * in it. What she has is a NAME AT A DESK and an hour on the roof. That is a
+ * different mouth by construction and not by decoration: it is second person
+ * where New York is third, because a host who booked a room has to tell you
+ * where to go; and it is deadpan where New York is dry, because the joke is
+ * that the newest building in the colony is described as though it had always
+ * been there.
+ *
+ * `shows_you_things` is the load-bearing tone and it is the exact inverse of
+ * PALM SPRINGS, the catalogue's other formal-ish knowing room, which sits at
+ * knowingness +1.91. A host showing you a building that opened last year is at
+ * knowingness MINUS. That is what kept this hand off Palm Springs' vector, and
+ * it was measured rather than hoped for.
+ *
+ * ── THE NUMBER, AND WHICH BAR IT IS HELD TO ──────────────────────────
+ *
+ * With her row transcribed, Hong Kong's nearest neighbours are Las Vegas, New
+ * York and Palm Springs, ALL AT 3 — at the gate, none below it, B2 empty. So no
+ * twin is needed and the MONITOR ceiling of 0.92 is what formally applies.
+ *
+ * THIS ROOM IS HELD TO STRICT 0.58 AGAINST NEW YORK ANYWAY, and the reason is
+ * her open question. The cell holding HK/NY at 3 rather than 2 is `ending` —
+ * the contested one. If she strips the drought and the ending goes to
+ * `dissolves`, New York is at 2 and STRICT applies for real. A mouth that only
+ * clears the bar while the disputed cell stands is a mouth doing the drought's
+ * job in a different costume.
+ */
+const HONG_KONG_1963_LOOK: Theme = {
+  key: "hong-kong-1963",
+  type: {
+    display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
+    body: '"Karla", "Helvetica Neue", Arial, sans-serif',
+    mono: '"Space Mono", ui-monospace, Menlo, monospace',
+  },
+  palette: {
+    ground: "#3A2A52",
+    ground2: "#312346",
+    bone: "#584673",
+    ink: "#F4ECDD",
+    inkSoft: "#B9AEC0",
+    inkFaint: "#948BA0",
+    rule: "#6A5788",
+    aqua: "#6FC4B4",
+    oxblood: "#E4886A",
+    gold: "#DDAE4C",
+    night: "#241A34",
+    night2: "#181024",
+    nightInk: "#E7E1EE",
+    nightSoft: "#A79FB4",
+    nightAqua: "#8FD6C6",
+    nightOxblood: "#F0A288",
+  },
+  paletteDark: {
+    ground: "#150F1F",
+    ground2: "#1D1529",
+    ink: "#F2EADC",
+    inkSoft: "#B0A6B8",
+    inkFaint: "#867D92",
+    rule: "#332747",
+    aqua: "#6ABBAB",
+    oxblood: "#E08A68",
+    gold: "#D9A948",
+  },
+};
+
+export const HONG_KONG_1963: Destination = {
+  key: "hong-kong-1963",
+  name: "HONG KONG, 1963",
+  tagline: "Your name is at the desk. The roof at seven, and the table at eight.",
+  premise:
+    "A table booked in a hotel that opened last year. You give your name at " +
+    "the desk and somebody takes you up. Drinks on the roof while the dining " +
+    "room is still dark, then down to dinner nobody in this party cooked. " +
+    "Afterwards the bar, which has other people's evenings in it, and the " +
+    "night ends because the room does.",
+  look: HONG_KONG_1963_LOOK,
+  voiceVersion: 1,
+  voice: {
+    speaker: "Whoever booked the table, an hour before anybody arrives.",
+    selfReference: ["the table", "the booking"],
+    audience: "the eight who were told a floor and an hour, and will find it",
+    address: {
+      mode: "second_person",
+      note:
+        "You are addressed directly because you have to get somewhere: a " +
+        "desk, a lift, a floor, an hour. New York writes ABOUT its guests " +
+        "because they are already in the apartment. This room writes TO them " +
+        "because they are not here yet and the building is large.",
+    },
+
+    register:
+      "A note left with the desk, in the hand of someone who has already " +
+      "checked the arrangements twice and will not mention that.",
+    formality: "formal",
+    cadence:
+      "The place, then the hour. Short, and the second half is a time or a " +
+      "floor. Nothing is added once the arrangement is stated.",
+    sentence: { typicalWords: 10, maxWords: 18 },
+    punctuation:
+      "Periods and commas. A colon before an hour or a list of arrangements. " +
+      "No exclamation points, no ellipses, no parentheses, no dash held open " +
+      "for effect, no semicolons.",
+    orthography:
+      "Hours in words: seven o'clock, half past eight, the last one. Floors " +
+      "by number. Headings in full caps and nothing else capitalised for " +
+      "emphasis. Dishes take their own names and then say what they are. " +
+      "Nothing on the page is spelled to sound like anywhere.",
+
+    humour: {
+      mode: "deadpan",
+      mechanism:
+        "Describe a building that opened last year as though it had always " +
+        "been there. The lift, the floor, the hour, all stated as settled " +
+        "facts. Nobody is the target and nothing is winked at.",
+    },
+
+    lexicon: [
+      {
+        term: "your name is at the desk",
+        gloss:
+          "the whole arrival. Nothing is checked and nobody is met at a door, because there is no door that belongs to us",
+        insteadOf: ["the guest list", "RSVP", "check in with", "ask for me"],
+      },
+      {
+        term: "the roof",
+        gloss:
+          "the first hour, at its hour, while the dining room is still dark. It is not the view and it is not a bar",
+        insteadOf: ["the rooftop bar", "the terrace", "cocktail hour"],
+      },
+      {
+        term: "the table",
+        gloss: "the booking. Eight of us, at eight, on a floor with a number",
+        insteadOf: ["the reservation", "our spot", "the private room"],
+      },
+      {
+        term: "the lift wants a jacket",
+        gloss: "the dress code, stated as a fact about the building rather than a rule of ours",
+        insteadOf: ["black tie", "smart dress", "dress code"],
+      },
+      {
+        term: "nobody here cooked",
+        gloss:
+          "said plainly and without apology. The kitchen is the hotel's and the evening is not worse for it",
+        insteadOf: ["catered", "we're being looked after", "let someone else do the work"],
+      },
+      {
+        term: "the bar afterwards",
+        gloss:
+          "where the night goes and where the talk is half other people's. Not ours, and better for it",
+        insteadOf: ["the after-party", "nightcaps", "kicking on"],
+      },
+      {
+        term: "the room closes",
+        gloss: "why it ends. A fact about the building, stated once, never apologised for",
+        insteadOf: ["last orders", "we should let you go", "winding down"],
+      },
+    ],
+
+    formulae: [
+      "Your name is at the desk from {hour}.",
+      "The roof at {hour}. The table at {later hour}.",
+      "{Floor}, and somebody will take you up.",
+      "{Dish}, and what is in it.",
+      "Nobody here cooked. {The plain fact about what there is}.",
+      "The bar afterwards, for as long as the room is open.",
+    ],
+
+    banned: [
+      "exotic",
+      "oriental",
+      "east meets west",
+      "the Orient",
+      "colonial",
+      "junk",
+      "gateway",
+      "fusion",
+      "bustling",
+      "teeming",
+      "pearl",
+      "skyline",
+      "authentic",
+      "curated",
+      "elevated",
+      "experience",
+      "vibe",
+      "iconic",
+      "unforgettable",
+      "magical",
+      "memories",
+      "hosted by",
+      "join us",
+    ],
+
+    signOffs: [
+      "Your name is at the desk.",
+      "The roof at seven.",
+      "Somebody will take you up.",
+    ],
+
+    always: [
+      "Give the floor and the hour. Both, every time.",
+      "Say what the building does, not what we have arranged.",
+      "Name a real thing: a desk, a lift, a floor, a glass, an hour.",
+      "Say plainly that nobody here cooked.",
+      "Assume the reader has not been in this building before and will not say so.",
+      "Let the food take its own name and then say what it is.",
+    ],
+
+    never: [
+      "Never an exclamation point.",
+      "Never name the feeling — no magic, no unforgettable, no memories, no glamour.",
+      "Never put an accent on the page. No phonetic spelling, no borrowed word set down to sound foreign. A real name is a fact; a spelling that performs an accent is a costume.",
+      "Never write the city as a backdrop. No harbour at dusk, no skyline, no junk with a red sail, no crowd described as teeming. People live here.",
+      "Never write from the outside. This is not a visitor's evening and nothing is discovered, sampled or explored.",
+      "Never apologise for not cooking. The kitchen is the hotel's and that is the arrangement, not a compromise.",
+      "Never make the building the point. It opened last year and the voice does not say so.",
+      "Never describe the staff. They exist and they are not ours to write about, and a line that stages them has handed the evening to people the host does not employ.",
+      "Never use italics.",
+    ],
+
+    breaksCharacterFor: [
+      "Anything a guest must act on to arrive or to be safe: the street, the floor, the lift, what is in the food. Fact first, fewest words, no joke.",
+      "Anything about money.",
+      "Any message that lets someone go — a decline, a cancellation, a way off a list. Written straight and made easy.",
+    ],
+
+    exemplars: [
+      {
+        piece: "invitation",
+        text: "Your name is at the desk. The roof at seven, the table at eight.",
+        note: "The whole room in eleven words. Two hours and a desk, and nothing that belongs to us.",
+      },
+      {
+        piece: "invitation",
+        text: "Fourteenth floor. Somebody will take you up.",
+      },
+      { piece: "invitation", text: "The lift wants a jacket. That is the whole rule." },
+      {
+        piece: "invitation",
+        text: "Nobody here cooked. Come anyway, and come hungry.",
+      },
+      {
+        piece: "menu_item",
+        text: "Oysters, opened somewhere else, arriving cold and very fast.",
+      },
+      {
+        piece: "menu_item",
+        text: "Beef, carved at the table because the room does it that way.",
+      },
+      {
+        piece: "menu_item",
+        text: "Champagne on the roof. The same glass, bitter lemon and ice, for whoever would rather.",
+      },
+      {
+        piece: "notice",
+        text: "The roof is at its hour. The dining room is dark until eight and that is deliberate.",
+      },
+      {
+        piece: "notice",
+        text: "The bar afterwards is not ours. Half the talk in it belongs to somebody else.",
+      },
+      {
+        piece: "house_note",
+        text: "The lift is on the left of the desk. It is the only one that goes all the way up.",
+      },
+      { piece: "place_card", text: "Mei — where she can see the room." },
+      { piece: "place_card", text: "Alan — beside whoever arrived last." },
+      { piece: "heading", text: "THE ROOF, AND WHAT IS OPEN AT SEVEN" },
+      { piece: "heading", text: "THE TABLE AT EIGHT" },
+      { piece: "heading", text: "THE BAR AFTERWARDS" },
+      { piece: "sign_off", text: "Your name is at the desk." },
+      { piece: "sign_off", text: "Somebody will take you up." },
+    ],
+
+    rejected: [
+      {
+        text: "Hong Kong, 1963. The harbour at dusk, a junk under a red sail, the Pearl of the Orient.",
+        why: "Three postcards and one of them is a slur in a nice hat. `Pearl of the Orient` is a travel-poster line about somebody else's city, and a junk at dusk is scenery that no guest at this table would mention. The whole point of this room is that it is INDOORS, on a floor, at an hour.",
+      },
+      {
+        text: "A city where East meets West, and the cocktails prove it.",
+        why: "Brochure, and it makes a colony's history into a flavour note. Refused whole.",
+      },
+      {
+        text: "They were counting the water that year, so we counted the glasses.",
+        why: "TRUE, AND STILL CUT — this is the line the whole room was rebuilt to stop leaning on. The drought was carrying `ending = clean_stop` on its own, and CLAUDE.md rule 34 refuses a room held legal by a researched detail. The night ends because the room closes. Water stays in the copy as colour; it is not the mouth and it is not the row.",
+      },
+      {
+        text: "The most modern hotel in Asia, and we had the best table in it.",
+        why: "Makes the building the point and then boasts about a booking. The voice describes a building that opened last year as though it had always been there; that is the joke and this line explains it away.",
+      },
+      {
+        text: "Let them look after you for once.",
+        why: "Stages the staff and thanks them on the guest's behalf. Rule 25.3 — the moment a line implies somebody carrying a tray, the evening has been handed to people the host does not employ.",
+      },
+      {
+        text: "Dinner is served at eight.",
+        why: "The same refusal New York makes, for a different reason. Somebody is serving, and this room does not write them.",
+      },
+    ],
+  },
+};
+
+/**
+ * HONG KONG's voice in tones. Seven, each pointed at a line above.
+ *
+ *   shows_you_things   "You give your name at the desk and somebody takes you
+ *                      up." The host is showing you a building. This is the
+ *                      load-bearing tag and it carries knowingness NEGATIVE,
+ *                      which is what holds the hand off PALM SPRINGS (+1.91).
+ *   closes_the_bar     "The bar afterwards, for as long as the room is open."
+ *   dressed_up         "The lift wants a jacket."
+ *   exact_word         "The roof at seven, the table at eight." Two hours,
+ *                      given every time.
+ *   impeccably_polite  A desk, a lift, a name given. The building's manners,
+ *                      never a claim about the people in it.
+ *   no_dead_air        "Half the talk in it belongs to somebody else." A public
+ *                      room, where something is always being said.
+ *   lingers            The night goes to the bar and stays there.
+ *
+ * Formality, address and humour are NOT tagged: the voice states them — formal,
+ * second person, deadpan — and `statedVoiceFacets` derives them. That triple is
+ * unused, which matters because cosine is blind to it and the test is not.
+ */
+export const HONG_KONG_1963_TONES: readonly ToneWeight[] = [
+  { code: "shows_you_things", weight: 1 },
+  { code: "closes_the_bar", weight: 0.9 },
+  { code: "dressed_up", weight: 0.8 },
+  { code: "exact_word", weight: 0.7 },
+  { code: "impeccably_polite", weight: 0.6 },
+  { code: "no_dead_air", weight: 0.5 },
+  { code: "lingers", weight: 0.4 },
+];
+
 export const DESTINATIONS = {
   "westhampton-1976": WESTHAMPTON_1976,
   havana: HAVANA,
@@ -10239,6 +10609,7 @@ export const DESTINATIONS = {
   // wiring blocker: `world` for `st-moritz-1984` is seeded draft, so nothing
   // reaches a member on this commit.
   "st-moritz-1984": ST_MORITZ_1984,
+  "hong-kong-1963": HONG_KONG_1963,
 } as const satisfies Record<string, Destination>;
 
 export type DestinationKey = keyof typeof DESTINATIONS;
@@ -10271,4 +10642,5 @@ export const DESTINATION_TONES = {
   "oaxaca-1954": OAXACA_1954_TONES,
   "palm-springs-1965": PALM_SPRINGS_1965_TONES,
   "st-moritz-1984": ST_MORITZ_1984_TONES,
+  "hong-kong-1963": HONG_KONG_1963_TONES,
 } as const satisfies Record<DestinationKey, readonly ToneWeight[]>;

@@ -1347,3 +1347,33 @@ fifteen of them Oaxaca's.
 - Mangoes cut open and salted, with lime · B · summer · L, D, C
 - Plátanos machos, fried, with cream · M · · L, D
 - Flan, cold, cut badly · M · · L, D
+
+## Hong Kong
+
+### Appetizers
+
+- Roast goose, bought at the shop and chopped through the bone · B
+- Char siu, the fatty end, sliced thick · B
+- Soy sauce chicken, cold, with ginger and spring onion oil · B
+- Har gow, steamed in the basket they came in · B
+- Salted duck egg, halved, orange and very rich · H
+- Swiss sauce wings, sweet and dark, made the day before · M
+
+### Mains
+
+- Roast pork belly, bought by the catty, crackling and all · B
+- Steamed fish with ginger and spring onion, hot oil poured over at the table · M
+- Claypot rice with lap cheong, the crust scraped up and fought over · M
+- Baked pork chop rice, browned under the grill until the top blisters · M
+- Beef brisket stewed with daikon, started the day before · M
+- Wonton noodle soup, the wontons bought and the soup not · H
+- Choi sum blanched, oyster sauce poured over it · H
+
+### Desserts
+
+- Egg tarts from the bakery, still warm in the box · B
+- Pineapple bun, which has no pineapple in it · B
+- Mango pudding, turned out of the mould · M
+- Steamed milk pudding, set in the bowl it is eaten from · M
+- Sago in coconut milk, cold · H
+- Osmanthus jelly, cut in squares · H

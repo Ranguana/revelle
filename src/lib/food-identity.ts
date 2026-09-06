@@ -163,6 +163,12 @@ export const FOOD_IDENTITY = {
     source: "premise",
     why: "A served dinner with a toast at it. The table is long enough to need a plan, which is the room's first fact.",
   },
+  "hong-kong-1963": {
+    identity: "expression",
+    from: "dinner nobody in this party cooked",
+    source: "premise",
+    why: "The same case as LAS VEGAS and decided the same way: a table BOOKED in a hotel is an asset secured for the night, not a meal the room authored. The premise says so in its own words — the kitchen is the hotel's — and the evening's spine is the roof hour, the table and the bar afterwards rather than the food. NOT `table`: a room whose own voice says `nobody here cooked` cannot owe twenty dishes on the grounds that dinner happens in it. NOT `incidental` either — a booked dinner is still a dinner, and the room carves beef at it.",
+  },
   nantucket: {
     identity: "table",
     from: "a dinner everybody takes apart with their hands",

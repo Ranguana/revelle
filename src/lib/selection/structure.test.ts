@@ -183,7 +183,7 @@ test("ending sorts the rooms the audit says it sorts", () => {
   const i = facetNames.indexOf("ending" as StructuralFacet);
   const by = (level: string) =>
     Object.keys(rows).filter((slug) => rows[slug][i] === level).length;
-  // The most even split any column has: 7 / 7 / 5 over nineteen rows.
+  // The most even split any column has: 7 / 7 / 6 over twenty rows.
   //
   // WAS 7 / 7 / 4 over eighteen (CLAUDE.md rule 14, the numbers kept rather
   // than overwritten). The fifth `clean_stop` is the PROPOSED tokyo-1978 row,
@@ -200,7 +200,7 @@ test("ending sorts the rooms the audit says it sorts", () => {
   // linearly with a catalogue meant to reach hundreds.
   assert.equal(by("until_morning"), 7);
   assert.equal(by("dissolves"), 7);
-  assert.equal(by("clean_stop"), 5);
+  assert.equal(by("clean_stop"), 6);  // 4 at eighteen rooms, 5 with tokyo-1978, 6 with hong-kong-1963
 });
 
 test("the Vegas / New York pair turns on ending", () => {

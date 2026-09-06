@@ -89,17 +89,20 @@ test("the declaration holds no room the catalogue does not", () => {
   );
 });
 
-test("all eighteen rooms are declared, and the split is the reported one", () => {
+test("all nineteen rooms are declared, and the split is the reported one", () => {
   const counts: Record<FoodIdentity, number> = {
     table: 0,
     expression: 0,
     incidental: 0,
   };
   for (const slug of DECLARED_ROOMS) counts[foodIdentityOf(slug)]++;
-  assert.equal(DECLARED_ROOMS.length, 18);
+  // WAS 18 (rule 14). hong-kong-1963 is the nineteenth: a voice written to her
+  // split-twin ruling, declared `expression` on the Las Vegas precedent — a
+  // table BOOKED is not a meal the room authored.
+  assert.equal(DECLARED_ROOMS.length, 19);
   // Rule 24: the number is asserted, not described. If a declaration is
   // revised this line is where the revision has to be acknowledged.
-  assert.deepEqual(counts, { table: 12, expression: 4, incidental: 2 });
+  assert.deepEqual(counts, { table: 12, expression: 5, incidental: 2 });  // was 12/4/2 over 18
 });
 
 test("every declaration quotes a sentence that is still in the source it names", () => {
