@@ -220,10 +220,30 @@
 --                             rows production has. db/061 section 4b's exact
 --                             pattern, and neither half covers both cases.
 --
--- AND WHAT THE COUNTS CANNOT SEE, said plainly: on a scratch build `game` is
--- EMPTY when migrations run, so every claim count below is vacuously zero and
--- proves nothing. It is green there because there is nothing to be wrong
--- about. `src/lib/games.test.ts` and `src/lib/day-material.test.ts` assert the
+-- AND THE THING THIS FILE GOT WRONG ON ITS FIRST RUN, kept here rather than
+-- quietly corrected, because the correction is the lesson (rule 14).
+--
+-- Section 7 originally RAISED when `field_day` had no native claimant, guarded
+-- by `v_games > 0`. It passed CI, wedged the deploy, and production stayed on
+-- db/068 with eight seeders never running. The guard was not wrong about what
+-- it wanted; it was asking a question that cannot be answered at migration
+-- time.
+--
+--     A GUARD MAY ASSERT A PROPERTY OF THE ROWS THAT EXIST.
+--     IT MAY NOT ASSERT THAT ROWS EXIST, when they are seed-supplied and this
+--     migration is what introduces them.
+--
+-- "Is the pool populated" does not save the second kind, and that is the part
+-- worth reading twice: a populated pool proves the seeders ran ONCE, not that
+-- they have run since the catalogue gained the rows being asked after. db/068's
+-- equivalent check survived only because the claims it counted PREDATED it.
+--
+-- So the existence checks are notices here and assertions in
+-- scripts/seed-games.mjs, which is the first moment they can be true, and
+-- `src/lib/migration-guards.test.ts` now fails any migration that raises on a
+-- seed-owned count being zero. Everything this file still raises on is a
+-- property of whatever rows are present: vacuous when empty, honest when not.
+-- `src/lib/games.test.ts` and `src/lib/day-material.test.ts` assert the
 -- authored half with no database at all.
 
 
@@ -602,6 +622,20 @@ begin
   select count(*) into v_daytime from occasion_shape where daytime;
   select count(*) into v_beats from occasion_slot where slot_code = 'field_day';
 
+  -- A MIGRATION-SUPPLIED COUNT, so asserting it is knowable here: if no
+  -- occasion declares a daytime, the beat this file builds exists nowhere and
+  -- nothing else would say so. `occasion_shape` is written by db/009 and
+  -- backfilled by section 1 above, never by a seeder, which is the whole
+  -- reason this one may raise and the claimant counts may not.
+  if v_daytime = 0 then
+    raise exception
+      'db/069 declared no occasion as having a daytime, so the field day beat '
+      'has nowhere to be.'
+      using hint = 'Section 1 backfills daytime from days > 1 and db/009 seeds '
+                   'occasion_shape in a migration. An empty result means the '
+                   'chain is not the chain this file was written against.';
+  end if;
+
   if v_beats <> v_daytime then
     raise exception
       'db/069: % occasion(s) declare a daytime and % got a field day beat.',
@@ -628,23 +662,45 @@ begin
     'db/069 AFTER — day_material claimed by % game(s), field_day by %, out of '
     '% in the catalogue.', v_day, v_field, v_games;
 
-  -- THE db/061 NEAR-MISS, CHECKED FROM BOTH ENDS.
-  if v_games > 0 and v_field = 0 then
-    raise exception
-      'db/069 created a beat and NOTHING claims it. A slot no row can fill '
-      'never reports anything; it simply never fills.'
-      using hint = 'Five games carry { slotCode: "field_day" } in '
-                   'src/lib/games.ts. If none reached the database, the '
-                   'seeder is the thing to look at.';
-  end if;
+  -- ── THE db/061 NEAR-MISS, AND WHERE IT IS ACTUALLY CHECKED ────────
+  --
+  -- IT IS NOT CHECKED HERE, AND THE FIRST VERSION OF THIS FILE DID CHECK IT
+  -- HERE AND WEDGED THE DEPLOY. The check is not dropped; it has moved to
+  -- scripts/seed-games.mjs, which is the earliest place it can be true.
+  --
+  -- WHAT HAPPENED, because it is rule 33 in its sharpest form. This block
+  -- raised when `field_day` had no native claimant, guarded by "the game pool
+  -- is not empty" — which looked like exactly the pre-seed guard db/068's
+  -- equivalent uses. It is not. render.yaml runs `migrate` BEFORE every
+  -- seeder, so at this instant production holds the PREVIOUS catalogue: the
+  -- game table is full, `v_games > 0` is true, and the five field day games
+  -- have never been written because the seeder that writes them has not run.
+  -- Zero claimants was the correct and expected state, and the guard called it
+  -- a catastrophe.
+  --
+  -- THE DISTINCTION THAT MATTERS, and it is not "is the pool seeded":
+  --
+  --     A GUARD MAY ASSERT A PROPERTY OF THE ROWS THAT EXIST.
+  --     IT MAY NOT ASSERT THAT ROWS EXIST,
+  --     when the rows are seed-supplied and this migration is what introduces
+  --     them.
+  --
+  -- `v_games > 0` cannot rescue the second kind. A populated pool says the
+  -- seeders ran ONCE; it says nothing about whether they have run since the
+  -- catalogue gained the rows this file is asking after. Those are different
+  -- questions and only the second one matters here.
+  --
+  -- So the two existence assertions this block used to make are NOTICES, and
+  -- the assertion lives after the seeding it depends on. Everything below
+  -- that still raises is of the first kind: it is vacuous on an empty pool and
+  -- true of whatever rows are there.
 
-  if v_games > 0 and v_day = 0 then
-    raise exception
-      'db/069 emptied day_material. Ten games that are not the field day claim '
-      'that beat and db/068 made it required on every multi-day occasion.'
-      using hint = 'This file deletes exactly five day_material claims, by '
-                   'slug. If it took more, read the delete in section 6.';
-  end if;
+  raise notice
+    'db/069 — day_material: % claimant(s); field_day: %. THESE NUMBERS ARE '
+    'NOT ASSERTED HERE. Migrations run before seeders, so at this instant the '
+    'catalogue is the previous one and a new beat legitimately has no '
+    'claimant. scripts/seed-games.mjs asserts it after the rows exist.',
+    v_day, v_field;
 
   select count(*) into v_stranded
     from game g
@@ -655,6 +711,13 @@ begin
          join occasion_slot os on os.slot_code = gs.slot_code
         where gs.game_id = g.id and gs.fit = 'native' and os.pool = 'game');
 
+  -- SEED-DEPENDENT GUARD, AND OF THE SAFE KIND: it asserts a PROPERTY OF THE
+  -- ROWS THAT ARE THERE — no game claims only beats no occasion has — rather
+  -- than asserting that any particular row exists. On an unseeded pool it is
+  -- vacuously zero; on the previous catalogue it is true of that catalogue;
+  -- after seeding it is true of the new one. There is no state in which the
+  -- ordinary deploy makes it fire spuriously, which is exactly what the
+  -- existence checks above could not say for themselves.
   if v_stranded > 0 then
     raise exception
       'db/069 leaves % game(s) claiming only beats no occasion has.', v_stranded
@@ -667,7 +730,10 @@ begin
   select offer_count into v_offer_cap
     from occasion_slot where slot_code = 'field_day' limit 1;
 
-  if v_games > 0 and v_field > v_offer_cap then
+  -- The same safe kind: it fires only if MORE field day games exist than the
+  -- beat can show, which is a property of rows that are there. Zero of them is
+  -- not a subset of anything.
+  if v_field > v_offer_cap then
     raise exception
       'db/069: % field day games and an offer ceiling of %. "Include all" is '
       'her ruling and this beat would show a subset.', v_field, v_offer_cap
@@ -678,8 +744,8 @@ begin
 
   if v_games = 0 then
     raise notice
-      'db/069 — the game table is empty, so every claim count above proves '
-      'nothing. This is a scratch build; the seeders have not run yet.';
+      'db/069 — the game table is empty. This is a scratch build and the '
+      'seeders have not run yet.';
   end if;
 end;
 $$;

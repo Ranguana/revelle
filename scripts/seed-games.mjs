@@ -794,6 +794,89 @@ try {
     log(`warn     ${row.slug} has no answer for: ${row.troubles}`);
   }
 
+  /*
+   * ── EVERY GAME BEAT HAS SOMETHING THAT CAN FILL IT ──────────────────
+   *
+   * CLAUDE.md's own near-miss entry: REMOVING A SLOT ORPHANS THE CLAIMS ON IT,
+   * AND CLAIMS ARE WHITELISTS. Its mirror is a beat nothing claims — silent in
+   * exactly the same way, because a slot no row can fill never reports
+   * anything, it simply never fills.
+   *
+   * ── WHY IT IS HERE AND NOT IN A MIGRATION, WHICH IS THE WHOLE POINT ──
+   *
+   * db/069 asked this question in the migration and WEDGED THE DEPLOY. Rule 33
+   * exactly: render.yaml runs `migrate` before every seeder, so at migration
+   * time production still holds the PREVIOUS catalogue. A beat the migration
+   * has just created legitimately has no claimant yet, and the guard called
+   * that a catastrophe and stopped eight seeders from running.
+   *
+   *     A GUARD MAY ASSERT A PROPERTY OF THE ROWS THAT EXIST.
+   *     IT MAY NOT ASSERT THAT ROWS EXIST.
+   *
+   * "Is the pool populated" does not rescue the second kind — a full table
+   * proves the seeders ran once, not that they have run since the catalogue
+   * gained the rows being asked after. THIS is the first instant at which the
+   * question has an answer: the claims were written above, in this
+   * transaction, from src/lib/games.ts.
+   *
+   * ── DRIVEN OFF occasion_slot, NEVER OFF A LIST OF BEATS (rule 19) ────
+   *
+   * Any beat drawing the game pool is covered, so `field_day`, `day_material`
+   * and `game` are one check and the tenth beat somebody authors is too. A
+   * hand-written list here would be correct until the next `insert into
+   * occasion_slot` and then wrong without being broken.
+   *
+   * DRAFT CLAIMANTS COUNT. A game held back because its world is not seeded
+   * yet is a legitimate state (see `isHeldBack` above), and refusing to
+   * finish the seed over it would turn an ordinary partial catalogue into a
+   * failed deploy. What is fatal is a beat NOTHING claims at any status —
+   * that one can only be an authoring or migration mistake.
+   */
+  const { rows: beats } = await client.query(
+    `select os.slot_code,
+            count(distinct gs.game_id)                        as claimants,
+            count(distinct g.id) filter (where g.status = 'active') as live
+       from occasion_slot os
+       left join game_slot gs
+         on gs.slot_code = os.slot_code and gs.fit = 'native'
+       left join game g on g.id = gs.game_id
+      where os.pool = 'game'
+      group by os.slot_code
+      order by os.slot_code`
+  );
+
+  const unclaimed = beats.filter((row) => Number(row.claimants) === 0);
+  for (const row of beats) {
+    log(
+      `beat     ${row.slot_code}: ${row.claimants} native claimant(s), ` +
+        `${row.live} of them live`
+    );
+  }
+
+  if (unclaimed.length > 0) {
+    await client.query("rollback");
+    throw new Error(
+      `${unclaimed.map((row) => row.slot_code).join(", ")} draw(s) from the ` +
+        `game pool and NO game claims ${unclaimed.length === 1 ? "it" : "them"}.\n\n` +
+        `A slot no row can fill never reports anything — it simply never ` +
+        `fills, and the member's package is quietly thinner than the ` +
+        `catalogue says. Either a game should claim the beat in ` +
+        `src/lib/games.ts, or the beat should not exist.\n\n` +
+        `This is the check db/069 tried to make at migration time, where it ` +
+        `could not be true yet. Do not move it back.`
+    );
+  }
+
+  // AND THE OTHER DIRECTION, which is a warning rather than a failure: a beat
+  // whose every claimant is held back fills for nobody today, and that is an
+  // ordinary consequence of a world not being seeded rather than a mistake.
+  for (const row of beats.filter((r) => Number(r.live) === 0)) {
+    log(
+      `warn     ${row.slot_code} has ${row.claimants} claimant(s) and none of ` +
+        `them is live, so nothing can fill it yet`
+    );
+  }
+
   await client.query("commit");
   log(`done. ${ALL_GAMES.length} games in the module.`);
 

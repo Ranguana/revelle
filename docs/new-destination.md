@@ -10,81 +10,61 @@ Miss any part and it fails in a specific way named below.
 ---
 
 
-## 0. THE ADMISSION TEST — before a word is written
+## 0. THE ROW — follow `docs/room-structure.md`
 
-The catalogue grows continuously, so a destination is ADMITTED before it is
-authored. Every step below happens in this order and the first failure stops the
-work. This exists because writing a room and then discovering it duplicates an
-existing one wastes the expensive half.
+**The row formula lives in `docs/room-structure.md`. Go there first, do all
+twelve of its steps, and come back here at §1.**
 
-### 0a. Claim a row in the matrix
+This section used to hold the row work and is replaced rather than edited,
+because it was wrong in two ways that a drafter could not see from inside it.
 
-Fill in all eight facets from `docs/destination-contrasts.md` for the room you
-intend to write. Eight cells, before any prose:
+**It said eight cells. There are nine.** `spectacle` was adopted after this page
+was written and never added, so a row drafted from §0a arrived one column short
+— and a short row is not a caught error, it is a silently different distance to
+every other room.
 
-`arrival` · `schedule` · `volume` · `dress` · `food` · `ending` · `starts` · `size`
+**And it called itself an admission test.** It is not one. **A world is admitted
+when a person moves the slug onto `authored`. Matrix green is a precondition,
+not the act.** The old heading invited the reading that a clean distance table
+had authored something, which is the exact failure `room-structure.md` was
+written to stop.
 
-No blanks. A blank is a destination abdicating from a distinction, and it will
-be the one that never wins or always wins.
+`room-structure.md` ends at its step 12 — `docs/proposals/rooms/<slug>.md`
+written, nothing seeded, nothing signed. **This page begins after that**, and
+begins after a founder pass. The two are deliberately not merged: a drafter
+working one continuous document reaches the voice object having never been
+stopped, and the gate that should have refused the row reads as a formatting
+step it already cleared.
 
-### 0b. Clear distance 3 against EVERY existing row
+### The distance the gate is written in — and the one it is not
 
-The room must differ from every already-authored destination on at least three
-facets. Three is the coding bound that lets one wrong quiz answer still land the
-host correctly; at distance 1, a single misread tap flips the result.
+Corrected here because the old §0b conflated two different instruments, and the
+conflation is the reason "one wrong tap" gets quoted as an argument for the gate.
 
-**Below 3, the room is not admitted.** The options are to re-place it in open
-space, or to conclude it is an existing room written twice — which is what
-happened to CAP FERRAT, and folding it in was the right outcome rather than a
-defeat.
+**CATALOGUE HAMMING is room-vs-row.** Symmetric, all-or-nothing per cell, no
+weights, owned by `src/lib/matrix.ts` and reported only by `npm run check:matrix`
+(rule 7). It is what `gate: 3` is expressed in. Three is a **designed minimum**
+in the BCH sense — a law chosen so that one substitution cannot turn Portofino
+into Côte d'Azur without a declared seam. It is not a decoder and there are no
+parity bits; see the "Designed distance, not a decoder" section of
+`room-structure.md`, and do not add a column to raise it.
 
-### 0b-bis. Or claim a twin, under the twin rule
+**HOST-VS-ROW SCORING is a different instrument.** It lives in
+`src/lib/selection/structure.ts`, it is **asymmetric**, it has a NEAR band, and
+it compares a member's stated answers against a room. Its own comment says so:
+"The matrix's own distance is Hamming ... Nothing below changes it."
 
-A room may fail 0b against EXACTLY ONE other room, if: distance >= 1, voice
-affinity below 0.65, the pair is declared in data/destination-matrix.json, and
-neither room already has a twin. A room below the gate against two others is a
-crowded corner and may twin with neither.
+The old sentence — *"three is the coding bound that lets one wrong quiz answer
+still land the host correctly; at distance 1, a single misread tap flips the
+result"* — describes the second instrument and offers it as the reason for a
+threshold in the first. **A host's mistap is scored by `structure.ts`, which the
+gate does not govern**, and the gate defends room-vs-room separation whether or
+not anybody ever taps anything. Kept here rather than deleted (rule 14) so the
+argument is not re-made from the same confusion.
 
-The full argument, and the precedent instance (Havana / New Orleans at 0.172),
-is in docs/destination-contrasts.md. A twin is for a pair that is genuinely two
-rooms separated by voice rather than by shape — it is not a way to retire an
-argument about whether a room should exist.
-
-### 0c. Know that there is plenty of room, and place deliberately
-
-The facet space holds **about 131 rooms** at minimum distance 3. Twelve are
-authored. So a collision is never the matrix running out — it is a room written
-into an occupied slot while a hundred sat empty.
-
-Two consequences. A destination that fails 0b should be MOVED rather than
-argued for. And a new room is cheapest to write when its row is chosen first, in
-open space, and the voice is written to the row.
-
-### 0d. Pass the thrown-ness test, which the matrix cannot check
-
-**A premise must read as a party somebody is THROWING, not a scene that
-OCCURS.** Weather, a view, or a place behaving as itself is not a party. A row
-can clear distance 3 against every other room and still describe a postcard.
-
-Rows are arithmetic. Thrown-ness is voice. Both must pass and neither
-substitutes for the other. The founder audits the second.
-
-### 0e. Declare what the deliverable presupposes
-
-If the room cannot be delivered without a feature of the venue — water, snow,
-outdoors — say so now. Venue never touches the DESTINATION CHOICE, which is the
-thesis of the product, but a room whose whole content prunes away in an
-apartment ships hollow and nobody is told.
-
-A room that presupposes many features is probably a location rather than a
-world, and that is worth knowing before it is written.
-
-### 0f. If it fails, record the block and stop
-
-A refused destination gets its proof written down, not a shrug — see RIO DE
-JANEIRO 1947 in `docs/destination-contrasts.md`, which is blocked with the
-distances that block it and the two conditions that would release it. A block
-with a proof is reusable. A block without one gets re-litigated every quarter.
+The same sentence stands, uncorrected, in `docs/destination-contrasts.md` § "The
+audit" and is reported rather than edited: that page is argument and is scoped
+separately.
 
 ## 1. The writing, first
 
@@ -116,8 +96,16 @@ in `docs/copy.md`.
 
 ## 2. The tones, chosen against the whole library
 
-Six to ten of the 51 in `src/lib/voice.ts`, added to `DESTINATION_TONES`, with
-a comment pointing each tag at a specific line of that destination's voice.
+Six to **thirteen** of the **64** in `src/lib/voice.ts`, added to
+`DESTINATION_TONES`, with a comment pointing each tag at a specific line of that
+destination's voice.
+
+*(Was "six to ten of the 51" — stale in both numbers, and stale in the direction
+that costs: a drafter reading it under-claims by three tones from a vocabulary a
+fifth larger than stated. The bound the build actually enforces is
+`tones.length >= 6` and `DESTINATION_TONE_MAX = 13` in `src/lib/voice.test.ts`;
+the vocabulary is 64. Corrected 2026-09-06, same class of staleness as §0a's
+eight facets.)*
 
 This is the join between a host's taps and the library, and it only works if
 the destinations **spread**. So:
@@ -136,14 +124,14 @@ A poster in `src/app/plates.tsx` and an entry in `src/lib/library.ts` with an
 unused `No.`. Tokens only, never a literal hex: a poster that names a colour
 can drift from the palette and cannot be repainted.
 
-## 4. The content, in her four documents
+## 4. The content, in her documents
 
 Each is a markdown file the seeders read directly, under a `## Heading` that
 matches the destination.
 
 | file | shape |
 |---|---|
-| `docs/menus.md` | dishes in order · what it's for · season · how much making |
+| ~~`docs/menus.md`~~ | **RETIRED. Do not write one.** The menu pool was retired by `db/045`; a new section here seeds `discontinued` and reaches nobody. The composed table draws from `docs/dishes.md`. Left in the table rather than deleted so the next drafter knows it was retired and not forgotten (rule 14). |
 | `docs/drinks.md` | cocktails · **mocktail mirrors** · what it's for · season · how much mixing |
 | `docs/dishes.md` | ~50: 18 appetizers, 18 mains, 14 desserts. `name · B/H/M` plus a season only where it binds |
 

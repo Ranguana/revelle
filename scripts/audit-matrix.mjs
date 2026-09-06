@@ -9,10 +9,25 @@
  * a number in prose can be diffed against a number in a file. Failure lists
  * quoted from a scratch script are how the matrix forked the first time.
  *
- * THE GATE IS 3. Two destinations must differ on at least three facets. Three
- * is the coding bound that lets one wrong quiz answer still land the host
- * correctly (d >= 2t+1 with t=1); at distance 1 a single misread tap flips the
- * result. Below the gate the two rooms are either one room written twice — fold
+ * THE GATE IS 3. Two destinations must differ on at least three facets.
+ *
+ * WHY THREE, SAID CORRECTLY. This comment used to read "the coding bound that
+ * lets one wrong quiz answer still land the host correctly (d >= 2t+1 with
+ * t=1)", and that sentence describes a DIFFERENT INSTRUMENT. A host's mistap is
+ * scored by `src/lib/selection/structure.ts`, which is asymmetric, has a NEAR
+ * band, and compares her answers to a room; this file's distance is row-vs-row,
+ * symmetric and all-or-nothing per cell, and the gate governs it whether or not
+ * anybody ever taps anything. Kept rather than deleted (rule 14) because the
+ * error is easy to re-derive: both are "distance", and only one of them has a
+ * host in it.
+ *
+ * Three is a DESIGNED minimum in the BCH sense — a law chosen so that one
+ * substitution cannot turn Portofino into Cote d'Azur without a declared seam.
+ * It is not a decoder and there are no parity bits. `docs/room-structure.md`
+ * refuses Reed-Solomon, BCH and a tenth facet by name; puncturing one column
+ * for the fingerprint-drop below is the only coding operation this house does.
+ *
+ * Below the gate the two rooms are either one room written twice — fold
  * one in, as CAP FERRAT was — or the facet set is blind to a real difference,
  * in which case add the facet. The test that tells them apart: CAN YOU STATE
  * THE DIFFERENCE IN ONE SENTENCE A HOST COULD ANSWER? Yes means add a facet.
@@ -35,6 +50,21 @@ import {
   matrixDistance,
   differingFacets,
   pairKey,
+  // The derived readings, per docs/room-structure.md steps 5-8. Owned by
+  // matrix.ts rather than computed here, because she has committed the house to
+  // a second consumer in writing: "a server action reads the same JSON as
+  // check:matrix". Two implementations of "is this corner crowded" is rule 21's
+  // exact defect.
+  neighbours,
+  ballB2,
+  gateShell,
+  loadBearingCells,
+  fingerprintDrop,
+  sameKind,
+  sameKindAtGate,
+  kindOf,
+  isAuthored,
+  KIND_MASK,
 } from "../src/lib/matrix.ts";
 
 const M = JSON.parse(readFileSync(new URL("../data/destination-matrix.json", import.meta.url), "utf8"));
@@ -138,12 +168,56 @@ if (M.founderPending && Object.keys(M.founderPending).length) {
   console.log(`\nPROVISIONAL — not the founder's, and every distance touching them is soft:`);
   for (const [cell, why] of Object.entries(M.founderPending)) console.log(`   ${cell}: ${why}`);
 }
-// ONE ROOM AGAINST EVERY OTHER, because a full pair list stops being readable
-// long before the catalogue stops growing. At 19 rooms this file prints 171
-// pairs; at 200 it would print 19,900, and the question an author actually asks
-// — "what is my room's nearest neighbour?" — would be unanswerable from the
-// output of the only instrument allowed to answer it. Same owner, same
-// arithmetic (src/lib/matrix.ts), narrower question.
+// ── SAME-KIND AT THE GATE, over the whole catalogue ──────────────────
+//
+// "Eligibility is not separation in use." A pair AT the gate that is also the
+// same KIND of evening — same arrival, dress, food and ending — sits at the
+// floor of the design and reads alike, and the ranker can still hand a member
+// both. Printed for every row rather than on request, because the pairs that
+// need saying are exactly the ones nobody thought to ask about.
+//
+// NOT A SECOND GATE, by her explicit instruction. It reports and refuses
+// nothing.
+const kindPairs = [];
+for (const p of pairs)
+  if (p.d <= M.gate && sameKind(p.a, p.b)) kindPairs.push(p);
+console.log(`\nSAME-KIND AT OR INSIDE THE GATE (mask: ${KIND_MASK.join(", ")}): ${kindPairs.length}`);
+if (!kindPairs.length)
+  console.log(`   none — no pair at ${M.gate} or below shares all four masked cells`);
+for (const p of kindPairs)
+  console.log(`   ${p.d}  ${p.a} / ${p.b}   [${kindOf(p.a)}]`);
+
+// ── PER-ROW OCCUPANCY, compact, for every row ────────────────────────
+//
+// docs/room-structure.md asks the audit to emit B2, the d=3 shell, load-bearing
+// cells and a fingerprint-drop line FOR EACH ROW. Nineteen full blocks is not
+// readable, so the catalogue view is one line per room and `--room <slug>` is
+// the full block. Both come from the same functions.
+console.log(`\nPER ROW — B2 (under the gate) · shell (at the gate) · load-bearing cells`);
+console.log(`   ${"room".padEnd(19)}${"B2".padStart(3)} ${"shell".padStart(6)}  load-bearing`);
+for (const k of keys) {
+  const b2 = ballB2(k);
+  const shell = gateShell(k);
+  const lb = [...loadBearingCells(k).keys()];
+  const flag = b2.length >= 2 ? "  CROWDED CORNER" : b2.length === 1 ? "  twin candidate" : "";
+  console.log(
+    `   ${k.padEnd(19)}${String(b2.length).padStart(3)} ${String(shell.length).padStart(6)}  ` +
+      (lb.length ? lb.join(", ") : "none") +
+      flag
+  );
+}
+
+// ── ONE ROOM, IN FULL ────────────────────────────────────────────────
+//
+// A full pair list stops being readable long before the catalogue stops
+// growing: 171 lines at nineteen rooms, 19,900 at two hundred, and the question
+// an author actually asks — "what is my row's nearest neighbour, and what holds
+// it up?" — would be unanswerable from the output of the only instrument
+// allowed to answer it (rule 7).
+//
+// EVERY ROW IS PRINTED, including the far ones. "No others >= 6": which
+// neighbours feel far is precisely the judgement a sampled table gets wrong,
+// and Hong Kong's first draft sampled Havana out of its own table.
 //
 //   npm run check:matrix -- --room tokyo-1964
 if (arg === "--room") {
@@ -152,21 +226,68 @@ if (arg === "--room") {
     console.error(`\nNo row for "${room}". Rows: ${keys.join(", ")}`);
     process.exit(1);
   }
-  const others = keys
-    .filter((k) => k !== room)
-    .map((k) => ({ k, d: dist(room, k), twin: declared.has(twinKey(room, k)) }))
-    .sort((a, b) => a.d - b.d || a.k.localeCompare(b.k));
-  const min = others[0].d;
-  console.log(`\n${room} AGAINST EVERY OTHER ROW (gate ${M.gate})`);
-  for (const o of others)
+  const ns = neighbours(room);
+  const min = ns[0].d;
+
+  console.log(`\n${room} — ${isAuthored(room) ? "AUTHORED" : "NOT SIGNED (draft or proposed)"}`);
+  console.log(`   row  ${M.rows[room].join(" · ")}`);
+  console.log(`   kind ${kindOf(room)}   [mask: ${KIND_MASK.join(", ")}]`);
+
+  console.log(`\n0b. DISTANCE TO EVERY OTHER ROW (gate ${M.gate})`);
+  for (const n of ns) {
+    const tags = [];
+    if (n.d < M.gate) tags.push(declared.has(twinKey(room, n.key)) ? "declared twin" : "FAILS THE GATE");
+    if (n.d === M.gate) tags.push("at the gate");
+    if (sameKind(room, n.key) && n.d <= M.gate) tags.push("SAME KIND");
+    if (!n.authored) tags.push("not signed");
     console.log(
-      `   ${o.d}  ${o.k}${o.d < M.gate ? (o.twin ? "   [declared twin]" : "   FAILS THE GATE") : ""}` +
-        (o.d === M.gate ? "   [zero margin]" : "")
+      `   ${n.d}  ${n.key.padEnd(19)} ${differingFacets(room, n.key).join(", ")}` +
+        (tags.length ? `   [${tags.join(" · ")}]` : "")
     );
+  }
   console.log(
-    `\n   nearest ${min} (${others.filter((o) => o.d === min).map((o) => o.k).join(", ")}) · ` +
-      `mean ${(others.reduce((s, o) => s + o.d, 0) / others.length).toFixed(2)}`
+    `\n   nearest ${min} (${ns.filter((n) => n.d === min).map((n) => n.key).join(", ")}) · ` +
+      `mean ${(ns.reduce((s, n) => s + n.d, 0) / ns.length).toFixed(2)}`
   );
+
+  // B2 and the shell, kept apart on purpose. Three is legal; the shell is
+  // load-bearing, not collision.
+  const b2 = ballB2(room);
+  const shell = gateShell(room);
+  console.log(`\n0b-ball. B2 — OCCUPANTS UNDER THE GATE (d <= 2): ${b2.length}`);
+  if (!b2.length) console.log(`   empty — eligible on structure, no twin needed`);
+  for (const n of b2) console.log(`   ${n.d}  ${n.key}${n.authored ? "" : "   [not signed]"}`);
+  if (b2.length === 1) console.log(`   ONE OCCUPANT — twin CANDIDATE. Then the four conditions. Propose; do not declare.`);
+  if (b2.length >= 2) console.log(`   CROWDED CORNER — change a cell or kill the snapshot. Rio is the proof.`);
+
+  console.log(`\n   d = ${M.gate} SHELL (legal, and load-bearing): ${shell.length}`);
+  for (const n of shell)
+    console.log(`   ${n.d}  ${n.key}${sameKind(room, n.key) ? "   SAME KIND" : ""}`);
+
+  const lb = loadBearingCells(room);
+  console.log(`\n0b-i. LOAD-BEARING CELLS — struck to the neighbour's value, who falls`);
+  if (!lb.size) console.log(`   none — no neighbour sits at the gate, so no single cell carries the row`);
+  for (const [facet, who] of lb)
+    console.log(`   ${facet.padEnd(11)} strike -> ${who.join(", ")} below ${M.gate}`);
+  if (lb.size)
+    console.log(`   Write one line per cell in the draft. A soft sentence on any of these is "legal if", which is not legal.`);
+
+  const fp = fingerprintDrop(room);
+  console.log(`\n0b-ii. FINGERPRINT-DROP`);
+  if (!fp) console.log(`   none — this row holds no level that only it holds`);
+  for (const f of fp ?? [])
+    console.log(
+      `   ${f.facet}.${f.level} (${f.why}) — min d ${f.minWith} with the column, ${f.minWithout} without.  ` +
+        (f.collapses
+          ? `COLLAPSES: the column is parity holding near-duplicates apart, not an evening.`
+          : `holds: the row stands without it.`)
+    );
+
+  const sk = sameKindAtGate(room);
+  console.log(`\n0b-iii. SAME-KIND NEIGHBOURS (d <= ${M.gate})`);
+  if (!sk.length) console.log(`   none`);
+  for (const n of sk) console.log(`   ${n.d}  ${n.key}   [${kindOf(room)}]`);
+  console.log(`\n   Eligibility is not separation in use. This is a report, not a gate.`);
 }
 
 if (arg === "--rows") {

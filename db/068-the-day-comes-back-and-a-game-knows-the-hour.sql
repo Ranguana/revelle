@@ -184,6 +184,40 @@
 -- migration. Every one of them means `all` today, which is what they get.
 
 
+-- ═════════════════════════════════════════════════════════════════════
+-- NOTE ADDED 2026-09-06, AFTER THIS FILE HAD ALREADY APPLIED IN PRODUCTION.
+-- PROSE ONLY. Not one statement below is changed, and none may be: this file
+-- is a record of what ran, and `schema_migrations` will never offer it again.
+--
+-- ONE GUARD IN SECTION 1.3 IS OF A SHAPE NOW KNOWN TO BE UNSAFE, and it
+-- survived by luck rather than by design. It reads:
+--
+--     if v_games > 0 and v_claims = 0 then raise exception
+--
+-- — "complain if the pool is populated and nothing claims the day beat". That
+-- looks like a pre-seed guard and is not one. Migrations run BEFORE seeders
+-- (render.yaml), so at that instant the database holds the PREVIOUS catalogue:
+-- the game table is full, `v_games > 0` is true, and any claim this migration
+-- introduces has not been written yet.
+--
+-- IT PASSED HERE ONLY BECAUSE THE `day_material` CLAIMS IT COUNTS PREDATED IT.
+-- Ten games had carried that claim in src/lib/games.ts for weeks, so the rows
+-- were already there. Had the beat been NEW, this file would have wedged the
+-- deploy — which is exactly what db/069 then did, one day later, with the same
+-- shape over a beat that was new.
+--
+--     A GUARD MAY ASSERT A PROPERTY OF THE ROWS THAT EXIST.
+--     IT MAY NOT ASSERT THAT ROWS EXIST.
+--
+-- The rule is now mechanical in `src/lib/migration-guards.test.ts`, which
+-- fails any migration raising on a seed-owned count of zero. This file is
+-- named in that test's DECLARED list with this reasoning attached, because an
+-- exemption a checker derives is an exemption that silently widens. The check
+-- itself has moved to the end of `scripts/seed-games.mjs`, where it covers
+-- every beat drawing the game pool and can actually be true.
+-- ═════════════════════════════════════════════════════════════════════
+
+
 -- ── 0. THE COUNT, RECORDED BEFORE IT IS CHANGED ──────────────────────
 --
 -- CLAUDE.md rule 24, and db/061 section 0's own precedent: after this file
