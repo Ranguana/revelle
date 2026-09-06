@@ -18,6 +18,15 @@ const SECTIONS: readonly { href: string; label: string; exact?: boolean }[][] = 
   [
     { href: "/desk", label: "The inbox", exact: true },
     { href: "/desk/members", label: "Members" },
+    // WITH THE INBOX AND MEMBERS, NOT WITH THE IMAGE BANK, and the two screens
+    // are easy to confuse. /desk/images is the house's OWN reference — other
+    // people's photographs, held so two curators can name an object and write
+    // a bank clause. This is a MEMBER'S evidence about HER evening, one row
+    // per application, and the only thing that can come out of it is a cell in
+    // the matrix. Different pictures, different rules, different consequences;
+    // sitting them next to each other in the rail would invite the reading
+    // that they are one feature with two doors.
+    { href: "/desk/photos", label: "Photographs" },
   ],
   [
     { href: "/desk/destinations", label: "Destinations" },
