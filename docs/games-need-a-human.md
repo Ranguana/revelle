@@ -434,29 +434,39 @@ for a week. `src/lib/day-material.test.ts` drives it rather than asserting it.
 
 ---
 
-### 14c. THE ITINERARY — the same gap, arriving for the third time
+### 14c. THE ITINERARY — ruled, and mostly built
 
-**This one is a real open item and it is hers, but it is not a question.** It
-is a spec waiting for a ruling, and it is written out in full in
-`docs/itinerary.md`.
+**Founder, 2026-09-06:** *"fix the field day."* Then, on being shown the honest
+status: every open question in this item was ruled inside field-day scope, and
+`db/069` built to those rulings the same day.
 
-*"host chooses itinerary, which is a gap we discussed earlier about host
-ability to edit menus and itineraries."* Menus, then the newsletter, now the
-field day. Three directions, one feature — and building it three times would
-be three authorities over one fact (WHAT HAPPENS ON DAY TWO), which is exactly
-how they drift.
+*"Field day games include all and she chooses"* is two clauses and both are now
+mechanical. All five arrive as one offer; she runs any number of them from one
+to five; she puts each on whichever day she likes and can put any of them back.
+The lead line above the cards tells her which kind of offer she is looking at,
+because *"the one you pick is the one that runs"* is true of a carousel and
+false of a set.
 
-**What is honestly true today, said here because it is the kind of shortfall
-that looks handled:** the engine deals ONE field day game per day beat, in its
-own order. She does not choose them, she cannot order them, and a one-day
-field day — which she said she may want — cannot be placed at all, because a
-single-evening occasion has no day beat. Nothing was half-built to make that
-look otherwise.
+*"It is a set across different days if host wants it"* retired the shape the
+house had reached for first. **The set is an offer and a name, not a
+placement** — what travels together is the offer, and the members are
+independent. A later pass reaching for `coherence_group` to make a field day
+land on one afternoon would be restoring the invariant she just removed.
 
-`docs/itinerary.md` carries the three questions that need her: whether the
-house still proposes a day or she starts empty, whether she may add something
-she was not given, and whether a field day is a named set that travels
-together or five games that happen to suit an afternoon.
+**What remains is not a question for her.** It is one build: AN ORDER WITHIN A
+DAY. `run_day` says Saturday; nothing yet says the sack race comes before the
+rope, and the morning bulletin — which already exists as a `bulletin` voice
+piece with a `day_index` (db/004, db/024) — needs exactly that. `docs/itinerary.md`
+carries the spec, and it is a smaller build than it was, because the offer, the
+per-member choice and the day already exist and already bind.
+
+**And one absence that is not a defect:** a field day on a one-evening occasion.
+Every one-day occasion the catalogue has calls itself an evening in its own
+words, so there is no daytime to put one in — and giving every occasion a
+daytime beat is the flattening that cost db/061 its deletion. What is missing is
+an occasion the catalogue does not have: a lunch, an afternoon, a day event.
+`occasion_shape.daytime` is declared rather than derived precisely so that
+admitting one gives it the field day with no migration.
 
 ---
 

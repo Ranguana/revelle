@@ -36,14 +36,25 @@ of them exist:
 |---|---|---|---|
 | the game carousel — db/061 | she picks ONE of three | all three | yes |
 | three per course — db/062 | she picks one of three, per course | all three | yes |
-| **the itinerary** | she picks HOW MANY, WHICH, and IN WHAT ORDER | all of them | **no** |
+| the set — db/069 | she picks HOW MANY, WHICH, and WHICH DAY | all of them | **yes** |
+| **the itinerary** | the above, over *every* pool, with an order within a day | all of them | no |
 
-The third is genuinely different and cannot be reached by turning
-`offer_count` up. `offer_count = n` still resolves to ONE running item per
-beat — db/061's partial unique index says so in the schema: at most one
-`chosen_at` per `(revelle_id, offer_group)`. An itinerary is many items, on
-days she assigns, in an order she sets. That is a different shape and the
-index would refuse it.
+The third row was written as impossible and **half of it has since been
+built**, which is worth reading before designing the rest. The obstacle named
+here was real: `offer_count = n` resolved to ONE running item per beat, because
+db/061's partial unique index allowed at most one `chosen_at` per
+`(revelle_id, offer_group)`.
+
+db/069 did not turn `offer_count` up. It said what the index had never been
+asked: **an offer is not always an OR.** The index now applies to exclusive
+offers only, the kind is stamped on the delivered row, and `run_day` carries
+the day. So "many items, on days she assigns" exists today for one beat.
+
+**What the fourth row still wants** is the part db/069 deliberately did not
+reach: the same thing across *every* pool at once, and an ORDER WITHIN A DAY
+rather than only a day. `run_day` says Saturday; nothing says the sack race
+comes before the rope. That ordering is the remaining gap, and it is the one
+the morning bulletin needs.
 
 ---
 
@@ -107,34 +118,50 @@ deletion orphaned ten authored claims.
 
 ---
 
-## Where the field day sits today, honestly
+## Where the field day sits — BUILT, 2026-09-06
 
-The field day games in `src/lib/games.ts` claim `day_material` natively and
-nothing else. That means:
+**Founder: *"fix the field day."*** It is fixed, and this section records what
+that cost so the next reader knows which parts of this document are a spec and
+which are a description.
 
-- They are placeable on the multi-day occasions and nowhere else.
-- The ENGINE deals one per day beat. **She does not choose them and she does
-  not order them.** "All the field day games are offered and she picks" is
-  NOT what happens.
+`db/069` gave the field day its own beat and a second kind of offer:
 
-That is stated here and in the games themselves rather than papered over,
-because a mechanism that looks like it honours her choice and does not is
-CLAUDE.md rule 16's most expensive failure. Two consequences of the gap, both
-real today:
+| | |
+|---|---|
+| `occasion_slot.offer_rule` | `one_of` — db/061's carousel, n delivered, exactly one runs. `any_of` — n delivered, **any non-empty subset** runs. |
+| `occasion_shape.daytime` | **Declared**, not inferred from `days`. The field day goes where there is a daytime. |
+| `revelle_<pool>.offer_exclusive` | Stamped at delivery. What kind of offer she actually received. |
+| `revelle_<pool>.run_day` | Which day **she** put this member on. Null means she has not said. |
 
-1. **A ONE-DAY FIELD DAY IS UNREACHABLE.** She said it may be one day. A
-   single-evening occasion has no `day_material` beat, so the field day games
-   cannot be placed there at all. The fix is not to give every occasion a day
-   beat — that is the flattening again — it is the itinerary, where she says
-   "these four, Saturday afternoon" regardless of how the house counted days.
-2. **A FIELD DAY IS A SET AND THE ENGINE DEALS SINGLES.** The sack race, the
-   rope, tied at the ankle, egg and spoon and the bucket line are an
-   AFTERNOON, not five interchangeable candidates for one slot. Nothing in the
-   selection engine can express "these belong together"; `coherence_group` on
-   `occasion_slot` is the nearest existing idea and it groups a slot's
-   candidates, not a slot's ITEMS.
+**The two defects this document named are gone.** All five are offered, she
+takes any number of them from one to five, she puts each on whichever day she
+likes, and she can put any of them back. The lead line above the cards says the
+true thing for each kind of offer, and the day control is drawn only where the
+question exists.
 
----
+**The invariant that did NOT get built, and must not be:** the five do not have
+to land together. Founder, correcting the house's first reading within the
+minute — *"it is a set across different days if host wants it."* So the set is
+an **offer and a name, never a placement**: what travels together is the offer,
+and what she decides is which members run and when, per member. A later pass
+reaching for `coherence_group` to make a field day occupy one afternoon would be
+restoring the invariant she retired.
+
+### What is still not reachable, and why it is an authoring absence
+
+**A field day on a one-evening occasion.** She said it may be one day, and on a
+multi-day occasion that is already hers — put every member on the same
+`run_day`. What cannot happen is a field day at a dinner party, and that is
+correct rather than missing: giving every occasion a daytime beat is the
+flattening that cost db/061 its deletion.
+
+What is genuinely absent is **an occasion the catalogue does not have.** Every
+one-day occasion db/009 wrote describes itself as an evening, in its own words
+— *"One table, one evening"*, *"One evening, honoured"*, *"One evening the
+calendar chose"*. There is no lunch, no afternoon and no day event. Admitting
+one is hers, not a migration's; `occasion_shape.daytime` is declared precisely
+so that the moment such a row exists it gets the field day with no edit to the
+predicate.
 
 ## The daily newsletter reads from it
 
@@ -176,18 +203,34 @@ five of the nine pools would reproduce it on paper.
 
 ---
 
-## The three questions for her
+## The three questions — ALL RULED, 2026-09-06
 
-1. **Does the house still propose a day, or does she start empty?** A proposed
-   itinerary she rearranges is a different product from a blank grid, and it
-   decides whether `added_by = 'house'` rows exist at all.
-2. **May she add something she was not given** — a game from the catalogue that
-   was not in her offer? Today the answer has to be no, because the assemblage
-   binds at delivery. If the answer is yes, that is a second delivery event and
-   db/003's decision 2 has to be revisited on purpose rather than by accident.
-3. **Does a field day TRAVEL TOGETHER?** That it is five games and not one is
-   settled — you cannot choose among events inside a single game, and she said
-   she chooses. What is not settled is whether the five are a named set that
-   arrives and leaves as one, or five rows that happen to suit the same
-   afternoon. The catalogue has no way to say the first, and the answer decides
-   whether an itinerary holds items or holds items and blocks.
+Kept with their answers rather than deleted, because the answers are short and
+the questions are the reason the design is the shape it is (rule 14).
+
+1. **Does the house still propose a day, or does she start empty?**
+   **THE HOUSE PROPOSES ALL FIVE AND SHE DEDUCTS.** *"Include all"* is a full
+   proposal she edits down — any number from one to all five, hers to reduce.
+   Not a dealt single, and not a blank grid.
+2. **May she add something she was not given?**
+   **NO, AND THE QUESTION IS SHUT.** Every field day game is already in the
+   offer, so there is nothing to add, and db/003's decision 2 is not reopened.
+   A design that finds itself needing a second delivery event has gone wrong
+   somewhere earlier and should stop rather than open it.
+3. **Does a field day TRAVEL TOGETHER?**
+   **YES, AS AN OFFER — AND NO, AS A PLACEMENT.** *"It is a set across
+   different days if host wants it."* The whole set arrives, one identity, one
+   heading; the members are then independent. She may run two on Saturday, two
+   on Sunday, and none of the fifth. So the grouping is about **identity and
+   offer**, never co-location, and `coherence_group` is the wrong instrument
+   for it.
+
+## What is still open, and it is one thing
+
+**An order within a day.** `run_day` says Saturday. Nothing says the sack race
+comes before the rope, and the morning bulletin needs exactly that — it prints
+a day, in order, as facts. The itinerary table specified above is still the
+answer, and it is now a smaller build than when this document was written:
+`offer_rule`, `offer_exclusive` and `run_day` already exist and already bind,
+so what remains is the ordering and the extension of the same gesture to the
+other pools.

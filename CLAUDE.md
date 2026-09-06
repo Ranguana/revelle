@@ -278,6 +278,38 @@ lost, and a deleted argument gets re-made.
   divergence rule 33 exists to refuse, arriving through the version control
   system rather than through the seed order.
 
+- **THE KNOB IS NOT THE RULE. WHEN A SECOND RULING ARRIVES, FIND WHAT
+  ACTUALLY ENCODED THE FIRST ONE.** db/061 built the carousel and the visible
+  parameter was `offer_count` — three candidates, one runs. So when the founder
+  asked for "field day games include all and she chooses", the obvious move was
+  to turn the number up to five. IT WOULD HAVE DELIVERED FIVE GAMES AND LET HER
+  RUN ONE, and the page would have looked entirely correct while doing it.
+
+  `offer_count` never encoded "an or, not an and". THREE OTHER THINGS DID, and
+  none of them is a number: a partial unique index allowing one `chosen_at` per
+  offer, a `case` in the write that cleared the siblings, and a lead line
+  reading "the one you pick is the one that runs". The parameter was the knob;
+  those three were the rule. Widening the knob widens nothing.
+
+  **The procedure: before extending a mechanism to a second ruling, list every
+  place the FIRST ruling's semantics is written down — schema, write path, and
+  the copy — and check each one against the new ruling separately.** Two of
+  those three are invisible from the caller and the third is prose, which is
+  why reading the parameter list feels like understanding the mechanism and is
+  not. Here it produced `offer_rule`: the kind became a value, the index
+  narrowed to the offers it was written for, the write branched on the row's own
+  stamp, and the copy split. db/069.
+
+  AND ITS COROLLARY, WHICH IS RULE 23 FROM A NEW ANGLE: **a stamped copy is not
+  always a duplicated authority.** `offer_exclusive` is copied onto the
+  delivered row rather than read back through to `occasion_slot`, which reads
+  like the duplication rule 21 forbids until the narrow test is actually
+  applied — MUST TWO SURFACES AGREE ABOUT THIS? No. They must be ALLOWED TO
+  DIFFER, because db/003 binds the promise at delivery and a curator editing
+  the slot in March must not retroactively change what a member was given. When
+  the answer to rule 21's test is "they must diverge", extraction is the bug and
+  stamping is the fix.
+
 - **A RENAME HAS NO GRACE PERIOD.** Adding is backward-compatible; renaming is
   not. The moment `alter type … rename` commits, every caller naming the old
   identifier fails at once — there is no window in which old and new both work.
