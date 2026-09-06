@@ -291,3 +291,108 @@ The earlier figure — Tokyo at 4, or 3 if its `size` moved — was computed fro
 against the new year, so **that number is withdrawn rather than carried
 forward.** It will be recomputed when the 1978 evening is written, and it stays
 UNCOMMITTED until both rooms have rows the audit can read.
+
+
+---
+
+## SUPERSEDED — her answer, 2026-09-06, and two corrections to this file
+
+`docs/voice-space.md` answers the question this file asked, and the answer is
+**neither of the two options it offered.**
+
+> "Split twins. Same evening shape, different world. Havana vs New Orleans is
+> the proof: distance 1 on the matrix, affinity 0.172. That is the mechanism
+> HK/NY should use instead of a drought cell."
+
+**Hong Kong is not a register and does not need a third structural difference.
+It needs a different mouth.** The section above concluding "on the evidence,
+Hong Kong 1963 is New York in another city-year" is kept under rule 14 and is
+**superseded**. Its arithmetic was right; the standard it applied was wrong. A
+third structural difference was never the requirement, because the gate is not
+the test of whether a room is a room.
+
+### Correction one: the distance is 3, not 2
+
+This file and the brief that produced it both said HK/NY sits at **2**. With her
+row transcribed, `npm run check:matrix -- --room hong-kong-1963` says:
+
+```
+   3  las-vegas           schedule, ending, spectacle   [at the gate]
+   3  new-york            schedule, volume, ending      [at the gate]
+   3  palm-springs-1965   arrival, starts, size         [at the gate]
+
+   nearest 3 (las-vegas, new-york, palm-springs-1965) · mean 5.37
+```
+
+**B₂ is empty. Nothing sits below the gate and no twin is needed.** Her own
+hand-computed table said 3 all along — "new-york — schedule, volume, ending →
+3" — and it was the relay that turned it into 2, not her.
+
+### Correction two: the row is now committed, so nothing here is UNCOMMITTED
+
+Her row is transcribed into `data/destination-matrix.json` verbatim, cell for
+cell, and registered in `founderPending` as hers and unsigned. Transcription is
+not admission — the slug is not on `authored` and admission is a signature.
+
+What it buys: every distance in this file was previously unreproducible, and
+`voice.test.ts` was applying the STRICT ceiling to all nineteen pairs on the
+grounds that the room had no row at all.
+
+## The voice, and the number
+
+Written to her ruling. `src/lib/destinations.ts`, `HONG_KONG_1963`.
+
+**The mouth: New York's host laid the table. Hong Kong's host booked it.**
+New York speaks as "the table, and the two people who laid it" — their
+apartment, their counter, a plan of the table on paper. Hong Kong's host owns
+nothing in the room: a name at a desk, an hour on the roof, the hotel's
+kitchen, and a bar afterwards with other people's evenings in it. Second person
+where New York is third, because a host who booked a room has to tell you where
+to go. Deadpan where New York is dry, because the joke is that a building which
+opened last year is described as though it had always been there.
+
+From `npm run check:voices`:
+
+| pair | affinity | d | tier | |
+|---|---|---|---|---|
+| hong-kong-1963 / new-york | **0.575** | 3 | monitor | ok |
+| hong-kong-1963 / las-vegas | 0.555 | 3 | monitor | ok |
+| hong-kong-1963 / palm-springs-1965 | 0.220 | 3 | monitor | ok |
+| hong-kong-1963 / st-moritz-1984 | 0.674 | 4 | monitor | ok |
+
+**0.575 is under STRICT 0.58**, and it is held to that bar on purpose even
+though MONITOR 0.92 is what formally applies. The cell holding HK at 3 from New
+York is `ending` — the contested one. If she strips the drought, New York is at
+2 and STRICT applies for real. A mouth that only clears while the disputed cell
+stands is doing the drought's job in a different costume.
+
+New York's own nearest neighbour is now Hong Kong, at 0.575. That is the
+split-twin pair working.
+
+**PALM SPRINGS was the collision to beat, not New York.** Every earlier draft of
+this hand ran 0.68–0.84 against Palm Springs, the catalogue's other formal
+knowing room, which sits at knowingness **+1.91**. `shows_you_things` carries
+knowingness NEGATIVE — a host showing you a building that opened last year is
+the inverse of a host who already knows everything — and that one tag took the
+pair from 0.72 to **0.220**.
+
+### The drought is not in the voice
+
+Not the speaker, not a lexicon term, not a formula, not an exemplar. It appears
+exactly once, in `rejected`:
+
+> *"They were counting the water that year, so we counted the glasses."*
+> TRUE, AND STILL CUT — the line the whole room was rebuilt to stop leaning on.
+
+### Still owed
+
+- **The signature gesture** (rule 27). Not written. No room in the catalogue has
+  one in a form a seeder can read — see `docs/nantucket-finish.md`.
+- **A game.** The voice had a `game_rule` exemplar and it was removed: a
+  game_rule requires a native row in `src/lib/games.ts`, which another agent
+  holds. Proposed instead: *everybody names a floor of this building they have
+  never been on; the one nobody can place buys the first round at the bar.*
+- **Drinks.** None authored. The dishes are eighteen, against an `expression`
+  floor of twelve.
+- **Her signature.** The row is hers and unsigned; the voice is mine and
+  unsigned. Admission is a signature and this is not one.
