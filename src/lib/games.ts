@@ -8347,20 +8347,38 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
  * with a watch. The prize, where there is one, is not having to clear after
  * dinner.
  *
- * ── WHERE THEY ARE PLACED, AND WHAT IS HONESTLY MISSING ─────────────
+ * ── WHERE THEY ARE PLACED — ALL OF THEM, AND SHE CHOOSES ────────────
  *
- * Each claims `day_material` NATIVELY and claims nothing else, so
- * `slotEligibility` reads it as a whitelist: these are eligible for the day
- * beat db/068 restored and refused for the evening's game. That is the whole
- * of "field days are daytime games" as the engine can currently express it.
+ * Each claims `field_day` NATIVELY and claims nothing else, so
+ * `slotEligibility` reads it as a whitelist: eligible for the field day beat
+ * db/069 built, refused for the evening's game, and refused for
+ * `day_material` — which matters, because `day_material` deals ONE candidate
+ * per day and dealing one anonymous race on a Tuesday is the behaviour db/069
+ * exists to end.
  *
- * WHAT IS NOT TRUE YET, SAID HERE BECAUSE A MECHANISM THAT LOOKS LIKE IT
- * HONOURS HER CHOICE AND DOES NOT IS CLAUDE.md RULE 16's MOST EXPENSIVE
- * FAILURE: she does not choose these. The engine deals ONE per day beat, in
- * its own order, and there is no way for a host to say "these four, Saturday
- * afternoon" — nor to run a field day on a single-evening occasion, which she
- * said she may want. `docs/itinerary.md` specifies what that needs and is the
- * document she can rule on. Nothing here pretends otherwise.
+ * THE BEAT IS AN `any_of` OFFER. All five are delivered together under one
+ * `offer_group`, and she runs any non-empty subset of them. That is her two
+ * clauses in one sentence — *"field day games include all and she chooses"* —
+ * and it is a different mechanism from db/061's carousel, which delivers three
+ * and runs exactly one. `occasion_slot.offer_rule` is what tells them apart.
+ *
+ * THE SET IS AN OFFER AND A NAME, NOT A PLACEMENT. Founder, correcting the
+ * house's first reading within the minute: *"it is a set across different days
+ * if host wants it."* So each delivered member carries its own `run_day` and
+ * they are independent of each other — the rope on Saturday, the egg and the
+ * bucket line on Sunday, the sack race not at all. NOTHING HERE WELDS THEM
+ * TOGETHER, and a later pass reaching for `coherence_group` to make them land
+ * on one afternoon would be restoring the invariant she just retired.
+ *
+ * WHAT IS STILL NOT TRUE, said here rather than discovered, because a
+ * mechanism that looks like it honours her choice and does not is CLAUDE.md
+ * rule 16's most expensive failure: a ONE-EVENING occasion still has no
+ * daytime and therefore no field day. That is not a refusal, it is an
+ * authoring absence (rule 29) — the catalogue has no lunch, no afternoon and
+ * no day event, and `occasion_shape.daytime` is declared precisely so that
+ * admitting one gives it the field day with no migration. On a multi-day
+ * occasion a one-day field day is already hers: put every member on the same
+ * `run_day`.
  *
  * AND ONE VOCABULARY GAP, RECORDED WHERE AN AUTHOR WILL MEET IT: these games
  * genuinely cannot happen indoors, and `game_requirement_kind` has no outdoor
@@ -8382,9 +8400,11 @@ const FIELD_DAY_WORLD =
   "Written in this room's voice, for its afternoon. A whitelist, per rule 23.";
 
 const FIELD_DAY_SLOT =
-  "db/068 restored the day beat for occasions that have days. A field day is " +
-  "daytime material and claims this and nothing else, so it is refused for " +
-  "the evening's game beat rather than merely unlikely there.";
+  "db/069's own beat, offered whole. It claims this and nothing else, so the " +
+  "whitelist refuses it the evening's game and refuses it the anonymous " +
+  "one-a-day deal `day_material` would have given it. The set is an OFFER and " +
+  "a NAME, never a placement: she says which members run and on which day, " +
+  "and nothing here makes them land on the same afternoon.";
 
 /**
  * THE SACK RACE.
@@ -8604,7 +8624,7 @@ const CATSKILLS_THE_SACK_RACE: Game = {
   ],
 
   occasions: [],
-  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+  slots: [{ slotCode: "field_day", fit: "native", note: FIELD_DAY_SLOT }],
 
   supplies: [
     {
@@ -8874,7 +8894,7 @@ const CATSKILLS_THE_ROPE: Game = {
   ],
 
   occasions: [],
-  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+  slots: [{ slotCode: "field_day", fit: "native", note: FIELD_DAY_SLOT }],
 
   supplies: [
     {
@@ -9165,7 +9185,7 @@ const CATSKILLS_TIED_AT_THE_ANKLE: Game = {
   ],
 
   occasions: [],
-  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+  slots: [{ slotCode: "field_day", fit: "native", note: FIELD_DAY_SLOT }],
 
   supplies: [
     {
@@ -9434,7 +9454,7 @@ const CATSKILLS_EGG_AND_SPOON: Game = {
   ],
 
   occasions: [],
-  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+  slots: [{ slotCode: "field_day", fit: "native", note: FIELD_DAY_SLOT }],
 
   supplies: [
     {
@@ -9710,7 +9730,7 @@ const CATSKILLS_THE_BUCKET_LINE: Game = {
   ],
 
   occasions: [],
-  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+  slots: [{ slotCode: "field_day", fit: "native", note: FIELD_DAY_SLOT }],
 
   supplies: [
     {

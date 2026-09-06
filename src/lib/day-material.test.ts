@@ -30,7 +30,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { ALL_GAMES, type GameSlotClaim } from "./games.ts";
-import { OCCASION_DAYS, replayOccasionSlots } from "./occasion-slot-replay.ts";
+import {
+  OCCASION_DAYS,
+  OCCASION_SHAPES,
+  replayOccasionSlots,
+} from "./occasion-slot-replay.ts";
 import { planSlots } from "./selection/occasion.ts";
 import { slotEligibility } from "./selection/occasion.ts";
 import type { OccasionShape, Scale, SlotRule } from "./selection/types.ts";
@@ -220,62 +224,133 @@ test("THE TIME OF DAY DEFAULTS TO NO OPINION, never to `always`", () => {
 
 /* ── a field day game reaching a day slot ────────────────────────────── */
 
-test("A FIELD DAY GAME REACHES THE DAY BEAT AND IS REFUSED FOR THE EVENING", () => {
+test("THE DAY BEAT IS STILL CLAIMED after the field day left it", () => {
   /*
-   * The mirror of db/061's near-miss, and the reason db/068 counts in both
-   * directions. Restoring a slot has its own quiet failure: a beat nothing
-   * claims. This drives the actual eligibility rule rather than trusting that
-   * the claims were written.
+   * The mirror of db/061's near-miss, and db/069 does BOTH halves of it in one
+   * file: it takes five claims off `day_material` and puts five on a beat that
+   * did not exist. Either direction failing is silent — a required beat nothing
+   * can fill reports a thin catalogue rather than a migration, and a new beat
+   * nothing claims simply never fills.
    */
-  const fieldDay = ALL_GAMES.filter((game) =>
-    game.slots.some((claim) => claim.slotCode === "day_material" && claim.fit === "native")
+  const onDay = ALL_GAMES.filter((game) =>
+    game.slots.some((c) => c.slotCode === "day_material" && c.fit === "native")
   );
   assert.ok(
-    fieldDay.length >= 10,
-    `${fieldDay.length} games claim the day beat. db/068 restored a REQUIRED ` +
-      `beat; if nothing claims it, every multi-day Revelle carries a gap that ` +
-      `reads as a thin catalogue rather than as the migration.`
+    onDay.length >= 10,
+    `${onDay.length} games claim the day beat. db/068 made it REQUIRED on ` +
+      `every multi-day occasion, so emptying it puts a gap in every weekend.`
   );
-
-  for (const game of fieldDay) {
-    const verdict = slotEligibility(asClaims(game.slots), "day_material");
+  for (const game of onDay) {
     assert.ok(
-      verdict.eligible,
-      `${game.slug} claims day_material natively and slotEligibility refuses ` +
-        `it there: ${verdict.reason}`
+      slotEligibility(asClaims(game.slots), "day_material").eligible,
+      `${game.slug} claims day_material natively and slotEligibility refuses it`
+    );
+    assert.notEqual(
+      game.phase,
+      "daylight",
+      `${game.slug} is a field day game still claiming day_material. That beat ` +
+        `deals ONE candidate per day, which is the anonymous placement db/069 ` +
+        `exists to end.`
+    );
+  }
+});
+
+test("THE FIELD DAY IS OFFERED WHOLE, and refused everywhere else", () => {
+  /*
+   * Founder: "field day games include all and she chooses", and then "it is a
+   * set across different days if host wants it."
+   *
+   * Both clauses are mechanical and both are checked. ALL: the beat's offer
+   * ceiling is not below the size of the set, or the house shows a subset of
+   * something she said to show whole. SHE CHOOSES: the beat is `any_of`, which
+   * is the only thing that lets more than one of them run.
+   */
+  const fieldDay = ALL_GAMES.filter((game) =>
+    game.slots.some((c) => c.slotCode === "field_day" && c.fit === "native")
+  );
+  assert.equal(fieldDay.length, 5, `${fieldDay.length} field day games rather than 5`);
+
+  const beats = [...replayOccasionSlots().rows.values()].filter(
+    (row) => row.slotCode === "field_day"
+  );
+  assert.ok(beats.length > 0, "no occasion carries the field day beat");
+
+  for (const beat of beats) {
+    assert.equal(beat.pool, "game", `${beat.occasion}'s field day draws ${beat.pool}`);
+    assert.equal(
+      beat.offerRule,
+      "any_of",
+      `${beat.occasion}'s field day is a carousel. A one_of beat delivers five ` +
+        `and runs exactly one, which is "she chooses" without "include all".`
+    );
+    assert.ok(
+      beat.offerCount >= fieldDay.length,
+      `${beat.occasion}'s field day offers up to ${beat.offerCount} and the ` +
+        `set is ${fieldDay.length}. "Include all" is the ruling; raise ` +
+        `occasion_slot.offer_count rather than shipping a subset.`
+    );
+    // NOT per_day. Her third sentence in one column: a per-day beat would
+    // offer the set again every morning and weld each offer to its day, which
+    // is the welding she retired. One offer; the day is the member's.
+    assert.equal(
+      beat.perDay,
+      false,
+      `${beat.occasion}'s field day repeats per day. The set is an OFFER and a ` +
+        `NAME, not a placement — she spreads its members across days herself.`
     );
   }
 
-  // AND THE FIELD DAY SPECIFICALLY: daytime, native to one room, and claiming
-  // the day and nothing else — so the whitelist refuses it the evening's game
-  // beat rather than merely ranking it low there.
-  const written = ALL_GAMES.filter((game) => game.phase === "daylight");
-  assert.equal(
-    written.length,
-    5,
-    `${written.length} daylight games rather than the five field day games`
+  for (const game of fieldDay) {
+    assert.deepEqual(
+      game.slots.map((c) => `${c.slotCode}:${c.fit}`),
+      ["field_day:native"],
+      `${game.slug} claims a beat besides the field day. A native claim is a ` +
+        `whitelist and this is what the whitelist is for.`
+    );
+    assert.equal(slotEligibility(asClaims(game.slots), "game").eligible, false);
+    assert.equal(slotEligibility(asClaims(game.slots), "day_material").eligible, false);
+    assert.equal(slotEligibility(asClaims(game.slots), "field_day").eligible, true);
+    assert.equal(game.phase, "daylight", `${game.slug} is not a daytime game`);
+    assert.equal(game.shape, "scheduled");
+    assert.ok(game.worlds.some((w) => w.world === "catskills" && w.native === true));
+    assert.equal(game.occasions.length, 0, `${game.slug} refuses an occasion`);
+  }
+});
+
+test("A FIELD DAY BEAT GOES ONLY WHERE THERE IS A DAYTIME, not where there are days", () => {
+  /*
+   * Ruling: a one-day field day must be reachable, and NOT by giving every
+   * occasion a daytime beat. db/069 answers with a DECLARED column rather than
+   * a day count (rule 30: a declared identity, never an inferred one), so the
+   * two questions can diverge the moment an afternoon occasion is admitted.
+   *
+   * The test is written against `daytime` and NOT against `days > 1`, on
+   * purpose. Asserting the day count here would make this green by
+   * construction and blind at exactly the row the column exists for.
+   */
+  const beats = new Set(
+    [...replayOccasionSlots().rows.values()]
+      .filter((row) => row.slotCode === "field_day")
+      .map((row) => row.occasion)
+  );
+  const daytime = new Set(
+    [...OCCASION_SHAPES].filter(([, shape]) => shape.daytime).map(([o]) => o)
   );
 
-  for (const game of written) {
-    assert.deepEqual(
-      game.slots.map((claim) => `${claim.slotCode}:${claim.fit}`),
-      ["day_material:native"],
-      `${game.slug} claims something other than the day beat. A daytime game ` +
-        `that also claims \`game\` is eligible for the evening, and "field ` +
-        `days are daytime games" stops being true of it.`
-    );
-    assert.equal(
-      slotEligibility(asClaims(game.slots), "game").eligible,
-      false,
-      `${game.slug} is eligible for the evening's game beat. A native claim is ` +
-        `a whitelist and this is what the whitelist is for.`
-    );
-    assert.equal(game.shape, "scheduled", `${game.slug} cannot fill the day beat: db/010 gives it only the scheduled shape`);
+  assert.deepEqual([...beats].sort(), [...daytime].sort());
+  assert.ok(daytime.size > 0, "no occasion declares a daytime");
+  assert.ok(
+    daytime.size < OCCASION_SHAPES.size,
+    "every occasion declares a daytime. That is the flattening db/061 paid " +
+      "for — a dinner party is not entitled to a sack race."
+  );
+
+  for (const [occasion, shape] of OCCASION_SHAPES) {
+    if (shape.daytime) continue;
     assert.ok(
-      game.worlds.some((scope) => scope.world === "catskills" && scope.native === true),
-      `${game.slug} is not native to the room the founder named`
+      !beats.has(occasion),
+      `${occasion} has no daytime and was given a field day`
     );
-    assert.equal(game.occasions.length, 0, `${game.slug} carries an occasion claim. Nothing in the catalogue may refuse a game.`);
   }
 });
 

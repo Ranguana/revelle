@@ -109,10 +109,27 @@ test("every course beat still contains ONE dish — an or, not an and", () => {
 });
 
 test("no beat outside the courses was swept along", () => {
+  /*
+   * THE INVARIANT SPLIT ON 2026-09-06 RATHER THAN LOOSENING, and the old
+   * reading is kept because it is the one a later agent will re-derive.
+   *
+   * It used to be "exactly the game beat and the three courses offer a
+   * choice", full stop, and that was exactly true while every offer in the
+   * product was db/061's carousel — n delivered, ONE runs. db/069 added a
+   * second kind: `any_of`, where n are delivered and she runs any non-empty
+   * subset ("field day games include all and she chooses").
+   *
+   * So `offerCount > 1` no longer means one thing, and a single list of
+   * expected beats would have had to absorb the field day as though it were a
+   * carousel — which is rule 32 in reverse: letting a new row into an old list
+   * because it superficially resembles the members. The list is now keyed on
+   * `offerRule`, which is the fact that actually distinguishes them, and each
+   * kind is counted separately.
+   */
   const replay = replayOccasionSlots();
 
-  const offering = [...replay.rows.values()]
-    .filter((row) => row.offerCount > 1)
+  const carousels = [...replay.rows.values()]
+    .filter((row) => row.offerCount > 1 && row.offerRule === "one_of")
     .map((row) => `${row.occasion}/${row.slotCode}`)
     .sort();
 
@@ -124,13 +141,30 @@ test("no beat outside the courses was swept along", () => {
   ].sort();
 
   assert.deepEqual(
-    offering,
+    carousels,
     expected,
-    "exactly the game beat and the three courses offer a choice. Anything " +
+    "exactly the game beat and the three courses offer a CAROUSEL. Anything " +
       "else here is a beat that started offering three without a ruling — " +
       "which is why db/062 names the three slot codes rather than writing " +
       "`where pool = 'dish'` (CLAUDE.md rule 32: symmetry is not evidence)"
   );
+
+  // AND THE OTHER KIND, counted in its own right rather than lumped in. Only
+  // the field day is an `any_of` today; a second one appearing here without a
+  // ruling is the same defect this test was written for, one mechanism over.
+  const sets = [...replay.rows.values()]
+    .filter((row) => row.offerRule === "any_of")
+    .map((row) => row.slotCode);
+
+  assert.deepEqual(
+    [...new Set(sets)],
+    ["field_day"],
+    "only the field day offers a set she picks from without exhausting it. " +
+      "db/069 made `any_of` a value on occasion_slot rather than a field-day " +
+      "special case, so a second beat can legitimately have it — but it needs " +
+      "her, not a migration."
+  );
+  assert.ok(sets.length > 0, "the field day beat was not replayed at all");
 });
 
 /* ── it extends db/061 rather than growing a second mechanism ───────── */

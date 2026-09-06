@@ -198,30 +198,97 @@ export function statementsOf(sqlCode: string): string[] {
  * Positional, exactly as the occasion_slot reader is, and it refuses a column
  * order it does not recognise rather than reading the wrong field.
  */
-export const OCCASION_DAYS: ReadonlyMap<string, number> = (() => {
-  const out = new Map<string, number>();
+/**
+ * WHAT `occasion_shape` HOLDS — the days, and whether there is a daytime.
+ *
+ * Read rather than restated, for db/009's own reason: "a product decision that
+ * lives in a `switch` is a product decision nobody can find." It is here and
+ * not in a test file because three rulings now turn on it — `per_day`
+ * multiplies a beat by `days`, db/068 gave the day beat to `days > 1`, and
+ * db/069 gives the field day to `daytime` — and CLAUDE.md rule 21's narrow test
+ * says one owner for a fact several surfaces must agree about.
+ *
+ * `daytime` IS NOT DERIVED HERE. db/069 declares it and backfills it, and this
+ * replays that statement rather than recomputing `days > 1` — which would make
+ * the reader agree with the migration by construction and prove nothing. The
+ * whole point of the column is that the two questions can diverge (rule 30: a
+ * declared identity, never an inferred one), so a reader that inferred it
+ * would be blind to the first occasion where they do.
+ */
+export type OccasionShapeRow = { days: number; daytime: boolean };
+
+export const OCCASION_SHAPES: ReadonlyMap<string, OccasionShapeRow> = (() => {
+  const out = new Map<string, OccasionShapeRow>();
   for (const name of MIGRATION_FILES) {
     for (const statement of statementsOf(MIGRATION_CODE.get(name) ?? "")) {
       const insert =
         /^insert into occasion_shape\s*\(([^)]*)\)\s*values([\s\S]*)$/.exec(
           statement
         );
-      if (insert === null) continue;
-      const columns = insert[1].split(",").map((c) => c.trim());
-      if (columns[0] !== "occasion" || columns[1] !== "days") {
+      if (insert !== null) {
+        const columns = insert[1].split(",").map((c) => c.trim());
+        if (columns[0] !== "occasion" || columns[1] !== "days") {
+          throw new Error(
+            `db/${name}: this replay reads occasion_shape inserts positionally ` +
+              `and this statement's first two columns are ` +
+              `${columns.slice(0, 2).join(", ")}.`
+          );
+        }
+        for (const tuple of insert[2].matchAll(/\(\s*'([a-z_]+)'\s*,\s*(\d+)/g)) {
+          if (!out.has(tuple[1])) {
+            // db/069's column default. A row inserted before that column
+            // existed means `false` until a statement says otherwise.
+            out.set(tuple[1], { days: Number(tuple[2]), daytime: false });
+          }
+        }
+        continue;
+      }
+
+      const update =
+        /^update occasion_shape\s+set\b([\s\S]*)$/.exec(statement);
+      if (update === null) continue;
+
+      // ONLY THE COLUMNS A RULING WAS MADE ABOUT, the same line the
+      // occasion_slot reader draws. db/010 sets `scheduled_game_max` on this
+      // table and nothing here models it, so that statement is skipped rather
+      // than refused — refusing every untracked column would make the reader
+      // unusable. One that DOES touch `days` or `daytime` in a form this
+      // parser cannot read is refused, because that is the one that would
+      // leave an occasion reading as an evening while the chain gave it an
+      // afternoon.
+      if (!/\b(days|daytime)\b/.test(update[1])) continue;
+
+      // db/069 — `set daytime = (days > 1)`, unqualified, which is the
+      // backfill.
+      const backfill =
+        /^\s*daytime\s*=\s*\(?\s*days\s*>\s*(\d+)\s*\)?\s*$/.exec(update[1]);
+      if (backfill === null) {
         throw new Error(
-          `db/${name}: this replay reads occasion_shape inserts positionally ` +
-            `and this statement's first two columns are ` +
-            `${columns.slice(0, 2).join(", ")}.`
+          `db/${name}: this replay cannot read "update occasion_shape set ` +
+            `${update[1].trim().slice(0, 60)}…", and it sets a column a ruling ` +
+            `turns on. Teach it the statement.`
         );
       }
-      for (const tuple of insert[2].matchAll(/\(\s*'([a-z_]+)'\s*,\s*(\d+)/g)) {
-        if (!out.has(tuple[1])) out.set(tuple[1], Number(tuple[2]));
+      const threshold = Number(backfill[1]);
+      let matched = 0;
+      for (const row of out.values()) {
+        row.daytime = row.days > threshold;
+        matched += 1;
+      }
+      if (matched === 0) {
+        throw new Error(
+          `db/${name}: the occasion_shape backfill matched no replayed row.`
+        );
       }
     }
   }
   return out;
 })();
+
+/** Just the day counts, for the callers that only ever wanted those. */
+export const OCCASION_DAYS: ReadonlyMap<string, number> = new Map(
+  [...OCCASION_SHAPES].map(([occasion, shape]) => [occasion, shape.days])
+);
 
 /** db/001's `occasion_type`, which is the list of occasions there are. */
 export const OCCASIONS: readonly string[] = [
@@ -444,6 +511,16 @@ export type OccasionSlotRow = {
    * `src/lib/day-material.test.ts` drives it rather than asserting it.
    */
   perDay: boolean;
+  /**
+   * `occasion_slot.offer_rule` — db/069. What KIND of choice the beat asks for.
+   *
+   * `one_of` is db/061's carousel: n delivered, exactly one runs. `any_of` is
+   * "include all and she chooses": n delivered, any non-empty subset runs, each
+   * scheduled independently. The column's default is `one_of`, which is what
+   * every offer made before db/069 was, so a statement that does not name it
+   * means that.
+   */
+  offerRule: "one_of" | "any_of";
 };
 
 export type OccasionSlotReplay = {
@@ -566,6 +643,7 @@ export function replayOccasionSlots(
         inserts += 1;
 
         const perDayAt = columns.indexOf("per_day");
+        const offerRuleAt = columns.indexOf("offer_rule");
         for (const tuple of tuplesOf(beforeOnConflict(m[2]))) {
           const fields = tupleFields(tuple);
           if (fields.length !== columns.length) {
@@ -594,6 +672,10 @@ export function replayOccasionSlots(
             // name the column means the default. Never inferred from anything
             // else.
             perDay: perDayAt === -1 ? false : fields[perDayAt] === "true",
+            offerRule:
+              offerRuleAt === -1
+                ? "one_of"
+                : (literal(fields[offerRuleAt]) as "one_of" | "any_of"),
           });
         }
         continue;
@@ -622,32 +704,43 @@ export function replayOccasionSlots(
               `${columns.slice(0, 3).join(", ")}.`
           );
         }
-        if (columns.includes("offer_count")) {
-          throw new Error(
-            `db/${name}: a derived occasion_slot insert names offer_count. ` +
-              `See the note on the values branch.`
-          );
-        }
-
+        // A DERIVED INSERT MAY NAME offer_count AND offer_rule, unlike a
+        // `values` one — its projection is a fixed list of literals and the
+        // reader takes them from it by the same column-list rule. The `values`
+        // branch still refuses them, because there the numbers vary per tuple
+        // and reading the first row's would be a guess about the rest.
         const body = m[2];
         const perDayAt = columns.indexOf("per_day");
+        const offerCountAt = columns.indexOf("offer_count");
+        const offerRuleAt = columns.indexOf("offer_rule");
         const projected =
           /^\s*sh\.occasion\s*,\s*'([a-z_]+)'\s*,\s*'([a-z_]+)'/.exec(body);
-        const source =
+
+        // TWO PREDICATES, AND THEY ASK DIFFERENT QUESTIONS ON PURPOSE.
+        // db/068 gives the day beat to `sh.days > n`; db/069 gives the field
+        // day to `sh.daytime`, which is DECLARED and may be true of a one-day
+        // occasion. Reading the second as the first would make the reader
+        // agree with the migration by construction and go blind at exactly the
+        // row the column exists for (rule 30).
+        const byDays =
           /\bfrom\s+occasion_shape\s+sh\b[\s\S]*?\bwhere\s+sh\.days\s*>\s*(\d+)/.exec(
             body
           );
-        if (projected === null || source === null) {
+        const byDaytime =
+          /\bfrom\s+occasion_shape\s+sh\b[\s\S]*?\bwhere\s+sh\.daytime\s*$/.test(
+            body.trimEnd()
+          );
+        if (projected === null || (byDays === null && !byDaytime)) {
           throw new Error(
             `db/${name}: this replay reads a derived occasion_slot insert as ` +
               `"select sh.occasion, '<slot>', '<pool>', … from occasion_shape ` +
-              `sh where sh.days > <n>" and this one is not that. Teach it the ` +
-              `statement rather than letting it insert nothing.`
+              `sh where sh.days > <n>" or "… where sh.daytime", and this one ` +
+              `is neither. Teach it the statement rather than letting it ` +
+              `insert nothing.`
           );
         }
 
         inserts += 1;
-        const minimumDays = Number(source[1]);
         // The projection is a fixed list of literals after `sh.occasion`, so
         // per_day is read from it by the same column-list rule the values
         // branch uses. `select` and `from` bracket it.
@@ -656,9 +749,18 @@ export function replayOccasionSlots(
         );
         const derivedPerDay =
           perDayAt === -1 ? false : projection[perDayAt]?.trim() === "true";
+        const derivedOfferCount =
+          offerCountAt === -1 ? 1 : Number(projection[offerCountAt]?.trim());
+        const derivedOfferRule =
+          offerRuleAt === -1
+            ? "one_of"
+            : ((/^'([a-z_]+)'$/.exec(projection[offerRuleAt]?.trim() ?? "")?.[1] ??
+                "one_of") as "one_of" | "any_of");
         let matched = 0;
-        for (const [occasion, days] of OCCASION_DAYS) {
-          if (days <= minimumDays) continue;
+        for (const [occasion, shape] of OCCASION_SHAPES) {
+          if (byDays !== null) {
+            if (shape.days <= Number(byDays[1])) continue;
+          } else if (!shape.daytime) continue;
           const key = `${occasion}/${projected[1]}`;
           matched += 1;
           // `on conflict do nothing` on every insert in db/, so an existing
@@ -668,8 +770,9 @@ export function replayOccasionSlots(
             occasion,
             slotCode: projected[1],
             pool: projected[2],
-            offerCount: 1,
+            offerCount: derivedOfferCount,
             perDay: derivedPerDay,
+            offerRule: derivedOfferRule,
           });
         }
 
@@ -678,9 +781,9 @@ export function replayOccasionSlots(
         // worked from every angle except this one.
         if (matched === 0) {
           throw new Error(
-            `db/${name}: "insert … select … where sh.days > ${minimumDays}" ` +
-              `produced no row. Either occasion_shape was not replayed or the ` +
-              `predicate matches nothing.`
+            `db/${name}: "insert … select … from occasion_shape" produced no ` +
+              `row. Either occasion_shape was not replayed or the predicate ` +
+              `matches nothing.`
           );
         }
         continue;
