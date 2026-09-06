@@ -956,3 +956,47 @@ party to protect the packing. Backwards."*
 
 Rule 32's sibling. That one says symmetry is not evidence; this one says
 ARITHMETIC IS NOT ARGUMENT.
+
+---
+
+**35. WRITE THE EVENING FIRST. THE CELLS ARE READ OFF IT. THE DISTANCES ARE A
+REPORT.** Founder ruling, 2026-09-06, verbatim, and it replaces the order every
+room in that session was drafted in:
+
+> "Write the evening that was thrown. Fill the nine cells from that. Run the
+> distances as a report. If you are hunting for a fact to make d hit 3, stop
+> and either:
+> - admit it is a register on an existing room (HK as New York in another
+>   city-year — her voice, her well), or
+> - change a cell that is true of the night, not true of a footnote.
+>
+> Water can stay in the copy. It should not be a structural pillar."
+
+Three steps, in this order, and inverting them is the defect:
+
+1. **WRITE THE EVENING.** Prose. A night somebody threw. No cells, no
+   distances, no audit.
+2. **FILL THE NINE CELLS FROM IT.** Every cell traceable to a sentence already
+   written.
+3. **RUN THE DISTANCES AS A REPORT.** Output, not a target. You are informing
+   her, not clearing a bar.
+
+**THE STOP CONDITION IS THE WHOLE RULE.** The moment you catch yourself looking
+for a fact that would move `d`, drafting is over and exactly two answers are
+owed:
+
+- **"This is a register on an existing room."** NOT A FAILURE. The same evening
+  in another city-year, in her voice, out of her well, is a legitimate and
+  honest product. Say it plainly.
+- **"This cell is wrong, and here is the cell that is true of the night."** A
+  cell may change because the evening says so. Never because a footnote does.
+
+`docs/room-structure.md` teaches the row-first order — nine cells, then the
+distance table, then the voice "last, never first." That order is what produced
+a room hunting for its third difference, and rules 34 and 35 are her correction
+to it. **An agent reading `room-structure.md` alone will draft the way Tokyo was
+drafted.** The two rulings are transcribed in
+`docs/proposals/rooms/hong-kong-1963.md`.
+
+COLOUR IS WELCOME AND COLOUR IS NOT A PILLAR. The more expensive the research,
+the more load-bearing it will feel; that feeling is the defect (rule 34).
