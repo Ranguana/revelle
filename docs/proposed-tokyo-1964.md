@@ -1121,9 +1121,10 @@ are hand-edited numbers rather than logic:
 
 - `src/lib/food-identity.test.ts` holds `18` rooms and a `12 / 4 / 2` identity
   split. A nineteenth table room makes it `13 / 4 / 2` over 19.
-- `src/lib/drinks-seed.test.ts` holds nine corpus counts (drinks, programmes,
-  rooms, mirrors). Programme 26 moves all of them.
-- `src/lib/games.test.ts` holds a game count. One native game moves it.
+- `src/lib/drinks-seed.test.ts` holds seven corpus counts — 55 paired, 25
+  programmes, 12 rooms, 21 mirrors owed, 76 drinks, 2 shared. Programme 26
+  moves all of them.
+- `src/lib/games.test.ts` asserts `29` provided games. One native game moves it.
 - `src/lib/selection/structure.test.ts` held the `7 / 7 / 4` ending split; it is
   already `7 / 7 / 5` with the old numbers preserved beside it, because the row
   landing turned the suite red and the brief required it green.
