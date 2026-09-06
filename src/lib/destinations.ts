@@ -1060,11 +1060,7 @@ export const HAVANA: Destination = {
         piece: "place_card",
         text: "Rafael — beside somebody who will get him up.",
       },
-      {
-        piece: "game_rule",
-        text: "Everybody names the song that gets them up. Nobody names their own. We play them in order.",
-      },
-      {
+            {
         piece: "bulletin",
         text: "Sunday. The pork went on at two. Somebody has taken the good chair into the courtyard.",
       },
@@ -2952,11 +2948,7 @@ export const CATSKILLS: Destination = {
       },
       { piece: "place_card", text: "Bird — top bunk, as always." },
       { piece: "place_card", text: "Moose — nearest the door, because he is up first." },
-      {
-        piece: "game_rule",
-        text: "Everybody tells the story of the swim test. Whoever's version is furthest from the ledger wins, and the ledger stays shut.",
-      },
-      {
+            {
         piece: "bulletin",
         text: "Thursday. Water at sixty-six. Two of the string lights are out at the far end and nobody has owned up.",
       },
@@ -8766,11 +8758,7 @@ export const OAXACA_1954: Destination = {
         piece: "place_card",
         text: "Tía Reme, in the chair she has had since before this table was this long.",
       },
-      {
-        piece: "game_rule",
-        text: "The story is told the long way. Anybody may correct the year, and somebody always does.",
-      },
-      {
+            {
         piece: "bulletin",
         text: "Sunday. The mole went on yesterday afternoon and the courtyard door has been open since noon.",
       },

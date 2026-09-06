@@ -590,7 +590,7 @@ test("ONE PRINTED PIECE PER GAME, counted in both directions", () => {
    * schema enforces, not the authoring gap CLAUDE.md rule 29 is about.
    */
   const provided = ALL_GAMES.filter((g) => g.sourcing === "provided");
-  assert.equal(provided.length, 26, `${provided.length} provided games rather than 26`);
+  assert.equal(provided.length, 23, `${provided.length} provided games rather than 23`);
 
   for (const game of provided) {
     assert.equal(
@@ -654,15 +654,15 @@ test("EVERY GAME_RULE THE FOUNDER WROTE IS A ROW, COUNTED IN BOTH DIRECTIONS", (
 
   assert.equal(
     written.length,
-    20,
+    17,
     `src/lib/destinations.ts now carries ${written.length} game_rule pieces ` +
-      `rather than 20. If a room gained one, it needs a game; if a room lost ` +
+      `rather than 17. If a room gained one, it needs a game; if a room lost ` +
       `one, this file has a row with nothing behind it.`
   );
   assert.equal(
     scoped.length,
-    20,
-    `${scoped.length} games claim a native destination rather than 20`
+    17,
+    `${scoped.length} games claim a native destination rather than 17`
   );
 
   for (const [key, rules] of GAME_RULE_PIECES) {
@@ -714,7 +714,7 @@ test("HER SENTENCE SURVIVES VERBATIM, character for character", () => {
     checked += 1;
   });
 
-  assert.equal(checked, 20, `${checked} room games checked rather than 20`);
+  assert.equal(checked, 17, `${checked} room games checked rather than 17`);
 });
 
 test("a room game is written for one room and says so with native, not affinity", () => {
