@@ -91,8 +91,20 @@ import { TONE_GROUPS, TONES, type Tone } from "./voice.ts";
  * NONE OF THE THREE IS A TASTE. They prune the pool at stage 3 and they never
  * reach the destination ranking — the same wall `environment` stands behind,
  * enforced in the same three places. See db/049.
+ *
+ * 2026-09-a REWRITES "how does this group actually have fun" into one question
+ * about APPETITE FOR PLAY, and it is the largest change this stamp has ever
+ * carried: NINE OF FOURTEEN OPTIONS ARE RETIRED FROM THE OFFER and four are
+ * added. The retired nine — `long_dinner`, `dance`, `toast`, `dress_up`,
+ * `talk_deep`, `wander`, `swim_late`, `cook_together`, `work_the_room` — keep
+ * their facet rows and their quiz_option_facet bridges, so a response written
+ * against 2026-08-h still resolves every code it carries. What it does NOT do
+ * is mean the same thing: the older response answered a question about the
+ * whole evening and this one answers a question about play, and `quiz_version`
+ * on the row is what says which she was shown. Codes are permanent; the OFFER
+ * is not. See db/066 and the note above GROUP_FUN.
  */
-export const QUIZ_VERSION = "2026-08-h";
+export const QUIZ_VERSION = "2026-09-a";
 
 export type QuizOption = {
   /** Permanent. Stored in the database. */
@@ -107,6 +119,21 @@ export type QuizOption = {
    * an entry in `MultiField.groups`. Ignored otherwise.
    */
   group?: string;
+  /**
+   * ON A MULTI FIELD: choosing this means choosing nothing else. "They hate
+   * games" cannot sit beside "they play for something worth winning".
+   *
+   * Rule 16 in one flag. Without it the contradicting taps are ACCEPTED,
+   * stored, scored against a pool that a later gate then deletes — input
+   * absorbed and not honoured, with nothing anywhere saying so. Three readers
+   * enforce it off this one declaration, the way `activeWhen` is enforced:
+   * `stepErrors` refuses the combination, QuizFlow's toggle replaces rather
+   * than adds, and the route validates the submission with the same function.
+   *
+   * Ignored on a single field, where it is meaningless. More than one exclusive
+   * option in a field is legal and each excludes the rest.
+   */
+  exclusive?: boolean;
 };
 
 /** A heading over a run of options. See MultiField.groups. */
@@ -524,33 +551,122 @@ const TASTE_DIRECTIONS: readonly QuizOption[] = [
 ];
 
 /*
- * The last four were added by db/016, and they are the four things
- * src/lib/games.ts wrote down and then refused to insert: "none of them is
- * worth an insert until a host can ANSWER in it". Making something, working the
- * room, keeping a secret, and playing for stakes are what the founder's seven
- * games actually split along, and until now the nearest terms were
- * `cook_together` for a room with paint on its hands and `compete` for talking
- * a stranger out of a foreign coin.
+ * APPETITE FOR PLAY — ONE QUESTION DOING ONE JOB.
  *
- * They belong here and not in four private facets on the catalogue side, for
- * the reason that file gives: a description in a richer vocabulary than the one
- * she answers in leaves the join returning mush.
+ * Founder, 2026-09-06, on a field of fourteen: "keep appetite for play
+ * questions and add my questions (or similar) regarding games, karaoke, etc.
+ * forget the people traits for this. if hates games, get rid of game option -
+ * very simple." And what she wants out of it: "we want to know if they like
+ * games, like karaoke, impromptu theater/gorilla theater, group games, board
+ * games... hate games."
+ *
+ * ── WHAT THE FOURTEEN WERE ACTUALLY DOING ───────────────────────────
+ *
+ * Three jobs, which is why the answer was hard to use. FOUR WERE MATRIX FACETS
+ * IN DISGUISE — "Commit to an outfit" is `dress`, "Split into corners and talk
+ * properly" is `volume`, "Sit at the table for five hours" is nearer
+ * `schedule`, "Crowd into the kitchen" is `food` — and a facet that describes
+ * the EVENING belongs in the column that already sorts rooms by it, not as a
+ * tile about her friends. THREE WERE PEOPLE TRAITS: dancing without being
+ * asked, making speeches, talking a stranger into something. Rule 1 is the
+ * reason those cannot sort a destination, and the founder's "forget the people
+ * traits for this" is the reason they are not in a question about play either.
+ * FIVE WERE APPETITE FOR PLAY, and they are the five kept below.
+ *
+ * ── WHAT THE ANSWER FEEDS, STATED SO IT CANNOT DRIFT (rule 15) ──────
+ *
+ * `group_fun` is one of the SIX dimensions the catalogue is actually tagged in
+ * (the sweep is written out in src/lib/selection/vector.ts), and the tagged
+ * side is src/lib/games.ts — seventy-odd `game_facet` rows. So this question
+ * scores THE GAME CAROUSEL: db/061 gives every occasion one game beat with
+ * three candidates, and until now those three were chosen by room and occasion
+ * alone. Nothing else reads it; in particular no destination carries a
+ * `group_fun` tag and this question has never sorted a room. It is not
+ * supposed to.
+ *
+ * EVERY OPTION BELOW HAS A CONSUMER, and that was the admission test. Where the
+ * catalogue could not answer a kind of play she named, the answer is not a tile
+ * that grades nothing (rule 16) — it is either an existing code that genuinely
+ * means it, or an authoring gap written down in docs/games-need-a-human.md.
+ *
+ * KARAOKE IS `perform`, NOT A NEW CODE. She named karaoke; "Sing badly, on
+ * purpose" is what the house has always called it, twelve games carry the tag,
+ * and a second code meaning the same thing would be two owners of one fact
+ * (rule 21) with the new one grading nothing. So the tile names karaoke in its
+ * hint and resolves to the code that already reaches the singing games. What
+ * the catalogue does NOT have is a karaoke game as such; that is an authoring
+ * absence (rule 29) and it is filed, not papered over.
+ *
+ * ── THE THREE ADDED, AND WHAT EACH REACHES ──────────────────────────
+ *
+ *   theatre      impromptu / guerrilla theatre. Reaches the games that are
+ *                somebody inventing and playing a thing straight-faced —
+ *                Somebody's Voice, One Of Them Is Lying, Nobody Finishes Their
+ *                Own, Art Battle's minute of invented art criticism.
+ *   board_games  a table, rules and pieces. Reaches Imposter, The Numbers
+ *                After Dark, Fishbowl, The Late Supper.
+ *   group_games  the whole room up at once. Reaches the Reverse Scavenger
+ *                Hunt, Art Battle, Let's Make a Deal, the two finales.
+ *
+ * The last two are the split her own list draws — "group games, board games" —
+ * and it is a real one in this pool rather than a restatement of `shape`. Shape
+ * says whether a game takes a block of the evening; these say whether her
+ * people would rather sit round a table with it or be on their feet.
+ *
+ * ── AND `hates_games`, WHICH IS A FILTER AND NOT A TASTE ────────────
+ *
+ * It carries `no_games` (db/014's slot exclusion) through
+ * quiz_option_exclusion, exactly the way `play_appetite = 'none'` has since
+ * db/016, and the game beat is removed from her plan before anything is scored.
+ * The constraint door, not the taste door: it does not rank a game down, it
+ * says the beat is not in her evening.
+ *
+ * IT IS THE SECOND ANSWER THAT CARRIES THAT CODE, AND THAT IS THE DESIGNED
+ * SHAPE, NOT A DUPLICATE AUTHORITY. `no_food` has been carried by two options
+ * since db/016 — `eating_out` and `drinks_only` — and exclusions.ts says in so
+ * many words that "a second answer that means 'no menu' is an INSERT". The one
+ * owner of the fact is the bridge; the answers are evidence for it, and
+ * hostExclusions unions them. What is left visible rather than hidden: a host
+ * who taps this is still shown "Where do games sit in this?" and will say
+ * "None at all", which is the same fact twice. Gating that step on this one
+ * needs `activeWhen` to learn multi-select and a negative form, and that is a
+ * change with its own argument to make.
+ *
+ * `exclusive` on the tile is what keeps rule 16 honest inside this one field:
+ * without it she could say her people hate games AND that they play for stakes,
+ * and the second tap would be absorbed and then deleted along with the beat.
  */
 const GROUP_FUN: readonly QuizOption[] = [
-  { code: "long_dinner", label: "Sit at the table for five hours" },
-  { code: "dance", label: "Dance without being asked twice" },
   { code: "compete", label: "Get genuinely competitive" },
-  { code: "toast", label: "Make speeches and toasts" },
-  { code: "dress_up", label: "Commit to an outfit" },
-  { code: "perform", label: "Sing, badly, on purpose" },
-  { code: "talk_deep", label: "Split into corners and talk properly" },
-  { code: "wander", label: "End up somewhere unplanned" },
-  { code: "swim_late", label: "Swim long after dark" },
-  { code: "cook_together", label: "Crowd into the kitchen" },
+  {
+    code: "perform",
+    label: "Sing badly, on purpose",
+    hint: "Karaoke, and nobody is embarrassed",
+  },
+  {
+    code: "theatre",
+    label: "Put on something they made up",
+    hint: "Invented on the spot and played straight",
+  },
+  {
+    code: "board_games",
+    label: "Sit round a table and play",
+    hint: "Rules, pieces, somebody keeping score",
+  },
+  {
+    code: "group_games",
+    label: "Get the whole room playing",
+    hint: "Nobody sits this one out",
+  },
   { code: "make_something", label: "Make something with their hands" },
-  { code: "work_the_room", label: "Talk a stranger into something" },
   { code: "keep_a_secret", label: "Keep something to themselves all night" },
   { code: "play_for_stakes", label: "Play for something worth winning" },
+  {
+    code: "hates_games",
+    label: "They hate games",
+    hint: "No game in the plan",
+    exclusive: true,
+  },
 ];
 
 /**
@@ -1199,8 +1315,8 @@ export const QUIZ_STEPS: readonly QuizStep[] = [
   {
     key: "fun",
     eyebrow: "Your people",
-    title: "How does this group actually have fun?",
-    help: "Not how they should. How they do.",
+    title: "What do they actually play?",
+    help: "Not what they should. What they do.",
     fields: [{ id: "group_fun", type: "multi", options: GROUP_FUN, min: 1, max: 4 }],
   },
   // Immediately after how they have fun, because it is the same subject seen
@@ -1404,6 +1520,15 @@ export function stepErrors(step: QuizStep, answers: QuizAnswers): string[] {
         );
         if (unknown.length) errors.push(`Unknown choice: ${unknown.join(", ")}`);
         if (new Set(chosen).size !== chosen.length) errors.push("Duplicate choice.");
+        // An exclusive option is the whole answer or it is not in it. See
+        // QuizOption.exclusive: the client already enforces this by
+        // replacement, and this is the half that a hand-built POST meets.
+        const exclusive = field.options
+          .filter((o) => o.exclusive === true && chosen.includes(o.code))
+          .map((o) => o.label);
+        if (exclusive.length > 0 && chosen.length > 1) {
+          errors.push(`"${exclusive[0]}" cannot be chosen with anything else.`);
+        }
         if (chosen.length < field.min) {
           errors.push(
             field.min === 1

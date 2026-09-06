@@ -91,12 +91,21 @@ export default function QuizFlow({ email }: { email: string }) {
       const chosen = Array.isArray(d.answers[field.id])
         ? (d.answers[field.id] as string[])
         : [];
+      // QuizOption.exclusive — "they hate games" is the whole answer or it is
+      // not in it. Enforced by REPLACEMENT for the same reason the ceiling is:
+      // a form that refuses a tap is telling her off, and the two combinations
+      // it refuses are ones she cannot have meant at once. `stepErrors` says
+      // the same thing to a submission that did not come through this screen.
+      const isExclusive = (c: string) =>
+        field.options.some((o) => o.code === c && o.exclusive === true);
       const next = chosen.includes(code)
         ? chosen.filter((c) => c !== code)
-        : // At the limit the newest choice replaces the oldest. Tapping a
-          // fourth thing should feel like changing your mind, not like being
-          // told off by a form.
-          [...chosen, code].slice(-field.max);
+        : isExclusive(code)
+          ? [code]
+          : // At the limit the newest choice replaces the oldest. Tapping a
+            // fourth thing should feel like changing your mind, not like being
+            // told off by a form.
+            [...chosen.filter((c) => !isExclusive(c)), code].slice(-field.max);
       return { ...d, answers: { ...d.answers, [field.id]: next } };
     });
   }, []);

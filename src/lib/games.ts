@@ -149,21 +149,90 @@
  * Every one of those sentences is still TRUE of a two-person anniversary and
  * is still enforced — by the floor, not by the occasion.
  *
- * THE TWO KEPT are kept on an argument that survives at any headcount, and
- * the argument is written onto the row rather than left as a bare forbid:
+ * THE TWO KEPT were kept on an argument that survives at any headcount —
  * `lets-make-a-deal` puts a compere and a running order between the room and
  * the two people the evening honours, and `the-secret-auction` ends the night
- * on a bidding war where the honouring belongs. Both are the house's reading
- * and neither is hers; docs/games-need-a-human.md asks her.
+ * on a bidding war where the honouring belongs. BOTH WERE LIFTED A DAY LATER;
+ * the section below says why, and it is the founder saying that the house's
+ * reading is not the one that decides.
  *
- * WHAT THIS DOES NOT TOUCH. The dinner-party, getaway, birthday and bridal
- * forbids are each argued on their own terms — "a dinner party has no
- * tomorrow to cook for", "it settles tomorrow morning" — and none of them is
- * a headcount claim. They stay. One consequence is left visible rather than
- * swept: WESTHAMPTON AT A DINNER PARTY OFFERS TWO GAMES, not three, because
- * its own room game runs for three days and five house games are argued out
- * of a long dinner. That is an authoring absence (rule 29), and it is in
- * docs/games-need-a-human.md as one.
+ * The paragraph that stood here about the dinner-party, getaway, birthday and
+ * bridal forbids — "they stay" — was true for one day. It did not survive her
+ * next ruling, and the ruling is general rather than a longer list of
+ * exceptions.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ * EVERY FORBID LIFTED — A ROOM'S CHARACTER MAY NOT VETO A GAME
+ *
+ * Founder, 2026-09-06, reading a forbid note back to us:
+ *
+ *   "regarding your game questions, lets clear something up - there is no way
+ *    a game shouldnt be offered bc somewhere the revelle is nobody leaves the
+ *    table - that shouldnt be a rule in the first place"
+ *
+ * On the two anniversary rows the pass above had kept:
+ *
+ *   "a twenty-five-person anniversary is just a party and entitled to a game
+ *    show. it is not a two person event unless the host says it is and then
+ *    obviously it is not the right game"
+ *
+ * And on the one row that was not a room-character argument at all:
+ *
+ *   "also forget this limiting rule that we have to be era specific and cannot
+ *    have later tech"
+ *
+ * SO THERE IS NO FORBID LEFT IN THIS FILE. Seventeen occasion forbids and one
+ * world forbid, all of them lifted, each read on its own note rather than
+ * swept by field (rule 32 — symmetry is not evidence, and the anniversary pass
+ * above is the worked example of reading one row at a time and finding they
+ * all said the same thing).
+ *
+ * THE PRINCIPLE, WHICH IS THE VENUE RULE READ ONTO GAMES (CLAUDE.md rule 2).
+ * Venue may eliminate what cannot physically happen and may never rank what
+ * can. So may a game's eligibility: what is left after this is `minGuests` and
+ * `maxGuests`, the venue affordances, and the requirement kinds. "Nobody
+ * leaves the table" is a lovely sentence about a dinner party and it is not a
+ * fact that makes a game impossible. THE CONSTRAINT DOOR STAYS OPEN; THE TASTE
+ * DOOR IS SHUT.
+ *
+ * AN OCCASION IS NOT A HEADCOUNT, which is the sharper half. db/009 defines
+ * the anniversary as "One evening, honoured" and says nothing about two
+ * people; `guest_count_band` is a separate answer with eight values, and
+ * `minGuests` in src/lib/selection/fill.ts already refuses a game show at a
+ * table of two, at every occasion. Her own proof that the mechanism was
+ * already right is the second clause: "unless the host says it is and then
+ * obviously it is not the right game." The forbid was a second authority over
+ * a fact the guest band already owns (rule 21), and it was the one of the two
+ * that could be wrong — it fires on the NAME of the occasion regardless of who
+ * is coming.
+ *
+ * THE FOUR THAT SOUNDED LIKE FACTS, named because they are the ones a later
+ * agent will want to put back: the weather, the boat count, the temperature
+ * and the last night were each forbidden at a dinner party because they
+ * "settle tomorrow morning". That sounds structural and is not. A dinner party
+ * can have a slip that settles in the morning; what the notes describe is a
+ * payoff landing after the guests have gone, which is a thing a host may want.
+ * If one of them is ever genuinely unrunnable it comes back as a REQUIREMENT —
+ * game_requirement_kind is where "this needs a next morning" belongs, as a
+ * fact about the room, pruning through the same door venue uses. It does not
+ * come back as a forbid.
+ *
+ * THE ERA RULING, AND ITS SCOPE. `imposter` was forbidden at westhampton-1976
+ * because "the house never mentions anything that did not exist in 1976". The
+ * room is a REGISTER, NOT A TIME MACHINE: the member's party happens this year
+ * and her guests have phones. 1976 is how the evening reads, not a claim about
+ * what may be in the room. NOT TOUCHED, and deliberately: the `never` lines in
+ * the Westhampton and Las Vegas voice blocks in src/lib/destinations.ts say
+ * the same sentence about how the ROOM WRITES. They are authored voice
+ * content, enforced by npm run check:voice-output, and they are a different
+ * rule wearing the same words. Hers to rule on separately.
+ *
+ * AND WHAT THIS LEAVES: the only thing that removes a game from her evening is
+ * HER saying she does not want one — `hates_games` on the play question and
+ * `play_appetite = 'none'`, both carrying db/014's `no_games`. The house no
+ * longer decides on her behalf that her evening is not a games evening. See
+ * db/066, which is the other half of this change: removing a claim from this
+ * file removes nothing from a database that already holds it.
  *
  * ─────────────────────────────────────────────────────────────────────
  * THE FACET VOCABULARY, AND WHERE IT IS SHORT
@@ -727,6 +796,20 @@ const ART_BATTLE: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "theatre",
+      weight: 0.7,
+      note:
+        "The minute is spent inventing what somebody else meant, in confident detail, with the artist standing there. That is a performance of a critic, not a painting.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.9,
+      note:
+        "Everyone paints, everyone speaks, everyone votes. Nobody sits it out.",
+    },
+    {
+      dimension: "group_fun",
       code: "make_something",
       weight: 1,
       note: "The game this term was missing for. A room of people with paint on their hands.",
@@ -771,13 +854,7 @@ const ART_BATTLE: Game = {
     { dimension: "anti_preference", code: "surprise_cost", weight: 0.3 },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "Twenty minutes of painting is twenty minutes nobody is at the table.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -1072,6 +1149,13 @@ const REVERSE_SCAVENGER_HUNT: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "group_games",
+      weight: 1,
+      note:
+        "The whole room is on its feet asking strangers for things. There is no version of it seated.",
+    },
+    {
+      dimension: "group_fun",
       code: "work_the_room",
       weight: 1,
       note:
@@ -1128,13 +1212,7 @@ const REVERSE_SCAVENGER_HUNT: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "Nobody leaves the table, and everyone at it already has each other's business cards.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "day_material", fit: "native" },
@@ -1420,6 +1498,20 @@ const LETS_MAKE_A_DEAL: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "theatre",
+      weight: 0.5,
+      note:
+        "A compere, a running order and a crowd. It is staged, and the staging is the fun.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.9,
+      note:
+        "The audience is half the game — they buy their way in from the floor.",
+    },
+    {
+      dimension: "group_fun",
       code: "play_for_stakes",
       weight: 1,
       note:
@@ -1457,25 +1549,7 @@ const LETS_MAKE_A_DEAL: Game = {
     { dimension: "affinity", code: "late", weight: 0.3 },
   ],
 
-  occasions: [
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note:
-        "KEPT WHEN THE OTHER SEVENTEEN WERE LIFTED, and on a register " +
-        "argument rather than a headcount one — the whole argument is under " +
-        "THE ANNIVERSARY at the top of src/lib/games.ts. An anniversary is one evening, honoured, and " +
-        "occasion_shape calls it quieter than a birthday. This game puts a " +
-        "compere, a running order and a ticket market between the room and " +
-        "the two people the evening is for. That is true at forty guests as " +
-        "much as at two.",
-    },
-    {
-      occasion: "getaway",
-      fit: "forbidden",
-      note: "A getaway is three unscheduled days. A game show is the most scheduled thing in this pool.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "the_moment", fit: "native" },
@@ -1752,6 +1826,20 @@ const SECRET_GAME_CARDS: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "theatre",
+      weight: 0.8,
+      note:
+        "Every guest is playing a part all evening without saying they are.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.7,
+      note:
+        "Everyone has a card. It runs across the whole room rather than at one table.",
+    },
+    {
+      dimension: "group_fun",
       code: "keep_a_secret",
       weight: 1,
       note:
@@ -1802,13 +1890,7 @@ const SECRET_GAME_CARDS: Game = {
     { dimension: "affinity", code: "late", weight: 0.3 },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "There is no underneath at one table. Everyone is already in the only conversation.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -2156,6 +2238,13 @@ const THE_SECRET_AUCTION: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "group_games",
+      weight: 0.8,
+      note:
+        "The bidding only works with a room in it.",
+    },
+    {
+      dimension: "group_fun",
       code: "play_for_stakes",
       weight: 1,
       note:
@@ -2177,29 +2266,7 @@ const THE_SECRET_AUCTION: Game = {
     { dimension: "anti_preference", code: "forced_fun", weight: 0.3 },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "A long dinner ends with dessert at midnight, which is the opposite of an auction.",
-    },
-    {
-      occasion: "anniversary",
-      fit: "forbidden",
-      note:
-        "KEPT WHEN THE OTHER SEVENTEEN WERE LIFTED, and on a register " +
-        "argument rather than a headcount one — the whole argument is under " +
-        "THE ANNIVERSARY at the top of src/lib/games.ts. This is the pool's loudest ending and it ends a " +
-        "night on a bidding war. An anniversary is one evening, honoured, " +
-        "and the thing it ends on is the two people. A finale that replaces " +
-        "the honouring with a transaction is wrong here at any headcount.",
-    },
-    {
-      occasion: "getaway",
-      fit: "forbidden",
-      note: "The occasion that most resists being decorated. See db/009.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -2511,6 +2578,20 @@ const FISHBOWL: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "board_games",
+      weight: 0.9,
+      note:
+        "A bowl, slips, teams, three rounds and a score. It is a parlour game in the plainest sense.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.7,
+      note:
+        "Teams, and everybody is in one.",
+    },
     { dimension: "group_fun", code: "perform", weight: 0.9 },
     { dimension: "affinity", code: "wit", weight: 0.8 },
     { dimension: "group_fun", code: "compete", weight: 0.8 },
@@ -2769,6 +2850,13 @@ const IMPOSTER: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "board_games",
+      weight: 1,
+      note:
+        "A phone in the middle of a table and everybody round it. The closest thing in this pool to a boxed game.",
+    },
+    {
+      dimension: "group_fun",
       code: "keep_a_secret",
       weight: 1,
       note:
@@ -2812,16 +2900,15 @@ const IMPOSTER: Game = {
   // sourcing is 'recommended'.
   printedMatter: [],
   dependencies: [],
-  worlds: [
-    {
-      world: "westhampton-1976",
-      forbidden: true,
-      note:
-        "The house never mentions anything that did not exist in 1976 — no " +
-        "links, no apps, no confirming online. This is not a low score under " +
-        "this destination, it is a structural no.",
-    },
-  ],
+  // LIFTED 2026-09-06 with every other forbid in this file. It said:
+  // "The house never mentions anything that did not exist in 1976 — no links,
+  // no apps, no confirming online. This is not a low score under this
+  // destination, it is a structural no." Founder: "also forget this limiting
+  // rule that we have to be era specific and cannot have later tech." The room
+  // is a register, not a time machine — see EVERY FORBID LIFTED at the top of
+  // this file. The `never` line in Westhampton's VOICE block is a different
+  // rule wearing the same words and is untouched.
+  worlds: [],
 };
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -3223,6 +3310,13 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
   facets: [
     {
       dimension: "group_fun",
+      code: "board_games",
+      weight: 0.4,
+      note:
+        "A pad, a pencil and a tally kept by the house. Quiet and sitting down.",
+    },
+    {
+      dimension: "group_fun",
       code: "keep_a_secret",
       weight: 1,
       note: "The whole mechanism is a score nobody is allowed to see.",
@@ -3252,13 +3346,7 @@ const WESTHAMPTON_THE_HOUSEGUEST_LIST: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "It runs for three days. One evening cannot hold a secret long enough for it to be one.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -3559,6 +3647,13 @@ const VEGAS_THE_LATE_SUPPER: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "board_games",
+      weight: 0.8,
+      note:
+        "A table, a bank, everybody in for the same. Rules and a settlement.",
+    },
     { dimension: "group_fun", code: "play_for_stakes", weight: 1 },
     { dimension: "group_fun", code: "compete", weight: 0.9 },
     { dimension: "affinity", code: "late", weight: 0.7 },
@@ -3840,6 +3935,13 @@ const NEW_YORK_THE_LIST: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.6,
+      note:
+        "Every guest names one, and the reading at midnight is to the whole room.",
+    },
     { dimension: "affinity", code: "one_moment", weight: 1 },
     { dimension: "affinity", code: "ritual", weight: 0.9 },
     {
@@ -3859,13 +3961,7 @@ const NEW_YORK_THE_LIST: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "bridal",
-      fit: "forbidden",
-      note: "A list of things that will not be repeated, at a shower, reads as a warning.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -4153,13 +4249,7 @@ const NANTUCKET_WHAT_THE_WEATHER_WILL_DO: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "It settles tomorrow morning, and a dinner party does not have one.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -4405,6 +4495,13 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "theatre",
+      weight: 1,
+      note:
+        "Each person takes over somebody else's story and plays it wrong on purpose. That is the game.",
+    },
     { dimension: "group_fun", code: "perform", weight: 0.9 },
     { dimension: "group_fun", code: "long_dinner", weight: 0.9 },
     { dimension: "affinity", code: "wit", weight: 0.9 },
@@ -4684,6 +4781,20 @@ const COTE_DAZUR_ONE_OF_THEM_IS_LYING: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "theatre",
+      weight: 0.9,
+      note:
+        "One guest invents an entire afternoon and has to hold it under questioning.",
+    },
+    {
+      dimension: "group_fun",
+      code: "board_games",
+      weight: 0.6,
+      note:
+        "A pack with one marked card, dealt round a table.",
+    },
     { dimension: "group_fun", code: "keep_a_secret", weight: 1 },
     { dimension: "affinity", code: "wit", weight: 0.9 },
     { dimension: "group_fun", code: "perform", weight: 0.7 },
@@ -4955,13 +5066,7 @@ const PORTOFINO_THE_BOAT_COUNT: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "It is written before leaving and settled on the way back, and a dinner party does neither.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -5204,13 +5309,7 @@ const DOLOMITES_THE_TEMPERATURE_AT_THE_TOP: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "It is written at breakfast and settled at the top of a mountain.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -5456,6 +5555,13 @@ const BIG_SUR_THE_LONG_WAY: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "theatre",
+      weight: 0.4,
+      note:
+        "One story each, told the long way with the detours left in, and nobody may hurry it.",
+    },
     { dimension: "group_fun", code: "talk_deep", weight: 1 },
     { dimension: "affinity", code: "late", weight: 0.7 },
     { dimension: "group_fun", code: "long_dinner", weight: 0.7 },
@@ -5476,13 +5582,7 @@ const BIG_SUR_THE_LONG_WAY: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "birthday",
-      fit: "forbidden",
-      note: "An hour of long stories in a circle is the opposite of what a birthday room is doing.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "day_material", fit: "native" },
@@ -5717,6 +5817,13 @@ const TAHITI_THE_LAST_NIGHT: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.6,
+      note:
+        "It goes round the whole table and everybody has to say one.",
+    },
     { dimension: "group_fun", code: "long_dinner", weight: 1 },
     { dimension: "affinity", code: "ritual", weight: 0.7 },
     { dimension: "group_fun", code: "cook_together", weight: 0.6 },
@@ -5731,13 +5838,7 @@ const TAHITI_THE_LAST_NIGHT: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "The forfeit is cooking tomorrow, and a dinner party has no tomorrow to cook for.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "day_material", fit: "native" },
@@ -6011,6 +6112,13 @@ const ACAPULCO_THE_LAST_SONG: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.8,
+      note:
+        "Everybody names one and the room is what catches a repeat.",
+    },
     { dimension: "group_fun", code: "dance", weight: 0.9 },
     { dimension: "affinity", code: "late", weight: 0.9 },
     { dimension: "affinity", code: "one_moment", weight: 0.7 },
@@ -6311,6 +6419,13 @@ const AMALFI_THE_NUMBERS_AFTER_DARK: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "board_games",
+      weight: 1,
+      note:
+        "Cards, called numbers and beans for markers. A board game with the board handed out.",
+    },
     { dimension: "affinity", code: "ritual", weight: 1 },
     { dimension: "group_fun", code: "compete", weight: 0.7 },
     { dimension: "group_fun", code: "long_dinner", weight: 0.7 },
@@ -6589,6 +6704,13 @@ const AMALFI_THE_FIVE_PRIZES: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.7,
+      note:
+        "Opened one at a time in front of everybody. The room watching is the mechanism.",
+    },
     { dimension: "group_fun", code: "play_for_stakes", weight: 0.9 },
     { dimension: "affinity", code: "ritual", weight: 0.8 },
     { dimension: "affinity", code: "one_moment", weight: 0.7 },
@@ -6873,6 +6995,13 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "theatre",
+      weight: 1,
+      note:
+        "Doing somebody's voice from whatever is on, until the room guesses whose.",
+    },
     { dimension: "group_fun", code: "perform", weight: 1 },
     { dimension: "affinity", code: "wit", weight: 0.8 },
     { dimension: "group_fun", code: "compete", weight: 0.5 },
@@ -6892,13 +7021,7 @@ const ASPEN_SOMEBODYS_VOICE: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "It needs a screen everybody has been half-watching, which a dinner party does not have.",
-    },
-  ],
+  occasions: [],
   slots: [
     { slotCode: "game", fit: "native" },
     { slotCode: "day_material", fit: "native" },
@@ -7153,13 +7276,7 @@ const ASPEN_THE_NEXT_LINE: Game = {
     },
   ],
 
-  occasions: [
-    {
-      occasion: "dinner_party",
-      fit: "forbidden",
-      note: "It needs something playing that everybody is half-watching, which is not a dinner party.",
-    },
-  ],
+  occasions: [],
   slots: [
     {
       slotCode: "game",
@@ -7399,6 +7516,13 @@ const PALM_SPRINGS_THE_BEST_LINE: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.8,
+      note:
+        "Everyone repeats one and nobody may claim their own, so it needs the whole room to have been listening.",
+    },
     { dimension: "affinity", code: "wit", weight: 1 },
     { dimension: "affinity", code: "one_moment", weight: 0.7 },
     { dimension: "group_fun", code: "talk_deep", weight: 0.6 },
@@ -7658,6 +7782,13 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
   },
 
   facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.8,
+      note:
+        "One each, said to a face, all the way round before the light goes.",
+    },
     { dimension: "affinity", code: "one_moment", weight: 0.9 },
     { dimension: "affinity", code: "ritual", weight: 0.9 },
     { dimension: "group_fun", code: "toast", weight: 0.8 },
