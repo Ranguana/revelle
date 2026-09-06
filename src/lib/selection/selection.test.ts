@@ -35,7 +35,7 @@ import {
 } from "./score.ts";
 import { FIELDS } from "../quiz.ts";
 import { matrixRow } from "../matrix.ts";
-import { rowFromCells, type StructuralRow } from "./structure.ts";
+import { type StructuralRow } from "./structure.ts";
 import { buildVector } from "./vector.ts";
 import { composeVenue, statedAnswers, venueEligibility } from "./venue.ts";
 import {
@@ -3016,11 +3016,7 @@ test("a destination nobody has tagged is not eliminated by its own silence", () 
 
 /** Her two structural answers, as the quiz actually resolves them (db/037). */
 const ENDS_UNTIL_MORNING = facet("f-end-until-morning", "evening_ending", "until_morning");
-const ENDS_DISSOLVES = facet("f-end-dissolves", "evening_ending", "dissolves");
-const ENDS_CLEAN_STOP = facet("f-end-clean-stop", "evening_ending", "clean_stop");
 const STARTS_EVENING = facet("f-start-evening", "evening_start", "evening");
-const STARTS_MORNING = facet("f-start-morning", "evening_start", "morning");
-const STARTS_LATE = facet("f-start-late", "evening_start", "late");
 
 /**
  * One answer, on the QUIZ FIELD it was given on.
