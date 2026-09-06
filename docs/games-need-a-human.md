@@ -176,59 +176,83 @@ any money.
 **This was not decided here.** Inventing an answer would be a machine deciding
 what two of her games are for.
 
-### 9. Westhampton at a dinner party offers two games, not three
+### 9. Westhampton at a dinner party — ANSWERED, AND THE QUESTION IS GONE
 
-After the anniversary work, 161 of the 162 room × occasion pairs offer three
-or more games. This is the one that does not.
+**SETTLED 2026-09-06.** This section asked whether a third dinner-party game
+was worth writing for one room that offered two. It has been overtaken: she
+lifted every forbid in the catalogue, so the two the room offered became eight
+and the count went from 161 of 162 room × occasion pairs to **162 of 162**.
+
+The old table is kept below because it is the evidence, and because each line
+is a sentence somebody may want to argue for again:
 
 | | |
 |---|---|
-| art battle | forbidden at a dinner party — twenty minutes of painting is twenty minutes nobody is at the table |
-| reverse scavenger hunt | forbidden — nobody leaves the table |
-| secret game cards | forbidden — there is no underneath at one table |
-| the secret auction | forbidden — a long dinner ends with dessert at midnight |
-| the houseguest list, this room's own | forbidden — it runs for three days |
-| **imposter** | **forbidden at this room specifically** |
-| let's make a deal | eligible |
-| fishbowl | eligible |
+| art battle | was forbidden at a dinner party — twenty minutes of painting is twenty minutes nobody is at the table |
+| reverse scavenger hunt | was forbidden — nobody leaves the table |
+| secret game cards | was forbidden — there is no underneath at one table |
+| the secret auction | was forbidden — a long dinner ends with dessert at midnight |
+| the houseguest list, this room's own | was forbidden — it runs for three days |
+| **imposter** | **was forbidden at this room specifically** — no links, no apps in 1976 |
+| let's make a deal | eligible then and now |
+| fishbowl | eligible then and now |
 
-Every one of those forbids is argued on its own terms and none of them is a
-headcount claim, so none was lifted. **This is an authoring absence and not a
-property of the room** (CLAUDE.md rule 29): the room is one game short of a
-carousel at one occasion, and the fill is a game, not a lifted forbid.
+Founder, reading the second line back:
 
-**The question: is a third dinner-party game worth writing, or does this room
-offer two cards at a long dinner?**
+> *"regarding your game questions, lets clear something up - there is no way a
+> game shouldnt be offered bc somewhere the revelle is nobody leaves the table
+> - that shouldnt be a rule in the first place"*
+
+and on the last:
+
+> *"also forget this limiting rule that we have to be era specific and cannot
+> have later tech"*
+
+The paragraph that stood here — "every one of those forbids is argued on its
+own terms and none of them is a headcount claim, so none was lifted" — was
+true about the arguments and wrong about what they were allowed to do. A
+room's CHARACTER may not veto a game. What may still prune one is
+`minGuests`, `maxGuests`, the venue affordances and the requirement kinds:
+the constraint door, which is the venue rule (CLAUDE.md rule 2) read onto
+games. See EVERY FORBID LIFTED at the top of `src/lib/games.ts` and db/066.
 
 ---
 
-## D. THE ANNIVERSARY, WHERE THE HOUSE MADE THE CALL
+## D. THE ANNIVERSARY, WHERE THE HOUSE MADE THE CALL — AND WAS OVERRULED
 
 Her ruling was *"let every room have a game"*, and seventeen of the nineteen
 anniversary forbids came down on evidence: every note that carried a reason
 gave a HEADCOUNT reason, `guest_count_band` is a separate answer with `two` as
 one of eight values, and `minGuests` already enforces the thing those notes
-were protecting. The full argument and all nineteen original sentences are in
-the block comment at the top of `src/lib/games.ts`.
+were protecting.
 
-**Two were kept, and both are the house's reading rather than hers.** They are
-here because a kept forbid is as much a ruling as a lifted one.
+**Two were kept on a register argument rather than a headcount one, and both
+were the house's reading rather than hers. She lifted both the next day.**
 
-### 10. Let's Make a Deal at an anniversary
+> *"a twenty-five-person anniversary is just a party and entitled to a game
+> show. it is not a two person event unless the host says it is and then
+> obviously it is not the right game"*
 
-Kept. An anniversary is one evening, honoured, and `occasion_shape` calls it
-quieter than a birthday. This game puts a compere, a running order and a ticket
-market between the room and the two people the evening is for. That argument
-holds at forty guests as much as at two, which is why it survived when the
-headcount arguments did not.
+### 10. Let's Make a Deal at an anniversary — LIFTED
 
-### 11. The Secret Auction at an anniversary
+The house's argument, kept per rule 14: an anniversary is one evening,
+honoured, and `occasion_shape` calls it quieter than a birthday; this game
+puts a compere, a running order and a ticket market between the room and the
+two people the evening is for.
 
-Kept. It is the pool's loudest ending and it ends a night on a bidding war,
-where an anniversary ends on the two people. Same shape as above.
+**What beat it:** an occasion is not a headcount. `db/009` defines the
+anniversary as "one evening, honoured" and says nothing about two people. The
+forbid fired on the NAME of the occasion regardless of who was coming, which
+made it a second authority over a fact the guest band already owns — and the
+one of the two that could be wrong. Her second clause is the proof the
+mechanism was already right: when she does say two, `minGuests` refuses the
+game show on its own.
 
-**The question on both: is that right, or is a twenty-five-person anniversary
-just a party and entitled to a game show?**
+### 11. The Secret Auction at an anniversary — LIFTED
+
+Same argument, same answer. It is the pool's loudest ending and it ends a
+night on a bidding war where an anniversary ends on the two people — true, and
+not a reason it cannot be offered to twenty-five people.
 
 ---
 
@@ -252,6 +276,59 @@ worse than asking.
 
 **The question: does that sentence stay?** If it goes, the card can name it as
 a phone game the room plays and stop there, and nothing else on the page moves.
+
+---
+
+## F. WHAT THE CATALOGUE CANNOT ANSWER YET
+
+### 13. There is no karaoke game
+
+**Founder, 2026-09-06,** on what the play question should learn: *"we want to
+know if they like games, like karaoke, impromptu theater/gorilla theater,
+group games, board games... hate games."*
+
+Three of those are now tiles with real tags behind them — `theatre`,
+`board_games`, `group_games`. **Karaoke is the fourth and it has no game.**
+
+The tile resolves to `perform` — "Sing badly, on purpose" — which twelve games
+carry, so her tap is not wasted and it reaches the performance games: doing
+somebody's voice, telling a story wrong on purpose, One Of Them Is Lying,
+Fishbowl. A `karaoke` code was refused because it would have been a second
+owner of one fact (rule 21) reaching nothing at all (rule 16).
+
+But NOT ONE GAME IN THE CATALOGUE IS SINGING. That is an authoring absence and
+never a property of the pool (rule 29), and it is the kind of absence that
+looks handled: the question is asked, the answer resolves, and a host who says
+her people do karaoke is offered charades.
+
+**The question: is a singing game worth writing, and is it a house game or one
+room's?**
+
+---
+
+### 14. The camp's charades — she named the game and the house wrote all of it
+
+**Founder, 2026-09-06:** *"give charades to catskills."* Four words, and they
+are the whole of what is hers in `catskills-what-happened-today`. Every other
+room game quotes a sentence she wrote under `HER RULE, VERBATIM:`; this one
+declares `NO RULE OF HERS:` instead, and `games.test.ts` reads that heading so
+the difference cannot blur.
+
+Three decisions in it are the house's and each is arguable in one line:
+
+1. **Every slip is something that happened today, seen by at least two
+   people.** This is what makes it the camp's game and not charades with a
+   name on it — and it is also the constraint that makes it unplayable by a
+   room that was not together all afternoon.
+2. **Nothing is scored and nobody wins.** The guessed slips go in the ledger
+   and the ledger is never read again. The room's own voice says *"never write
+   a rule that somebody could fail"*, so a score looked like the one thing it
+   must not have — but a charades with no winner is a real departure from what
+   people expect when they hear the word.
+3. **There is no clock.** A turn ends when it is got or when the actor sits
+   down, whenever she likes.
+
+**The question: is a charades that nobody wins still the game she meant?**
 
 ---
 

@@ -4568,6 +4568,392 @@ const NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN: Game = {
  */
 
 /**
+ * THE CAMP — WHAT HAPPENED TODAY.
+ *
+ * Charades, dealt rather than drawn, about a day everybody was at.
+ *
+ * Founder, 2026-09-06: "give charades to catskills." The room lost its own
+ * game the same day — its rule turned on a ledger that stays shut, which is
+ * unresolvable as an instruction — and it keeps the shared house games either
+ * way, so no carousel is short. What it lacked was a game only it can claim
+ * (rule 30), and this is that.
+ *
+ * ── IT IS NOT FISHBOWL'S SECOND ROUND, AND THAT WAS THE TEST ────────
+ *
+ * CLAUDE.md's unratified section: for machine-generated content, check
+ * SINGLE SUBSTITUTION against what exists — same frame, one ingredient
+ * swapped — because that is what found eight real duplicates when a
+ * word-overlap sweep found nothing usable. Fishbowl's middle round is
+ * charades, so the check was run against it deliberately rather than after
+ * the fact. Five things differ, and they are mechanics rather than dressing:
+ *
+ *   1. ONE SLIP EACH, NOT SIX, and the bowl is never refilled. There are no
+ *      rounds and nothing is played twice.
+ *   2. WHAT IS ON THE SLIP. Fishbowl takes names and nouns from anywhere.
+ *      Every slip here is something that happened TODAY, to these people,
+ *      seen by at least two of them. It cannot be played by a room that was
+ *      not together all afternoon, which is the whole reason it belongs to
+ *      this room and to no other.
+ *   3. NOBODY ACTS HER OWN AND NOBODY LEARNS WHOSE SHE HAD. Fishbowl's
+ *      clue-giver draws blind from a shared bowl and whose slip it is never
+ *      matters. Here the slips are DEALT, the camp assigns, and you are
+ *      acting somebody else's noticing rather than your own joke.
+ *   4. NO TEAMS AND NO CLOCK. Fishbowl is two teams and a minute a turn. A
+ *      turn here ends when it is got or when the actor sits down, and she may
+ *      sit down whenever she likes.
+ *   5. NOTHING IS SCORED. Fishbowl's most slips wins. This one writes the
+ *      guessed slips into the ledger and puts the ledger away, which is the
+ *      room's own joke and its warmest fact at once.
+ *
+ * What the two share is the physical act — a written prompt acted in silence
+ * — and that is charades, which nobody owns. If a later pass finds these two
+ * scoring as near-duplicates on a deliverables measure, the measure is
+ * reading the act and not the game; the list above is the argument.
+ *
+ * ── THE ROOM ────────────────────────────────────────────────────────
+ *
+ * Its voice assigns rather than invites, reports a procedure straight and
+ * lets the affection show through the seriousness, and holds one line above
+ * everything else: the ledger is written carefully and never read again. This
+ * game is that sentence made playable. It also honours the two `never` lines
+ * that bear on it — nothing here can be failed, and nothing is a competition.
+ */
+const CATSKILLS_WHAT_HAPPENED_TODAY: Game = {
+  slug: "catskills-what-happened-today",
+  name: "What Happened Today",
+  description:
+    "Charades, except every slip is something that happened here this " +
+    "afternoon. Nobody acts her own and nobody finds out whose she had.",
+  howItWorks:
+    "One slip each, written before dinner. Something that actually happened " +
+    "today, to these people, that at least two of you saw. Six words at " +
+    "most. Folded once and into the tin by the door.\n\n" +
+    "The office deals them out after dinner, face down, one each. Nobody " +
+    "draws for herself. Anybody holding her own says so and swaps with the " +
+    "person on her left, once, and neither of them explains why. You will " +
+    "not find out whose slip you had and you do not ask afterwards.\n\n" +
+    "Then, in the order people are already sitting, one at a time, you stand " +
+    "up and act it. No words and no mouthing. Two more rules, and they are " +
+    "the ones that stop it being over in a single gesture: you may not point " +
+    "at the person it happened to, and you may not pick up anything that is " +
+    "on the table. Everybody guesses at once, out loud, over each other.\n\n" +
+    "THERE IS NO CLOCK. A turn ends when somebody says it near enough that " +
+    "you nod, or when you sit down, and you may sit down whenever you like " +
+    "and nobody argues about it. Then the next person stands up.\n\n" +
+    "Nobody wins. There are no teams and nothing is counted. Every slip that " +
+    "got guessed is read out at the end and written into the ledger, in the " +
+    "order it was acted, with the name of whoever acted it. Then the ledger " +
+    "goes back in the drawer and is never read again.\n\n" +
+    "The last slip is the office's own and it is written before anybody " +
+    "arrives: the bell, rung once, just to test it. It is the first thing " +
+    "that happened today and every single person saw it. It gets guessed in " +
+    "about four seconds, which is how the game ENDS rather than merely " +
+    "stops.\n\n" +
+    "The reason it works is that nothing in the tin is trivia. The room is " +
+    "not being tested on anything — it is being handed back an afternoon it " +
+    "has just had, in the wrong person's handwriting, and the good part is " +
+    "how differently two people noticed the same twenty minutes.",
+  materials:
+    "THE HOUSE PRINTS one sheet a head, perforated across the middle: the " +
+    "rules at the head and one slip to tear off underneath. YOU SUPPLY a " +
+    "pencil each, a tin or a bowl to stand by the door from the afternoon " +
+    "on, and a notebook for the ledger.",
+
+  shape: "scheduled",
+  sourcing: "provided",
+  durationMinutes: 25,
+  durationMaxMinutes: 40,
+  // Under five, the handwriting gives every slip away and the deal is
+  // pointless. Above twenty, a person waits forty minutes for one turn.
+  minGuests: 5,
+  maxGuests: 20,
+
+  scoring:
+    "Nothing is scored and nobody wins. Every slip that was guessed goes " +
+    "into the ledger with the name of whoever acted it, in order, and the " +
+    "ledger is put away and never read again.",
+
+  sourceNote:
+    "Founder ruling, 2026-09-06: \"give charades to catskills.\" Charades is " +
+    "a folk game with no owner, so the house may print the rules in full. " +
+    "The form is nobody's; everything below it — the dealt slips, the day " +
+    "as the only subject, the missing clock, the ledger — is the house's, " +
+    "authored to this room and separable from her instruction.",
+  notes:
+    "NO RULE OF HERS: the founder assigned this room a game — \"give charades " +
+    "to catskills\" — and did not write the rule, so there is no sentence to " +
+    "quote and nothing below is hers except the choice of game. That heading " +
+    "is fixed and games.test.ts reads it: a room game either quotes her " +
+    "sentence verbatim or says in these words that there is not one, because " +
+    "the difference between what she wrote and what the house added is the " +
+    "one thing a later edit must not be able to blur.\n\n" +
+    "THE ROOM HAD NO `piece: \"game_rule\"` TO WRITE FROM, which is why this " +
+    "one is not marked ROOM_VOICE like the other nineteen. Its own game was " +
+    "refused on 2026-09-06 (db/065) because the rule turned on reading a " +
+    "ledger the room says is never read. This is a replacement for it and " +
+    "not a rewrite of it: nothing of the old rule survives here except the " +
+    "ledger, which was always the room's and not that game's.\n\n" +
+    "THE SIX-WORD LIMIT IS THE HOUSE'S AND IS THE LOAD-BEARING NUMBER. " +
+    "Longer and the slip becomes a scene with three parts, which cannot be " +
+    "acted and cannot be guessed; shorter and everything reads as one of " +
+    "four things that happen at every party. Six is what makes it a moment " +
+    "rather than a category.\n\n" +
+    "TWO WITNESSES IS THE OTHER ONE, and it is the fix for the only way this " +
+    "game dies: a slip about something only the writer and one other person " +
+    "saw is unguessable and the room goes quiet. Said out loud at the top, " +
+    "and it is also the contingency.\n\n" +
+    "NOT SCORED, ON PURPOSE AND NOT BY OVERSIGHT. This room's voice carries " +
+    "\"never write a rule that somebody could fail\", and a charades score " +
+    "is exactly such a rule wearing a party hat. The ledger is the joke that " +
+    "replaces it and it is the room's own: written carefully, never read.",
+
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You write a slip and act one like everybody else. The two jobs that " +
+      "are only yours are dealing the tin out and going last with the bell, " +
+      "and neither takes you out of the game.",
+    steps: [
+      {
+        step: "the_tin_by_the_door",
+        phase: "before",
+        instruction: "Put the tin by the door in the afternoon, with the pencils beside it.",
+        detail:
+          "It has to be standing there for hours before anybody writes " +
+          "anything. A tin produced at nine o'clock asks the room to " +
+          "remember on demand; a tin that has been by the door since two " +
+          "gets filled by people on their way past.",
+        supplyItem: "A tin",
+        printedPiece: "the_sheet",
+      },
+      {
+        step: "write_the_last_slip_first",
+        phase: "before",
+        instruction: "Write the office's own slip now and keep it out of the tin: the bell, rung once to test it.",
+        detail:
+          "This is the ending and it has to exist before the game starts. " +
+          "Everybody saw it, so it is guessed instantly, and a game that " +
+          "finishes on a laugh everybody is already in has ended rather than " +
+          "run out.",
+      },
+      {
+        step: "deal_them_out",
+        phase: "opening",
+        instruction: "Deal the tin round face down, one each. Nobody takes her own.",
+        detail:
+          "Anybody who gets her own says so and swaps with her left, once. " +
+          "Neither of them explains why, and nobody asks.",
+        minutes: 4,
+        supplyItem: "A tin",
+      },
+      {
+        step: "say_the_two_rules",
+        phase: "opening",
+        instruction: "Say the two rules out loud, and say that a slip needed two witnesses.",
+        detail:
+          "No pointing at the person it happened to, and nothing picked up " +
+          "off the table. Both exist because either one ends a turn in a " +
+          "single gesture.",
+        say: "One each, and none of them is yours. No talking, no pointing at whoever it happened to, and do not pick anything up. There is no clock and nobody is counting.",
+        minutes: 2,
+        printedPiece: "the_sheet",
+      },
+      {
+        step: "round_the_room",
+        phase: "playing",
+        instruction: "Stand up in the order people are sitting, one at a time, and let the room shout.",
+        detail:
+          "A turn ends when somebody gets it near enough that the actor " +
+          "nods, or when the actor sits down. She may sit down whenever she " +
+          "likes and that is not a forfeit, because there is nothing to " +
+          "forfeit.",
+        minutes: 20,
+      },
+      {
+        step: "the_bell_goes_last",
+        phase: "playing",
+        instruction: "When it has been all the way round, stand up and act the bell.",
+        detail:
+          "Yours is the only slip nobody wrote and the only one everybody " +
+          "already knows. Do it badly. It will be got before you have " +
+          "finished.",
+        minutes: 2,
+      },
+      {
+        step: "write_the_ledger",
+        phase: "deciding",
+        instruction: "Read the guessed slips back out and write them in the ledger in order, with who acted each.",
+        detail:
+          "This is the whole of the scoring and it settles nothing. Read " +
+          "them straight, in the order they were acted, and do not rank " +
+          "them or say which was best.",
+        minutes: 5,
+        supplyItem: "The ledger",
+      },
+      {
+        step: "put_the_ledger_away",
+        phase: "ending",
+        instruction: "Close the ledger, put it back in the drawer, and say that it is never read again.",
+        detail:
+          "Say it plainly and do not make a joke of it afterwards. The " +
+          "sentence is the end of the game and it is also the reason " +
+          "everybody wrote something true down.",
+        say: "That is all of them. It goes in the drawer and nobody reads it again.",
+        minutes: 2,
+        supplyItem: "The ledger",
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who will not stand up deals the tin and rules on whether " +
+          "a guess was near enough. Both jobs are real, both are argued " +
+          "over, and neither requires getting out of a chair.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under five the handwriting gives every slip away and the deal " +
+          "means nothing. Have two slips each and ask whoever is dealing to " +
+          "copy them all out in one hand before they go back in the tin.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above twenty somebody waits forty minutes for one turn. Split the " +
+          "slips into two tins and run both ends of the table at once. The " +
+          "ledger is still one ledger and it is read out once.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "It runs long when the guessing is good, which is not a problem. " +
+          "Take the slips that are left out of the tin and go straight to " +
+          "the bell. Never shorten a turn — the turns are the game.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Somebody who has played writes something small and exact instead " +
+          "of the obvious thing, which is what the game wanted from " +
+          "everybody. Say the six words out loud again and let her.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "Two turns in silence means the slips are too private — somebody " +
+          "wrote a thing only she and one other person saw. Say the two " +
+          "witnesses rule again and let anybody swap her slip once.",
+      },
+    ],
+  },
+
+  facets: [
+    {
+      dimension: "group_fun",
+      code: "theatre",
+      weight: 1,
+      note: "Standing up and playing somebody else's afternoon, in silence, for a room that was there.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.9,
+      note: "Everybody writes, everybody acts, everybody guesses. There is no way to sit it out except by choosing the dealing job.",
+    },
+    { dimension: "group_fun", code: "perform", weight: 0.6 },
+    {
+      dimension: "group_fun",
+      code: "keep_a_secret",
+      weight: 0.5,
+      note: "Whose slip you had is never said, before or after.",
+    },
+    {
+      dimension: "group_fun",
+      code: "compete",
+      weight: -0.4,
+      note: "A NEGATIVE ON PURPOSE, and it is the sign arithmetic in score.ts working: nothing is counted and nobody wins, so a room that says it gets genuinely competitive should be offered something else.",
+    },
+    { dimension: "affinity", code: "one_moment", weight: 0.7 },
+    { dimension: "affinity", code: "wit", weight: 0.5 },
+    {
+      dimension: "anti_preference",
+      code: "forced_fun",
+      weight: 0.7,
+      note: "Everybody stands up in turn. A host who vetoes forced participation should not be offered this, and the positive weight is what makes it disappear for her.",
+    },
+    {
+      dimension: "anti_preference",
+      code: "kids_party",
+      weight: 0.4,
+      note: "It is charades, and a host is entitled to know that before it is put in front of her.",
+    },
+  ],
+
+  occasions: [],
+  slots: [
+    {
+      slotCode: "game",
+      fit: "native",
+      note: "db/061 collapsed the five game beats into one. This is the beat now, and she chooses among what the room offers.",
+    },
+    { slotCode: "day_material", fit: "native" },
+  ],
+
+  supplies: [
+    {
+      item: "A tin",
+      detail:
+        "Or a bowl. It stands by the door from the afternoon on, with the pencils beside it, and it is filled by people going past.",
+      source: "on_hand",
+      quantity: 1,
+    },
+    {
+      item: "A pencil each",
+      source: "on_hand",
+      perGuest: true,
+    },
+    {
+      item: "The ledger",
+      detail:
+        "Any notebook, and the plainer the better. It is written in carefully and never read again.",
+      source: "on_hand",
+      quantity: 1,
+    },
+  ],
+  requirements: [
+    {
+      requirement: "floor_space",
+      note: "Somewhere in front of the table to stand up and be seen from every seat.",
+    },
+    { requirement: "printing" },
+  ],
+  printedMatter: [
+    {
+      piece: "the_sheet",
+      label: "The rules, and your slip",
+      description:
+        "One sheet a head, perforated across the middle. The rules sit at " +
+        "the head of it and stay wherever she was sitting, so nobody has to " +
+        "ask twice. The slip tears off underneath, takes six words and a " +
+        "fold, and goes in the tin by the door. Nothing is printed on the " +
+        "back of the slip, so one held up to a lamp does not read through.",
+      voicePiece: "game_rule",
+      perGuest: true,
+    },
+  ],
+  dependencies: [],
+  worlds: [
+    {
+      world: "catskills",
+      native: true,
+      note: "Written in this room's voice. A whitelist, per rule 23.",
+    },
+  ],
+};
+
+/**
  * CÔTE D'AZUR — ONE OF THEM IS LYING.
  *
  * The story game whose engine is a card drawn in secret. Her second sentence
@@ -7868,6 +8254,9 @@ export const GAMES = {
   "new-york-the-list": NEW_YORK_THE_LIST,
   "nantucket-what-the-weather-will-do": NANTUCKET_WHAT_THE_WEATHER_WILL_DO,
   "new-orleans-nobody-finishes-their-own": NEW_ORLEANS_NOBODY_FINISHES_THEIR_OWN,
+  // The one room game with no `piece: "game_rule"` behind it. Founder, 2026-09-06:
+  // "give charades to catskills." Placed in destination order like the rest.
+  "catskills-what-happened-today": CATSKILLS_WHAT_HAPPENED_TODAY,
   "cote-dazur-one-of-them-is-lying": COTE_DAZUR_ONE_OF_THEM_IS_LYING,
   "portofino-the-boat-count": PORTOFINO_THE_BOAT_COUNT,
   "dolomites-the-temperature-at-the-top": DOLOMITES_THE_TEMPERATURE_AT_THE_TOP,

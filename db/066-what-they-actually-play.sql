@@ -116,6 +116,26 @@ insert into facet (dimension_code, code, label, description, provenance, notes) 
 on conflict (dimension_code, code) do nothing;
 
 
+-- KARAOKE, ON THE ROW THAT ALREADY MEANT IT. The tile keeps the code
+-- `perform` and gains a hint that says the word she used. db/002 copies each
+-- option's `hint` into `facet.description` verbatim "so that
+-- scripts/check-facets.mjs reports ZERO drift on a clean tree — a drift check
+-- with expected noise in it is a drift check nobody reads", so the row moves
+-- with the tile. The comma also goes, which is a rewording and not a meaning.
+
+update facet
+   set label       = 'Sing badly, on purpose',
+       description = 'Karaoke, and nobody is embarrassed',
+       notes       = 'Reworded 2026-09-06 to name karaoke, which the founder '
+                     'asked for by name. A LABEL CHANGE AND NOT A NEW TERM: '
+                     'twelve games carry this tag and a `karaoke` code would '
+                     'have been a second owner of one fact reaching none of '
+                     'them. What the catalogue does not have is a karaoke '
+                     'game; docs/games-need-a-human.md carries that as an '
+                     'authoring absence.'
+ where dimension_code = 'group_fun' and code = 'perform';
+
+
 -- ── 2 · THE ANSWERS, AS IDENTITIES ───────────────────────────────────
 --
 -- db/037's registry, and its rule: REGISTER THE OPTION FIRST, THEN BRIDGE IT.
@@ -405,12 +425,17 @@ $$;
 delete from game_occasion where fit = 'forbidden';
 
 -- A world scope may carry a native claim or a weight as well as the veto, so
--- the veto is cleared rather than the row dropped, and only a row left saying
--- NOTHING is removed. Today that is one row and both statements are correct
--- for it; written generally because the next one may not be.
+-- the row is not simply dropped. TWO STATEMENTS, IN THIS ORDER, and the order
+-- is the whole of it: a scope whose only content was the veto says NOTHING
+-- once the veto is lifted, and "no row" already means eligible here at neutral
+-- weight — so leaving it would be a row that reads as a claim and is not one
+-- (rule 23). Selecting those while they are still marked is exact; clearing
+-- first and then hunting for empty rows would also catch scopes that were
+-- always empty and are somebody else's to explain.
+delete from game_world where forbidden and not native and affinity = 0;
+
+-- Anything that also carried a claim or a weight keeps it and loses the veto.
 update game_world set forbidden = false where forbidden;
-delete from game_world
- where not forbidden and not native and affinity = 0;
 
 do $$
 declare v_occ integer; v_world integer;

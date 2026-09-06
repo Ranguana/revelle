@@ -139,7 +139,20 @@ export function randomAnswers(random: () => number = Math.random): QuizAnswers {
         const taken: string[] = [];
         while (taken.length < want && pool.length > 0) {
           const index = Math.floor(random() * pool.length) % pool.length;
-          taken.push(pool.splice(index, 1)[0].code);
+          const [option] = pool.splice(index, 1);
+          // QuizOption.exclusive — "they hate games" is the whole answer or it
+          // is not in it, and `stepErrors` refuses the combination. A roll that
+          // reached one and kept going produced a host the quiz would have
+          // turned away, which is the one thing this function promises not to
+          // do. Taken FIRST rather than filtered out, because a rolled host who
+          // can never state a refusal is a bench that cannot drive the path the
+          // refusal opens.
+          if (option.exclusive === true) {
+            taken.length = 0;
+            taken.push(option.code);
+            break;
+          }
+          taken.push(option.code);
         }
         answers[field.id] = taken;
         break;

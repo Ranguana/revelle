@@ -590,7 +590,8 @@ test("ONE PRINTED PIECE PER GAME, counted in both directions", () => {
    * schema enforces, not the authoring gap CLAUDE.md rule 29 is about.
    */
   const provided = ALL_GAMES.filter((g) => g.sourcing === "provided");
-  assert.equal(provided.length, 23, `${provided.length} provided games rather than 23`);
+  // 23 until 2026-09-06, when the founder gave charades to the camp room.
+  assert.equal(provided.length, 24, `${provided.length} provided games rather than 24`);
 
   for (const game of provided) {
     assert.equal(
@@ -643,14 +644,30 @@ const GAME_RULE_PIECES = new Map<string, string[]>(
   ])
 );
 
+/**
+ * A room game whose room writes no rule — the founder assigning a game rather
+ * than writing one. DECLARED, never inferred: the game says so under a fixed
+ * heading in `notes`, and both tests below read that heading rather than
+ * working the exception out from a missing quote. Rule 15's shape — an
+ * exception a checker derives is an exception that silently widens.
+ */
+const NO_RULE_OF_HERS = /^NO RULE OF HERS: /m;
+
 test("EVERY GAME_RULE THE FOUNDER WROTE IS A ROW, COUNTED IN BOTH DIRECTIONS", () => {
   // Rule 24, and the reason this test is a count and not a spot check: a
   // matcher that found nineteen and a matcher that found twenty-one read
-  // identically from outside. Both numbers are asserted.
+  // identically from outside. Every number is asserted.
+  //
+  // THE INVARIANT WIDENED ON 2026-09-06 AND IS STILL A COUNT. It used to be
+  // "one native game per game_rule piece, in both directions", which was
+  // exactly true while every room game came from a sentence she wrote. Then
+  // she said "give charades to catskills" — a room that writes no game_rule —
+  // and the equality became false in one direction only. So the two halves are
+  // now counted separately: every rule she wrote still has a game, and a game
+  // native to a room that wrote none must DECLARE that it is one.
   const written = [...GAME_RULE_PIECES.values()].flat();
-  const scoped = ALL_GAMES.flatMap((g) =>
-    g.worlds.filter((w) => w.native === true).map(() => g)
-  );
+  const scoped = ALL_GAMES.filter((g) => g.worlds.some((w) => w.native === true));
+  const assigned = scoped.filter((g) => NO_RULE_OF_HERS.test(g.notes ?? ""));
 
   assert.equal(
     written.length,
@@ -661,18 +678,33 @@ test("EVERY GAME_RULE THE FOUNDER WROTE IS A ROW, COUNTED IN BOTH DIRECTIONS", (
   );
   assert.equal(
     scoped.length,
-    17,
-    `${scoped.length} games claim a native destination rather than 17`
+    18,
+    `${scoped.length} games claim a native destination rather than 18`
+  );
+  assert.equal(
+    assigned.length,
+    1,
+    `${assigned.length} room games declare NO RULE OF HERS rather than 1. ` +
+      `A game native to a room that writes no rule must say so in those ` +
+      `words; a game that quietly stops quoting her must not pass as one.`
+  );
+  assert.equal(
+    scoped.length - assigned.length,
+    written.length,
+    `${scoped.length - assigned.length} room games are written from a rule ` +
+      `and ${written.length} rules exist.`
   );
 
   for (const [key, rules] of GAME_RULE_PIECES) {
     const mine = ALL_GAMES.filter((g) => g.worlds.some((w) => w.world === key && w.native === true));
+    const fromARule = mine.filter((g) => !NO_RULE_OF_HERS.test(g.notes ?? ""));
     assert.equal(
-      mine.length,
+      fromARule.length,
       rules.length,
-      `${key} writes ${rules.length} game_rule piece(s) and has ${mine.length} ` +
-        `game(s) native to it. A room with no game row has an AUTHORING ` +
-        `ABSENCE and never a property (CLAUDE.md rule 29).`
+      `${key} writes ${rules.length} game_rule piece(s) and has ` +
+        `${fromARule.length} game(s) written from one. A room with no game ` +
+        `row has an AUTHORING ABSENCE and never a property (CLAUDE.md rule ` +
+        `29).`
     );
   }
 });
@@ -684,11 +716,22 @@ test("HER SENTENCE SURVIVES VERBATIM, character for character", () => {
   // compared to the room's own voice piece, not to another copy of itself.
   const quoted = /HER RULE, VERBATIM: "([^"]+)"/;
   let checked = 0;
+  let assigned = 0;
 
   each((game) => {
     const native = game.worlds.filter((w) => w.native === true);
     if (native.length === 0) return;
     assert.equal(native.length, 1, `${game.slug} claims ${native.length} native rooms`);
+
+    // A game she ASSIGNED rather than wrote has no sentence to quote, and it
+    // says so under its own fixed heading. Read, never inferred: without the
+    // declaration a game that quietly dropped her quote would pass as one.
+    if (NO_RULE_OF_HERS.test(game.notes ?? "")) {
+      const card = game.printedMatter.find((p) => p.voicePiece === "game_rule");
+      assert.ok(card, `${game.slug} prints no game_rule card`);
+      assigned += 1;
+      return;
+    }
 
     const found = quoted.exec(game.notes ?? "");
     assert.ok(
@@ -714,7 +757,8 @@ test("HER SENTENCE SURVIVES VERBATIM, character for character", () => {
     checked += 1;
   });
 
-  assert.equal(checked, 17, `${checked} room games checked rather than 17`);
+  assert.equal(checked, 17, `${checked} room games quoted rather than 17`);
+  assert.equal(assigned, 1, `${assigned} room games assigned rather than 1`);
 });
 
 test("a room game is written for one room and says so with native, not affinity", () => {

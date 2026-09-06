@@ -1865,6 +1865,142 @@ test("an exclusion she did not state removes nothing", () => {
   assert.ok(result.candidates[0].picks.some((p) => p.slot.slotCode === "the_menu"));
 });
 
+/* ── THE GAME BEAT, AND THE HOST WHO SAYS HER PEOPLE HATE THEM ───────
+ *
+ * The menu pair above proves the third gate on `no_food`. This proves it on
+ * `no_games`, which is a different shape and is the one db/061 made sharp: the
+ * game beat is REQUIRED at every occasion and OFFERS THREE CANDIDATES, so a
+ * host who is not heard is handed three cards for an evening she said has no
+ * game in it. `hates_games` on the play question and `play_appetite = 'none'`
+ * both carry the code; db/066 and db/016 are the two bridges.
+ *
+ * The plan differs from MENU_RULES in one column, which is the point: the same
+ * `game` rule with `excludedBy` set, as db/014 sets it on slot_kind.
+ */
+const GAME_RULES: SlotRule[] = [
+  rule({
+    slotCode: "the_menu",
+    label: "The menu",
+    section: "details",
+    pool: "menu",
+    required: true,
+    position: 10,
+    excludedBy: "no_food",
+  }),
+  rule({
+    slotCode: "game",
+    label: "The fun",
+    required: true,
+    position: 20,
+    offerCount: 3,
+    excludedBy: "no_games",
+  }),
+];
+
+function gameInput(exclusions: string[]): SelectionInput {
+  return inputFor(
+    {
+      destinations: [destination("d1", "ONE", { [COASTAL.id]: 0.9 })],
+      ingredients: [
+        ingredient("m1", "menu", "Oysters, then cold roast chicken", {
+          [COASTAL.id]: 0.9,
+        }, { slots: [{ slotCode: "the_menu", fit: "native", note: null }] }),
+        ingredient("g1", "game", "The Art Battle", { [COASTAL.id]: 0.8 }, {
+          shape: "scheduled",
+          slots: [{ slotCode: "game", fit: "native", note: null }],
+        }),
+        ingredient("g2", "game", "The Late Supper", { [COASTAL.id]: 0.7 }, {
+          shape: "scheduled",
+          slots: [{ slotCode: "game", fit: "native", note: null }],
+        }),
+        ingredient("g3", "game", "The Last Song", { [COASTAL.id]: 0.6 }, {
+          shape: "finale",
+          slots: [{ slotCode: "game", fit: "native", note: null }],
+        }),
+      ],
+      slotRules: GAME_RULES,
+      shape: DINNER,
+    },
+    { occasion: "dinner_party", exclusions }
+  );
+}
+
+test("she wants games: the beat offers her three, which is db/061's carousel", () => {
+  const candidate = runSelection(gameInput([]), { seed: 5 }).candidates[0];
+  assert.equal(
+    candidate.picks.filter((p) => p.slot.slotCode === "game").length,
+    3,
+    "the carousel is what a host who said nothing about games receives"
+  );
+});
+
+test("SHE SAYS HER PEOPLE HATE GAMES: NO CARD, NO GAP, NO SENTENCE", () => {
+  const result = runSelection(gameInput(["no_games"]), { seed: 5 });
+  const candidate = result.candidates[0];
+
+  assert.equal(
+    candidate.picks.filter((p) => p.slot.slotCode === "game").length,
+    0,
+    "she was dealt a game she said her people hate"
+  );
+  assert.equal(
+    result.gaps.filter((g) => g.slotCode === "game").length,
+    0,
+    "NOT A WORK ORDER. Nobody can author their way out of 'she does not want " +
+      "games', and a gap list with rows nobody can act on stops being read."
+  );
+  assert.ok(
+    !candidate.dropped.some((d) => d.slot.slotCode === "game"),
+    "nothing was filled and then discarded — the beat was never in the plan"
+  );
+
+  const excluded = result.excluded.find((s) => s.slotCode === "game");
+  assert.ok(excluded, "the curator can still see that she said so");
+  assert.equal(excluded!.exclusion, "no_games");
+  assert.equal(
+    excluded!.requiredByOccasion,
+    true,
+    "db/061 made this beat required at every occasion, and her answer still wins"
+  );
+});
+
+test("A GAMELESS REVELLE IS A REVELLE, AND SAYS NOTHING ABOUT A GAME", () => {
+  // CLAUDE.md rule 29's neighbourhood: an absence SHE CHOSE is not an
+  // authoring gap, and the page must not read as though something failed. To
+  // the member an excluded slot and an unfillable one are identical and
+  // deliberately so — no heading, no empty state, no "no game selected". What
+  // is left is the rest of her evening, unchanged.
+  const withGames = runSelection(gameInput([]), { seed: 5 }).candidates[0];
+  const without = runSelection(gameInput(["no_games"]), { seed: 5 }).candidates[0];
+
+  assert.ok(without.fingerprint, "a Revelle with no game is still issuable");
+  assert.equal(without.blocked, null);
+  assert.deepEqual(
+    without.picks.map((p) => p.ingredient.name),
+    withGames.picks
+      .filter((p) => p.slot.slotCode !== "game")
+      .map((p) => p.ingredient.name),
+    "everything that is not the game is exactly what it was"
+  );
+
+  const view = memberRevelle(without);
+  assert.ok(view.pieces.length > 0, "and she still receives a Revelle");
+  assert.ok(
+    !view.pieces.some((p) => p.heading === "The fun"),
+    "the section is absent rather than empty"
+  );
+  assert.ok(
+    !view.sections.some((s) => s.pieces.length === 0),
+    "no section renders with nothing in it"
+  );
+  const rendered = JSON.stringify(view).toLowerCase();
+  assert.ok(!rendered.includes("no_games"), "the code never reaches her");
+  assert.ok(
+    !rendered.includes("the fun"),
+    "she is never told a game was planned and removed"
+  );
+});
+
 // ═════════════════════════════════════════════════════════════════════
 // THREE PRODUCT DECISIONS
 //
