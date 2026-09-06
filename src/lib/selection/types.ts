@@ -998,6 +998,17 @@ export type EngineOptions = {
   /** Multiplicative fuzz on rank. Published guidance is 1.5–3. */
   ditherEpsilon: number;
   /**
+   * THE STRUCTURAL EPSILON — how much nearer one room has to be before the
+   * matrix is allowed to overturn the aesthetic order. See DEFAULT_OPTIONS for
+   * where the number comes from; it is not a taste.
+   *
+   * A difference of ε OR LESS is a tie, and a tie is settled by the aesthetic
+   * score with its issuance discount already taken. Anything wider is
+   * structure's to decide. Without it a quarter-point near miss reads as a
+   * verdict, which is the one thing the near band was priced not to be.
+   */
+  structureEpsilon: number;
+  /**
    * THE VOICE BAR — the tier, in one number. Cosine, −1..1. See tone.ts.
    *
    * A destination whose tone match falls below this is OUT OF STAGE 2, at any
@@ -1048,6 +1059,36 @@ export const DEFAULT_OPTIONS: EngineOptions = {
   softNegativeRatio: 0.2,
   inheritedFacetWeight: 0.35,
   ditherEpsilon: 2,
+  /**
+   * 0.25, AND IT IS READ OFF THE ARITHMETIC ALREADY IN structure.ts.
+   *
+   * That file prices a cell at FULL = 1 and a NEAR miss at 0.25, and states
+   * the intent in one sentence: "four near misses cost what one real mismatch
+   * costs, so nearness can order two rooms that are otherwise tied and cannot
+   * overturn a column she actually agreed with." This constant is that
+   * sentence applied one layer up, where the overturning actually happens —
+   * without it, the sentence is true of the distance and false of the ranking.
+   *
+   * THE REACHABLE DISTANCES, over the two columns a host feeds today
+   * (`ending`, `starts`), every one of them a sum of 0, 0.25 and 1:
+   *
+   *   0      0.25      1      1.25      2
+   *      ↑         ↑       ↑        ↑
+   *    0.25      0.75    0.25     0.75      ← the gaps between neighbours
+   *
+   * A gap of 0.25 is ONE near miss and nothing else — today the single
+   * `starts.late → evening` cell. A gap of 0.75 or more cannot be reached
+   * without a column she actually disagreed on. So the band is closed at the
+   * near miss (a difference of exactly 0.25 is a tie) and open above it, and
+   * the two cases the founder named come out right: a 0.25 near-miss does not
+   * look like a verdict, and a full mismatch does.
+   *
+   * IT DOES NOT MOVE AS COLUMNS ARE FED. A near miss is 0.25 whether two
+   * columns are fed or nine, so this number stays put while `fedBy` fills in.
+   * What changes is HOW MANY ROOMS SHARE A BAND, and that is the number to
+   * watch — a band holding every survivor means structure decided nothing.
+   */
+  structureEpsilon: 0.25,
   /**
    * 0.20, AND HERE IS WHERE IT CAME FROM.
    *

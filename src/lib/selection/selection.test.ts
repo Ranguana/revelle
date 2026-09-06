@@ -34,6 +34,8 @@ import {
   similarityDiscount,
 } from "./score.ts";
 import { FIELDS } from "../quiz.ts";
+import { matrixRow } from "../matrix.ts";
+import { rowFromCells, type StructuralRow } from "./structure.ts";
 import { buildVector } from "./vector.ts";
 import { composeVenue, statedAnswers, venueEligibility } from "./venue.ts";
 import {
@@ -92,6 +94,17 @@ const GUESTS = facet("f-guests", "guest_count", "from_9_to_12");
 const MADE = facet("f-made", "making", "made_by_hand");
 
 const OPTIONS = withDefaults({ seed: 42, now: new Date("2026-08-15T00:00:00Z") });
+
+/**
+ * A HOST WHO STATED NO STRUCTURAL COLUMN — which is what most of these tests
+ * are, because most of them are about something else.
+ *
+ * It is passed explicitly rather than defaulted inside `chooseDestinations`,
+ * and that is the point of the parameter being required: a test that means "the
+ * matrix has nothing to say here" says so, and a test that forgot to think
+ * about the matrix cannot compile. See the parameter's own note.
+ */
+const NO_STRUCTURE: StructuralRow = {};
 
 /**
  * `weight` defaults to 1, which is what every answer to an unordered question
@@ -644,7 +657,8 @@ test("a dealbreaker eliminates, and no score is high enough to survive it", () =
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.deepEqual(
@@ -665,7 +679,8 @@ test("a destination that REPUDIATES a dealbreaker is not eliminated by it", () =
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.equal(result.shortlist.length, 1);
@@ -683,7 +698,8 @@ test("dealbreakers eliminating everything is an impasse, not a relaxation", () =
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.equal(result.shortlist.length, 0);
@@ -2728,7 +2744,8 @@ test("the tone filter cuts the shortlist, and cuts the aesthetic winner", () => 
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.deepEqual(
@@ -2769,7 +2786,8 @@ test("the aesthetic ranks WITHIN the survivors and is never averaged with voice"
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.equal(result.shortlist.length, 2, "both cleared the voice bar");
@@ -2826,7 +2844,8 @@ test("the dither never resurrects a destination the tone filter killed", () => {
       FACETS,
       OPTIONS,
       rng(seed),
-      OPTIONS.now!
+      OPTIONS.now!,
+      NO_STRUCTURE
     );
     assert.ok(
       !result.shortlist.some((s) => s.destination.id === "d-wrong"),
@@ -2873,7 +2892,8 @@ test("a hard clash is a catalogue gap BEFORE it is an engine decision", () => {
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.ok(result.voiceClash, "nothing cleared the bar");
@@ -2920,7 +2940,8 @@ test("a woman who answered no tone question is not eliminated by silence", () =>
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.ok(result.toneSilent);
@@ -2952,7 +2973,8 @@ test("a destination nobody has tagged is not eliminated by its own silence", () 
     FACETS,
     OPTIONS,
     rng(1),
-    OPTIONS.now!
+    OPTIONS.now!,
+    NO_STRUCTURE
   );
 
   assert.equal(

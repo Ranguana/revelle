@@ -15,7 +15,30 @@
  * epsilon is. THE SEAM in src/lib/destinations.ts owns all three, and every one
  * of them is a decision this file would be the wrong place to make.
  *
- * ── THE SOCKET IS EMPTY. READ THIS BEFORE BELIEVING ANY CALLER ───────
+ * ── THE SOCKET IS FILLED. WHAT FOLLOWS IS THE STATE IT WAS FILLED FROM ─
+ *
+ * `chooseDestinations` now calls `rankByStructure` at step 5½ and sorts the
+ * voice survivors into bands of structural distance, the look breaking the
+ * ties. The rows come out of `data/destination-matrix.json` through
+ * src/lib/matrix.ts, which is the file's one owner; the epsilon is
+ * `EngineOptions.structureEpsilon` and its arithmetic is beside it in types.ts;
+ * the argument for bands rather than a blended term is in the header of
+ * src/lib/selection/destination.ts. So a host's `how_it_ends` and `meal_time`
+ * move a rank, which is the sentence this paragraph existed to be unable to
+ * write.
+ *
+ * THE PARAGRAPH BELOW IS KEPT UNDER CLAUDE.md RULE 14 rather than deleted: it
+ * is the diagnosis that produced the wiring, and the shape of the failure it
+ * describes — an instrument that returns a number nobody reads — is worth more
+ * than the fact that this instance of it is closed. Everything in it was true
+ * as of db/037 and up to that call being added. The half that is STILL TRUE is
+ * the aesthetic half: `facetOverlap(aesthetic, destination.facets)` remains 0
+ * for every destination, because `world_facet` holds voice tones (plus
+ * projections in two dimensions the vector excludes) and her aesthetic keys are
+ * in none of them. That is a live defect with a fork in it — tag the rooms, or
+ * stop putting those keys on her vector — and it is the founder's to pick.
+ *
+ * ── THE SOCKET WAS EMPTY. READ THIS BEFORE BELIEVING ANY CALLER ──────
  *
  * NOTHING IN src/ CALLS THIS YET, AND NOTHING IN src/ READS THE MATRIX. As of
  * db/037 the only reader of `data/destination-matrix.json` is

@@ -29,8 +29,19 @@
  * Hamming ... Nothing below changes it"), and the two must not be confused:
  * they answer different questions and would give different numbers.
  *
- * Nothing in the running application imports this module. It is read by the two
- * audit scripts and by the voice test.
+ * ── IT IS IN THE REQUEST PATH NOW ────────────────────────────────────
+ *
+ * This module used to say "nothing in the running application imports this",
+ * and that stopped being true when the ranker was wired:
+ * `src/lib/selection/destination.ts` reads `matrixRow()` at step 5½ to sort the
+ * voice survivors. The JSON is imported at BUILD time, not read from disk in a
+ * request, so the bundle carries the rows and no file path exists at runtime.
+ *
+ * What that changes for a reader: an edit to `data/destination-matrix.json` is
+ * now a change to what a host is shown, not only to what an audit prints. The
+ * cells are founder-signed (CLAUDE.md rule 13) and this is why.
+ *
+ * Consumers: the two audit scripts, the voice test, and the destination ranker.
  */
 
 import MATRIX from "../../data/destination-matrix.json" with { type: "json" };

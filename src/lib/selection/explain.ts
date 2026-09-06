@@ -31,6 +31,12 @@
 
 import { formatCents, type SlotPool } from "./fill.ts";
 import { humanOccasion } from "./occasion.ts";
+import {
+  FED_FACETS,
+  structuralDistance,
+  type StructuralFacet,
+  type StructuralRow,
+} from "./structure.ts";
 import { TONE_DIMENSIONS } from "./tone.ts";
 import { topMatches } from "./vector.ts";
 import type {
@@ -67,6 +73,14 @@ export type ExplainInput = {
   destinationScore: number;
   destinationRank: number;
   ditheredRank: number;
+  /** Her structural row — the columns she actually stated, and no others. */
+  structure: StructuralRow;
+  /** The room's row out of the matrix. Null when it has none. */
+  structuralRow: StructuralRow | null;
+  /** The distance the ranker used. Null when structure abstained. */
+  structuralDistance: number | null;
+  /** The band width the ranker banded on. */
+  structureEpsilon: number;
   picks: Pick[];
   dropped: DroppedPick[];
   gaps: CatalogueGap[];
@@ -132,18 +146,43 @@ export function explain(input: ExplainInput): Explanation {
         `have brought back one that failed it.`
   );
 
+  /*
+   * ── CODES, NOT VIBES ───────────────────────────────────────────────
+   *
+   * The two sentences below and the structural block after them name the
+   * KEYS the ranker actually read: `dimension=code` for every aesthetic facet
+   * that genuinely intersected this room's tags, and `facet=level` for every
+   * matrix cell that was compared. The test is the founder's: if the
+   * explanation cannot name a fed facet, the ranker used a ghost.
+   *
+   * `topMatches` only ever returns a facet present in BOTH her vector and the
+   * room's tags, so `positives` is the intersection and not a wish list. The
+   * empty case is therefore a finding rather than a formatting branch, and it
+   * says so — a room can be ranked on the aesthetic half only if the aesthetic
+   * half touches it, and today, for every room in the library, it does not.
+   */
+  const key = (facet: { dimension: string; code: string }) =>
+    `${facet.dimension}=${facet.code}`;
+
   if (positives.length > 0) {
     why.push(
-      `${destination.name} then ranked on ${list(positives.map((m) => m.facet.label.toLowerCase()))} — ` +
+      `${destination.name} then ranked on ${list(positives.map((m) => key(m.facet)))} — ` +
         `${(destinationScore * 100).toFixed(0)} against the look half of her ` +
-        `preference vector. The voice half is not in that number; it was already spent.`
+        `preference vector. Those are the keys that actually intersected its tags; ` +
+        `the voice half is not in that number, it was already spent.`
     );
   } else {
     why.push(
-      `${destination.name} scored ${(destinationScore * 100).toFixed(0)} and shares no ` +
-        `named facet with her answers. Worth a second look before it goes out.`
+      `${destination.name} scored ${(destinationScore * 100).toFixed(0)} because NOT ONE ` +
+        `aesthetic key in her vector appears on its tags — the overlap is empty, ` +
+        `not small. The look half of this rank decided nothing here, and whatever ` +
+        `order it appears in came from the structural bands below or from the ` +
+        `dither. Tagging the room in a dimension she can answer in is what fixes it.`
     );
   }
+
+  // ── the structural half, in cells ──────────────────────────────────
+  why.push(...structureSentences(input));
 
   if (agreements.length > 0) {
     why.push(
@@ -410,6 +449,86 @@ export function explain(input: ExplainInput): Explanation {
     confidence,
     secret: application.secret,
   };
+}
+
+/**
+ * WHAT THE MATRIX DID, CELL BY CELL — and it names cells, never adjectives.
+ *
+ * Three states, three sentences, and the two silent ones are said out loud
+ * because a ranking that abstained looks exactly like a ranking that agreed
+ * (CLAUDE.md rule 16):
+ *
+ *   she stated no column      the matrix sorted nothing; the order is the look
+ *   the room has no row       unmeasured, and unmeasured is never near
+ *   both rows present         the hits and the misses, with what each cost
+ *
+ * The per-cell cost is taken from `structuralDistance` one column at a time
+ * rather than re-implemented here, so the number beside a cell and the number
+ * that moved the rank are the same arithmetic (rule 21). The parts sum to the
+ * total because `cellCost` charges per column; the only cross-column rule in it
+ * — a late start against a room that runs until morning — reads the room's row,
+ * which is passed whole to each call.
+ */
+function structureSentences(input: ExplainInput): string[] {
+  const { destination, structure, structuralRow, structuralDistance: distance } =
+    input;
+
+  const hersCells = Object.entries(structure) as [StructuralFacet, string][];
+
+  if (hersCells.length === 0) {
+    return [
+      `STRUCTURE ABSTAINED: she stated none of the ${FED_FACETS.length} column` +
+        `${FED_FACETS.length === 1 ? "" : "s"} a host can state ` +
+        `(${list([...FED_FACETS])}), so the matrix sorted nothing and this order ` +
+        `is the look and the dither alone. Not a match — an absence.`,
+    ];
+  }
+
+  const said = list(hersCells.map(([facet, level]) => `${facet}=${level}`));
+
+  if (structuralRow === null) {
+    return [
+      `STRUCTURE ABSTAINED: she stated ${said}, and ${destination.name} has no row ` +
+        `in data/destination-matrix.json. Nothing was charged against it and ` +
+        `nothing credited to it — an unrowed room is UNMEASURED, never near, and ` +
+        `the fix is a row rather than a default.`,
+    ];
+  }
+
+  const hits: string[] = [];
+  const misses: string[] = [];
+
+  for (const [facet, level] of hersCells) {
+    const cost = structuralDistance({ [facet]: level }, structuralRow);
+    const theirs = structuralRow[facet];
+    if (theirs === undefined) {
+      misses.push(`${facet}=${level} against a room with no ${facet} cell (+0.00)`);
+      continue;
+    }
+    if (cost === 0) {
+      hits.push(
+        theirs === level
+          ? `${facet}=${level}`
+          : `${facet}: hers ${level}, its ${theirs}, charged nothing`
+      );
+      continue;
+    }
+    misses.push(`${facet}: hers ${level} against its ${theirs} (+${cost.toFixed(2)})`);
+  }
+
+  const lines = [
+    `Structure: ${destination.name} is ${(distance ?? 0).toFixed(2)} from the evening ` +
+      `she described, over the ${hersCells.length} column` +
+      `${hersCells.length === 1 ? "" : "s"} she stated (${said}). ` +
+      (hits.length > 0 ? `Matched ${list(hits)}. ` : `Matched nothing. `) +
+      (misses.length > 0 ? `Missed ${list(misses)}.` : `Missed nothing.`),
+    `That distance is a SORT KEY and not a term: rooms within ` +
+      `${input.structureEpsilon.toFixed(2)} of each other are one band and the look ` +
+      `orders them from the inside, and no part of it is averaged into the ` +
+      `${(input.destinationScore * 100).toFixed(0)} above.`,
+  ];
+
+  return lines;
 }
 
 function budgetSentences(budget: BudgetReport): string[] {

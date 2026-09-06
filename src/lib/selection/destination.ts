@@ -18,7 +18,37 @@
  *   3. FILTER on the VOICE. A tier, not a weight — see below.
  *   4. RANK what survives, on the AESTHETIC half of her vector.
  *   5. PENALISE recently-issued destinations, so the catalogue spreads.
+ *   5½. SORT ON THE STRUCTURAL MATRIX, with 4 and 5 as the tiebreak.
  *   6. DITHER, within the survivors, and take the top few.
+ *
+ * ── STRUCTURE IS A SORT KEY. IT IS NOT A TERM ────────────────────────
+ *
+ * Step 5½ is the wiring THE SEAM in src/lib/destinations.ts asked for and
+ * src/lib/selection/structure.ts described as an empty socket. What goes in it
+ * is an ORDER, never an addend:
+ *
+ *   NOT  score = 0.6 · aesthetic + 0.4 · (1 − distance)
+ *
+ * That line is the compromise the tier argument above forbids, arriving on a
+ * third axis. What happens instead is that the survivors are grouped into bands
+ * of structural distance — everything within `structureEpsilon` of the nearest
+ * room in the band is the same band — and the aesthetic score, with its
+ * issuance discount already taken, orders each band from the inside. Closer
+ * structure wins; the look breaks what structure calls a tie.
+ *
+ * THE ROWS COME FROM `data/destination-matrix.json`, THROUGH src/lib/matrix.ts,
+ * AND FROM NOWHERE ELSE. One owner (CLAUDE.md rule 21): the audit script, the
+ * voice test and now the ranker all read the same file, so a distance quoted at
+ * the desk and a distance that moved a rank cannot disagree. The alternative —
+ * seeding the cells into `world_facet` — would have made a second copy of a
+ * founder-signed fact (rule 13) whose two halves nothing compares.
+ *
+ * A ROOM WITH NO ROW IS UNMEASURED, NOT DISTANT. It carries no structural
+ * claim, so nothing is charged against it — the same rule structure.ts applies
+ * one grain down to a room with no cell in a column, and CLAUDE.md rule 29: an
+ * absence in the matrix is the catalogue being unfinished, never a property of
+ * the room. It lands in the nearest band and is ordered there on its look, and
+ * the explanation says out loud that structure abstained.
  *
  * ── THE VENUE IS NOT ON THAT LIST, AND NEVER WILL BE ─────────────────
  *
@@ -77,9 +107,15 @@
  * selection.test.ts asserts it across many seeds rather than trusting it.
  */
 
+import { matrixRow } from "../matrix.ts";
 import { dither, type Rng } from "./rng.ts";
 import { facetOverlap, issuanceMultiplier, issuancePenalty } from "./score.ts";
 import { occasionEligibility } from "./occasion.ts";
+import {
+  rankByStructure,
+  rowFromCells,
+  type StructuralRow,
+} from "./structure.ts";
 import { isSilent, isToneFacet, toneMatch, voiceProfileOfTags } from "./tone.ts";
 import type {
   CatalogueGap,
@@ -106,7 +142,30 @@ export type ScoredDestination = {
   toneMatch: number | null;
   issuancePenalty: number;
   score: number;
-  /** On merit, 1-based. */
+  /**
+   * HOW FAR THIS ROOM IS FROM THE EVENING SHE DESCRIBED — the matrix, summed
+   * over the columns she actually stated. Lower is nearer.
+   *
+   * NULL MEANS UNMEASURED AND NEVER MEANS NEAR. Two ways to reach it: she
+   * stated no structural column (the ranker had nothing to sort on), or this
+   * room has no row in `data/destination-matrix.json`. Both are silence, and
+   * silence is not a score — a null is ordered as though structure abstained,
+   * which is what it did.
+   */
+  structuralDistance: number | null;
+  /**
+   * The room's own row, for the explanation. Null when it has none.
+   *
+   * Carried rather than re-read, so that the sentence a curator reads names the
+   * cells this ranking actually used.
+   */
+  structuralRow: StructuralRow | null;
+  /**
+   * On merit, 1-based — and merit is now BAND THEN LOOK, not `score` alone.
+   *
+   * `score` is the aesthetic half only. Reading this field as "the order of
+   * `score`" was true until the matrix was wired and is not true now.
+   */
   rank: number;
   /** After the dither, 1-based. This is the order the curator sees. */
   ditheredRank: number;
@@ -139,7 +198,22 @@ export function chooseDestinations(
   facets: Record<string, Facet>,
   options: EngineOptions,
   random: Rng,
-  now: Date
+  now: Date,
+  /**
+   * HER STRUCTURAL ROW — `structureOf(application.stated)`, and REQUIRED.
+   *
+   * Required rather than defaulted to `{}` on purpose (CLAUDE.md rule 16): a
+   * caller that forgot to pass it would get a silent aesthetic-only ranking
+   * that looks exactly like a working one, which is the failure this whole
+   * wiring exists to end. An empty row is a legitimate value and means she
+   * stated nothing — the compiler is what makes the difference between the two
+   * visible.
+   *
+   * Named `structure` rather than `hers` because this function already has a
+   * `hers` — her VOICE profile, at the tone filter. Two "hers" in one scope is
+   * the averaging confusion waiting to be typed.
+   */
+  structure: StructuralRow
 ): Shortlist {
   const eliminated: Elimination[] = [];
   const gaps: CatalogueGap[] = [];
@@ -300,15 +374,30 @@ export function chooseDestinations(
       toneMatch: tone,
       issuancePenalty: penalty,
       score: rawScore - penalty,
+      structuralDistance: null as number | null,
+      structuralRow: null as StructuralRow | null,
       rank: 0,
       ditheredRank: 0,
     };
   });
 
+  // ── 5½. THE MATRIX, AS A SORT KEY ──────────────────────────────────
+  const ordered = orderByStructure(scored, structure, options.structureEpsilon);
+
   // ── 6. dither, WITHIN THE SURVIVORS, and read the shortlist off the top ──
+  //
+  // THE DITHER RANKS THE COMPOSITE ORDER, NOT `score`. It sorts descending on
+  // whatever `scoreOf` returns, so it is handed the position in `ordered`
+  // rather than the aesthetic number: passing `entry.score` here would rebuild
+  // the pre-matrix ranking inside the very function that is supposed to
+  // preserve it, and rank 1 — the one destination the dither may never move —
+  // would be the aesthetic winner again.
+  const position = new Map(
+    ordered.map((entry, index) => [entry, ordered.length - index])
+  );
   const shortlist = dither(
-    scored,
-    (entry) => entry.score,
+    ordered,
+    (entry) => position.get(entry) ?? 0,
     options.ditherEpsilon,
     random
   ).map((entry) => ({
@@ -318,6 +407,107 @@ export function chooseDestinations(
   }));
 
   return { shortlist, eliminated, impasse: null, gaps, voiceClash, toneSilent };
+}
+
+/**
+ * THE BANDS — structure orders, the look breaks the ties structure declares.
+ *
+ * Every survivor gets its distance from `rankByStructure`, which is the one
+ * owner of host-against-room distance (src/lib/selection/structure.ts). They
+ * are then walked nearest-first and cut into bands: a room stays in the current
+ * band while it is within ε of the NEAREST room in that band, and opens a new
+ * one otherwise. Inside a band the aesthetic score — issuance discount already
+ * taken — decides, and a tie there is broken by catalogue order so that the
+ * whole function is a deterministic function of its inputs.
+ *
+ * WHY THE ANCHOR IS THE BAND'S NEAREST ROOM AND NOT THE PREVIOUS ONE. Chaining
+ * ε off each successive room would let a run of near misses carry a genuinely
+ * distant room into the top band a quarter at a time — the transitivity bug
+ * every epsilon comparator has, and the reason this is written as a walk rather
+ * than as a comparator handed to `sort`.
+ *
+ * WHAT IT DOES WHEN SHE SAID NOTHING. Every distance is 0, one band holds
+ * everything, and the order is exactly the aesthetic order it was before the
+ * matrix was wired. Silence changes no ranking (CLAUDE.md rule 3).
+ */
+function orderByStructure(
+  scored: readonly ScoredDestination[],
+  hers: StructuralRow,
+  epsilon: number
+): ScoredDestination[] {
+  const stated = Object.keys(hers).length > 0;
+
+  const rows: Record<string, StructuralRow> = {};
+  const rowed = new Set<string>();
+  for (const entry of scored) {
+    const cells = matrixRow(entry.destination.slug);
+    if (cells === undefined) {
+      // No row. `rowFromCells` is not asked for one, and an empty row costs
+      // nothing against any answer — see the header: unmeasured, not distant.
+      rows[entry.destination.slug] = {};
+      continue;
+    }
+    rows[entry.destination.slug] = rowFromCells(cells);
+    rowed.add(entry.destination.slug);
+  }
+
+  const distances = new Map(
+    rankByStructure(hers, rows).map((room) => [room.slug, room.distance])
+  );
+
+  const measured = scored.map((entry, index) => {
+    const slug = entry.destination.slug;
+    const isRowed = rowed.has(slug);
+    return {
+      index,
+      distance: distances.get(slug) ?? 0,
+      entry: {
+        ...entry,
+        structuralRow: isRowed ? rows[slug] : null,
+        structuralDistance: stated && isRowed ? (distances.get(slug) ?? 0) : null,
+      },
+    };
+  });
+
+  const byDistance = measured
+    .slice()
+    .sort(
+      (a, b) =>
+        a.distance - b.distance ||
+        b.entry.score - a.entry.score ||
+        a.index - b.index
+    );
+
+  const out: ScoredDestination[] = [];
+  let band: typeof byDistance = [];
+  let anchor = 0;
+
+  const flush = () => {
+    band.sort((a, b) => b.entry.score - a.entry.score || a.index - b.index);
+    for (const item of band) out.push(item.entry);
+    band = [];
+  };
+
+  for (const item of byDistance) {
+    if (band.length === 0) {
+      anchor = item.distance;
+      band.push(item);
+      continue;
+    }
+    // The tolerance is for arithmetic, not for taste: every distance today is a
+    // multiple of 0.25 and exact in binary, and the day a third cell price is
+    // added it may not be. A band boundary must not move because of a bit.
+    if (item.distance - anchor <= epsilon + 1e-9) {
+      band.push(item);
+      continue;
+    }
+    flush();
+    anchor = item.distance;
+    band.push(item);
+  }
+  flush();
+
+  return out;
 }
 
 /** Her vector with the voice half taken out. See the note at the call site. */

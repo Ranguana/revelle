@@ -21,6 +21,7 @@ import { explain } from "./explain.ts";
 import { fillSlots, scopePools } from "./fill.ts";
 import { ensureNovel } from "./novelty.ts";
 import { planSlots } from "./occasion.ts";
+import { structureOf } from "./structure.ts";
 import { mealShape, statedMeal, statedRung, statedSeason } from "./table.ts";
 import { arbitrarySeed, rng } from "./rng.ts";
 import { buildVector, inheritDestination } from "./vector.ts";
@@ -79,6 +80,16 @@ export function runSelection(
   // emphasis.ts, and the `affinity` entry in vector.ts's non-taste list.
   const emphasis = buildEmphasis(application.stated);
 
+  // ── stage 1¾ — THE EVENING SHE DESCRIBED, AS A MATRIX ROW ──────────
+  //
+  // Her answers in the vocabulary `data/destination-matrix.json` is written in,
+  // and only the columns a question actually feeds — `structureOf` cannot
+  // produce a cell for a column with no supplier, which is what keeps the
+  // number of columns the reveal ranks on equal to the number she filled in
+  // (CLAUDE.md rule 15). Read once, here, and passed to the one stage that
+  // consumes it, for the same reason `season` is.
+  const structure = structureOf(application.stated);
+
   // ── stage 2 ────────────────────────────────────────────────────────
   const {
     shortlist,
@@ -92,7 +103,8 @@ export function runSelection(
     catalogue.facets,
     options,
     random,
-    now
+    now,
+    structure
   );
 
   // ── the occasion gate, her own exclusions, and her emphasis ────────
@@ -272,6 +284,13 @@ export function runSelection(
       destinationScore: entry.score,
       destinationRank: entry.rank,
       ditheredRank: entry.ditheredRank,
+      // THE MATRIX, AS IT WAS ACTUALLY USED. Her row, the room's row and the
+      // distance between them, carried rather than re-derived: an explanation
+      // that recomputes anything can disagree with the ranking it is explaining.
+      structure,
+      structuralRow: entry.structuralRow,
+      structuralDistance: entry.structuralDistance,
+      structureEpsilon: options.structureEpsilon,
       picks: novelty.picks,
       dropped,
       gaps: fill.gaps,
