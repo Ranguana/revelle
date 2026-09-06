@@ -5,6 +5,13 @@ nothing here is live.** Written 2026-09-06 by a subagent under
 `docs/new-destination.md`. `world` and `world_voice` are governed classes
 (CLAUDE.md rule 13), so this document is the thing to read and sign, or refuse.
 
+**A world is admitted when it is signed. Matrix green is a precondition, not the
+act.** Her ruling, 2026-09-06, transcribed in full at
+`docs/proposals/rooms/hong-kong-1963.md`. It arrived while this document was
+being written and section 0 was rebuilt under it: the checks are reported, they
+are not called an admission, no cell is justified by what it clears, and every
+cell carries a sentence about the night.
+
 The only change made outside this file is the matrix row, which step 0a requires
 and rule 7 makes the only quotable source of a distance. It is registered in
 `founderPending`, so `npm run check:matrix` prints, on every run, that the row
@@ -16,47 +23,61 @@ in named. None of it has been pasted.
 
 ---
 
-## 0. THE ADMISSION TEST
+## 0. THE PRECONDITIONS — not an admission
 
-### 0a. The row
+**A world is admitted when it is signed. Matrix green is a precondition, not the
+act.** Founder, 2026-09-06. Nothing in this section admits anything, and the
+three mechanical checks below are not the gate; the signature is. They are here
+because they can go wrong cheaply and it is worth knowing before she spends a
+turn on the writing.
 
-| facet | level |
-|---|---|
-| `arrival` | `assigned` |
-| `schedule` | `posted` |
-| `volume` | `overlapping` |
-| `dress` | `plain` |
-| `food` | `bought` |
-| `ending` | `clean_stop` |
-| `starts` | `evening` |
-| `size` | `few` |
-| `spectacle` | `nothing` |
+`docs/new-destination.md` calls this step "THE ADMISSION TEST", which is the
+reading she has just refused. That heading should change; it is her file and the
+change is not made here.
 
-No blanks. Two cells will be argued with and the arguments are here rather than
+### 0a. The row, with a sentence per cell
+
+A cell is not a level. It is a level with a sentence about the night, and the
+sentence has to reach the level on its own — not by arriving at it from what
+was already taken.
+
+| facet | level | sentence |
+|---|---|---|
+| `arrival` | `assigned` | A glass is put in your hand before your coat is off, and you are told whose glass is yours. |
+| `schedule` | `posted` | The card gives two hours. Both are kept. |
+| `volume` | `overlapping` | Six people at a covered table, all of them talking across it. |
+| `dress` | `plain` | Nobody has been home. Everyone is in what they wore to work. |
+| `food` | `bought` | Most of it came from the shop on the way. The egg did not. |
+| `ending` | `clean_stop` | The last bowl goes round at half past ten and the evening is over. |
+| `starts` | `evening` | Seven o'clock, because that is when people are off work. |
+| `size` | `few` | Six or seven. It is a weeknight and she cooked nothing. |
+| `spectacle` | `nothing` | Nobody performs. The pan is set down and people reach. |
+
+Two of those sentences will be argued with, so the argument is here rather than
 buried:
 
 **`arrival = assigned`** was Catskills alone — a fingerprint level, one tap
-naming one room, which the audit has been flagging as a defect worth fixing.
-This room is a second claimant and it is not a claim made to retire the flag.
-A role really is handed over at the door: you are given a glass, and told whose
-glass is yours to keep filled. That is the room's manner stated at the moment a
-person walks in, and `absorbed` would be the wrong word for it. **After this row
-the audit's LEVEL USE section stops printing `FINGERPRINT arrival.assigned`.**
-Only `food.arrived` (Tahiti) remains.
+naming one room. This room is a second claimant, and the sentence reaches the
+level without help: a role really is handed over at the door. `absorbed` would
+be the wrong word for being told, on arrival, which glass you are responsible
+for. **A consequence, not a reason:** after this row the audit stops printing
+`FINGERPRINT arrival.assigned`. That is a good thing to happen and it is not why
+the cell says what it says.
 
-**`food = bought`** is provenance, not identity — the `fedBy` note is explicit
+**`food = bought`** is provenance, not identity — the `fedBy` block is explicit
 that this column and the making axis "come apart at both ends". This is a TABLE
-room whose table mostly came from the shop on the way home. Declaring it
-`cooked` to sound more serious would be the retro-tag this catalogue exists to
-escape, and it would cost the room the thing that makes it useful (see 6).
+room whose table mostly came from a shop. Writing `cooked` to sound more serious
+would be the retro-tag this catalogue exists to escape.
 
-### 0b. Distance 3 against every existing row
+### 0b. What the committed audit reports
 
 From `npm run check:matrix`, which is the only place a distance may be quoted
-from (rule 7). The full run reports **19 destinations · 171 pairs · gate 3**,
-**FAILING (below the gate, undeclared): 0**, and **ZERO MARGIN (exactly 3): 29**
-— the same twenty-nine pairs as before this row existed, none of them involving
-it. Mean distance moved 4.93 → 4.95.
+from (rule 7), with the row present in the file so that every number here can be
+reproduced by running it. Nothing below is UNCOMMITTED.
+
+The full run: **19 destinations · 171 pairs · gate 3**, **FAILING (below the
+gate, undeclared): 0**, **ZERO MARGIN (exactly 3): 29** — the same twenty-nine
+pairs as before this row existed, none of them involving it. Mean 4.93 → 4.95.
 
 `npm run check:matrix -- --room tokyo-1964`:
 
@@ -84,30 +105,74 @@ tokyo-1964 AGAINST EVERY OTHER ROW (gate 3)
    nearest 4 (amalfi-1953, aspen-1994, st-moritz-1984) · mean 5.06
 ```
 
-**Nearest 4, mean 5.06, no pair at the gate.** The room has a full unit of
-margin against every row in the catalogue, which means no single cell flip
-anywhere — including the six cells `founderPending` still holds — can push it
-below the gate.
+`--room <slug>` was added to `scripts/audit-matrix.mjs` in the same commit: at
+nineteen rooms the audit prints 171 pairs and at two hundred it would print
+19,900, and "what is my room's nearest neighbour" has to stay answerable by the
+one instrument allowed to answer it.
 
-`--room <slug>` was added to `scripts/audit-matrix.mjs` in the same commit, for
-the reason given there: at nineteen rooms the audit prints 171 pairs and at two
-hundred it would print 19,900, and "what is my room's nearest neighbour" has to
-stay answerable by the one instrument allowed to answer it.
+### 0b-i. It is not legal-if. Every cell was struck and the row re-run
+
+The `few` finding — *"the sentence never reached the level. Strike `few` and New
+York is at 2. So the old row was 'legal if,' which is not legal"* — is a test
+every row should have to pass, so it was run against all nine cells rather than
+the one. Each line below is a separate run of
+`npm run check:matrix -- --room tokyo-1964` with that one cell changed in the
+file and then restored.
+
+| cell struck and replaced | nearest | to |
+|---|---|---|
+| `arrival` → `ceremony` | 3 | amalfi-1953 |
+| `arrival` → `absorbed` | 3 | aspen-1994, st-moritz-1984 |
+| `schedule` → `anchored` | 4 | amalfi-1953, new-orleans, palm-springs-1965 |
+| `schedule` → `standing` | 4 | amalfi-1953, nantucket, portofino, westhampton-1976 |
+| `schedule` → `unplanned` | 3 | amalfi-1953 |
+| `volume` → `one_conversation` | 4 | catskills, new-york, portofino, westhampton-1976 |
+| `volume` → `quiet` | 4 | big-sur, dolomites, nantucket |
+| `dress` → `dressed` | 3 | st-moritz-1984 |
+| `food` → `cooked` | 3 | aspen-1994 |
+| `food` → `arrived` | 4 | aspen-1994 |
+| `ending` → `dissolves` | 3 | amalfi-1953 |
+| `ending` → `until_morning` | 3 | st-moritz-1984 |
+| `starts` → `morning` | 4 | aspen-1994, catskills, dolomites |
+| `starts` → `afternoon` | 3 | aspen-1994 |
+| **`size` → `one_table`** | **4** | amalfi-1953, aspen-1994, dolomites, las-vegas, new-york, st-moritz-1984 |
+| **`size` → `crowd`** | **3** | amalfi-1953, aspen-1994, st-moritz-1984 |
+| `spectacle` → `performed` | 4 | las-vegas |
+
+**No single cell carries the row.** Seventeen alternative levels, seventeen rows
+still at or above the gate, worst case 3. `size` in particular is not
+load-bearing: strike `few` and the row is at 4, not 2. If she reads the size
+sentence and says six people at a weeknight table is `one_table` rather than
+`few`, the cell changes and nothing else does.
+
+### 0b-ii. The three nearest are not one neighbourhood
+
+*"Two 3s against the same kind of night ... floor of the gate, same neighborhood.
+The ranker can still hand you that cluster."* Checked rather than assumed. The
+three rooms at 4 are, from the same audit, **amalfi/st-moritz 4, aspen/st-moritz
+4, amalfi/aspen 5** — the same spacing they have from this room. So this is not
+a room sitting inside an existing cluster at the floor; it is at the ordinary
+distance of that part of the space, one unit above the gate, and the three are
+three different nights: an evening crowd that dissolves, a cooked afternoon that
+stops, and a dressed evening that runs until morning. All three are `crowd`
+where this is `few`, and none is `assigned`.
 
 ### 0b-bis. No twin claimed
 
-None needed. The twin rule is for a pair genuinely separated by voice rather
-than shape, and this room is separated by shape from everything.
+None needed, and a twin is not a way to retire an argument about whether a room
+should exist.
 
-### 0c. Placed deliberately, in open space
+### 0c. Where the row sits, stated as a consequence
 
-The row was chosen before a word was written, which is what 0c asks for. It was
-chosen on a specific and measurable hole:
+*"'Evening because afternoon hits Côte' is picking a cell for clearance. If dusk
+is true, say dusk."* So the cells are the sentences in 0a and nothing else. What
+follows is what those sentences turned out to land on, reported because it is
+useful, not offered as the reason any cell says what it says.
 
 **Of the nine facets, exactly two are FED** — `ending` (by `how_it_ends`) and
 `starts` (by `meal_time`). The other seven state `field: null` in the matrix's
-own `fedBy` block. So the structural ranker sorts nineteen rooms through a
-3 × 3 grid of nine cells, and this is how the eighteen sat in it:
+own `fedBy` block. The structural ranker therefore sorts the whole catalogue
+through a 3 × 3 grid of nine cells, and this is how the eighteen sat in it:
 
 | ending / starts | count | rooms |
 |---|---|---|
@@ -122,30 +187,32 @@ own `fedBy` block. So the structural ranker sorts nineteen rooms through a
 | `until_morning` / `afternoon` | 0 | — |
 
 **A host who says her evening starts at dinner and ends cleanly is asking for a
-cell no room occupies.** Of the three empty cells it is the only one describing
-a party a person would actually throw — an evening that begins in the evening
-and finishes at a stated hour is the most ordinary shape a dinner has, and the
-catalogue does not offer it once. The other two empty cells are a party that
-starts in the morning and runs until dawn, which is not a party, and one that
-starts in the afternoon and does the same, which is Oaxaca's shape stretched.
+cell no room occupies.** Seven rooms sit in one cell; the ranker cannot tell
+those seven apart on structure at all.
 
-The doc's own line here — "the facet space holds about 131 rooms at minimum
-distance 3" — is stale and is corrected in the scaling note that accompanies
-this proposal. It was computed before `spectacle` and before `schedule` split to
-four levels. The real number is between 286 and 338 by greedy packing.
+**And she should know before signing either that there are now two candidates
+for that empty cell.** `docs/proposals/rooms/hong-kong-1963.md` — her own revised
+row — is also `clean_stop` / `evening`. UNCOMMITTED, because Hong Kong has no row
+in the file: the two differ on arrival, schedule, dress and size → **4**, and on
+arrival, schedule and dress → **3** if Tokyo's `size` moves to `one_table`. They
+are compatible. At `one_table` they are compatible by exactly one unit.
+
+The protocol's own line here — "the facet space holds about 131 rooms at minimum
+distance 3" — is stale, and is corrected in the scaling note that accompanies
+this proposal.
 
 ### 0d. Thrown-ness
 
-She audits this one; the claim is made rather than assumed.
+She audits this one; a claim is made rather than assumed.
 
 The premise below has a person in it doing five things: she writes a card that
 gives two hours, she lays the table before anyone comes, she buys most of it on
 the way home, she hands the first arrival a glass and says whose it is, and at
 half past ten she sends the last bowl round. Nothing in it happens by itself,
 nothing is weather, and the room is not a place behaving as itself — it is a
-Thursday somebody organised around the fact that everybody has to be up.
+weeknight somebody organised around the fact that everybody has to be up.
 
-The failure mode to check it against: this room could have been written as
+The failure mode it was checked against: this room could have been written as
 "neon, noodles, a city that never sleeps," which is a postcard and is also the
 opposite claim. It is in `rejected`.
 
@@ -158,20 +225,18 @@ premise is honourable in a one-room apartment in August.
 Two things were deliberately kept OUT of the writing for rule 25.1, and they are
 recorded so nobody puts them back:
 
-- **The last train.** It is the true reason a Tokyo evening ends at a stated
-  hour and it was the first thing this room wanted to say. It is a fact about a
-  city, not about a host, and a backyard cannot honour it. The end is stated as
-  an hour and a bowl instead, and both travel.
-- **A low table and floor seating.** Furniture the host may not own. The
-  premise says the table is covered, not what height it is.
+- **The last train.** It is the true reason a Tokyo evening ends at a stated hour
+  and it was the first thing this room wanted to say. It is a fact about a city,
+  not about a host, and a backyard cannot honour it. The end is stated as an hour
+  and a bowl instead, and both travel.
+- **A low table and floor seating.** Furniture the host may not own. The premise
+  says the table is covered, not what height it is.
 
-### 0f. It did not fail
+### 0f. What would stop it, and what has not
 
-Recorded because the brief asked for the block if it came: it did not. The room
-clears 0b at 4 with no twin, clears 0d on the argument above, and presupposes
-nothing at 0e.
-
----
+Nothing mechanical stopped it, which is a report and not a verdict. The one
+thing that can stop it is her, and the four places she is most likely to are
+listed at the end of this document rather than pre-argued here.
 
 ## 1. THE WRITING
 
@@ -1019,7 +1084,21 @@ signs, not before, and `activate:catalogue` is a separate gesture on purpose.
 
 ## WHAT THIS STILL NEEDS FROM HER
 
-In the order it blocks on:
+**The signature. Everything else is a precondition.** The four places she is
+most likely to stop it, named rather than pre-argued:
+
+- **The room itself.** A weeknight supper in somebody else's country, written by
+  an agent. She may want the room and not want it written here, or want it and
+  write it herself. That is the whole decision and nothing below matters if it
+  goes the other way.
+- **`size = few`.** The sentence is "six or seven, it is a weeknight and she
+  cooked nothing." If that reads as `one_table` to her, the cell moves; 0b-i
+  shows the row survives it at 4, and 0c shows it lands one unit from Hong Kong
+  rather than two.
+- **The last bowl**, which is the signature and is mine.
+- **The premise and the tagline**, which rule 3 makes hers.
+
+Then, in the order it blocks on:
 
 1. **The row.** Two cells will be argued with — `arrival = assigned` and
    `food = bought` — and both arguments are in 0a. Everything else waits on this.
