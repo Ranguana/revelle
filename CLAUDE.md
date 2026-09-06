@@ -67,6 +67,8 @@ Vegas, never Portofino.
 
 ## Working
 
+When proposing or drafting a destination row, follow `docs/room-structure.md`. Do not skip to `destinations.ts`.
+
 **7. Distances are quoted ONLY from the committed audit script.**
 `npm run check:matrix`, reading `data/destination-matrix.json`. Never from a
 scratch run. The matrix forked once precisely because numbers were reported from
