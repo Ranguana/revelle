@@ -167,7 +167,7 @@ export async function saveBankItem(
       await query(
         `update bank_item
             set slug = $1, kind = $2::bank_kind, name = $3,
-                description = $4, phase = $5::bank_phase,
+                description = $4, phase = $5::day_phase,
                 min_lead_days = $6, ships = $7,
                 technique_card_id = $8, weight = $9::numeric,
                 status = $10::product_status, source_citation = $11
@@ -180,7 +180,7 @@ export async function saveBankItem(
            (slug, kind, name, description, phase,
             min_lead_days, ships, technique_card_id, weight, status,
             source_citation)
-         values ($1,$2::bank_kind,$3,$4,$5::bank_phase,
+         values ($1,$2::bank_kind,$3,$4,$5::day_phase,
                  $6,$7,$8,$9::numeric,$10::product_status,$11)
          returning id`,
         values

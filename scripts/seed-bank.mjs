@@ -3220,7 +3220,7 @@ try {
            (slug, kind, name, description, phase,
             min_lead_days, ships, weight, status, source_citation,
             supply, take_home_quantity, supply_note)
-         values ($1, $2::bank_kind, $3, $4, $5::bank_phase,
+         values ($1, $2::bank_kind, $3, $4, $5::day_phase,
                  $6, $7, $8, $9::product_status, $10,
                  $11::bank_supply, $12::take_home_quantity, $13)
          returning id`,
@@ -3352,7 +3352,7 @@ try {
           // offered is settled once, on the way in, and after that it belongs
           // to the desk.
           `update bank_item set name = $2, description = $3, kind = $4::bank_kind,
-                  phase = $5::bank_phase,
+                  phase = $5::day_phase,
                   min_lead_days = $6, ships = $7, weight = $8,
                   source_citation = $9,
                   supply = $10::bank_supply,

@@ -428,7 +428,7 @@ export async function approvePlacement(form: FormData): Promise<void> {
       const inserted = await client.query<{ id: string }>(
         `insert into bank_item
            (slug, kind, name, description, phase, status, source_citation)
-         values ($1,$2::bank_kind,$3,$4,'all'::bank_phase,'draft'::product_status,$5)
+         values ($1,$2::bank_kind,$3,$4,'all'::day_phase,'draft'::product_status,$5)
          returning id::text as id`,
         [
           slug,
