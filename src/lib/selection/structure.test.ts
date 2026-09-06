@@ -321,3 +321,65 @@ test("the ending step sits directly after the calendar", () => {
   const keys = QUIZ_STEPS.map((s) => s.key);
   assert.equal(keys[keys.indexOf("when") + 1], "ending");
 });
+
+/**
+ * NO DESTINATION IS LIMITED BY GUEST COUNT.
+ *
+ * Founder ruling, 2026-09-06, given for at least the second time: "i dont want
+ * any destination TO BE LIMITED BY GUEST COUNT - this is not the first time ive
+ * said this."
+ *
+ * A ruling that has to be given twice is a ruling with no guard. This is the
+ * guard. It goes through the CONSUMER — `statedStructure` fed a real guest-count
+ * answer, and `structuralDistance` scored against a real room — rather than
+ * asserting `STRUCTURAL_SUPPLIERS.size === null`, which would be a test of the
+ * constant against itself and would pass on the day somebody wires it and
+ * updates the constant in the same edit (rule 21).
+ *
+ * It is deliberately NOT a test that `size` is absent from the matrix. The cell
+ * may exist and may be true of a night — "if the weeknight is six people, `few`
+ * is true", same founder, same day. What it may never do is narrow, penalise or
+ * reorder. Description is allowed; gating is not.
+ */
+test("a host's headcount cannot move a destination, in either direction", () => {
+  const roomFew = rowFromCells(rows["nantucket"]);
+  const roomCrowd = rowFromCells(rows["new-orleans"]);
+
+  // Every band she can answer with, against a `few` room and a `crowd` room.
+  for (const band of [
+    "from_2_to_4",
+    "from_5_to_8",
+    "from_9_to_12",
+    "from_13_to_20",
+    "from_21_to_40",
+    "over_40",
+  ]) {
+    const hers = statedStructure([said("guest_count_band", "guest_count", band)]);
+    assert.deepEqual(
+      hers,
+      {},
+      `a guest-count answer of ${band} produced a structural cell: ${JSON.stringify(hers)}`
+    );
+    assert.equal(
+      structuralDistance(hers, roomFew),
+      structuralDistance(hers, roomCrowd),
+      `${band} scores a few-room and a crowd-room differently`
+    );
+    assert.equal(structuralDistance(hers, roomFew), 0, `${band} cost a room distance`);
+  }
+
+  // And the same answer alongside a REAL stated facet must not change that
+  // facet's verdict — the sneaky failure, where the count rides along.
+  const alone = statedStructure([said("how_it_ends", "evening_ending", "clean_stop")]);
+  const withCount = statedStructure([
+    said("how_it_ends", "evening_ending", "clean_stop"),
+    said("guest_count_band", "guest_count", "over_40"),
+  ]);
+  assert.deepEqual(withCount, alone, "a guest-count answer changed the structural row");
+  for (const slug of Object.keys(rows))
+    assert.equal(
+      structuralDistance(withCount, rowFromCells(rows[slug])),
+      structuralDistance(alone, rowFromCells(rows[slug])),
+      `adding a headcount answer changed the distance to ${slug}`
+    );
+});

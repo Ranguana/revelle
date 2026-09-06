@@ -161,6 +161,39 @@ export const STRUCTURAL_SUPPLIERS: Readonly<
   food: null,
   ending: { field: "how_it_ends", dimension: "evening_ending" },
   starts: { field: "meal_time", dimension: "evening_start" },
+  /*
+   * SIZE STAYS NULL, AND THE RULING IS WRITTEN HERE BECAUSE THIS IS THE ONE
+   * LINE THAT WOULD UNDO IT.
+   *
+   * Founder, 2026-09-06, and she was repeating herself: "i dont want any
+   * destination TO BE LIMITED BY GUEST COUNT - this is not the first time ive
+   * said this."
+   *
+   * An audit of every consumer that day found the ruling already honoured for
+   * destinations: no hard filter, no ranking penalty, no SQL predicate, and
+   * `application.scale` is not even among the arguments `chooseDestinations`
+   * receives. The `size` cell DESCRIBES a night and gates nothing — which is
+   * consistent with her other ruling the same day, "if the weeknight is six
+   * people, `few` is true." A cell may be true and still never narrow what a
+   * host is offered.
+   *
+   * CHANGING THIS ONE `null` TO A SUPPLIER IS THE WHOLE AUDIT SURFACE. It is
+   * the entire distance between "describes" and "limits": the moment `size`
+   * has a supplier, `statedStructure` emits it, `structuralDistance` scores it,
+   * and a host's headcount starts sorting rooms. Nothing else would have to
+   * change and no test would go red on the intent — which is why the ruling is
+   * recorded at the line rather than only in a document (rule 23: state the
+   * fact at every place the wrong reading would be made).
+   *
+   * The obvious bridge is also wrong on its own terms, and `fedBy` in
+   * data/destination-matrix.json already says so: `guest_count_band`'s
+   * `from_13_to_20` straddles the 16 that divides `one_table` from `crowd`, so
+   * wiring it is a judgement rather than a translation. But the reason it stays
+   * null is her ruling, not the boundary.
+   *
+   * DO NOT "FINISH THE JOB" BY SYMMETRY (rule 32). Seven columns are unfed;
+   * this is the one that may not be wired.
+   */
   size: null,
   spectacle: null,
 };
