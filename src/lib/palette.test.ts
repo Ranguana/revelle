@@ -2,6 +2,11 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { DESTINATIONS } from "./destinations.ts";
+// EXTRACTED 2026-09-06. These three were module-private here, which meant the
+// room page could only have them by copying the arithmetic — rule 21's exact
+// defect, and the way "0.65 everywhere" happened. src/lib/palette.ts is the
+// one owner now and this test is a consumer of it.
+import { luminance, contrast, apart, paletteDarkAudit } from "./palette.ts";
 
 /**
  * THE PALETTES ARE READABLE, AND THEY ARE EIGHTEEN PALETTES.
@@ -32,27 +37,8 @@ import { DESTINATIONS } from "./destinations.ts";
  * be right — what they may not be is the same room twice.
  */
 
-function luminance(hex: string): number {
-  const h = hex.replace("#", "");
-  const parts = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
-  const lin = parts.map((c) =>
-    c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-  );
-  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
-}
 
-function contrast(a: string, b: string): number {
-  const la = luminance(a);
-  const lb = luminance(b);
-  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
-}
 
-function apart(a: string, b: string): number {
-  const rgb = (hex: string) =>
-    [0, 2, 4].map((i) => parseInt(hex.replace("#", "").slice(i, i + 2), 16));
-  const [x, y] = [rgb(a), rgb(b)];
-  return x.reduce((n, v, i) => n + Math.abs(v - y[i]), 0) / 3;
-}
 
 test("every room's writing is readable on its own ground", () => {
   for (const [slug, room] of Object.entries(DESTINATIONS)) {
@@ -101,4 +87,69 @@ test("no two rooms share a ground, and none is a near-duplicate", () => {
       );
     }
   }
+});
+
+/**
+ * THE DARK REGISTRY, MEASURED FOR THE FIRST TIME — AND IT IS NOT CLEAN.
+ *
+ * Every room ships `paletteDark` and nothing has ever looked at it. The day
+ * side was deduplicated on 2026-09-04 after it was found to be very nearly one
+ * palette; the dark side got none of that pass. Measured now:
+ *
+ *   mean pairwise ground separation  4.91   (the day floor is 8)
+ *   pairs below that floor           146 of 171
+ *   BYTE-IDENTICAL across all nine dark fields   havana / acapulco-1959
+ *
+ * SO THIS TEST DOES NOT APPLY THE DAY FLOOR, and that is deliberate rather than
+ * a softening. Asserting >= 8 here would fail 146 pairs on the first run, which
+ * is not a guard — it is a red build with no owner and no next action, and the
+ * thing it would be "catching" is that the dark registry was never designed to
+ * that number. CLAUDE.md's own account of `copyAgrees` is the precedent: a
+ * tripwire that has been amber since it was installed stops being read.
+ *
+ * WHAT IT DOES INSTEAD IS PIN THE STATE SO IT CANNOT GET WORSE. One identical
+ * pair is a known, recorded defect. A SECOND one is a new defect and goes red
+ * the day it lands. The number the detector reports can reach zero, which is
+ * the property CLAUDE.md demands of a detector: fix Havana/Acapulco and this
+ * assertion is edited down to 0, and it can never drift up quietly.
+ *
+ * `npm run room:check <slug>` prints the full dark reading per room, including
+ * the separation figure this test does not gate.
+ */
+test("the dark registry does not get worse than it already is", () => {
+  const audit = paletteDarkAudit(DESTINATIONS);
+
+  assert.equal(
+    audit.identical.length,
+    1,
+    "A dark palette became byte-identical to another room's, or the known one " +
+      "was fixed. Known: havana / acapulco-1959, all nine fields. Two rooms " +
+      "that render identically after dark are one room twice, exactly as on " +
+      "the day side — and nothing but this line is watching."
+  );
+  assert.deepEqual(
+    audit.identical.map((p) => [p.a, p.b].sort().join(" / ")),
+    ["acapulco-1959 / havana"],
+    "the identical pair is not the one on the record"
+  );
+  assert.ok(
+    audit.measured === Object.keys(DESTINATIONS).length,
+    `${audit.measured} of ${Object.keys(DESTINATIONS).length} rooms carry a paletteDark; ` +
+      "a room without one renders on the host's own ground after dark"
+  );
+});
+
+test("the palette measurement has ONE owner, and this file consumes it", () => {
+  // Rule 21's guard has to go through the consumers. These three functions used
+  // to be private here; `npm run room:check` now quotes the same numbers, so a
+  // second implementation would let the page and the build disagree while both
+  // looked right. Asserted against hand-computed values rather than against the
+  // functions themselves, so the test cannot pass by comparing them to
+  // themselves.
+  assert.equal(apart("#000000", "#000018"), 8);        // 0 + 0 + 24, / 3
+  assert.equal(apart("#ffffff", "#ffffff"), 0);
+  assert.equal(Math.round(contrast("#000000", "#ffffff")), 21);
+  assert.equal(contrast("#123456", "#123456"), 1);
+  assert.ok(Math.abs(luminance("#ffffff") - 1) < 1e-9);
+  assert.equal(luminance("#000000"), 0);
 });
