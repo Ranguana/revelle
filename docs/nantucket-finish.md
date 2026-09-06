@@ -73,27 +73,41 @@ one seeded, and the planning one lagged. Nothing is owed here.
 5.3 carry it too, not only 5.2 — and all three are equally resolved in the
 seeded file.)*
 
-### 3 · No signature gesture — and this is the whole catalogue, not this room
+### 3 · ~~No signature gesture~~ — WRONG. RETRACTED IN FULL.
 
-Rule 27: **every room has one signature gesture.** `db/031` gives `world` a
-`gesture` and a `gesture_note` column and argues for them — "an invariant in a
-pool of variables eventually gets left out of a package." `scripts/seed-bank.mjs`
-reads them from a clause marked `GESTURE:` or `(GESTURE)` in a bank document,
-and documents the consequence: "Westhampton's only host act is its gesture, and
-Westhampton therefore contributes zero `host_act` rows."
+**This section claimed that no room in the catalogue has a signature gesture in
+a form any seeder can read, and that `world.gesture` is NULL for all nineteen
+rooms. That is false, and it is false because I counted the wrong corpus.**
 
-**Counted across all three bank documents: the token `GESTURE:` appears zero
-times.** The word "gesture" appears twelve times, every one of them in prose
-about the concept. So the parser that routes gestures matches nothing, and
-`world.gesture` is NULL for all nineteen rooms.
+I grepped `docs/take-home-bank-*.md` for a `GESTURE:` token, found zero, and
+reported a catalogue-wide defect. **`seed-bank.mjs` does not read those files.**
+It reads `docs/atmosphere-idea-bank-v1.md` — one line of the seeder says so
+(`const SOURCE = new URL("../docs/atmosphere-idea-bank-v1.md", ...)`) and I did
+not check it before publishing a count.
 
-That is rule 24's shape exactly — a parser whose author described its behaviour
-correctly and whose input never contained the token — and it is **not a
-Nantucket finding**. It is reported here because "finish Nantucket" surfaced it
-and because rule 20 says a finding does not stay in the file where it was found.
-CLAUDE.md rule 27 names five gestures in prose (Tahiti's conch, Amalfi's plate,
-Aspen's blankets, Oaxaca's stirring, Acapulco's relaid table); **none of the
-five is in a form any seeder can read.**
+The truth, from the instrument rather than from a grep —
+`npm run check:bank`, the seeder's own dry run:
+
+> `18 rooms, 353 bank_item rows, 17 gestures, 42 dish lines and 18 drink lines routed out.`
+
+**Seventeen of eighteen rooms have a gesture.** Nantucket's is
+**"the pot-dump onto the headlines"**, and it routes correctly. Sixteen are
+decided; the seventeenth is CATSKILLS, held at `NULL` on purpose with its
+reason attached — *"FOUNDER DECIDES — mock awards vs.
+last-up-turns-off-the-string-lights"* — which is rule 17 working, not a gap.
+
+**So Nantucket owes no gesture and neither does the catalogue.** The rooms
+without one are the ones with no entry in that document at all: `tahiti`, and
+the two new drafts `hong-kong-1963` and `tokyo-1978`.
+
+**Why this is worth keeping rather than deleting** (rule 14, and rule 24 turned
+on its author): the failure was not a bad grep, it was *reporting a count
+without checking what the matcher was pointed at.* Rule 24 says count what it
+matched and assume your matching is wrong until you have. I counted, got zero,
+and read zero as evidence — when zero matches is the single most likely
+signature of a matcher aimed at the wrong input. The rule has a worked example
+for a tagger that matched 9 of 152; this is the other end, a tagger that matched
+0 of 0 because it was reading a file the pipeline never opens.
 
 ### 4 · Two matrix cells that only she can decide — the real blocker
 
@@ -142,6 +156,8 @@ touched either cell.
 ## What is already finished, verified rather than assumed
 
 - **Voice** — written, `authored`, in `src/lib/destinations.ts`.
+- **Signature gesture** — "the pot-dump onto the headlines", routing correctly
+  through `seed-bank.mjs` from `docs/atmosphere-idea-bank-v1.md`.
 - **Food identity** — declared `table`, from the premise line *"a dinner
   everybody takes apart with their hands"*. Floor 20; it holds 85.
 - **Making-axis coverage** — B/H/M present at all three courses. Nantucket is
@@ -157,8 +173,8 @@ touched either cell.
    the two fed columns, and the Westhampton twin question.
 2. **Write two mocktail mirrors** — cold beer in a cooler, whiskey with one ice
    cube. Hers; the constraint refuses them live until they exist.
-3. **Write the signature gesture** — hers, and it is nineteen rooms rather than
-   one. The column, the parser and the rule all exist; the clause does not.
+3. ~~Write the signature gesture~~ — **NOT OWED.** Nantucket has one: "the
+   pot-dump onto the headlines". See the retraction in § 3.
 4. Bank, games, product, tracklist: **not owed.** Leave them.
 
 Nothing above has been written in her voice, and nothing has been seeded.
