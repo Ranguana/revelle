@@ -25,7 +25,9 @@ import {
   silentExtract,
   type DecidedClaim,
   type MatrixFacet,
+  type PhotoExtract,
 } from "./photo-extract.ts";
+import { GOLD_GROUPS, GOLD_SET, score } from "./photo-gold-set.ts";
 import { bandOf, sortQueue, type QueueApplication } from "./desk/photo-queue.ts";
 
 /**
@@ -816,4 +818,207 @@ test("nothing in this feature adds a fedBy entry", () => {
     "a photograph-supplied column has been wired. That is a founder's " +
       "decision and this feature deliberately did not make it."
   );
+});
+
+/* ══ 11 · THE BENCH ═════════════════════════════════════════════════ */
+
+test("the bench is thirty cases, ten of each group", () => {
+  assert.equal(GOLD_SET.length, 30);
+  for (const group of GOLD_GROUPS) {
+    assert.equal(
+      GOLD_SET.filter((entry) => entry.group === group).length,
+      10,
+      `${group} is not ten cases. A bench that has quietly lost four still ` +
+        `prints a percentage.`
+    );
+  }
+  assert.equal(new Set(GOLD_SET.map((entry) => entry.id)).size, 30);
+});
+
+test("every trap has its invitation written, which is what a trap is", () => {
+  const traps = GOLD_SET.filter((entry) => entry.group === "trap");
+  for (const trap of traps) {
+    assert.ok(trap.brief.length > 60, `${trap.id} has no design written`);
+  }
+  // The founder's three, by their shape rather than by their words.
+  const byId = new Map(traps.map((trap) => [trap.id, trap]));
+  assert.deepEqual([...(byId.get("trap-01")?.mustNotPropose ?? [])], ["dress"]);
+  assert.deepEqual([...(byId.get("trap-02")?.mustNotPropose ?? [])], ["spectacle"]);
+  assert.ok(byId.get("trap-03")?.brief.includes("beach"));
+  // At least half the group must be scoreable before anybody labels anything;
+  // otherwise the trap group is a list of pictures rather than a measurement.
+  const scoreable = traps.filter((trap) => trap.mustNotPropose.length > 0);
+  assert.ok(scoreable.length >= 5, `${scoreable.length} traps score unlabelled`);
+});
+
+test("nothing in the bench is labelled by a machine", () => {
+  // Rule 8, at the bench: the ground truth is the founder's, and an entry
+  // that arrived pre-labelled would be the reader marking its own paper.
+  assert.equal(
+    GOLD_SET.filter((entry) => entry.labelled).length,
+    0,
+    "a case is labelled. If she wrote it, delete this assertion and say so in " +
+      "docs/photo-gold-set.md. If a script wrote it, the bench is now measuring " +
+      "the reader against the reader."
+  );
+});
+
+function reading(over: Partial<PhotoExtract> = {}): PhotoExtract {
+  return { ...silentExtract("none"), outcome: "read", silence: null, ...over };
+}
+
+test("a proposal on a trap's invited column is a false positive", () => {
+  const trap = GOLD_SET.find((entry) => entry.id === "trap-01");
+  assert.ok(trap);
+  const s = score([
+    {
+      photo: trap,
+      extract: reading({
+        facets: [
+          {
+            facet: "dress" as MatrixFacet,
+            level: "dressed",
+            evidence: "marble",
+            confidence: 0.9,
+          },
+        ],
+      }),
+    },
+  ]);
+  assert.equal(s.falsePositives, 1);
+  assert.equal(s.falsePositiveRate, 1);
+  assert.equal(s.silencePrecision, 0);
+});
+
+test("silence on a trap's invited column is the whole point", () => {
+  const trap = GOLD_SET.find((entry) => entry.id === "trap-01");
+  assert.ok(trap);
+  const s = score([{ photo: trap, extract: reading() }]);
+  assert.equal(s.falsePositives, 0);
+  assert.equal(s.silencePrecision, 1);
+  assert.equal(s.falsePositiveRate, null, "nothing was proposed to rate");
+});
+
+test("an unlabelled case contributes nothing to precision or recall", () => {
+  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
+  assert.ok(evening);
+  const s = score([
+    {
+      photo: evening,
+      extract: reading({
+        facets: [
+          {
+            facet: "size" as MatrixFacet,
+            level: "one_table",
+            evidence: "one table",
+            confidence: 1,
+          },
+        ],
+      }),
+    },
+  ]);
+  assert.equal(s.labelled, 0);
+  assert.equal(s.hits, 0);
+  assert.equal(s.misses, 0);
+  assert.equal(s.scoredProposals, 0);
+  assert.equal(s.recall, null);
+});
+
+test("a labelled case scores hits, misses and the columns left silent", () => {
+  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
+  assert.ok(evening);
+  const labelled = {
+    ...evening,
+    labelled: true,
+    expected: [
+      { facet: "size" as MatrixFacet, level: "one_table" },
+      { facet: "volume" as MatrixFacet, level: "one_conversation" },
+    ],
+  };
+  const s = score([
+    {
+      photo: labelled,
+      extract: reading({
+        facets: [
+          {
+            facet: "size" as MatrixFacet,
+            level: "one_table",
+            evidence: "one table",
+            confidence: 1,
+          },
+          {
+            facet: "dress" as MatrixFacet,
+            level: "dressed",
+            evidence: "guessed",
+            confidence: 0.4,
+          },
+        ],
+      }),
+    },
+  ]);
+  assert.equal(s.hits, 1);
+  assert.equal(s.misses, 1, "volume was labelled and nobody proposed it");
+  assert.equal(s.falsePositives, 1, "dress was invented");
+  assert.equal(s.scoredProposals, 2);
+  assert.equal(s.recall, 0.5);
+  // Four proposable columns were not labelled; `dress` is one of them and was
+  // proposed, so three of four were correctly silent.
+  assert.equal(s.shouldBeSilent, 4);
+  assert.equal(s.wereSilent, 3);
+});
+
+test("the seam is checked on every bench case and a breach is not a score", () => {
+  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
+  const place = GOLD_SET.find((entry) => entry.id === "place-01");
+  assert.ok(evening && place);
+
+  const clean = score([
+    { photo: evening, extract: reading({ role: "evening_she_wants" }) },
+    { photo: place, extract: reading({ role: "place_she_has", mayPrune: true }) },
+  ]);
+  assert.equal(clean.seamBreaches, 0);
+
+  const breached = score([
+    // A taste frame that came back able to prune. That is the whole seam.
+    { photo: evening, extract: reading({ mayPrune: true }) },
+    // And a taste frame carrying a venue cue.
+    {
+      photo: evening,
+      extract: reading({
+        venue: [{ affordance: "requires_outdoors" as const, evidence: "sky" }],
+      }),
+    },
+  ]);
+  assert.equal(breached.seamBreaches, 2);
+});
+
+test("schema validity is counted apart from claim correctness", () => {
+  const trap = GOLD_SET.find((entry) => entry.id === "trap-07");
+  assert.ok(trap);
+  const s = score([
+    {
+      photo: trap,
+      extract: reading(),
+      drops: [
+        { kind: "fingerprint" },
+        { kind: "not_a_level" },
+      ],
+    },
+  ]);
+  assert.equal(s.dropped, 2);
+  assert.equal(s.fingerprintAttempts, 1);
+  // And none of that moved the claim numbers.
+  assert.equal(s.falsePositives, 0);
+  assert.equal(s.hits, 0);
+});
+
+test("a silent reading is reported with its reason, not as a zero", () => {
+  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
+  assert.ok(evening);
+  const s = score([
+    { photo: evening, extract: silentExtract("the reader declined this frame") },
+  ]);
+  assert.equal(s.read, 0);
+  assert.equal(s.silences.length, 1);
+  assert.match(s.silences[0], /evening-01: the reader declined/);
 });

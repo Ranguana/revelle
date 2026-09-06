@@ -40,7 +40,8 @@
     "check:voices": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-voices.mjs",
     "copy:source": "node scripts/copy-source.mjs",
     "check:voice-output": "node scripts/check-voice-output.mjs",
-    "design:games": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/design-handoff-games.mjs"
+    "design:games": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/design-handoff-games.mjs",
+    "bench:photos": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/photo-bench.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",
