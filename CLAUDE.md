@@ -264,6 +264,56 @@ lost, and a deleted argument gets re-made.
   identity: the row declares, the guard enforces, and a guard that infers the
   category it is checking has stopped checking it.
 
+- **AN UNTRACKED FILE IN `db/` IS A LIVE MIGRATION.** The chain is read from
+  the filesystem, not from git. Untracking hides a migration from production
+  and from nobody else — every local run, every test, and every scratch
+  database still executes it. There is no "leave it there for now."
+
+  Found 2026-09-06 when a superseded migration was left on disk on the
+  reasoning that an untracked file harms nothing. Within the minute
+  `occasion-slot-replay.ts` was replaying it, `npm test` was red against it,
+  and `scripts/migrate.mjs` would have applied it to any scratch database
+  built that afternoon. That is rule 33's shape from the other end: A FILE
+  THAT BEHAVES DIFFERENTLY IN SCRATCH AND IN PRODUCTION, which is the exact
+  divergence rule 33 exists to refuse, arriving through the version control
+  system rather than through the seed order.
+
+- **A RENAME HAS NO GRACE PERIOD.** Adding is backward-compatible; renaming is
+  not. The moment `alter type … rename` commits, every caller naming the old
+  identifier fails at once — there is no window in which old and new both work.
+  A rename and its casts are one commit or the rename does not go.
+
+  Worked example, 2026-09-06, and the shape is worse than it sounds. db/068
+  renamed `bank_phase` to `day_phase` and its own header said *"the rename
+  reaches code in the same commit, because a cast is a name"* — and then the
+  commit carrying the migration did not carry three of the five casts. It
+  deployed; `alter type` committed; `seed-bank` died on
+  `type "bank_phase" does not exist`; pre-deploy exited 1. **The header was
+  right and the code did not follow it, which is the failure mode a paragraph
+  can never catch** (rule 20: the file that describes the deploy is not the
+  deploy). A migration that renames anything is one commit with its callers,
+  and the check is a grep for the old identifier across `src` and `scripts`
+  before the commit, not after.
+
+- **A PARSER PROVED BY A FILE SOMEBODY MAY DELETE IS PROVED BY NOTHING.**
+  The same hour, and it is the bigger of the two. `occasion-slot-replay.ts`
+  matched `insert`, `delete` and one shape of `update` against
+  `occasion_slot`, and SKIPPED anything else — so an aliased
+  `update occasion_slot os set … from occasion_shape sh where …`, which is
+  ordinary Postgres, fell past every branch and was replayed as if it had not
+  happened. Nothing threw. The replay reported a chain it had not read, which
+  makes every assertion downstream of it worth nothing while looking green.
+
+  Two halves to the fix and neither is sufficient alone. The reader now
+  REFUSES a statement against the table it cannot parse, loudly, so the next
+  unparseable form is a red test rather than a silence. And the fixtures that
+  prove it live in `src/lib/occasion-slot-replay.test.ts` as strings, not in
+  `db/`: the statement that exposed this was in a file that was deleted an
+  hour later for unrelated reasons, and a proof that leaves with a file was
+  never a proof. **Generally: a checker whose only evidence is that today's
+  inputs pass has not been tested against the input it cannot read, and that
+  input is the entire risk.**
+
 ## Where things live
 
 | | |

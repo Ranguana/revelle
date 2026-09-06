@@ -176,6 +176,32 @@ any money.
 **This was not decided here.** Inventing an answer would be a machine deciding
 what two of her games are for.
 
+**AMENDED 2026-09-06, AND HALF OF IT HAS GONE AWAY BY ITSELF.** db/068
+restores the `day_material` beat on the occasions that run more than one day,
+so a getaway, a girls' weekend and anything bridal now have a daytime beat as
+well as an evening one. Counted rather than reasoned about (rule 24): **three
+of the auction's four earning games — the art battle, the scavenger hunt and
+the game show — claim `day_material` natively.** So on any multi-day occasion
+the dependency is satisfiable in the ordinary way: the earning game runs in
+the day, the auction closes the evening. Nothing had to be exempted and no
+ruling was reopened.
+
+**What survives, and it is now a narrower question:**
+
+- **On a ONE-EVENING occasion both games are still unsatisfiable**, and a host
+  who takes the auction there runs an auction where nobody has any money.
+  Options 1 to 3 above are still the three ways out, and they now only have to
+  answer for the single-evening case.
+- **`amalfi-the-five-prizes` is not helped at all.** Its one required
+  dependency is `amalfi-the-numbers-after-dark`, which claims only the evening
+  beat, so the pair is still unplaceable together anywhere. That is an
+  authoring fact about one room's two games rather than a structural one, and
+  it is fixable by a claim if she wants the pair to run.
+- **Nothing enforces any of this, in either direction.** `src/lib/selection/`
+  still does not read `game_dependency`, so the improvement above is
+  opportunity rather than guarantee: the engine may place the auction on a
+  weekend without placing an earning game, and will not say so.
+
 ### 9. Westhampton at a dinner party — ANSWERED, AND THE QUESTION IS GONE
 
 **SETTLED 2026-09-06.** This section asked whether a third dinner-party game
@@ -365,29 +391,72 @@ It is now **+0.5** — positive, but not maximal, since the sides are the seatin
 there is no clock, and the prize is a line in a ledger. Left at −0.4 it would
 have hidden a competitive game from the one host who asked for one.
 
-### 14b. The field day — the part of her ruling a migration cannot fill
+### 14b. The field day — ANSWERED, WRITTEN, AND THE REAL GAP NAMED
 
 **Founder, same day:** *"re catskills multi day event gets all the field day
-games."*
+games"*, then *"field days are daytime games"*, then — when asked how they are
+placed — *"field day can be multi day or one day - host chooses itinerary,
+which is a gap we discussed earlier about host ability to edit menus and
+itineraries. field day games include all and she chooses for the daily
+newsletter/itinerary."*
 
-The structural half is done: `db/067` puts the multi-day occasions back on
-`per_day`, so a three-day getaway draws a game **each day**, three different
-ones, each offered as three candidates. (Finding recorded there: `per_day` was
-dead in production — the only rows that ever carried it were the three
-`day_material` rows db/061 deleted — so this restores the mechanism as well as
-the count.)
+**Nothing is owed by a human here any more.** It is recorded rather than
+deleted because the way the question was posed was wrong in a way worth
+keeping (rule 14).
 
-**What it cannot do is supply the games.** Catskills has exactly **one** native
-game today, `catskills-what-happened-today`, after the swim test was refused in
-db/065. A multi-day Catskills fills its other days from the world-agnostic pool,
-which works and is not nothing. But *"all the field day games"* read literally —
-**a named set, authored to this room, played in an afternoon, in the plural** —
-is an authoring order, and rule 3 forbids inventing it from four words.
+**THE QUESTION AS ASKED:** *is the field day a set of separate games, or one
+game with events inside it?* It read as a genuine fork. It was already
+answered in the sentence that commissioned the work, and the sentence is easy
+to read past: **you cannot choose among events inside one game.** A host
+picking what goes on Saturday is picking between GAMES. So it is separate
+games, and the plural is mechanical rather than stylistic.
 
-**The question: is the field day a set of Catskills games you want authored —
-and if so, is it a set of separate games, or one game with events inside it?**
-The distinction matters before anything is written: a field day with four
-events is one slot, and four field day games is four.
+**WHAT WAS WRITTEN:** five games in `src/lib/games.ts`, native to the camp —
+the sack race, the rope, tied at the ankle, egg and spoon, the bucket line.
+Folk forms nobody owns, so the house prints the rules in full; `sourcing:
+"provided"`, one printed sheet each, no forbids. Each declares
+`NO RULE OF HERS:` for the same reason the charades does: she named the
+material and did not write the rules.
+
+**AND THE STRUCTURAL HALF, corrected.** An earlier draft of this section
+credited a migration that put the multi-day occasions back on `per_day` for
+the EVENING'S game beat — three days, three games through the `game` slot.
+That is not her ruling and it was withdrawn: *"day_material should come back
+for multi-day occasions only"*, and the evening's one game is db/061's and
+untouched. `db/068` restores `day_material` where `occasion_shape.days > 1`
+and changes nothing about the evening.
+
+The finding from the withdrawn file is kept and credited in db/068's header,
+because it is the valuable part: **`per_day` was dead in production.** The
+only rows that ever carried it were the three `day_material` rows db/061
+deleted, so the day loop in the selection engine had been reachable by nothing
+for a week. `src/lib/day-material.test.ts` drives it rather than asserting it.
+
+---
+
+### 14c. THE ITINERARY — the same gap, arriving for the third time
+
+**This one is a real open item and it is hers, but it is not a question.** It
+is a spec waiting for a ruling, and it is written out in full in
+`docs/itinerary.md`.
+
+*"host chooses itinerary, which is a gap we discussed earlier about host
+ability to edit menus and itineraries."* Menus, then the newsletter, now the
+field day. Three directions, one feature — and building it three times would
+be three authorities over one fact (WHAT HAPPENS ON DAY TWO), which is exactly
+how they drift.
+
+**What is honestly true today, said here because it is the kind of shortfall
+that looks handled:** the engine deals ONE field day game per day beat, in its
+own order. She does not choose them, she cannot order them, and a one-day
+field day — which she said she may want — cannot be placed at all, because a
+single-evening occasion has no day beat. Nothing was half-built to make that
+look otherwise.
+
+`docs/itinerary.md` carries the three questions that need her: whether the
+house still proposes a day or she starts empty, whether she may add something
+she was not given, and whether a field day is a named set that travels
+together or five games that happen to suit an afternoon.
 
 ---
 

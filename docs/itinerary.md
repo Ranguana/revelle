@@ -127,8 +127,8 @@ real today:
    cannot be placed there at all. The fix is not to give every occasion a day
    beat — that is the flattening again — it is the itinerary, where she says
    "these four, Saturday afternoon" regardless of how the house counted days.
-2. **A FIELD DAY IS A SET AND THE ENGINE DEALS SINGLES.** Sack race, tug of
-   war, three-legged race, egg and spoon and the bucket brigade are an
+2. **A FIELD DAY IS A SET AND THE ENGINE DEALS SINGLES.** The sack race, the
+   rope, tied at the ankle, egg and spoon and the bucket line are an
    AFTERNOON, not five interchangeable candidates for one slot. Nothing in the
    selection engine can express "these belong together"; `coherence_group` on
    `occasion_slot` is the nearest existing idea and it groups a slot's
@@ -185,7 +185,9 @@ five of the nine pools would reproduce it on paper.
    was not in her offer? Today the answer has to be no, because the assemblage
    binds at delivery. If the answer is yes, that is a second delivery event and
    db/003's decision 2 has to be revisited on purpose rather than by accident.
-3. **Is the field day a NAMED SET or five separate games?** They are written as
-   five rows, which is what "all the field day games" says. If a field day is
-   one thing a host puts on an afternoon, the catalogue needs a way to say "a
-   set that travels together" and nothing does.
+3. **Does a field day TRAVEL TOGETHER?** That it is five games and not one is
+   settled — you cannot choose among events inside a single game, and she said
+   she chooses. What is not settled is whether the five are a named set that
+   arrives and leaves as one, or five rows that happen to suit the same
+   afternoon. The catalogue has no way to say the first, and the answer decides
+   whether an itinerary holds items or holds items and blocks.
