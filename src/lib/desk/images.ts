@@ -732,7 +732,7 @@ export type BankDraft = {
   description: string;
   /** `bank_kind`. */
   kind: "good" | "host_act";
-  /** `bank_phase`. `all` means NO OPINION — see BANK_PHASES in labels.ts. */
+  /** `day_phase`. `all` means NO OPINION — see DAY_PHASES in labels.ts. */
   phase: "all";
 };
 

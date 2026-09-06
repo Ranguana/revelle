@@ -889,14 +889,15 @@ function readSupply(clause, name) {
 /**
  * PHASE, FROM WORDS SHE ACTUALLY WROTE.
  *
- * `bank_phase` defaults to `all`, which db/031 glosses as NO OPINION rather
+ * `day_phase` (db/031's `bank_phase`, renamed by db/068) defaults to `all`,
+ * which db/031 glosses as NO OPINION rather
  * than "every phase", and CLAUDE.md rule 3 forbids inference from silence. So
  * the map is small on purpose: five phrases, each of which names a time of day
  * outright.
  *
  * `dawn` IS DELIBERATELY ABSENT and is a finding rather than an omission — see
  * the GAPS section of the report. Havana's dawn pour and St. Moritz's dawn
- * breakfast are real content and `bank_phase` has no value for them; `dark` is
+ * breakfast are real content and `day_phase` has no value for them; `dark` is
  * the nearest and is not true, because dawn is the moment dark ends.
  */
 const PHASE_WORDS = [
@@ -930,7 +931,7 @@ const TIME_WORDS = /\bdawn\b|\bmidnight\b|\bdusk\b|\bsundown\b|\bafternoon\b|\bn
  * `tahiti.starts` and the Tahiti premise cell in data/destination-matrix.json)
  * turns the room from an evening party into an AFTERNOON-THROUGH-MORNING ARC:
  * it now begins in daylight and runs until morning. The staging arc formally
- * gains the daylight phase. `bank_phase` has carried `daylight` since db/031,
+ * gains the daylight phase. The phase enum has carried `daylight` since db/031,
  * so nothing about the schema changed — only which value is true.
  *
  * The founder named three items by hand: the blossom bowl, the lei craft, the
@@ -942,7 +943,7 @@ const TIME_WORDS = /\bdawn\b|\bmidnight\b|\bdusk\b|\bsundown\b|\bafternoon\b|\bn
  *
  * ── WHAT THIS TABLE CANNOT SAY, SAID PLAINLY ─────────────────────────
  *
- * `bank_item.phase` is ONE VALUE PER ROW — a scalar `bank_phase` column in
+ * `bank_item.phase` is ONE VALUE PER ROW — a scalar `day_phase` column in
  * db/031, not an array and not a join table. "Include daylight" is therefore
  * expressible only as a REPLACEMENT. That is harmless for all three rows here
  * and only because all three read `all`, which db/031 glosses as NO OPINION
@@ -2779,7 +2780,7 @@ function report() {
   console.log(`\nBANK_PHASE HAS NO 'dawn'`);
   console.log(
     `   Havana's dawn pour and St. Moritz's dawn breakfast are authored ` +
-      `content\n   and db/031's bank_phase is (daylight, dusk, dark, all). ` +
+      `content\n   and db/031's day_phase is (daylight, dusk, dark, dawn, all). ` +
       `'dark' is the\n   nearest and is not true — dawn is the moment dark ` +
       `ends. Both rows are\n   phase='all' (NO OPINION) rather than wrongly ` +
       `dark.`

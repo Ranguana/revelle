@@ -1,5 +1,5 @@
 import { query } from "@/lib/db";
-import { BANK_KINDS, BANK_PHASES, COURSES, DISH_LEVELS, MEAL_SHAPES, SEASONS } from "@/lib/desk/labels";
+import { BANK_KINDS, DAY_PHASES, COURSES, DISH_LEVELS, MEAL_SHAPES, SEASONS } from "@/lib/desk/labels";
 import {
   CAP,
   listQuery,
@@ -168,7 +168,7 @@ export function bankList(
       // which is a real question and not the same as "any phase" — that is the
       // empty filter, the one the select's first option sets.
       name: "phase",
-      value: oneOf(get("phase"), BANK_PHASES.map((entry) => entry.code)),
+      value: oneOf(get("phase"), DAY_PHASES.map((entry) => entry.code)),
       sql: "b.phase::text = $?",
     },
     {

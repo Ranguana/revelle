@@ -305,6 +305,22 @@ export type HostRole = "runs_it" | "plays_too";
 /** db/010. Whether the house may print it, or only point at it. */
 export type GameSourcing = "provided" | "recommended";
 
+/**
+ * db/068's `day_phase` — WHEN A THING HAPPENS, for any pool with an opinion.
+ *
+ * db/031 minted these values for the bank and db/033 added `dawn`; db/068
+ * renamed the type from `bank_phase` and gave games the same column, because
+ * "daylight" has to mean one thing across a package that renders both
+ * (CLAUDE.md rule 21). A second vocabulary saying the same five words would be
+ * rule 19's hand-written list wearing a type name.
+ *
+ * `all` IS THE DEFAULT AND MEANS NO OPINION — not "every phase" and not
+ * "always". db/031's argument, kept verbatim because it is the part that gets
+ * lost: "most content has no time of day, and a tag that has to be filled in
+ * for every row gets filled in wrongly."
+ */
+export type DayPhase = "daylight" | "dusk" | "dark" | "dawn" | "all";
+
 /** db/010. How a supply arrives. */
 export type SupplySource = "printed" | "host_buys" | "on_hand";
 
@@ -494,6 +510,22 @@ export type Game = {
 
   shape: GameShape;
   sourcing: GameSourcing;
+
+  /**
+   * db/068. WHEN IT HAPPENS. Omitted means `all`, which is the column default
+   * and means NO OPINION — which is what every game authored before the field
+   * day means, and it is left off rather than written out for exactly db/031's
+   * reason.
+   *
+   * DESCRIPTIVE. It does not prune and it does not score, exactly as
+   * `bank_item.phase` has not since db/031, and CLAUDE.md rule 15 is why that
+   * is said here rather than left to be discovered: an instrument in the
+   * scoring loop that looks fed is the failure this repo hunts, and this is not
+   * in the scoring loop at all. WHAT ACTUALLY KEEPS A DAYTIME GAME OUT OF THE
+   * EVENING IS ITS SLOT CLAIM — the field day games claim `day_material` and
+   * nothing else, and `slotEligibility` reads a native claim as a whitelist.
+   */
+  phase?: DayPhase;
 
   /** The planning figure and the top of the range. Null on an ambient game. */
   durationMinutes?: number;
@@ -8259,6 +8291,1478 @@ const ST_MORITZ_BEFORE_THE_LIGHT_GOES: Game = {
   ],
 };
 
+/* ═══════════════════════════════════════════════════════════════════
+ * THE FIELD DAY — FIVE GAMES, ONE AFTERNOON, AND NOBODY IS OUT
+ *
+ * Founder, 2026-09-06: "catskills multi day event gets all the field day
+ * games", and then, when asked how they are placed: "field day can be multi
+ * day or one day - host chooses itinerary... field day games include all and
+ * she chooses for the daily newsletter/itinerary."
+ *
+ * ── WHY FIVE ROWS AND NOT ONE ───────────────────────────────────────
+ *
+ * "ALL the field day games" is plural, and the second sentence settles what
+ * the plural means mechanically: you cannot choose among events INSIDE one
+ * game. A host putting things on Saturday is choosing between GAMES. So each
+ * is its own row with its own rules, its own supplies and its own printed
+ * piece, exactly as the last pass established across the catalogue.
+ *
+ * ── WHAT THE HOUSE MAY PRINT ────────────────────────────────────────
+ *
+ * These are folk games with no owner — a sack, a rope, a spoon, an ankle tied
+ * to another ankle. Nobody holds them, so the house prints the rules in full
+ * and `sourcing` is `provided`, on fishbowl's precedent. The FORM is nobody's.
+ * Everything on top of it is the house's and is written to this room: the
+ * bunks as the sides, the office with the watch, the ledger, the line that
+ * ends the afternoon.
+ *
+ * ── THE TWO `never` LINES THIS ROOM HOLDS, AND HOW FIVE RACES HONOUR
+ *    THEM ───────────────────────────────────────────────────────────
+ *
+ * The room says "Never make the swim test a competition, and never write a
+ * rule that somebody could fail." A field day is unmistakably a competition,
+ * so the second half is where the work is, and it is answered the same way in
+ * all five:
+ *
+ *   NOBODY IS ELIMINATED AND NOBODY SITS OUT. Nothing here has an "out". A
+ *   dropped egg is picked up. A pair that falls gets up. There is no last
+ *   round with two people left in it while everybody watches.
+ *
+ *   THE TIME GOES TO THE BUNK, NEVER TO THE PERSON. The ledger records which
+ *   bunk and what it took, and no individual name is written next to a
+ *   number. Losing with your bunk is not failing; it is the afternoon.
+ *
+ *   THE SIDES ARE ASSIGNED. The bunk list already exists and is already on the
+ *   door with everybody on it. Nobody is picked and nobody picks, which is the
+ *   room's own kindness — "the camp assigns rather than invites... nobody has
+ *   to decide anything" — and it is also the only version of team games that
+ *   does not reproduce the worst two minutes of a childhood.
+ *
+ * ── 1963, NOT AN AWAY-DAY ───────────────────────────────────────────
+ *
+ * CLAUDE.md rule 30: era-specific beats category-generic, and it is available
+ * wherever a room has a year. Nothing below has a coach, a briefing, a
+ * facilitator, a scoreboard or a prize anybody bought. It has a rope, a line
+ * drawn with a heel, potato sacks the kitchen had anyway, and somebody's aunt
+ * with a watch. The prize, where there is one, is not having to clear after
+ * dinner.
+ *
+ * ── WHERE THEY ARE PLACED, AND WHAT IS HONESTLY MISSING ─────────────
+ *
+ * Each claims `day_material` NATIVELY and claims nothing else, so
+ * `slotEligibility` reads it as a whitelist: these are eligible for the day
+ * beat db/068 restored and refused for the evening's game. That is the whole
+ * of "field days are daytime games" as the engine can currently express it.
+ *
+ * WHAT IS NOT TRUE YET, SAID HERE BECAUSE A MECHANISM THAT LOOKS LIKE IT
+ * HONOURS HER CHOICE AND DOES NOT IS CLAUDE.md RULE 16's MOST EXPENSIVE
+ * FAILURE: she does not choose these. The engine deals ONE per day beat, in
+ * its own order, and there is no way for a host to say "these four, Saturday
+ * afternoon" — nor to run a field day on a single-evening occasion, which she
+ * said she may want. `docs/itinerary.md` specifies what that needs and is the
+ * document she can rule on. Nothing here pretends otherwise.
+ *
+ * AND ONE VOCABULARY GAP, RECORDED WHERE AN AUTHOR WILL MEET IT: these games
+ * genuinely cannot happen indoors, and `game_requirement_kind` has no outdoor
+ * term — the venue vocabulary lives in `structural_requirement`, which
+ * `src/lib/games.ts` has no field for. They say it through `floor_space` and a
+ * note, which is the precedent the last-light game already set. It is an
+ * authoring absence in the requirement vocabulary, not a fact about the games.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/** What the five say in the same words, because it is one afternoon. */
+const FIELD_DAY_SOURCE =
+  "Founder ruling, 2026-09-06: \"catskills multi day event gets all the " +
+  "field day games\", and \"field days are daytime games\". A field day is " +
+  "folk material with no owner, so the house prints the rules in full. The " +
+  "form is nobody's; the bunks as the sides, the office with the watch and " +
+  "the ledger are the house's, authored to this room.";
+
+const FIELD_DAY_WORLD =
+  "Written in this room's voice, for its afternoon. A whitelist, per rule 23.";
+
+const FIELD_DAY_SLOT =
+  "db/068 restored the day beat for occasions that have days. A field day is " +
+  "daytime material and claims this and nothing else, so it is refused for " +
+  "the evening's game beat rather than merely unlikely there.";
+
+/**
+ * THE SACK RACE.
+ *
+ * The one everybody can already picture, and the reason to write it down is
+ * the part nobody pictures: what happens to the sack between two people.
+ */
+const CATSKILLS_THE_SACK_RACE: Game = {
+  slug: "catskills-the-sack-race",
+  name: "The Sack Race",
+  description:
+    "One sack a bunk, and everybody in it once. The bunk with the sack goes " +
+    "up the field and back, and the office writes down what it took.",
+  howItWorks:
+    "One sack for each bunk and one line drawn at each end of a flat piece " +
+    "of grass, about twenty paces apart. The sacks are the kind potatoes " +
+    "come in, and there is one spare because there is always one spare.\n\n" +
+    "Each bunk lines up behind the near line in whatever order it likes. " +
+    "The first person gets in the sack, holds it at the waist, and goes to " +
+    "the far line and back. At the near line she gets out of it and the next " +
+    "person gets in, and so on until everybody in that bunk has been in the " +
+    "sack once. The office starts a watch when the first person moves and " +
+    "stops it when the last one is back over the line.\n\n" +
+    "Two rules, and they are the only two. You may not run out of the sack " +
+    "and carry it, and you may not be lifted. If you go over, get up where " +
+    "you fell and carry on from there; nobody is out and nothing is " +
+    "restarted.\n\n" +
+    "All the bunks go, one at a time, and each one is timed. THE TIME " +
+    "BELONGS TO THE BUNK. No individual is timed and no name is written next " +
+    "to a number, which is the difference between a bunk being slower and a " +
+    "person being slow.\n\n" +
+    "The quickest bunk does not clear after dinner. That is the whole prize " +
+    "and it is a real one.",
+  materials:
+    "THE HOUSE PRINTS one notice, to be pinned where the sacks are: the " +
+    "rules at the head and a ruled table underneath with room for a bunk and " +
+    "a time. YOU SUPPLY one hessian or heavy paper sack per bunk and one " +
+    "spare, a watch with a second hand, and a flat piece of grass about " +
+    "twenty paces long.",
+
+  shape: "scheduled",
+  sourcing: "provided",
+  phase: "daylight",
+  durationMinutes: 20,
+  durationMaxMinutes: 30,
+  // Under six there are not two bunks in it and a relay against nobody is a
+  // person hopping alone. No ceiling: more bunks is a longer afternoon, which
+  // is what an afternoon is for.
+  minGuests: 6,
+  maxGuests: undefined,
+
+  scoring:
+    "One time per bunk, taken from the first person moving to the last one " +
+    "back over the line, written on the notice. No individual is timed. The " +
+    "quickest bunk does not clear after dinner.",
+
+  sourceNote: FIELD_DAY_SOURCE,
+  notes:
+    "NO RULE OF HERS: the founder named the material — \"catskills multi day " +
+    "event gets all the field day games\" — and did not write the rule, so " +
+    "there is no sentence to quote and everything below the form is the " +
+    "house's. That heading is fixed and games.test.ts reads it.\n\n" +
+    "EVERYBODY IN THE SACK ONCE IS THE LOAD-BEARING RULE, and it is not how " +
+    "a sack race is usually run. The ordinary version is everybody at once in " +
+    "a line, which produces one winner, one long tail and eleven people " +
+    "watching the last two. As a bunk relay nobody is watching anybody: your " +
+    "own bunk is shouting at you and the other bunks are waiting their turn.\n\n" +
+    "GET UP WHERE YOU FELL is the room's \"never write a rule that somebody " +
+    "could fail\" made mechanical. There is no disqualification in this game. " +
+    "Falling over is the game.",
+
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You are in a bunk and you get in the sack like everybody else. The " +
+      "watch passes to whoever is not running, which is the bunk waiting its " +
+      "turn.",
+    steps: [
+      {
+        step: "draw_the_two_lines",
+        phase: "before",
+        instruction: "Mark a line at each end of a flat piece of grass, about twenty paces apart.",
+        detail:
+          "A heel dragged through the grass is the line. Twenty paces is far " +
+          "enough to be a race and short enough that the slowest person is " +
+          "not out there alone.",
+        supplyItem: "A flat piece of grass",
+      },
+      {
+        step: "count_the_sacks",
+        phase: "before",
+        instruction: "Put out one sack per bunk and one spare, at the near line.",
+        detail:
+          "The spare is not optional. A sack goes at some point in the " +
+          "afternoon and a field day that stops for want of one is a field " +
+          "day that stopped.",
+        supplyItem: "A sack per bunk",
+        printedPiece: "the_notice",
+      },
+      {
+        step: "read_the_two_rules",
+        phase: "opening",
+        instruction: "Say the two rules, and say that nobody is out.",
+        detail:
+          "No running out of the sack and carrying it, and no lifting " +
+          "anybody. Then the third thing, which is the one that matters: if " +
+          "you go over, get up where you fell.",
+        say: "One sack a bunk and everybody in it once. Do not carry the sack and do not lift anybody. If you go over, get up where you went over and carry on. Nobody is out of this.",
+        minutes: 3,
+        printedPiece: "the_notice",
+      },
+      {
+        step: "run_the_bunks",
+        phase: "playing",
+        instruction: "Send one bunk at a time and time it from the first person moving to the last one back.",
+        detail:
+          "The bunk lines up in whatever order it likes and sorts that out " +
+          "itself. One watch, one bunk, one number. Whoever is holding the " +
+          "watch is holding it for a bunk that is not theirs.",
+        minutes: 18,
+        supplyItem: "A watch with a second hand",
+      },
+      {
+        step: "write_the_times",
+        phase: "deciding",
+        instruction: "Write each bunk and its time on the notice, in the order they went.",
+        detail:
+          "Bunks and times, nothing else. No names beside a number, which is " +
+          "the whole reason the time belongs to the bunk.",
+        minutes: 2,
+        printedPiece: "the_notice",
+      },
+      {
+        step: "say_who_is_not_clearing",
+        phase: "ending",
+        instruction: "Read the times out and say which bunk is not clearing after dinner.",
+        detail:
+          "Read them all, quickest last. Then say the sentence and go and do " +
+          "the next thing; a field day that stops to congratulate itself has " +
+          "become a ceremony.",
+        say: "That is the sack race. Bunk 3 is not clearing after dinner.",
+        minutes: 2,
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who will not get in a sack holds the watch and writes the " +
+          "times. It is a real job, it is argued over, and the bunk she is " +
+          "timing is not hers.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under six there are not two bunks in it. Run it as one line " +
+          "against the watch, everybody once, and write the one time down. " +
+          "The afternoon still has a number in the ledger.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above about thirty a bunk waits a long time for its turn. Draw a " +
+          "second pair of lines alongside and run two bunks at once, on two " +
+          "watches. Nothing else changes.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "It runs long when the bunks are big. Send the last two bunks " +
+          "together on parallel lines rather than shortening anybody's turn. " +
+          "The turns are the game.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Everybody has done a sack race and nobody has done it as a relay " +
+          "with a watch on the bunk. Say that part out loud and it is a " +
+          "different afternoon.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If it is flat, the ground is too smooth or the distance is too " +
+          "short. Move the far line ten paces further out. A sack race is " +
+          "funny in direct proportion to how far there is left to go.",
+      },
+    ],
+  },
+
+  facets: [
+    {
+      dimension: "group_fun",
+      code: "compete",
+      weight: 0.9,
+      note: "It is a timed race between sides and the time is written down. A host who said her people get genuinely competitive is the host this is for.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 1,
+      note: "Everybody is in the sack once. There is no way to sit it out except by taking the watch, which is also a job.",
+    },
+    { dimension: "affinity", code: "ease", weight: 0.5 },
+    {
+      dimension: "anti_preference",
+      code: "forced_fun",
+      weight: 0.8,
+      note: "Everybody takes a turn in front of everybody. A host who vetoes forced participation should not be offered this, and the positive weight is what makes it disappear for her.",
+    },
+    {
+      dimension: "anti_preference",
+      code: "kids_party",
+      weight: 0.6,
+      note: "It is a sack race, and a host is entitled to know that before it is put in front of her.",
+    },
+  ],
+
+  occasions: [],
+  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+
+  supplies: [
+    {
+      item: "A sack per bunk",
+      detail:
+        "Hessian or heavy paper, the kind potatoes come in, waist high on the shortest person. One spare, always.",
+      source: "host_buys",
+      leadTimeDays: 7,
+    },
+    {
+      item: "A watch with a second hand",
+      detail: "Anything that counts seconds and can be handed to somebody else.",
+      source: "on_hand",
+      quantity: 1,
+    },
+    {
+      item: "A flat piece of grass",
+      detail: "About twenty paces of it, with room at both ends for people to stand.",
+      source: "on_hand",
+      quantity: 1,
+    },
+  ],
+  requirements: [
+    {
+      requirement: "floor_space",
+      note: "Twenty paces of flat grass outdoors, with room at both ends. This one cannot happen indoors and there is no outdoor term in game_requirement_kind to say so with.",
+    },
+    { requirement: "printing" },
+  ],
+  printedMatter: [
+    {
+      piece: "the_notice",
+      label: "The sack race",
+      description:
+        "One sheet, pinned where the sacks are, set in the room's own face. " +
+        "The rules at the head in the fewest words that can be read at ten " +
+        "paces, and a ruled table underneath with a column for the bunk and a " +
+        "column for the time. It is the scoring, the rules and the ledger " +
+        "page in one object, which is what stops a field day needing three.",
+      voicePiece: "game_rule",
+      quantity: 1,
+    },
+  ],
+  dependencies: [],
+  worlds: [{ world: "catskills", native: true, note: FIELD_DAY_WORLD }],
+};
+
+/**
+ * THE ROPE.
+ *
+ * Tug of war, and the two decisions that make it a game rather than a
+ * stalemate: the sides swap ends, and the rope has a handkerchief on it.
+ */
+const CATSKILLS_THE_ROPE: Game = {
+  slug: "catskills-the-rope",
+  name: "The Rope",
+  description:
+    "Two bunks, one rope, a handkerchief tied at the middle of it. Best of " +
+    "three, and the sides swap ends between pulls so the ground is nobody's.",
+  howItWorks:
+    "One long rope, thick enough to hold without it cutting, with a " +
+    "handkerchief tied at the exact middle. A line is drawn in the grass and " +
+    "the handkerchief is held over it to start.\n\n" +
+    "Two bunks take an end each, in any order, with the heaviest at the " +
+    "back. If the bunks are uneven the bigger one lends a person to the " +
+    "smaller one and that person pulls for the side she is lent to, which is " +
+    "settled before anybody picks up the rope and is not argued about " +
+    "afterwards.\n\n" +
+    "The office says pull. It is over when the handkerchief has crossed the " +
+    "line and stayed across it while somebody counts to three out loud. " +
+    "Nobody lets go on purpose to make somebody fall, and anybody who sits " +
+    "down is standing on their own feet again before the next pull.\n\n" +
+    "THEN THE SIDES SWAP ENDS AND PULL AGAIN. This is the rule the ordinary " +
+    "version leaves out, and it is the one that makes the result mean " +
+    "something: grass has a slope, and a side that won at the high end has " +
+    "not beaten anybody yet. Best of three, and the third pull is at " +
+    "whichever end the first was.\n\n" +
+    "With more than two bunks, they take it in turns and the winner of each " +
+    "meeting stays on the rope. A bunk that has pulled twice in a row sits " +
+    "the next one out, because the rope is heavier the second time and much " +
+    "heavier the third.",
+  materials:
+    "THE HOUSE PRINTS one notice for the rope: the rules, and a ruled table " +
+    "for which bunk beat which. YOU SUPPLY a rope about fifteen paces long " +
+    "and thick enough to hold comfortably, a handkerchief or a strip of cloth " +
+    "to tie at its middle, and flat grass with a line drawn across it.",
+
+  shape: "scheduled",
+  sourcing: "provided",
+  phase: "daylight",
+  durationMinutes: 15,
+  durationMaxMinutes: 25,
+  minGuests: 8,
+  maxGuests: undefined,
+
+  scoring:
+    "Best of three pulls, ends swapped between them. With more than two " +
+    "bunks the winner stays on the rope and nobody pulls three in a row. " +
+    "Which bunk beat which goes on the notice; nothing is added up.",
+
+  sourceNote: FIELD_DAY_SOURCE,
+  notes:
+    "NO RULE OF HERS: the founder named the material and did not write the " +
+    "rule. Everything below the form is the house's.\n\n" +
+    "SWAPPING ENDS IS THE HOUSE'S AND IT IS THE WHOLE GAME. Every lawn has a " +
+    "slope and the side at the top of it wins without pulling harder. One " +
+    "swap turns an argument about the ground into a result, and it costs " +
+    "thirty seconds.\n\n" +
+    "THE LENT PERSON is the other one. Uneven sides are the normal case at a " +
+    "party and the ordinary fix — send somebody over — is exactly the moment " +
+    "a person gets picked last in front of everybody. So it is decided by " +
+    "the office before the rope is touched, it is announced as a loan, and " +
+    "the person goes back to her own bunk for the next meeting.\n\n" +
+    "COUNTING TO THREE OUT LOUD is not fussiness. Without it every pull ends " +
+    "in a disagreement about whether it had really crossed, and a field day " +
+    "that turns on adjudication has stopped being a field day.",
+
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You are on the rope with your bunk. The only job that is yours is " +
+      "saying pull and counting to three, and both can be handed to whoever " +
+      "is sitting the pull out.",
+    steps: [
+      {
+        step: "tie_the_handkerchief",
+        phase: "before",
+        instruction: "Find the middle of the rope and tie a handkerchief there.",
+        detail:
+          "Fold the rope in half to find the middle rather than measuring it. " +
+          "The knot is what the whole game is watching.",
+        supplyItem: "A rope",
+      },
+      {
+        step: "draw_the_line",
+        phase: "before",
+        instruction: "Draw a line across flat grass and note which end is higher.",
+        detail:
+          "There is always a higher end. Knowing which it is before anybody " +
+          "pulls is what makes the swap uncontroversial when it happens.",
+        supplyItem: "Flat grass with a line across it",
+        printedPiece: "the_notice",
+      },
+      {
+        step: "settle_the_sides",
+        phase: "opening",
+        instruction: "Put two bunks on the ends and settle any loan before the rope is picked up.",
+        detail:
+          "If one bunk is bigger, it lends a person to the other one and says " +
+          "so out loud. Decided first, announced as a loan, and not revisited " +
+          "when somebody starts losing.",
+        say: "Bunk 2 at the top end, Bunk 4 at the bottom. Bunk 2 is lending Bunk 4 a person for this one. Heaviest at the back.",
+        minutes: 3,
+      },
+      {
+        step: "pull_and_swap",
+        phase: "playing",
+        instruction: "Say pull. It is over when the handkerchief crosses the line and stays across for a count of three.",
+        detail:
+          "Then swap ends and pull again, and if it is one each, pull a third " +
+          "at the end the first one was. With more bunks the winner stays on " +
+          "and nobody pulls three in a row.",
+        minutes: 14,
+        supplyItem: "A rope",
+      },
+      {
+        step: "write_who_beat_whom",
+        phase: "deciding",
+        instruction: "Write which bunk beat which on the notice. Nothing is added up.",
+        detail:
+          "A list of meetings, not a table of points. The rope produces an " +
+          "afternoon of small results and adding them together would invent a " +
+          "champion nobody played for.",
+        minutes: 1,
+        printedPiece: "the_notice",
+      },
+      {
+        step: "put_the_rope_away",
+        phase: "ending",
+        instruction: "Coil the rope, say who won the last one, and stop there.",
+        detail:
+          "The rope goes away while people still want another pull. That is " +
+          "the right time and it is always ten minutes before anybody thinks " +
+          "it is.",
+        say: "Bunk 4 took the last one. The rope goes away now.",
+        minutes: 2,
+        supplyItem: "A rope",
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who will not pull says pull and counts to three, and both " +
+          "of those are argued with, which is the point of them.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under eight there are not two ends. Run it as three against three " +
+          "with everybody swapping in after each pull, and let the loan rule " +
+          "do the arithmetic.",
+      },
+      {
+        trouble: "odd_number",
+        answer:
+          "An odd number is what the loan is for. The bigger bunk lends one " +
+          "person, decided before the rope is touched and announced as a loan.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above about thirty the rope runs out before the people do. Cap " +
+          "each end at eight and rotate the rest in between pulls; a bunk of " +
+          "twelve pulling at once is mostly people holding a rope.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "Stop at the meeting somebody is already arguing about. A field day " +
+          "with an unfinished argument in it is a better afternoon than one " +
+          "that ran everybody out.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Everybody has pulled a rope and almost nobody has swapped ends. " +
+          "Say why the swap is there and the second pull is a different game " +
+          "from the first.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "A pull that ends in four seconds is a mismatch, not a game. Move " +
+          "one person across as a loan and pull it again rather than moving " +
+          "on; the rope is only good when it is close.",
+      },
+    ],
+  },
+
+  facets: [
+    {
+      dimension: "group_fun",
+      code: "compete",
+      weight: 1,
+      note: "Two sides and a rope. There is nothing else in the catalogue this literal about competing, and it should be reached for first by a host who asked for it.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.9,
+      note: "Everybody who is on the rope is pulling. Nobody stands in the middle of this one.",
+    },
+    { dimension: "affinity", code: "one_moment", weight: 0.4 },
+    {
+      dimension: "anti_preference",
+      code: "forced_fun",
+      weight: 0.7,
+      note: "The sides are assigned and everybody on a side pulls. Positive on purpose: this is what a host who vetoes forced participation is vetoing.",
+    },
+    {
+      dimension: "anti_preference",
+      code: "kids_party",
+      weight: 0.5,
+      note: "It is a tug of war. Said plainly so a host can decline it on sight.",
+    },
+  ],
+
+  occasions: [],
+  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+
+  supplies: [
+    {
+      item: "A rope",
+      detail:
+        "About fifteen paces, thick enough to hold without it cutting into anybody's hands. Natural fibre if there is a choice.",
+      source: "host_buys",
+      leadTimeDays: 10,
+    },
+    {
+      item: "A handkerchief",
+      detail: "Or any strip of cloth, tied at the exact middle of the rope. It is what everybody watches.",
+      source: "on_hand",
+      quantity: 1,
+    },
+    {
+      item: "Flat grass with a line across it",
+      detail: "Drawn with a heel. Note which end is higher before anybody pulls.",
+      source: "on_hand",
+      quantity: 1,
+    },
+  ],
+  requirements: [
+    {
+      requirement: "floor_space",
+      note: "Fifteen paces of flat grass outdoors with standing room at both ends. It cannot happen indoors and game_requirement_kind has no term for that.",
+    },
+    { requirement: "printing" },
+  ],
+  printedMatter: [
+    {
+      piece: "the_notice",
+      label: "The rope",
+      description:
+        "One sheet in the room's face, pinned where the rope is. The rules " +
+        "short enough to read while holding something, the swap explained in " +
+        "one line because it is the rule nobody expects, and a ruled table " +
+        "underneath for which bunk beat which. No column for a total, on " +
+        "purpose.",
+      voicePiece: "game_rule",
+      quantity: 1,
+    },
+  ],
+  dependencies: [],
+  worlds: [{ world: "catskills", native: true, note: FIELD_DAY_WORLD }],
+};
+
+/**
+ * TIED AT THE ANKLE.
+ *
+ * The three-legged race, with the one change that makes it the camp's: the
+ * pairs are drawn out of the tin rather than chosen.
+ */
+const CATSKILLS_TIED_AT_THE_ANKLE: Game = {
+  slug: "catskills-tied-at-the-ankle",
+  name: "Tied At The Ankle",
+  description:
+    "Names out of a tin, two at a time, and whoever comes out together is " +
+    "tied together. Up the field and back, and nobody chooses a partner.",
+  howItWorks:
+    "Everybody's name goes in the tin. The office draws two at a time and " +
+    "those two are a pair, tied at the ankle with a strip of cloth, and that " +
+    "is the whole of how partners are decided. Nobody picks and nobody is " +
+    "picked. If the last name out has nobody to go with, it goes with " +
+    "whoever drew it.\n\n" +
+    "Tie the inside ankles together, above the bone and not tight enough to " +
+    "mark. Inside arms round each other's backs is the way that works and " +
+    "nobody has to be told twice.\n\n" +
+    "All the pairs line up behind the same line and go at once, to the far " +
+    "line and back. There is no clock and no heats. The first pair back is " +
+    "the first pair back, and every other pair finishes, which is the rule " +
+    "that matters: NOTHING ENDS UNTIL THE LAST PAIR IS OVER THE LINE, and " +
+    "the last pair gets the loudest of it.\n\n" +
+    "If you go down, get up where you fell. Nobody may be carried and nobody " +
+    "may be dragged. A pair that comes untied stops, ties it again, and goes " +
+    "on from there.\n\n" +
+    "Run it twice, and redraw the tin between. Two draws is what makes it a " +
+    "draw rather than a verdict on the first one.",
+  materials:
+    "THE HOUSE PRINTS one notice: the rules, and a ruled space to write the " +
+    "pairs as they come out of the tin. YOU SUPPLY strips of soft cloth about " +
+    "an arm long, one per pair and two spare, a tin or a bowl for the names, " +
+    "paper and a pencil, and a flat piece of grass about twenty paces long.",
+
+  shape: "scheduled",
+  sourcing: "provided",
+  phase: "daylight",
+  durationMinutes: 20,
+  durationMaxMinutes: 30,
+  minGuests: 6,
+  maxGuests: 30,
+
+  scoring:
+    "The first pair back is the first pair back, and it is said out loud and " +
+    "not written down. What goes on the notice is who was tied to whom, both " +
+    "times, because that is the part anybody wants to read.",
+
+  sourceNote: FIELD_DAY_SOURCE,
+  notes:
+    "NO RULE OF HERS: the founder named the material and did not write the " +
+    "rule. Everything below the form is the house's.\n\n" +
+    "THE TIN IS THE WHOLE DEPARTURE AND IT IS THIS ROOM'S OWN DEVICE. A " +
+    "three-legged race normally begins with everybody choosing, which takes " +
+    "four minutes and ends with two people left over. The camp assigns — it " +
+    "is the room's first principle, stated in its own voice, and it is the " +
+    "kindness as much as the joke. It is also the reason to run it twice: " +
+    "one draw is a coincidence and two is the tin doing it on purpose.\n\n" +
+    "NOTHING ENDS UNTIL THE LAST PAIR IS IN. Written as a rule rather than " +
+    "left to manners, because the moment a field day goes wrong is the moment " +
+    "the winners start talking while two people are still coming up the " +
+    "grass.\n\n" +
+    "ABOVE THE BONE AND NOT TIGHT is the only piece of safety writing in " +
+    "these five and it is in the rules rather than in a note, because it is " +
+    "the thing a host says out loud while people are already tying.",
+
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "Your name is in the tin like everybody else's. The only thing that is " +
+      "yours is drawing it, and you can hand that over as soon as your own " +
+      "name is out.",
+    steps: [
+      {
+        step: "cut_the_cloth",
+        phase: "before",
+        instruction: "Cut soft cloth into strips about an arm long, one per pair and two spare.",
+        detail:
+          "An old sheet is right. Soft, wide and long enough to go round two " +
+          "ankles twice and still knot.",
+        supplyItem: "Strips of soft cloth",
+      },
+      {
+        step: "fill_the_tin",
+        phase: "before",
+        instruction: "Write everybody's name on a slip and put them in the tin.",
+        detail:
+          "Yours as well. A tin somebody is not in is a tin somebody is " +
+          "running.",
+        supplyItem: "A tin",
+        printedPiece: "the_notice",
+      },
+      {
+        step: "draw_the_pairs",
+        phase: "opening",
+        instruction: "Draw two at a time and read both names out. Write them on the notice as they come.",
+        detail:
+          "Read them together, not one and then the other. If the last name " +
+          "has nobody to go with, it goes with whoever is drawing.",
+        say: "Names out of the tin, two at a time. You do not choose and you are not chosen. Whoever comes out with you is who you are tied to.",
+        minutes: 5,
+        supplyItem: "A tin",
+      },
+      {
+        step: "tie_and_run",
+        phase: "playing",
+        instruction: "Tie the inside ankles above the bone, line everybody up, and go together to the far line and back.",
+        detail:
+          "Inside arms round each other's backs. Everybody starts at once, " +
+          "there is no clock, and if you go down you get up where you fell.",
+        minutes: 8,
+        supplyItem: "Strips of soft cloth",
+      },
+      {
+        step: "wait_for_the_last_pair",
+        phase: "playing",
+        instruction: "Nothing is announced until the last pair is over the line.",
+        detail:
+          "This is a rule and not a courtesy. Everybody stays turned that way " +
+          "and the last pair gets the loudest of it.",
+        minutes: 2,
+      },
+      {
+        step: "redraw_and_run_again",
+        phase: "playing",
+        instruction: "Put the names back in the tin, draw again, and run it once more.",
+        detail:
+          "Two draws is what makes it a draw. The second set of pairs is " +
+          "always better than the first and nobody knows why.",
+        minutes: 10,
+        supplyItem: "A tin",
+      },
+      {
+        step: "write_the_pairs_down",
+        phase: "deciding",
+        instruction: "Check both sets of pairs are on the notice, and say which pair came back first.",
+        detail:
+          "The pairs are the record. The winners are said out loud once and " +
+          "not written, which is the right way round for a race nobody was " +
+          "timed in.",
+        minutes: 2,
+        printedPiece: "the_notice",
+      },
+      {
+        step: "untie_everybody",
+        phase: "ending",
+        instruction: "Untie, collect the cloth, and stop.",
+        detail:
+          "Collect the strips yourself. Otherwise they are in the grass for " +
+          "the rest of the week and one of them is somebody's good sheet.",
+        say: "That is both draws. Give me the strips back and go and get a drink.",
+        minutes: 2,
+        supplyItem: "Strips of soft cloth",
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who will not be tied to anybody draws the tin and writes " +
+          "the pairs down. She sees every pair before anybody else does, " +
+          "which is the best seat in this one.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under six the tin is not a draw, it is a list. Run it as one race " +
+          "of two or three pairs and draw twice anyway; the second draw is " +
+          "what people remember.",
+      },
+      {
+        trouble: "odd_number",
+        answer:
+          "The last name out goes with whoever is drawing. If that is also " +
+          "you, it goes with the person who has already finished and is " +
+          "nearest.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above thirty the line is wider than the grass. Run it in two " +
+          "halves, drawn from the same tin, and do not time either of them.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "Drop the second draw rather than shortening the first race. One " +
+          "good draw run whole beats two run in a hurry.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Everybody has run one and chosen their own partner. Say that this " +
+          "one comes out of a tin and watch the room work out what that " +
+          "means before the first pair is out.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "It is not landing because the pairs are too polite. Redraw and " +
+          "read the two names out together, loudly, instead of handing the " +
+          "slips round; the announcement is half the game.",
+      },
+    ],
+  },
+
+  facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 1,
+      note: "Every name is in the tin. There is no version of this in which somebody is not paired with somebody.",
+    },
+    {
+      dimension: "group_fun",
+      code: "compete",
+      weight: 0.6,
+      note: "There is a first pair back and it is said out loud. Lower than the rope because nothing is timed and nothing is written down.",
+    },
+    { dimension: "affinity", code: "ease", weight: 0.6 },
+    { dimension: "affinity", code: "one_moment", weight: 0.4 },
+    {
+      dimension: "anti_preference",
+      code: "forced_fun",
+      weight: 0.9,
+      note: "You are assigned a partner and tied to her. The highest positive on this facet in the pool, and it is the honest number.",
+    },
+    {
+      dimension: "anti_preference",
+      code: "strangers",
+      weight: 0.5,
+      note: "A drawn pair can be two people who have not spoken. That is the point of it and a host who said her people do not want that should not be offered it.",
+    },
+    {
+      dimension: "anti_preference",
+      code: "kids_party",
+      weight: 0.5,
+    },
+  ],
+
+  occasions: [],
+  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+
+  supplies: [
+    {
+      item: "Strips of soft cloth",
+      detail:
+        "An old sheet torn into strips about an arm long, one per pair and two spare. Soft and wide, so nothing marks anybody.",
+      source: "on_hand",
+    },
+    {
+      item: "A tin",
+      detail: "Or a bowl. The same one the slips go in, if the camp has one out already.",
+      source: "on_hand",
+      quantity: 1,
+    },
+    {
+      item: "Paper and a pencil",
+      detail: "For the names. Small slips, folded once.",
+      source: "on_hand",
+      quantity: 1,
+    },
+    {
+      item: "A flat piece of grass",
+      detail: "About twenty paces, wide enough for every pair to start in one line.",
+      source: "on_hand",
+      quantity: 1,
+    },
+  ],
+  requirements: [
+    {
+      requirement: "floor_space",
+      note: "Twenty paces of flat grass outdoors, wide enough for one starting line. It cannot happen indoors and game_requirement_kind has no term for that.",
+    },
+    { requirement: "printing" },
+  ],
+  printedMatter: [
+    {
+      piece: "the_notice",
+      label: "Tied at the ankle",
+      description:
+        "One sheet in the room's face. The rules at the head, with the ankle " +
+        "line said plainly because it is read aloud while people are already " +
+        "tying, and two ruled columns underneath for the pairs as they come " +
+        "out of the tin — one column per draw. The pairs are the thing " +
+        "anybody wants to read afterwards, which is why the sheet has room " +
+        "for them and no room for a result.",
+      voicePiece: "game_rule",
+      quantity: 1,
+    },
+  ],
+  dependencies: [],
+  worlds: [{ world: "catskills", native: true, note: FIELD_DAY_WORLD }],
+};
+
+/**
+ * EGG AND SPOON.
+ *
+ * The slow one, and the reason a field day needs a slow one: everything else
+ * is decided by whoever is quickest.
+ */
+const CATSKILLS_EGG_AND_SPOON: Game = {
+  slug: "catskills-egg-and-spoon",
+  name: "Egg And Spoon",
+  description:
+    "A spoon each, an egg on it, and a walk to the far line and back. " +
+    "Running is the one thing you may not do, and a dropped egg is picked up " +
+    "where it fell.",
+  howItWorks:
+    "One spoon each and one egg each, raw and in its shell. Everybody lines " +
+    "up behind the near line, holding the spoon by the very end of the " +
+    "handle, one hand only, and walks to the far line and back.\n\n" +
+    "Three rules. YOU MAY NOT RUN, and running is defined out loud before " +
+    "anybody starts: both feet off the ground at once. You may not touch the " +
+    "egg with your other hand at any point. And if the egg goes down, you " +
+    "stop, pick it up where it fell, put it back on the spoon and carry on " +
+    "from that spot. Nobody is out and nobody starts again.\n\n" +
+    "It is over when everybody is back over the near line, and the order " +
+    "people come back in is the order they came back in. Nothing is timed.\n\n" +
+    "The eggs are raw and everybody is told so at the start. A hard-boiled " +
+    "egg makes it a walking race; a raw one makes it the only game of the " +
+    "afternoon where the slowest person can win, because the fast ones are " +
+    "the ones who drop it.\n\n" +
+    "Whoever gets round without dropping it at all gets their egg back at " +
+    "breakfast, cooked however they like it.",
+  materials:
+    "THE HOUSE PRINTS one notice: the three rules and a ruled space for who " +
+    "got round without dropping it. YOU SUPPLY one dessert spoon per person, " +
+    "one raw egg per person and half a dozen spare, and a flat piece of grass " +
+    "about fifteen paces long. Nothing here is worth doing on a hard floor.",
+
+  shape: "scheduled",
+  sourcing: "provided",
+  phase: "daylight",
+  durationMinutes: 15,
+  durationMaxMinutes: 25,
+  minGuests: 4,
+  maxGuests: 30,
+
+  scoring:
+    "No clock and no places. The names of whoever got round without dropping " +
+    "the egg go on the notice, and each of them gets that egg back at " +
+    "breakfast, cooked however they like it.",
+
+  sourceNote: FIELD_DAY_SOURCE,
+  notes:
+    "NO RULE OF HERS: the founder named the material and did not write the " +
+    "rule. Everything below the form is the house's.\n\n" +
+    "RAW, AND THE ROOM IS TOLD SO. This is the load-bearing decision and it " +
+    "is the one a nervous author reverses. Hard-boiled removes the whole " +
+    "game: the egg cannot be lost, so the fastest walker wins and it is a " +
+    "walking race with a prop. Raw is what makes carefulness beat speed, " +
+    "which is the only event of the five where that is true and is the reason " +
+    "this one is in the set.\n\n" +
+    "PICK IT UP WHERE IT FELL, AGAIN. Same rule as the sack, said again " +
+    "because it is the room's own line about never writing a rule somebody " +
+    "could fail. A dropped egg on a lawn is a mess and not a verdict.\n\n" +
+    "THE EGG AT BREAKFAST is the house's, and it is deliberately not a prize " +
+    "anybody bought. It is the same egg, it is the following morning, and it " +
+    "is the smallest possible way of saying that yesterday afternoon " +
+    "happened.\n\n" +
+    "SIX SPARE EGGS is a real number and not a flourish. In a room of twelve " +
+    "about four eggs do not survive the first crossing.",
+
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You walk it with a spoon like everybody else. The only thing that is " +
+      "yours is saying what running means before anybody starts, and it takes " +
+      "one sentence.",
+    steps: [
+      {
+        step: "get_the_eggs_out",
+        phase: "before",
+        instruction: "Put out one spoon and one raw egg each, and six spare eggs beside them.",
+        detail:
+          "Dessert spoons, not tablespoons: a spoon an egg sits comfortably " +
+          "in has taken the game out.",
+        supplyItem: "An egg each, and six spare",
+      },
+      {
+        step: "mark_fifteen_paces",
+        phase: "before",
+        instruction: "Draw a line at each end of flat grass, about fifteen paces apart.",
+        detail:
+          "Shorter than the sack race on purpose. This one is slow and " +
+          "fifteen paces there and back is already a long way with an egg on " +
+          "a spoon.",
+        supplyItem: "A flat piece of grass",
+        printedPiece: "the_notice",
+      },
+      {
+        step: "say_what_running_is",
+        phase: "opening",
+        instruction: "Say the three rules, and define running before anybody argues about it.",
+        detail:
+          "Both feet off the ground at once is running. One hand on the " +
+          "spoon, at the end of the handle. Egg down means pick it up where " +
+          "it fell and carry on.",
+        say: "One hand, at the end of the handle. Running is both feet off the ground at once, and you may not. If the egg goes down, pick it up where it went down and carry on from there. The eggs are raw.",
+        minutes: 3,
+        printedPiece: "the_notice",
+      },
+      {
+        step: "walk_it",
+        phase: "playing",
+        instruction: "Everybody goes at once, to the far line and back over the near one.",
+        detail:
+          "No heats and no clock. The order people come back in is the order " +
+          "they came back in, and the ones still out there have the whole " +
+          "field watching them, which is the good part.",
+        minutes: 12,
+        supplyItem: "A spoon each",
+      },
+      {
+        step: "write_the_clean_rounds",
+        phase: "deciding",
+        instruction: "Write down whoever got round without dropping it once.",
+        detail:
+          "Names, not places. It is usually nobody or it is usually three " +
+          "people, and both of those are a good notice.",
+        minutes: 2,
+        printedPiece: "the_notice",
+      },
+      {
+        step: "promise_the_breakfast",
+        phase: "ending",
+        instruction: "Tell whoever got round clean that they are getting that egg back at breakfast.",
+        detail:
+          "Say it to them and then say it to the field, and keep the eggs. " +
+          "The promise is only worth anything if somebody actually cooks them " +
+          "in the morning.",
+        say: "Three of you got round without dropping it. Those are your eggs and you are getting them back in the morning.",
+        minutes: 2,
+        supplyItem: "An egg each, and six spare",
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who will not carry an egg stands at the far line and " +
+          "rules on whether anybody ran. It is the most argued-with job on " +
+          "the field.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under four it is a walk with a friend. Move the far line out to " +
+          "twenty-five paces and go twice; the distance is what makes it a " +
+          "game when the numbers do not.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above thirty the line is wider than the grass and the eggs run " +
+          "out. Go in two waves from the same line and buy another dozen.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "It runs long when several people keep dropping it near the end. " +
+          "Say that anybody still out may finish while the notice is being " +
+          "written, and start writing.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Everybody has done it at school with a hard-boiled egg and a " +
+          "teacher. Say the eggs are raw and that nobody is out, and it is " +
+          "not the same game at all.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "If nobody is dropping anything, the spoons are too deep. Swap to " +
+          "the shallowest ones in the drawer and send everybody again.",
+      },
+    ],
+  },
+
+  facets: [
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 0.9,
+      note: "Everybody walks at the same time, which is what stops it being a queue.",
+    },
+    {
+      dimension: "group_fun",
+      code: "compete",
+      weight: 0.4,
+      note: "The lowest of the five on purpose: nothing is timed, there are no places, and carefulness beats speed.",
+    },
+    { dimension: "affinity", code: "ease", weight: 0.7 },
+    { dimension: "affinity", code: "wit", weight: 0.3 },
+    {
+      dimension: "anti_preference",
+      code: "forced_fun",
+      weight: 0.6,
+    },
+    {
+      dimension: "anti_preference",
+      code: "kids_party",
+      weight: 0.7,
+      note: "It is the school sports day event, and a host is entitled to see that coming.",
+    },
+  ],
+
+  occasions: [],
+  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+
+  supplies: [
+    {
+      item: "A spoon each",
+      detail: "Dessert spoons, and the shallowest ones in the drawer. A deep spoon takes the game out.",
+      source: "on_hand",
+      perGuest: true,
+    },
+    {
+      item: "An egg each, and six spare",
+      detail:
+        "Raw and in the shell. Six spare is a real number: in a room of twelve about four do not survive the first crossing.",
+      source: "host_buys",
+      leadTimeDays: 2,
+    },
+    {
+      item: "A flat piece of grass",
+      detail: "About fifteen paces. Not a hard floor — a dropped egg on flagstones is a different afternoon.",
+      source: "on_hand",
+      quantity: 1,
+    },
+  ],
+  requirements: [
+    {
+      requirement: "floor_space",
+      note: "Fifteen paces of flat grass outdoors. Grass specifically, not a hard floor, and game_requirement_kind has no term for either.",
+    },
+    { requirement: "printing" },
+  ],
+  printedMatter: [
+    {
+      piece: "the_notice",
+      label: "Egg and spoon",
+      description:
+        "One sheet in the room's face. Three rules at the head, with what " +
+        "running means written out, because that is the only thing anybody " +
+        "argues about. Underneath, a ruled space headed for whoever got round " +
+        "without dropping it, and a line at the foot about breakfast. Names " +
+        "and no places: the sheet has nowhere to write a first, a second or a " +
+        "third.",
+      voicePiece: "game_rule",
+      quantity: 1,
+    },
+  ],
+  dependencies: [],
+  worlds: [{ world: "catskills", native: true, note: FIELD_DAY_WORLD }],
+};
+
+/**
+ * THE BUCKET LINE.
+ *
+ * The wet one. Every field day has a wet one and it is always last, because
+ * nothing dry can follow it.
+ */
+const CATSKILLS_THE_BUCKET_LINE: Game = {
+  slug: "catskills-the-bucket-line",
+  name: "The Bucket Line",
+  description:
+    "Each bunk in a line, a full bucket at one end and an empty one at the " +
+    "other, and one cup that goes hand to hand over your heads. Most water " +
+    "in the far bucket wins.",
+  howItWorks:
+    "Each bunk stands in a line, an arm's length apart. At the head of the " +
+    "line is a full bucket; at the far end is an empty one with a mark drawn " +
+    "on the inside of it about a third of the way up.\n\n" +
+    "One enamel cup per line. The person at the head fills the cup and " +
+    "passes it back OVER HER HEAD, without turning round. Everybody passes it " +
+    "the same way, over the head, facing the front. The person at the end " +
+    "tips whatever is left into the empty bucket and sends the cup back down " +
+    "the line at knee height, which is the fast way and is why the line does " +
+    "not stop.\n\n" +
+    "Nobody moves their feet. That is the only prohibition and it is the one " +
+    "everybody breaks, so it is said twice.\n\n" +
+    "It runs for four minutes on the watch. When time is called, the line " +
+    "with the most water in the far bucket wins, and if two are close the " +
+    "office tips one into the other and looks. There is no measuring and " +
+    "there is no arithmetic.\n\n" +
+    "Everybody gets wet and the person at the head of the line gets the least " +
+    "of it, which is why the head of the line changes for the second run.",
+  materials:
+    "THE HOUSE PRINTS one notice for the water: the rules and a ruled space " +
+    "for which line won. YOU SUPPLY two buckets per bunk, one enamel or tin " +
+    "cup per bunk, a watch, water, and a piece of grass nobody minds being " +
+    "soaked. Towels near the house, not at the field.",
+
+  shape: "scheduled",
+  sourcing: "provided",
+  phase: "daylight",
+  durationMinutes: 15,
+  durationMaxMinutes: 25,
+  minGuests: 8,
+  maxGuests: undefined,
+
+  scoring:
+    "Four minutes on the watch. Most water in the far bucket wins, judged by " +
+    "eye and settled by tipping one into the other. Nothing is measured and " +
+    "nothing is added up.",
+
+  sourceNote: FIELD_DAY_SOURCE,
+  notes:
+    "NO RULE OF HERS: the founder named the material and did not write the " +
+    "rule. Everything below the form is the house's.\n\n" +
+    "OVER THE HEAD, FACING THE FRONT is the rule that makes it a game. Passed " +
+    "hand to hand at waist height it is a chore and it is dry; passed " +
+    "overhead without looking it is most of a cup down the back of the person " +
+    "in front, which is the entire point and is why every version of this " +
+    "ever played does it that way.\n\n" +
+    "FOUR MINUTES, AND A WATCH. A bucket line with no clock runs until people " +
+    "are cold. Four minutes is long enough for a line to find its rhythm and " +
+    "lose it twice, and short enough that the second run is still wanted.\n\n" +
+    "JUDGED BY EYE, ON PURPOSE. Measuring water is the moment this stops " +
+    "being a camp and becomes a laboratory. Tipping one bucket into the " +
+    "other in front of everybody is both the measurement and the best ten " +
+    "seconds of it.\n\n" +
+    "IT GOES LAST, and the runbook says so rather than leaving a host to find " +
+    "out. Nothing dry can follow it.",
+
+  runbook: {
+    hostRole: "plays_too",
+    hostNote:
+      "You are in a line and you are getting wet. The watch goes to whoever " +
+      "is not in a line, and if everybody is in a line it goes on a stump " +
+      "where two people can see it.",
+    steps: [
+      {
+        step: "fill_the_buckets",
+        phase: "before",
+        instruction: "Set two buckets per bunk: one full at the head of the line, one empty at the far end.",
+        detail:
+          "Draw a mark inside each empty bucket about a third of the way up. " +
+          "It gives the line something to aim at and it makes the judging " +
+          "quicker.",
+        supplyItem: "Two buckets per bunk",
+      },
+      {
+        step: "put_the_towels_by_the_house",
+        phase: "before",
+        instruction: "Put the towels by the house, not at the field.",
+        detail:
+          "Towels at the field end it early: somebody dries off and stops. " +
+          "Towels at the house mean the whole line walks back together, wet, " +
+          "which is the end of the afternoon rather than the end of a game.",
+      },
+      {
+        step: "say_the_one_prohibition",
+        phase: "opening",
+        instruction: "Line the bunks up an arm apart and say the one rule twice: nobody moves their feet.",
+        detail:
+          "Then show the pass rather than describing it — over the head, " +
+          "facing the front, and the cup comes back at knee height.",
+        say: "Over your head, facing forwards, and do not turn round. The cup comes back low. Nobody moves their feet, and I am saying that twice because everybody moves their feet.",
+        minutes: 4,
+      },
+      {
+        step: "four_minutes",
+        phase: "playing",
+        instruction: "Four minutes on the watch, then call it and everybody stops where they are.",
+        detail:
+          "The line finds a rhythm in the first minute and loses it twice " +
+          "after that. Do not coach anybody; a line that has worked it out is " +
+          "the thing worth watching.",
+        minutes: 5,
+        supplyItem: "A watch",
+      },
+      {
+        step: "swap_the_head_and_go_again",
+        phase: "playing",
+        instruction: "Move whoever was at the head to the back and run it once more.",
+        detail:
+          "The head of the line stays driest and everybody knows it by now. " +
+          "One swap and nobody has to say anything about fairness.",
+        minutes: 6,
+      },
+      {
+        step: "tip_one_into_the_other",
+        phase: "deciding",
+        instruction: "Judge by eye, and where two are close tip one bucket into the other in front of everybody.",
+        detail:
+          "No measuring and no arithmetic. The tipping is the judging and it " +
+          "is also the best ten seconds of the game.",
+        minutes: 3,
+        printedPiece: "the_notice",
+      },
+      {
+        step: "walk_back_wet",
+        phase: "ending",
+        instruction: "Write the winning line on the notice and walk everybody back to the towels together.",
+        detail:
+          "This one goes last. Nothing dry can follow it and nobody should " +
+          "be asked to sit down and play something else while wet.",
+        say: "Bunk 1, by about two inches. Towels are at the house. That is the field day.",
+        minutes: 2,
+        printedPiece: "the_notice",
+      },
+    ],
+    contingencies: [
+      {
+        trouble: "will_not_play",
+        answer:
+          "Somebody who will not get wet holds the watch, calls the four " +
+          "minutes and does the tipping at the end. That job decides the " +
+          "result, which is more than anybody in the line does.",
+      },
+      {
+        trouble: "under_minimum",
+        answer:
+          "Under eight there is no line, there is a short queue. Move the " +
+          "buckets further apart so the cup has further to travel, and run " +
+          "one bunk against the mark on the bucket instead of against another " +
+          "bunk.",
+      },
+      {
+        trouble: "over_size",
+        answer:
+          "Above about thirty, a line is too long for one cup to be " +
+          "interesting. Split each bunk into two lines with their own bucket " +
+          "and let them share the result.",
+      },
+      {
+        trouble: "running_long",
+        answer:
+          "Drop the second run rather than shortening the four minutes. The " +
+          "clock is what stops it being a chore and it should not be touched.",
+      },
+      {
+        trouble: "played_before",
+        answer:
+          "Somebody has done it at school with a sponge. Say the cup goes " +
+          "over the head and nobody turns round, and it is a different game " +
+          "in about fifteen seconds.",
+      },
+      {
+        trouble: "not_landing",
+        answer:
+          "A dry line means the cup is being handed at waist height. Stop, " +
+          "show the overhead pass once yourself, and start the four minutes " +
+          "again from nothing.",
+      },
+    ],
+  },
+
+  facets: [
+    {
+      dimension: "group_fun",
+      code: "compete",
+      weight: 0.8,
+      note: "Two lines, a clock and a result judged in front of everybody.",
+    },
+    {
+      dimension: "group_fun",
+      code: "group_games",
+      weight: 1,
+      note: "A line is only as good as the person in it who is not paying attention, which is what makes this the most collective of the five.",
+    },
+    { dimension: "affinity", code: "one_moment", weight: 0.5 },
+    {
+      dimension: "anti_preference",
+      code: "forced_fun",
+      weight: 0.8,
+      note: "Everybody is in a line and everybody gets wet. Positive on purpose.",
+    },
+    {
+      dimension: "anti_preference",
+      code: "kids_party",
+      weight: 0.6,
+    },
+    {
+      dimension: "anti_preference",
+      code: "photographed",
+      weight: -0.4,
+      note: "A NEGATIVE, and the only one in the five: this is the most photographed thing that will happen all week, so a host who does not want the day photographed is not being handed the reason it gets photographed.",
+    },
+  ],
+
+  occasions: [],
+  slots: [{ slotCode: "day_material", fit: "native", note: FIELD_DAY_SLOT }],
+
+  supplies: [
+    {
+      item: "Two buckets per bunk",
+      detail:
+        "One full, one empty with a mark drawn inside about a third of the way up. Metal if there is a choice, because they get dropped.",
+      source: "host_buys",
+      leadTimeDays: 7,
+    },
+    {
+      item: "An enamel cup per bunk",
+      detail: "The same mugs everything else is drunk out of. One per line and one spare.",
+      source: "on_hand",
+    },
+    {
+      item: "A watch",
+      detail: "Four minutes, twice. Anything that counts.",
+      source: "on_hand",
+      quantity: 1,
+    },
+    {
+      item: "Towels, at the house",
+      detail: "At the house and not at the field. Towels at the field end the game early.",
+      source: "on_hand",
+    },
+  ],
+  requirements: [
+    {
+      requirement: "floor_space",
+      note: "Grass nobody minds being soaked, and a tap or a lake to fill from. It cannot happen indoors and game_requirement_kind has no term for that.",
+    },
+    { requirement: "printing" },
+  ],
+  printedMatter: [
+    {
+      piece: "the_notice",
+      label: "The bucket line",
+      description:
+        "One sheet in the room's face, and it is the one sheet of the five " +
+        "that will get wet, so it is pinned at the house rather than at the " +
+        "field. The rules at the head with the overhead pass drawn rather " +
+        "than described, the one prohibition printed twice because it is said " +
+        "twice, and a ruled space at the foot for which line won and by about " +
+        "how much.",
+      voicePiece: "game_rule",
+      quantity: 1,
+    },
+  ],
+  dependencies: [],
+  worlds: [{ world: "catskills", native: true, note: FIELD_DAY_WORLD }],
+};
+
 /**
  * Every game that exists, by slug — the same slug as `game.slug`.
  *
@@ -8300,6 +9804,14 @@ export const GAMES = {
   "aspen-the-next-line": ASPEN_THE_NEXT_LINE,
   "palm-springs-the-best-line": PALM_SPRINGS_THE_BEST_LINE,
   "st-moritz-before-the-light-goes": ST_MORITZ_BEFORE_THE_LIGHT_GOES,
+
+  // THE FIELD DAY, in the order it is run. Last on purpose: the bucket line
+  // is the wet one and nothing dry follows it.
+  "catskills-the-sack-race": CATSKILLS_THE_SACK_RACE,
+  "catskills-the-rope": CATSKILLS_THE_ROPE,
+  "catskills-tied-at-the-ankle": CATSKILLS_TIED_AT_THE_ANKLE,
+  "catskills-egg-and-spoon": CATSKILLS_EGG_AND_SPOON,
+  "catskills-the-bucket-line": CATSKILLS_THE_BUCKET_LINE,
 } as const satisfies Record<string, Game>;
 
 export type GameKey = keyof typeof GAMES;

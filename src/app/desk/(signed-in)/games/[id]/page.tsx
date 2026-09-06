@@ -92,6 +92,7 @@ export default async function GamePage({
   const game = await queryOne<GameValues & { status: string; name: string }>(
     `select id, slug::text as slug, name, description, how_it_works, materials,
             shape::text as shape, sourcing::text as sourcing,
+            phase::text as phase,
             duration_minutes, duration_max_minutes, min_guests, max_guests,
             scoring, currency_label, external_name, external_url, caveat,
             host_role::text as host_role, host_note, source_note, notes,

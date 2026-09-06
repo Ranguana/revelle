@@ -4,7 +4,7 @@ import { useActionState } from "react";
 
 import {
   BANK_KINDS,
-  BANK_PHASES,
+  DAY_PHASES,
   BANK_SHIPS,
   POOL_STATUS,
 } from "@/lib/desk/labels";
@@ -206,7 +206,7 @@ export default function BankForm({
             defaultValue={values.phase ?? "all"}
             className={styles.select}
           >
-            {BANK_PHASES.map((entry) => (
+            {DAY_PHASES.map((entry) => (
               <option key={entry.code} value={entry.code}>
                 {entry.label} — {entry.gloss}
               </option>

@@ -590,8 +590,12 @@ test("ONE PRINTED PIECE PER GAME, counted in both directions", () => {
    * schema enforces, not the authoring gap CLAUDE.md rule 29 is about.
    */
   const provided = ALL_GAMES.filter((g) => g.sourcing === "provided");
-  // 23 until 2026-09-06, when the founder gave charades to the camp room.
-  assert.equal(provided.length, 24, `${provided.length} provided games rather than 24`);
+  // 23 until 2026-09-06, when the founder gave charades to the camp room, and
+  // 24 until later the same day, when she asked the camp for "all the field
+  // day games" and got five: the sack, the rope, the ankle, the egg and the
+  // bucket line. Every one of them is a folk form nobody owns, which is what
+  // lets the house print the rules in full — fishbowl's argument, five times.
+  assert.equal(provided.length, 29, `${provided.length} provided games rather than 29`);
 
   for (const game of provided) {
     assert.equal(
@@ -678,13 +682,19 @@ test("EVERY GAME_RULE THE FOUNDER WROTE IS A ROW, COUNTED IN BOTH DIRECTIONS", (
   );
   assert.equal(
     scoped.length,
-    18,
-    `${scoped.length} games claim a native destination rather than 18`
+    23,
+    `${scoped.length} games claim a native destination rather than 23`
   );
+  // ONE, THEN SIX. The camp's charades was the first game she ASSIGNED rather
+  // than wrote; the five field day games are the same act repeated, from
+  // "catskills multi day event gets all the field day games". Counting them
+  // separately is what keeps the two kinds of authorship legible: seventeen
+  // games are hers sentence and all, six are her instruction and the house's
+  // rules, and the difference must not be blurrable by an edit.
   assert.equal(
     assigned.length,
-    1,
-    `${assigned.length} room games declare NO RULE OF HERS rather than 1. ` +
+    6,
+    `${assigned.length} room games declare NO RULE OF HERS rather than 6. ` +
       `A game native to a room that writes no rule must say so in those ` +
       `words; a game that quietly stops quoting her must not pass as one.`
   );
@@ -758,7 +768,7 @@ test("HER SENTENCE SURVIVES VERBATIM, character for character", () => {
   });
 
   assert.equal(checked, 17, `${checked} room games quoted rather than 17`);
-  assert.equal(assigned, 1, `${assigned} room games assigned rather than 1`);
+  assert.equal(assigned, 6, `${assigned} room games assigned rather than 6`);
 });
 
 test("a room game is written for one room and says so with native, not affinity", () => {

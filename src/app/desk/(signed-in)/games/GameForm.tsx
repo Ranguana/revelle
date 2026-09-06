@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import type { FacetGroup } from "@/lib/desk/facets";
 import {
+  DAY_PHASES,
   GAME_SHAPES,
   GAME_SOURCING,
   HOST_ROLES,
@@ -55,6 +56,7 @@ export type GameValues = {
   how_it_works?: string;
   materials?: string | null;
   shape?: string;
+  phase?: string;
   sourcing?: string;
   duration_minutes?: number | null;
   duration_max_minutes?: number | null;
@@ -195,6 +197,28 @@ export default function GameForm({
           <span className={styles.hint}>
             Ambient runs underneath the night and takes no block — so it carries
             no duration, and the database refuses one.
+          </span>
+        </div>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="phase">
+            When it happens
+          </label>
+          <select
+            id="phase"
+            name="phase"
+            defaultValue={values.phase ?? "all"}
+            className={styles.select}
+          >
+            {DAY_PHASES.map((entry) => (
+              <option key={entry.code} value={entry.code}>
+                {entry.label}
+              </option>
+            ))}
+          </select>
+          <span className={styles.hint}>
+            No opinion is the answer for almost everything, and it is not
+            &ldquo;any time&rdquo; — it is no claim at all. The field day is
+            daylight; the charades is not, and does not have to say so.
           </span>
         </div>
         <div className={styles.field}>

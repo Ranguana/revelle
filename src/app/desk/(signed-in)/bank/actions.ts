@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
-import { BANK_KINDS, BANK_PHASES, slugify } from "@/lib/desk/labels";
+import { BANK_KINDS, DAY_PHASES, slugify } from "@/lib/desk/labels";
 import {
   clearRequirement,
   declareRequirement,
@@ -57,7 +57,7 @@ import { recordAction, requireStaff } from "@/lib/staff";
 export type BankState = { error: string | null };
 
 const KIND_CODES = BANK_KINDS.map((entry) => entry.code);
-const PHASE_CODES = BANK_PHASES.map((entry) => entry.code);
+const PHASE_CODES = DAY_PHASES.map((entry) => entry.code);
 // `retired` joined the list when the No button started retiring instead of
 // deleting — see refuseBankItem below. It is a status a curator may set and a
 // seeder may not, which is the same rule every other status here follows.

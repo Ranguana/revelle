@@ -3,7 +3,7 @@ import Link from "next/link";
 import { query } from "@/lib/db";
 import {
   BANK_KINDS,
-  BANK_PHASES,
+  DAY_PHASES,
   POOL_STATUS,
   leadDays,
   shipsWord,
@@ -363,7 +363,7 @@ export default async function BankPage({
             the reason the default value here is "" rather than "all".
           */}
           <option value="">Any time of day</option>
-          {BANK_PHASES.map((entry) => (
+          {DAY_PHASES.map((entry) => (
             <option key={entry.code} value={entry.code}>
               {entry.code === "all"
                 ? "Only the ones with no opinion"
@@ -552,7 +552,7 @@ export default async function BankPage({
                   */}
                   {row.phase === "all"
                     ? "no opinion"
-                    : label(BANK_PHASES, row.phase)}
+                    : label(DAY_PHASES, row.phase)}
                 </td>
                 <td>
                   <Needs needs={carried.get(row.id)} />

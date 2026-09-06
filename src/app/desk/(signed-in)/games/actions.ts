@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { query, queryOne } from "@/lib/db";
 import { setTags, validFacetIds } from "@/lib/desk/facets";
-import { slugify } from "@/lib/desk/labels";
+import { DAY_PHASES, slugify } from "@/lib/desk/labels";
 import { carryReview } from "@/lib/desk/review";
 import { recordAction, requireStaff } from "@/lib/staff";
 
@@ -67,6 +67,10 @@ import { recordAction, requireStaff } from "@/lib/staff";
 const STATUSES = ["draft", "active", "discontinued"];
 const SHAPES = ["scheduled", "ambient", "finale"];
 const SOURCING = ["provided", "recommended"];
+// db/068, and derived from the one list rather than restated: a second copy
+// of the phase vocabulary here would be correct until the enum grows a value,
+// exactly as `dawn` grew one in db/033 (CLAUDE.md rule 21).
+const PHASES: readonly string[] = DAY_PHASES.map((entry) => entry.code);
 const HOST_ROLES = ["runs_it", "plays_too"];
 
 export type GameState = { error: string | null; hint: string | null };
@@ -133,6 +137,11 @@ export async function saveGame(
 
   const shape = trimmed(form, "shape");
   if (!SHAPES.includes(shape)) return { error: "Unknown shape.", hint: null };
+  // db/068. WHEN it happens, as opposed to what it does to an evening. `all`
+  // is the default and means NO OPINION, so a form that never showed the field
+  // still saves the truth.
+  const phase = trimmed(form, "phase") || "all";
+  if (!PHASES.includes(phase)) return { error: "Unknown time of day.", hint: null };
   const sourcing = trimmed(form, "sourcing");
   if (!SOURCING.includes(sourcing)) {
     return { error: "Unknown sourcing.", hint: null };
@@ -167,6 +176,7 @@ export async function saveGame(
     nullable(form, "materials"),
     shape,
     sourcing,
+    phase,
     durationMinutes,
     durationMax,
     minGuests,
@@ -190,14 +200,14 @@ export async function saveGame(
         `update game
             set slug = $1, name = $2, description = $3, how_it_works = $4,
                 materials = $5, shape = $6::game_shape,
-                sourcing = $7::game_sourcing,
-                duration_minutes = $8, duration_max_minutes = $9,
-                min_guests = $10, max_guests = $11,
-                scoring = $12, currency_label = $13,
-                external_name = $14, external_url = $15, caveat = $16,
-                host_role = $17::host_role, host_note = $18,
-                source_note = $19, notes = $20, status = $21::product_status
-          where id = $22`,
+                sourcing = $7::game_sourcing, phase = $8::day_phase,
+                duration_minutes = $9, duration_max_minutes = $10,
+                min_guests = $11, max_guests = $12,
+                scoring = $13, currency_label = $14,
+                external_name = $15, external_url = $16, caveat = $17,
+                host_role = $18::host_role, host_note = $19,
+                source_note = $20, notes = $21, status = $22::product_status
+          where id = $23`,
         [...values, id]
       );
     } else {
@@ -208,13 +218,14 @@ export async function saveGame(
       const rows = await query<{ id: string }>(
         `insert into game
            (slug, name, description, how_it_works, materials, shape, sourcing,
-            duration_minutes, duration_max_minutes, min_guests, max_guests,
-            scoring, currency_label, external_name, external_url, caveat,
-            host_role, host_note, source_note, notes, status)
-         values ($1,$2,$3,$4,$5,$6::game_shape,$7::game_sourcing,$8,$9,$10,$11,
-                 $12,$13,$14,$15,$16,$17::host_role,$18,$19,$20,'draft')
+            phase, duration_minutes, duration_max_minutes, min_guests,
+            max_guests, scoring, currency_label, external_name, external_url,
+            caveat, host_role, host_note, source_note, notes, status)
+         values ($1,$2,$3,$4,$5,$6::game_shape,$7::game_sourcing,
+                 $8::day_phase,$9,$10,$11,$12,
+                 $13,$14,$15,$16,$17,$18::host_role,$19,$20,$21,'draft')
          returning id`,
-        values.slice(0, 20)
+        values.slice(0, 21)
       );
       gameId = rows[0].id;
     }
@@ -236,7 +247,7 @@ export async function saveGame(
     entityTable: "game",
     entityId: gameId,
     summary: `${name} (${id ? status : "draft"})`,
-    detail: { slug, shape, sourcing, status, facets: facets.length },
+    detail: { slug, shape, sourcing, phase, status, facets: facets.length },
   });
 
   revalidatePath("/desk/games");

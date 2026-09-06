@@ -291,7 +291,14 @@ export const BANK_KINDS: readonly { code: string; label: string }[] = [
 ];
 
 /**
- * `bank_phase` in db/031 — and the whole reason this map exists is `all`.
+ * `day_phase` — db/031's enum, renamed by db/068 when games got a column on
+ * it. THE WHOLE REASON THIS MAP EXISTS IS `all`.
+ *
+ * It was `BANK_PHASES` until the bank stopped being the only pool with an
+ * opinion about the hour. Nothing about the values, their order or their
+ * glosses changed; the name did, because a game reading its time of day off a
+ * list called BANK_PHASES is CLAUDE.md rule 23's shape — the thing is not
+ * broken, the name promises something else.
  *
  * `all` IS THE DEFAULT AND MEANS NO OPINION. It is not "every phase" and it is
  * not "always". Most atmosphere has no time of day, and db/031 chose that
@@ -319,7 +326,7 @@ export const BANK_KINDS: readonly { code: string; label: string }[] = [
  * which one, and a list that mixes it in among the four invites a curator to
  * pick it as though it were one.
  */
-export const BANK_PHASES: readonly {
+export const DAY_PHASES: readonly {
   code: string;
   label: string;
   gloss: string;

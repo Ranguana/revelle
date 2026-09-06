@@ -370,23 +370,29 @@ try {
       const orphanNatives = unresolvableNatives(game, worldId);
       const held = isHeldBack(game) || orphanNatives.length > 0;
       const { rows } = await client.query(
-        // THE PLACEHOLDERS RUN $1..$21 WITH NO GAP. `status` was the literal
-        // 'draft' until db/038 and is now bound like everything else, which is
-        // the moment a column list gets renumbered wrongly — see the note in
-        // scripts/seed-bank.mjs's insert, where exactly that left $7 skipped
-        // and the statement running off the end. src/lib/seed-binds.test.ts
-        // now checks this statement and every other one in the tree.
+        // THE PLACEHOLDERS RUN $1..$22 WITH NO GAP. `status` was the literal
+        // 'draft' until db/038 and is now bound like everything else, and
+        // `phase` was added by db/068 — both are the moment a column list gets
+        // renumbered wrongly, see the note in scripts/seed-bank.mjs's insert,
+        // where exactly that left $7 skipped and the statement running off the
+        // end. src/lib/seed-binds.test.ts now checks this statement and every
+        // other one in the tree.
+        //
+        // `phase` COALESCES TO 'all' RATHER THAN BINDING NULL: db/068 makes the
+        // column not-null with that default, and `all` means NO OPINION, which
+        // is what a game that does not state an hour means. Binding null would
+        // fail the insert; binding 'all' says the true thing.
         `insert into game (
            slug, name, description, how_it_works, materials,
-           shape, sourcing,
+           shape, sourcing, phase,
            duration_minutes, duration_max_minutes,
            min_guests, max_guests,
            scoring, currency_label,
            external_name, external_url, caveat,
            source_note, notes, host_role, host_note, status)
-         values ($1,$2,$3,$4,$5,$6::game_shape,$7::game_sourcing,
-                 $8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,
-                 $19::host_role,$20,$21::product_status)
+         values ($1,$2,$3,$4,$5,$6::game_shape,$7::game_sourcing,$8::day_phase,
+                 $9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,
+                 $20::host_role,$21,$22::product_status)
          returning id`,
         [
           game.slug,
@@ -396,6 +402,7 @@ try {
           game.materials ?? null,
           game.shape,
           game.sourcing,
+          game.phase ?? "all",
           game.durationMinutes ?? null,
           game.durationMaxMinutes ?? null,
           game.minGuests ?? null,
