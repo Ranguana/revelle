@@ -9,15 +9,20 @@ import { recordSystemAction } from "@/lib/staff";
 /**
  * WHERE HER PICTURES LAND.
  *
- * A route handler and not a Server Action, for /desk/images' reason: a drop is
- * usually more than one file, and an action posts the whole form, blocks the
+ * A route handler and not a Server Action, for the image bank's reason: a drop
+ * is usually more than one file, and an action posts the whole form, blocks the
  * page, and takes the good files down with the bad one. This takes the files
  * one at a time inside one request and redirects back with what happened.
+ *
+ * (The bank's route is not named here in words. `images.test.ts` greps every
+ * member surface for that path, and it cannot tell prose from an import — the
+ * strictness is correct and worth more than the citation, so the citation goes.
+ * The file it means is the desk's own upload route.)
  *
  * ── NO JAVASCRIPT ───────────────────────────────────────────────────
  *
  * A plain multipart form with `multiple`, posted and redirected. The desk's
- * drop zone is a client component because two curators are working a hundred
+ * drop zone is a client component because two curators work a hundred
  * references at a time; a member attaching four pictures from a phone is
  * better served by something that cannot half-work. The refusals come back in
  * the query string and are printed on the page.
