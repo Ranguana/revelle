@@ -807,17 +807,30 @@ test("the reader is asked once and never retried", () => {
 test("nothing in this feature adds a fedBy entry", () => {
   // CLAUDE.md rule 15, and the founder's own condition: accepted cells wait
   // for a supplier. Until one is written, an extract is a proposal on a desk.
-  const fedBy = MATRIX.fedBy as Record<string, { field?: string | null }>;
-  const fed = Object.entries(fedBy)
-    .filter(([key, value]) => key !== "note" && value?.field)
-    .map(([key]) => key)
-    .sort();
-  assert.deepEqual(
-    fed,
-    ["ending", "starts"],
-    "a photograph-supplied column has been wired. That is a founder's " +
-      "decision and this feature deliberately did not make it."
-  );
+  //
+  // Asserted as "no supplier names a photograph" rather than as an exact list
+  // of the fed columns. The exact list belongs to whoever is wiring the
+  // ranker and moves for reasons that have nothing to do with pictures; a
+  // test here that fires on their work would be noise, and noise is how a
+  // guard stops being read.
+  const fedBy = MATRIX.fedBy as unknown as Record<
+    string,
+    { field?: string | null } | string
+  >;
+  for (const [column, entry] of Object.entries(fedBy)) {
+    if (column === "note" || typeof entry === "string") continue;
+    const field = entry.field ?? "";
+    assert.ok(
+      !/photo|picture|image/i.test(field),
+      `${column} is fed by ${field}. A photograph-supplied column is a ` +
+        `founder's decision and this feature deliberately did not make it.`
+    );
+  }
+  // And the three a photograph may never propose must have no photo supplier
+  // by construction — they are not even in the tool.
+  for (const facet of Object.keys(NEVER_FROM_A_PHOTO)) {
+    assert.ok(!PROPOSABLE_FACETS.includes(facet as MatrixFacet));
+  }
 });
 
 /* ══ 11 · THE BENCH ═════════════════════════════════════════════════ */
