@@ -4,7 +4,7 @@ import type { QueryResultRow } from "pg";
 
 import { transaction } from "@/lib/db";
 import { composed } from "@/lib/desk/publish";
-import { chooseStatement } from "@/lib/portal/choice";
+import { chooseStatement, scheduleStatement } from "@/lib/portal/choice";
 import { OPENABLE } from "@/lib/portal/occasions";
 
 /**
@@ -112,13 +112,22 @@ export async function chooseInOffer(input: {
 
     // NOTHING MATCHED, OR THE SLUG IS NOT IN THIS OFFER.
     //
-    // The second is the one worth naming: the update above clears the group
-    // whether or not the slug is in it, so a bad slug would otherwise leave
-    // her with an offer and no choice — a button that un-chose her main course
-    // and said nothing. Rolling back is the only honest answer, and returning
-    // false is what makes the caller leave the page as it was.
+    // The second is the one worth naming: the update above clears an exclusive
+    // group whether or not the slug is in it, so a bad slug would otherwise
+    // leave her with an offer and no choice — a button that un-chose her main
+    // course and said nothing. Rolling back is the only honest answer, and
+    // returning false is what makes the caller leave the page as it was.
+    //
+    // THE CHECK USED TO BE "SOMETHING IS NOW CHOSEN", which was the same thing
+    // while every offer was an OR: a good slug always left one card taken.
+    // db/069's `any_of` breaks that equivalence in the honest direction — a
+    // host putting a field day game BACK legitimately leaves nothing chosen —
+    // and the old form would have rolled her correction back and told her
+    // nothing. So it asks the question it always meant: was the card she
+    // pressed in this offer at all? For an exclusive offer the two are
+    // identical, which is why this is a repair and not a loosening.
     if (rows.length === 0) throw new Rollback();
-    if (!rows.some((row) => row.chosen_at !== null)) throw new Rollback();
+    if (!rows.some((row) => row.slug === input.slug)) throw new Rollback();
     return true;
   }).catch((err) => {
     if (err instanceof Rollback) return false;
@@ -126,5 +135,78 @@ export async function chooseInOffer(input: {
   });
 }
 
-/** Not an error anybody reports. It is how the statement above is undone. */
+/**
+ * PUTTING ONE ON A DAY — db/069.
+ *
+ * Founder: "it is a set across different days if host wants it." A member of a
+ * set she is running may sit on any day her occasion has, independently of its
+ * siblings, and this is the write that says so.
+ *
+ * The same authorisation as choosing, for the same reason: her Revelle, her
+ * offer, her card, in one statement, so none of the three can be true of a
+ * different row than the other two. And the same silence on refusal — a member
+ * who has landed on somebody else's Revelle is not owed an explanation of the
+ * schema.
+ *
+ * `day` is null to unschedule, which is a real answer and not an absence of
+ * one: a game she is running and has not placed on a day is legible as
+ * unscheduled, and never silently lands on the first morning.
+ *
+ * THE UPPER BOUND IS THE DATABASE'S. db/069's constraint trigger reads
+ * `occasion_shape.days` through her quiz response, so a day outside her
+ * occasion raises there rather than being range-checked here against a second
+ * copy of the same fact (rule 21). The raise rolls the transaction back and
+ * the caller sees a failure, which is correct: a page offering day four of a
+ * three-day weekend is a bug in the page, not a member's mistake to absorb.
+ */
+export async function scheduleInOffer(input: {
+  customerId: string;
+  revelleId: string;
+  pool: string;
+  group: string;
+  slug: string;
+  /** 1-based. Null puts it back to unscheduled. */
+  day: number | null;
+}): Promise<boolean> {
+  const statement = scheduleStatement(input.pool);
+  if (statement === null) return false;
+
+  if (input.day !== null && (!Number.isInteger(input.day) || input.day < 1)) {
+    // NOT AN EXCEPTION. A day out of a form is the same class of thing as a
+    // slug naming no card, and gets the same silent answer.
+    return false;
+  }
+
+  return transaction(async (tx) => {
+    const ask = async <T extends QueryResultRow>(
+      text: string,
+      params?: readonly unknown[]
+    ): Promise<T[]> =>
+      (await tx.query<T>(text, params ? [...params] : [])).rows;
+
+    const { rows } = await tx.query(
+      await composed(ask, statement.template, statement.identifiers),
+      [
+        input.customerId,
+        input.revelleId,
+        input.group,
+        input.slug,
+        OPENABLE,
+        input.day,
+      ]
+    );
+
+    // NO ROW MATCHED: not hers, not in this offer, or not a card she is
+    // running. The schema refuses a day on an unchosen card and so does the
+    // statement, so this is the ordinary answer for a day pressed on a game
+    // she has put back.
+    if (rows.length === 0) throw new Rollback();
+    return true;
+  }).catch((err) => {
+    if (err instanceof Rollback) return false;
+    throw err;
+  });
+}
+
+/** Not an error anybody reports. It is how the statements above are undone. */
 class Rollback extends Error {}

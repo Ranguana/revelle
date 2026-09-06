@@ -507,3 +507,47 @@
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+
+/*
+ * WHICH DAY SHE IS RUNNING IT ON — db/069.
+ *
+ * Only ever drawn under a card of a SET she has taken, on an occasion that has
+ * more than one day. It sits below the choose button and is deliberately the
+ * quieter of the two: taking a game is the decision, placing it is an
+ * adjustment, and a control that shouted would make the page look like a form
+ * to fill in rather than an evening she is arranging.
+ */
+.offerDay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.offerDay label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.offerDayLabel {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* 44px, for the same reason the button is: she is standing up, on a phone. */
+.offerDay select {
+  appearance: none;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+}

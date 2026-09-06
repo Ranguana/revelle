@@ -98,6 +98,35 @@ export function settledSql(alias: string): string {
 }
 
 /**
+ * ── AND THEN THE FIELD DAY — db/069 ─────────────────────────────────
+ *
+ * Founder, 2026-09-06: "field day games include all and she chooses", and then
+ * "it is a set across different days if host wants it."
+ *
+ * AN OFFER IS NO LONGER ALWAYS AN OR, and this module is where that stops
+ * being a schema fact and becomes a behaviour. `occasion_slot.offer_rule`
+ * names two kinds and `revelle_<pool>.offer_exclusive` stamps which kind a
+ * delivered row arrived in:
+ *
+ *   one_of   db/061's carousel. Taking one clears its siblings.
+ *   any_of   the field day. Taking one leaves its siblings exactly as they
+ *            were, and she may hold any non-empty subset of them.
+ *
+ * THE RULE IS READ OFF THE ROW AND NEVER OFF THE CALLER. A parameter saying
+ * which kind of offer this is would be a second authority over a fact the
+ * delivered row already carries (rule 21), and the failure would be the worst
+ * available: a caller passing the wrong one would either clear a host's field
+ * day down to a single game or leave a carousel holding two, and both look
+ * like a working button. So the `case` below branches on `j.offer_exclusive`,
+ * inside the statement, where a caller cannot reach it.
+ *
+ * `isSettled` NEEDED NO CHANGE, and that is worth recording rather than
+ * assuming. A row in an `any_of` offer that she has not taken is unsettled by
+ * exactly the same sentence that made an unchosen carousel card unsettled —
+ * offered, delivered, hers, and not part of the night. The prep list buys for
+ * the three field day games she picked and not for the two she did not,
+ * without a line of this module knowing what a field day is.
+ *
  * THE STATEMENT, AS A TEMPLATE AND THE THREE NAMES IT NEEDS.
  *
  * Separated from the write so that the composition can be driven by a test on
@@ -123,7 +152,31 @@ export function chooseStatement(
   return {
     template:
       "update %I j" +
-      " set chosen_at = case when t.slug = $4 then now() else null end" +
+      // THE WHOLE OF BOTH RULES, IN ONE EXPRESSION.
+      //
+      // An exclusive offer is set in one pass — the pressed card to now() and
+      // its siblings to null — so there is no instant at which two are chosen
+      // and none at which none is. That was db/061's argument and it is
+      // unchanged.
+      //
+      // A non-exclusive offer TOUCHES ONLY THE CARD SHE PRESSED, and toggles
+      // it: pressing an unchosen card takes it, pressing a chosen one puts it
+      // back. `else j.chosen_at` is load-bearing — without it every sibling
+      // would be rewritten to its own value, which is harmless today and is
+      // exactly the line somebody edits into `null` while "simplifying".
+      " set chosen_at = case" +
+      "   when j.offer_exclusive" +
+      "     then case when t.slug = $4 then now() else null end" +
+      "   when t.slug = $4" +
+      "     then case when j.chosen_at is null then now() else null end" +
+      "   else j.chosen_at end," +
+      // AND UNTAKING A CARD UNSCHEDULES IT. The schema refuses a run_day on a
+      // row with no chosen_at, so this is not a nicety: without it the toggle
+      // would fail the constraint on the way out and a host correcting herself
+      // would meet an error. Rule 18 — nothing may punish a correction.
+      "   run_day = case" +
+      "     when t.slug = $4 and j.chosen_at is not null then null" +
+      "     else j.run_day end" +
       " from %I t, revelle r" +
       " where t.id = j.%I" +
       " and r.id = j.revelle_id" +
@@ -136,6 +189,48 @@ export function chooseStatement(
   };
 }
 
+/**
+ * WHICH DAY SHE IS RUNNING IT ON — db/069.
+ *
+ * Separate from `chooseStatement` because it answers a different question and
+ * because bundling them would make every choice a scheduling decision: she may
+ * take a game today and say nothing about which afternoon it belongs on, and
+ * `run_day` null means exactly that rather than "day one".
+ *
+ * The schema refuses a day on a card she has not taken, so this can only ever
+ * move a day around inside what she is already running. `$4` is the slug and
+ * `$6` the day, null to unschedule.
+ */
+export function scheduleStatement(
+  pool: string
+): { template: string; identifiers: string[] } | null {
+  const entity = tablesFor(pool);
+  if (!entity?.joinTable) return null;
+
+  const idColumn = idColumnFor(entity.pool as EntityTable);
+
+  return {
+    template:
+      "update %I j" +
+      " set run_day = $6::integer" +
+      " from %I t, revelle r" +
+      " where t.id = j.%I" +
+      " and r.id = j.revelle_id" +
+      " and j.revelle_id = $2" +
+      " and r.customer_id = $1" +
+      " and r.status = any($5::revelle_status[])" +
+      " and j.offer_group = $3" +
+      " and t.slug = $4" +
+      // ONLY WHAT SHE IS RUNNING. The database says the same thing and would
+      // raise; saying it here too means the statement matches no row and the
+      // caller rolls back silently, which is the right answer for a member who
+      // has pressed a day on a card she has not taken.
+      " and j.chosen_at is not null" +
+      " returning j.%I as entity_id, t.slug, j.run_day",
+    identifiers: [entity.joinTable, entity.pool, idColumn, idColumn],
+  };
+}
+
 /* ── the carousel, as the page reads it ─────────────────────────────── */
 
 export type OfferCard = {
@@ -144,8 +239,18 @@ export type OfferCard = {
   name: string;
   description: string;
   pool: string;
-  /** True for the one she has taken. At most one card in an offer is true. */
+  /**
+   * True for a card she has taken. AT MOST ONE IS TRUE IN AN EXCLUSIVE OFFER
+   * and any number may be true in a set — read `Offer.exclusive` before
+   * assuming which, because db/069 made both real.
+   */
   chosen: boolean;
+  /**
+   * db/069. Which day she has put it on, 1-based, or null for she has not
+   * said. Only ever set on a chosen card, and only meaningful on an occasion
+   * that has more than one day.
+   */
+  runDay: number | null;
 };
 
 export type Offer = {
@@ -165,7 +270,28 @@ export type Offer = {
   heading: string;
   /** In delivery order, always. See rule 18 above. */
   cards: OfferCard[];
-  /** True once she has taken one of them. */
+  /**
+   * WHAT KIND OF OFFER — db/069.
+   *
+   * True is db/061's carousel: three cards, one runs, taking one puts the
+   * others back. False is a SET: all of them were delivered and she runs any
+   * non-empty subset, each on a day of its own. "Field day games include all
+   * and she chooses."
+   *
+   * A property of the OFFER and not of a card, because the rule is stamped on
+   * every row of the group from one `occasion_slot.offer_rule` — and READ from
+   * the rows rather than inferred from how many there are, since a room with
+   * two field day games would otherwise read as a two-card carousel.
+   */
+  exclusive: boolean;
+  /**
+   * True once she has taken one of them.
+   *
+   * The same sentence for both kinds, deliberately: an offer she has acted on
+   * is settled, and one she has not is a beat still waiting for her. It does
+   * NOT mean "finished" for a set — she may take a fourth game tomorrow — and
+   * nothing downstream reads it that way; `isSettled` is per card.
+   */
   settled: boolean;
 };
 
@@ -211,7 +337,27 @@ export type Entry =
  */
 export function offerLead(offer: Offer): string {
   const count = inWords(offer.cards.length);
-  const opening = `${count.charAt(0).toUpperCase()}${count.slice(1)} to choose between.`;
+  const many = `${count.charAt(0).toUpperCase()}${count.slice(1)}`;
+
+  // A SET IS NOT A CAROUSEL AND MUST NOT BE DESCRIBED AS ONE — db/069.
+  //
+  // "Three to choose between. The one you pick is the one that runs" is true
+  // of a carousel and false of a field day, and a member reading it would
+  // reasonably believe that taking the rope put the sack race back. That is
+  // rule 16's shape in copy rather than in code: the page would be telling her
+  // the mechanism does something it does not.
+  //
+  // The line credits her either way (rule 10). It says what is hers to decide,
+  // never what the house has done.
+  if (!offer.exclusive) {
+    const opening = `${many}, and they are all yours.`;
+    if (offer.settled) {
+      return `${opening} Run as many as you want, on whichever days you want.`;
+    }
+    return `${opening} Take the ones you want and leave the rest.`;
+  }
+
+  const opening = `${many} to choose between.`;
   if (offer.settled) return `${opening} Change your mind whenever you like.`;
 
   switch (offer.pool) {
@@ -278,7 +424,14 @@ export function entriesIn(pieces: readonly MemberPiece[]): Entry[] {
           description: member.description,
           pool: member.pool,
           chosen: member.chosen,
+          runDay: member.runDay,
         })),
+        // READ OFF THE ROWS, NEVER COUNTED. Every card of a group carries the
+        // same stamp, so the first one answers for all of them; `?? true` is
+        // for a Revelle delivered before db/069, whose offers were all
+        // carousels and whose rows carry null. That is not a guess — it is
+        // what every offer made before that migration was.
+        exclusive: siblings[0].offerExclusive ?? true,
         settled: siblings.some((member) => member.chosen),
       },
     });

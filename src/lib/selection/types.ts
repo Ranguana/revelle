@@ -682,6 +682,20 @@ export type UnitSlot = {
    * be where it was the first time she looked, whatever she has clicked since.
    */
   offerIndex?: number;
+  /**
+   * db/069. WHAT KIND OF OFFER — true for db/061's carousel (one runs), false
+   * for `any_of` (any non-empty subset runs), null for no offer.
+   *
+   * Absent on the forward path and present on the read-back, and that is not
+   * an oversight: the kind is STAMPED on the delivered row at approval from
+   * `occasion_slot.offer_rule`, so a plan has no stamp to report. See db/069.
+   */
+  offerExclusive?: boolean | null;
+  /**
+   * db/069. Which day SHE put it on, 1-based, or null for she has not said.
+   * Only ever present on a read-back: the engine delivers and never schedules.
+   */
+  runDay?: number | null;
 };
 
 export type Catalogue = {

@@ -128,6 +128,8 @@ export type PickRow = {
   offer_group: string | null;
   /** db/061. When she took this one. Null means she has not. */
   chosen_at: string | null;
+  offer_exclusive: boolean | null;
+  run_day: number | null;
   printed_matter: unknown;
 };
 
@@ -406,6 +408,12 @@ async function readPool(
     // offer_count is pool-agnostic, and a read that only looked for them on
     // one pool would drop an offer the plan legitimately produced.
     " j.offer_group, j.chosen_at::text as chosen_at," +
+    // db/069. What KIND of offer it was, and which day she put it on. Read
+    // for every pool for db/061's own reason: the columns are on every join
+    // table because the mechanism is registered on occasion_slot, and a read
+    // that only looked for them on the game would drop a set the plan
+    // legitimately produced over another pool.
+    " j.offer_exclusive, j.run_day," +
     " sk.label as slot_label, sk.section::text as slot_section," +
     " sk.per_guest as slot_per_guest, sk.position as slot_position,";
 
@@ -546,6 +554,8 @@ function toPick(row: PickRow, guestCount: number | null): Pick {
     // db/061. Carried so the page can show her the choice she was given; the
     // ORDER of the cards is the order this row arrived in, not this number.
     offerGroup: row.offer_group ?? null,
+    offerExclusive: row.offer_exclusive ?? null,
+    runDay: row.run_day ?? null,
   };
 
   // WHAT SHE HAS NOT PICKED PRINTS NOTHING AND BUYS NOTHING.

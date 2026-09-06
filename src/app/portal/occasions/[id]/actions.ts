@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireMember } from "@/lib/members";
-import { chooseInOffer } from "@/lib/portal/choose";
+import { chooseInOffer, scheduleInOffer } from "@/lib/portal/choose";
 
 /**
  * SHE PICKS ONE OF THE THREE — the game, and since db/062 each of the courses.
@@ -67,6 +67,61 @@ export async function chooseAction(form: FormData): Promise<void> {
     pool,
     group,
     slug,
+  });
+
+  revalidatePath(`/portal/occasions/${revelleId}`);
+}
+
+/**
+ * SHE PUTS ONE OF THE SET ON A DAY — db/069.
+ *
+ * Founder: "it is a set across different days if host wants it." The field day
+ * arrives whole and she spreads it, or does not, per member.
+ *
+ * ── IT IS ITS OWN ACTION, AND NOT A SECOND ARGUMENT TO chooseAction ──
+ *
+ * Taking a game and placing it on Sunday are two decisions, and bundling them
+ * would force the first to imply the second: every card she took would land on
+ * a day, and null — SHE HAS NOT SAID — would stop being expressible. That is
+ * the value the column exists to hold, and a mechanism that cannot represent
+ * "not yet" invents an answer she did not give (rule 16).
+ *
+ * Everything else is chooseAction's, for chooseAction's reasons: it revalidates
+ * and does not redirect, the session is what makes it her Revelle, and there is
+ * no error to render because there is no refusal to report that she caused.
+ */
+export async function scheduleAction(form: FormData): Promise<void> {
+  const revelleId = String(form.get("revelleId") ?? "").trim();
+  const pool = String(form.get("pool") ?? "").trim();
+  const group = String(form.get("group") ?? "").trim();
+  const slug = String(form.get("slug") ?? "").trim();
+  const raw = String(form.get("day") ?? "").trim();
+  if (
+    revelleId.length === 0 ||
+    pool.length === 0 ||
+    group.length === 0 ||
+    slug.length === 0
+  ) {
+    return;
+  }
+
+  // AN EMPTY SELECTION IS "SHE HAS NOT SAID", NOT A FAILED PARSE. The control
+  // carries a blank option on purpose — a set she is running without having
+  // decided the days is a real and common state — so an empty string is the
+  // member unscheduling, and anything that is not a whole number is a request
+  // that never reaches a statement.
+  const day = raw.length === 0 ? null : Number(raw);
+  if (day !== null && !Number.isInteger(day)) return;
+
+  const member = await requireMember();
+
+  await scheduleInOffer({
+    customerId: member.id,
+    revelleId,
+    pool,
+    group,
+    slug,
+    day,
   });
 
   revalidatePath(`/portal/occasions/${revelleId}`);

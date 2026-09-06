@@ -110,6 +110,23 @@ export type MemberPiece = {
    * three belong together could not show her the choice she was promised.
    */
   offerGroup: string | null;
+  /**
+   * db/069. WHAT KIND OF OFFER this card arrived in, stamped at delivery.
+   *
+   * True is db/061's carousel — one of them runs. False is `any_of`: she runs
+   * any non-empty subset, which is what "field day games include all and she
+   * chooses" needed. Null when the house simply placed it and there is no
+   * offer at all.
+   *
+   * READ, NEVER DERIVED. A page that inferred the kind from how many cards it
+   * could see would call a two-card field day a carousel.
+   */
+  offerExclusive: boolean | null;
+  /**
+   * db/069. WHICH DAY she is running it on, 1-based, or null for SHE HAS NOT
+   * SAID — never "day one". Only ever set on a card she has taken.
+   */
+  runDay: number | null;
   /** True for the one she has taken. At most one per offer. */
   chosen: boolean;
 };
@@ -211,6 +228,11 @@ export function memberRevelle(candidate: Candidate): MemberRevelle {
       // db/061. Both null/false on anything the engine has just produced: a
       // run of the engine delivers an offer and never makes a choice.
       offerGroup: pick.slot.offerGroup ?? null,
+      // Both are null on the forward path and set on the read-back, because
+      // both are facts about a DELIVERED row: the stamp is taken at approval
+      // and the day is hers to set afterwards. A plan has neither.
+      offerExclusive: pick.slot.offerExclusive ?? null,
+      runDay: pick.slot.runDay ?? null,
       chosen: pick.chosen ?? false,
     }));
 

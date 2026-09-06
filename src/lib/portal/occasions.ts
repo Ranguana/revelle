@@ -98,6 +98,15 @@ export type Occasion = {
   revelle: MemberRevelle;
   /** A short list. Not a project plan — docs/portal-spec.md says so. */
   prep: PrepLine[];
+  /**
+   * db/069. How many days her occasion runs — `occasion_shape.days`.
+   *
+   * One for an evening, three for a weekend. It bounds every day control the
+   * page draws, and it is the SAME number the database checks a `run_day`
+   * against, read from the same table, so a page cannot offer a day the write
+   * would refuse (rule 21).
+   */
+  days: number;
 };
 
 /* ── the shelf ──────────────────────────────────────────────────────── */
@@ -147,6 +156,7 @@ export async function listOccasions(customerId: string): Promise<Occasions> {
 type RevelleRow = {
   id: string;
   occasion: string;
+  days: number | null;
   world_id: string;
   world_slug: string;
   name: string;
@@ -173,10 +183,17 @@ export async function readOccasion(
 ): Promise<Occasion | null> {
   if (!/^[0-9a-f-]{36}$/i.test(revelleId)) return null;
 
+  // `occasion_shape.days` joins in for db/069: how many days her occasion
+  // runs, so the page can offer a day for each member of a set she is running.
+  // Read from the table rather than from a switch, for db/009's own reason —
+  // a product decision that lives in a switch is a product decision nobody can
+  // find — and read from the SAME table the run_day trigger checks against, so
+  // a page cannot offer a day the write would refuse (rule 21).
   const row = await queryOne<RevelleRow>(
     `select r.id, r.event_date, r.guest_count, r.dedication,
             r.tokens_override,
             q.occasion::text                        as occasion,
+            os.days                                 as days,
             w.id                                    as world_id,
             w.slug::text                            as world_slug,
             coalesce(r.title_override, w.name)      as name,
@@ -185,6 +202,7 @@ export async function readOccasion(
        from revelle r
        join world w on w.id = r.world_id
        join quiz_response q on q.id = r.quiz_response_id
+       join occasion_shape os on os.occasion = q.occasion
       where r.id = $1 and r.customer_id = $2
         and r.status = any($3::revelle_status[])`,
     [revelleId, customerId, OPENABLE]
@@ -208,6 +226,7 @@ export async function readOccasion(
     premise: row.description ?? "",
     dedication: row.dedication,
     theme: look.theme,
+    days: Math.max(1, row.days ?? 1),
     revelle: memberRevelle(
       candidateFrom(
         {

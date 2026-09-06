@@ -8,7 +8,7 @@ import { UnrenderableIngredients } from "@/lib/portal/picks";
 import { inHouseOrder, inWords, longDate } from "@/lib/portal/sections";
 import { themeCss } from "@/lib/tokens";
 
-import { chooseAction } from "./actions";
+import { chooseAction, scheduleAction } from "./actions";
 import styles from "./occasion.module.css";
 
 /**
@@ -220,6 +220,7 @@ export default async function OccasionPage({
                       offer={entry.offer}
                       revelleId={occasion.id}
                       label={label}
+                      days={occasion.days}
                     />
                   )
                 )}
@@ -432,10 +433,13 @@ function Carousel({
   offer,
   revelleId,
   label,
+  days,
 }: {
   offer: Offer;
   revelleId: string;
   label: boolean;
+  /** occasion_shape.days — db/069. Bounds the day control and hides it at 1. */
+  days: number;
 }) {
   return (
     <section className={styles.offer} aria-label={offer.heading}>
@@ -463,7 +467,13 @@ function Carousel({
               </div>
             ) : null}
 
-              {card.chosen ? (
+              {card.chosen && offer.exclusive ? (
+                /*
+                  A CAROUSEL'S CHOSEN CARD IS A MARK AND NOT A BUTTON, because
+                  in an OR there is nothing to put it back to: the correction
+                  for taking the wrong game is taking the right one, which is
+                  the button on every other card (rule 18).
+                */
                 <p className={styles.offerMark}>Yours</p>
               ) : (
                 <form action={chooseAction}>
@@ -477,11 +487,52 @@ function Carousel({
                   <input type="hidden" name="pool" value={card.pool} />
                   <input type="hidden" name="group" value={offer.group} />
                   <input type="hidden" name="slug" value={card.slug} />
+                  {/*
+                    A SET'S CHOSEN CARD IS REVERSIBLE — db/069. The same form
+                    and the same action; the statement toggles. Without this
+                    button the toggle in the SQL would be unreachable and her
+                    choice could only ever add, which is a mechanism that
+                    accepts an input and gives her no way to take it back
+                    (rules 16 and 18).
+                  */}
                   <button className={styles.offerChoose} type="submit">
-                    Choose this
+                    {card.chosen ? "Put it back" : "Choose this"}
                   </button>
                 </form>
             )}
+
+            {/*
+              WHICH DAY SHE IS RUNNING IT ON — db/069, and only where the
+              question exists: a set she is running, on an occasion with more
+              than one day. On an evening there is no day to choose and the
+              control is not drawn, rather than drawn and disabled.
+
+              The blank option is the real answer "she has not said", not a
+              placeholder: a game she is running and has not placed is legible
+              as unscheduled and never silently lands on the first morning.
+            */}
+            {!offer.exclusive && card.chosen && days > 1 ? (
+              <form action={scheduleAction} className={styles.offerDay}>
+                <input type="hidden" name="revelleId" value={revelleId} />
+                <input type="hidden" name="pool" value={card.pool} />
+                <input type="hidden" name="group" value={offer.group} />
+                <input type="hidden" name="slug" value={card.slug} />
+                <label>
+                  <span className={styles.offerDayLabel}>Which day</span>
+                  <select name="day" defaultValue={card.runDay ?? ""}>
+                    <option value="">Not yet</option>
+                    {Array.from({ length: days }, (_, index) => (
+                      <option key={index + 1} value={index + 1}>
+                        {`Day ${index + 1}`}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button className={styles.offerChoose} type="submit">
+                  Set the day
+                </button>
+              </form>
+            ) : null}
           </article>
         ))}
       </div>

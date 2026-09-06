@@ -32,6 +32,8 @@ function piece(over: Partial<MemberPiece> & { name: string }): MemberPiece {
     perGuest: false,
     dayIndex: null,
     offerGroup: null,
+    offerExclusive: null,
+    runDay: null,
     chosen: false,
     ...over,
   };
@@ -324,4 +326,113 @@ test("changing her mind is one card unmarked and another marked", () => {
       "at most one, which db/061's partial unique index enforces below this"
     );
   }
+});
+
+/* ── the set, and the carousel it is not — db/069 ───────────────────── */
+
+test("A SET IS NOT DESCRIBED AS A CAROUSEL", () => {
+  /*
+   * Founder: "field day games include all and she chooses." The lead line above
+   * an `any_of` offer must not say "the one you pick is the one that runs" —
+   * it is true of a carousel, false of a field day, and a member reading it
+   * would reasonably believe that taking the rope put the sack race back.
+   * Rule 16's shape in copy rather than in code.
+   */
+  const cards = [
+    piece({ name: "The Rope", offerGroup: "field_day:1:0", offerExclusive: false }),
+    piece({ name: "The Sack Race", offerGroup: "field_day:1:0", offerExclusive: false }),
+    piece({ name: "Egg And Spoon", offerGroup: "field_day:1:0", offerExclusive: false }),
+  ];
+  const [entry] = entriesIn(cards);
+  assert.equal(entry.kind, "offer");
+  if (entry.kind !== "offer") return;
+
+  assert.equal(entry.offer.exclusive, false, "the set read as a carousel");
+
+  const lead = offerLead(entry.offer);
+  assert.doesNotMatch(lead, /the one you pick/i, "it promises exclusivity");
+  assert.doesNotMatch(lead, /choose between/i, "they are not alternatives");
+  assert.match(lead, /all yours/i, "and it says what she was actually given");
+
+  // And it credits her rather than the house (rule 10): what is hers to
+  // decide, never what the product has done.
+  assert.doesNotMatch(lead, /\b(we|we've|the house|arrives?)\b/i);
+});
+
+test("a set that she has acted on says the days are hers", () => {
+  const [entry] = entriesIn([
+    piece({ name: "The Rope", offerGroup: "field_day:1:0", offerExclusive: false, chosen: true, runDay: 2 }),
+    piece({ name: "The Sack Race", offerGroup: "field_day:1:0", offerExclusive: false }),
+  ]);
+  assert.equal(entry.kind, "offer");
+  if (entry.kind !== "offer") return;
+
+  assert.equal(entry.offer.settled, true);
+  assert.match(offerLead(entry.offer), /whichever days you want/i);
+
+  // THE DAY TRAVELS PER CARD, which is the whole of "it is a set across
+  // different days if host wants it". A day on the offer rather than on the
+  // card would be the welding she retired.
+  assert.deepEqual(
+    entry.offer.cards.map((card) => [card.name, card.chosen, card.runDay]),
+    [
+      ["The Rope", true, 2],
+      ["The Sack Race", false, null],
+    ]
+  );
+});
+
+test("MORE THAN ONE CARD OF A SET MAY BE HERS", () => {
+  // The mechanical content of `any_of`, from the read side. `isSettled` is per
+  // card and was not touched by db/069, so a set she has half-taken prints and
+  // buys for exactly the half she took.
+  const cards = [
+    piece({ name: "The Rope", offerGroup: "field_day:1:0", offerExclusive: false, chosen: true }),
+    piece({ name: "Egg And Spoon", offerGroup: "field_day:1:0", offerExclusive: false, chosen: true }),
+    piece({ name: "The Sack Race", offerGroup: "field_day:1:0", offerExclusive: false }),
+  ];
+  const [entry] = entriesIn(cards);
+  assert.equal(entry.kind, "offer");
+  if (entry.kind !== "offer") return;
+
+  assert.equal(entry.offer.cards.filter((card) => card.chosen).length, 2);
+  assert.equal(isSettled("field_day:1:0", "2026-09-06T12:00:00Z"), true);
+  assert.equal(isSettled("field_day:1:0", null), false);
+});
+
+test("AN OFFER DELIVERED BEFORE db/069 IS READ AS A CAROUSEL", () => {
+  /*
+   * Rule 33's read-side twin, and the only place a default could have been
+   * wrong in a way nothing would report. Every Revelle delivered before that
+   * migration carries `offer_exclusive` null, and every offer made before it
+   * WAS an OR — the migration backfills exactly that. So null reads as
+   * exclusive, which is a fact rather than a fallback, and the alternative
+   * would silently turn a delivered carousel into a set she could take three
+   * of.
+   */
+  const [entry] = entriesIn([
+    piece({ name: "Art Battle", offerGroup: "game:1:0", offerExclusive: null }),
+    piece({ name: "Fishbowl", offerGroup: "game:1:0", offerExclusive: null }),
+  ]);
+  assert.equal(entry.kind, "offer");
+  if (entry.kind !== "offer") return;
+  assert.equal(entry.offer.exclusive, true);
+  assert.match(offerLead(entry.offer), /the one you pick is the one that runs/i);
+});
+
+test("the kind is READ from the rows, never counted from them", () => {
+  // A room with two field day games is still a SET, and a two-card carousel is
+  // still a carousel. Inferring from the count would get both wrong, and the
+  // failure would look like a working page in each direction.
+  const twoOfASet = entriesIn([
+    piece({ name: "The Rope", offerGroup: "field_day:1:0", offerExclusive: false }),
+    piece({ name: "Egg And Spoon", offerGroup: "field_day:1:0", offerExclusive: false }),
+  ])[0];
+  assert.equal(twoOfASet.kind === "offer" && twoOfASet.offer.exclusive, false);
+
+  const twoOfACarousel = entriesIn([
+    piece({ name: "Art Battle", offerGroup: "game:1:0", offerExclusive: true }),
+    piece({ name: "Fishbowl", offerGroup: "game:1:0", offerExclusive: true }),
+  ])[0];
+  assert.equal(twoOfACarousel.kind === "offer" && twoOfACarousel.offer.exclusive, true);
 });

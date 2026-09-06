@@ -726,9 +726,35 @@ export async function approve(
       // rolls back whole. That is the loud form this path needs — a Revelle
       // materialised minus one of its pools is the same silent thinning the
       // portal read was fixed for, one table upstream.
+      // `offer_exclusive` IS STAMPED HERE, AT DELIVERY, AND IS NEVER READ BACK
+      // THROUGH TO THE SLOT — db/069. What kind of offer she received is a
+      // fact about the promise the house made her, and db/003 fixes that at
+      // delivery: a curator changing `occasion_slot.offer_rule` next March
+      // must not reach back and turn a field day she has already picked three
+      // games out of into a carousel that now refuses two of them.
+      //
+      // IT IS SUBQUERIED RATHER THAN CARRIED ON THE PICK because the pick was
+      // computed by the planner and the stamp is a property of the moment of
+      // delivery; those are different instants and the second one is the one
+      // db/003 binds. If the slot has vanished between the two, the subquery
+      // is null against a non-null offer_group and db/069's
+      // `offer_has_a_kind` check refuses the insert — loudly, inside the
+      // transaction, rolling the whole approval back. That is the right
+      // failure: an offer whose rule nobody can state is an offer the portal
+      // cannot honour, and a coalesce to `true` here would deliver it anyway
+      // and look like it worked.
       `insert into revelle_${spec.table}
-         (revelle_id, ${spec.table}_id, slot, slot_code, position, offer_group)
-       values ($1, $2, $3::section_kind, $4, $5, $6)
+         (revelle_id, ${spec.table}_id, slot, slot_code, position, offer_group,
+          offer_exclusive)
+       select $1, $2, $3::section_kind, $4, $5, $6,
+              case when $6::text is null then null else (
+                select os.offer_rule = 'one_of'
+                  from revelle r
+                  join quiz_response qr on qr.id = r.quiz_response_id
+                  join occasion_slot os
+                    on os.occasion = qr.occasion and os.slot_code = $4
+                 where r.id = $1
+              ) end
        on conflict do nothing`,
       [
         revelleId,
