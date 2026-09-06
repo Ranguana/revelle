@@ -1,4 +1,4 @@
-# PROPOSED — TOKYO, 1964
+# PROPOSED — TOKYO, 1978
 
 **Status: an agent's proposal, unsigned. Nothing here is the founder's voice and
 nothing here is live.** Written 2026-09-06 by a subagent under
@@ -79,10 +79,10 @@ The full run: **19 destinations · 171 pairs · gate 3**, **FAILING (below the
 gate, undeclared): 0**, **ZERO MARGIN (exactly 3): 29** — the same twenty-nine
 pairs as before this row existed, none of them involving it. Mean 4.93 → 4.95.
 
-`npm run check:matrix -- --room tokyo-1964`:
+`npm run check:matrix -- --room tokyo-1978`:
 
 ```
-tokyo-1964 AGAINST EVERY OTHER ROW (gate 3)
+tokyo-1978 AGAINST EVERY OTHER ROW (gate 3)
    4  amalfi-1953
    4  aspen-1994
    4  st-moritz-1984
@@ -116,7 +116,7 @@ The `few` finding — *"the sentence never reached the level. Strike `few` and N
 York is at 2. So the old row was 'legal if,' which is not legal"* — is a test
 every row should have to pass, so it was run against all nine cells rather than
 the one. Each line below is a separate run of
-`npm run check:matrix -- --room tokyo-1964` with that one cell changed in the
+`npm run check:matrix -- --room tokyo-1978` with that one cell changed in the
 file and then restored.
 
 | cell struck and replaced | nearest | to |
@@ -242,7 +242,7 @@ listed at the end of this document rather than pre-argued here.
 
 ### The name
 
-`TOKYO, 1964` · slug `tokyo-1964` · heading `Tokyo`
+`TOKYO, 1978` · slug `tokyo-1978` · heading `Tokyo`
 
 The year is a period, not a pitch. It fixes a register — everybody working,
 everybody commuting, a table put together from a shopping street on the way home
@@ -309,7 +309,7 @@ ritual. Something is made, and handed round, and it means a thing.
 
 ```ts
 const TOKYO_1964_LOOK: Theme = {
-  key: "tokyo-1964",
+  key: "tokyo-1978",
   type: {
     display: '"Bodoni Moda", Didot, "Bodoni MT", Georgia, serif',
     body: '"Karla", "Helvetica Neue", Arial, sans-serif',
@@ -347,8 +347,8 @@ const TOKYO_1964_LOOK: Theme = {
 };
 
 export const TOKYO_1964: Destination = {
-  key: "tokyo-1964",
-  name: "TOKYO, 1964",
+  key: "tokyo-1978",
+  name: "TOKYO, 1978",
   tagline:
     "Supper at seven, and rice with tea over it at ten. Nobody fills their " +
     "own glass.",
@@ -733,8 +733,8 @@ rest of the shelf.)
 
 ```ts
 {
-  slug: "tokyo-1964",
-  name: "TOKYO, 1964",
+  slug: "tokyo-1978",
+  name: "TOKYO, 1978",
   caption: "Tokyo",
   number: "No. 04",
   occasion: "The long dinner",
@@ -1019,13 +1019,13 @@ a floor of 20.
 `scripts/catalogue-vocabulary.mjs`, in `DESTINATIONS`:
 
 ```js
-  Tokyo: "tokyo-1964",
+  Tokyo: "tokyo-1978",
 ```
 
 And in `ROOM_HEADINGS`, wherever the full names are mapped:
 
 ```js
-  "TOKYO, 1964": "Tokyo",
+  "TOKYO, 1978": "Tokyo",
 ```
 
 **This is the step that fails the deploy if it is missed.** The seeders throw on

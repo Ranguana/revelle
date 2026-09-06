@@ -219,7 +219,7 @@ export function gateShell(key: string): Neighbour[] {
  * and not a search: every differing cell on a d=3 neighbour is load-bearing, no
  * single cell on a d=4 neighbour is, and d <= 2 is already under the gate.
  *
- * NOTE WHAT THIS IS NOT. An earlier sweep in `docs/proposed-tokyo-1964.md`
+ * NOTE WHAT THIS IS NOT. An earlier sweep in `docs/proposed-tokyo-1978.md`
  * replaced each cell with EVERY other level and re-ran the audit. That answers
  * a broader question and costs 17 runs; this answers hers exactly and costs
  * none. Both are honest, and hers is the one the row formula asks for, because
@@ -258,7 +258,7 @@ export function fingerprintLevels(): { facet: string; level: string; room: strin
  *
  * WHY A NAMED LIST AND NOT JUST THE COMPUTED FINGERPRINTS. The first cut of
  * this function reported only levels currently held by ONE room, and it
- * returned "none" for tokyo-1964 — a row that uses `assigned`, which her step 8
+ * returned "none" for tokyo-1978 — a row that uses `assigned`, which her step 8
  * covers explicitly. The reason it returned none is the interesting part: the
  * proposed row is itself the SECOND claimant, so `assigned` stopped being a
  * computed fingerprint the moment the row landed, and the check silently

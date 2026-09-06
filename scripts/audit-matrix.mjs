@@ -219,7 +219,7 @@ for (const k of keys) {
 // neighbours feel far is precisely the judgement a sampled table gets wrong,
 // and Hong Kong's first draft sampled Havana out of its own table.
 //
-//   npm run check:matrix -- --room tokyo-1964
+//   npm run check:matrix -- --room tokyo-1978
 if (arg === "--room") {
   const room = process.argv[3];
   if (!M.rows[room]) {

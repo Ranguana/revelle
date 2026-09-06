@@ -194,7 +194,7 @@ reproducible today, and it is a row rather than a distance.
 **A second room is proposed into the same empty cell.** `ending = clean_stop`
 with `starts = evening` was, before either of these, the one combination of the
 two FED facets that no room occupied — and there are now two candidates for it:
-this one and `tokyo-1964` (`docs/proposed-tokyo-1964.md`).
+this one and `tokyo-1978` (`docs/proposed-tokyo-1978.md`).
 
 They do not collide. **UNCOMMITTED**, by hand, because Hong Kong has no row:
 

@@ -1,7 +1,7 @@
 # What "hundreds of rooms" actually costs
 
 Measured 2026-09-06 against a nineteen-row matrix, by the subagent that wrote
-`docs/proposed-tokyo-1964.md`. Every number here is reproducible: the matrix
+`docs/proposed-tokyo-1978.md`. Every number here is reproducible: the matrix
 numbers come from the committed distance function in `src/lib/matrix.ts` (the
 one owner, which `check:matrix` and `voice.test.ts` also consume), the tone
 numbers from the committed `voiceAffinity` in `src/lib/voice.ts`, the palette
@@ -89,7 +89,7 @@ computation is nothing — 20,000 pairs is milliseconds — but a human adjudica
 of twenty broken pairs per flipped cell is not.
 
 **Mitigation that is cheap and is not in place:** every row should ship with the
-single-cell-flip sweep that `docs/proposed-tokyo-1964.md` § 0b-i runs, so
+single-cell-flip sweep that `docs/proposed-tokyo-1978.md` § 0b-i runs, so
 "legal if" is caught at authoring time rather than at revision time. Seventeen
 runs of an existing script.
 
@@ -210,7 +210,7 @@ one room rather than about the catalogue:
 | catalogue | `clean_stop` / `evening` → nearest | tied |
 |---|---|---|
 | the eighteen rows as they stand | **1.00** | **14 rooms** |
-| with `tokyo-1964` added | **0.00** | 1 room |
+| with `tokyo-1978` added | **0.00** | 1 room |
 
 **A host who says her evening starts at dinner and ends cleanly is currently
 handed fourteen of eighteen rooms at the same distance** — westhampton,
@@ -218,7 +218,7 @@ new-york, new-orleans, dolomites, havana, las-vegas, tahiti, big-sur, nantucket,
 amalfi, palm-springs, st-moritz, aspen, acapulco. Not "poorly served": not
 served at all, by the only two columns the quiz feeds.
 
-That is the same hole § 0c of `docs/proposed-tokyo-1964.md` found by counting
+That is the same hole § 0c of `docs/proposed-tokyo-1978.md` found by counting
 occupied cells, arriving from the other end and much harder. It is also the
 argument for `docs/proposals/rooms/hong-kong-1963.md`, which wants the same
 cell. **Either room closes it. Neither is closed by anything else in the

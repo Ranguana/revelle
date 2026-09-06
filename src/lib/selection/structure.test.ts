@@ -186,7 +186,7 @@ test("ending sorts the rooms the audit says it sorts", () => {
   // The most even split any column has: 7 / 7 / 5 over nineteen rows.
   //
   // WAS 7 / 7 / 4 over eighteen (CLAUDE.md rule 14, the numbers kept rather
-  // than overwritten). The fifth `clean_stop` is the PROPOSED tokyo-1964 row,
+  // than overwritten). The fifth `clean_stop` is the PROPOSED tokyo-1978 row,
   // which is the only row in the matrix that is an agent's proposal rather than
   // the founder's — see `founderPending` in data/destination-matrix.json. If
   // she declines it, the row goes and these three numbers go back.

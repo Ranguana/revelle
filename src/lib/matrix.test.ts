@@ -119,7 +119,7 @@ test("a room with an empty shell has no load-bearing cell, and the converse", ()
 
 test("the fingerprint-drop fires on a level the house names, not only on one held alone", () => {
   // REGRESSION. The first cut reported only levels held by exactly one room,
-  // and returned null for tokyo-1964 — a row using `assigned`, which
+  // and returned null for tokyo-1978 — a row using `assigned`, which
   // room-structure.md step 8 covers by name. It returned null BECAUSE that row
   // is itself the second claimant, so the check stopped applying to the row
   // that triggered it. Rule 24 caught it at zero matches.
