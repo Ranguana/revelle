@@ -268,6 +268,67 @@ export function isLevelOf(facet: string, level: unknown): boolean {
   );
 }
 
+/**
+ * WHAT A CELL SOUNDS LIKE TO THE WOMAN WHO SENT THE PICTURE.
+ *
+ * She never sees `dress = plain`. She sees "no one is dressed up", and she can
+ * say no to it. Founder: "Member side sees words, not facets: warm, sparse,
+ * late sun, not costumes. Strike is enough."
+ *
+ * Kept here rather than in the member screen because the desk needs the same
+ * sentence — a curator judging a strike has to be able to see what she was
+ * actually shown, and a second copy in a component would drift from this one
+ * without either surface going red (rule 21).
+ *
+ * Written in the plainest form of each level and nothing more. These are
+ * descriptions of an evening, not compliments about it, and they carry no
+ * verb whose subject is the house (rule 10).
+ */
+export const CELL_SAID: Readonly<Record<string, Readonly<Record<string, string>>>> =
+  {
+    schedule: {
+      posted: "there is a running order",
+      anchored: "a few fixed points, and the rest loose",
+      standing: "nothing written down",
+      unplanned: "nothing planned at all",
+    },
+    volume: {
+      overlapping: "several conversations at once",
+      one_conversation: "one conversation, everybody in it",
+      quiet: "quiet",
+    },
+    dress: {
+      dressed: "people are dressed up",
+      plain: "nobody is dressed up",
+    },
+    food: {
+      bought: "food bought and put out",
+      cooked: "food cooked there",
+      arrived: "food arriving from somewhere else",
+    },
+    size: {
+      few: "a handful of people",
+      one_table: "one table",
+      crowd: "a crowd",
+    },
+    spectacle: {
+      performed: "something is performed",
+      nothing: "nothing is performed",
+    },
+  };
+
+/**
+ * The sentence for one cell, or the raw pair when there is none.
+ *
+ * Falling back to `facet = level` rather than to silence is deliberate: a
+ * missing sentence is an authoring gap, and a gap that renders as nothing is a
+ * claim she cannot strike because she cannot see it (rule 16). It looks wrong
+ * on her screen, which is the point — the fix is to write the sentence.
+ */
+export function saidAs(facet: string, level: string): string {
+  return CELL_SAID[facet]?.[level] ?? `${facet} = ${level}`;
+}
+
 /* ══ 4 · THE STATUSES A CLAIM CAN HOLD ══════════════════════════════ */
 
 /**
