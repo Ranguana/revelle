@@ -7,10 +7,11 @@ import styles from "./pricing.module.css";
 
 export const metadata: Metadata = {
   title: "Membership",
-  // "Or commission a single Revelle without joining." was the second sentence
-  // here and went with the offer it described. What is left is her line,
-  // unaltered, which was always the first half.
-  description: "Apply once. Dues annually.",
+  // Her line, unaltered, plus the door that came back on 2026-09-06. The
+  // second sentence used to read "Or commission a single Revelle without
+  // joining"; the offer returned under a different word, so the sentence does
+  // too. See the note beside `commissionCents` in src/lib/pricing.ts.
+  description: "Apply once. Dues annually. Or come once, as a guest.",
 };
 
 /**
@@ -29,11 +30,18 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default function PricingPage() {
-  // `commissionCents` is deliberately not read. Founder, 2026-09-05: the
-  // single Revelle is gone, so membership is the only door. Rule 15's shape —
-  // an instrument that is not consumed does not get to sit in the file looking
-  // wired. See the note beside the field in src/lib/pricing.ts.
-  const { duesCents, foundingMembers, trialDays } = pricing();
+  // Every figure is read. `commissionCents` was inert for one day — see the
+  // note beside it in src/lib/pricing.ts — and is live again as the guest
+  // price. If any of these is unset it renders as "on application", never as
+  // a guess.
+  const {
+    duesCents,
+    commissionCents,
+    extraCents,
+    includedRevelles,
+    foundingMembers,
+    trialDays,
+  } = pricing();
 
   return (
     <main className={styles.page}>
@@ -71,10 +79,41 @@ export default function PricingPage() {
             <h2 className={styles.termName}>Founding members</h2>
             <div>
               <p className={styles.amount}>No dues</p>
+              {/*
+                THIS PARAGRAPH WAS CORRECTED, 2026-09-06, AND THE CORRECTION
+                IS THE POINT. It used to read "They are not billed, and they
+                do not lapse into a bill later." That was true when dues were
+                the only charge. Founding members are now billed per Revelle,
+                à la carte, so a flat "not billed" had become a false promise
+                on a live page — the worst kind, because it was made publicly
+                and generously and somebody would have held us to it.
+
+                What was promised in public is NO DUES. That promise is kept
+                here in the same words, and the thing it never covered is now
+                said out loud rather than discovered at a first invoice. The
+                offer is not smaller for being accurate.
+
+                THE RATE IS THE MEMBERS' ONE, AND THAT IS A JUDGEMENT. She
+                said "billing them à la carte" without naming a figure. A
+                founding member is a member, so they pay what members pay past
+                their allowance; and having no dues, they have no allowance to
+                be past. Flagged to her rather than left to be inferred.
+              */}
               <p className={styles.termBody}>
                 The first {spellCount(foundingMembers)} memberships are
-                founding memberships. They are not billed, and they do not
-                lapse into a bill later.
+                founding memberships. Dues are never charged, and they do not
+                lapse into dues later.
+              </p>
+              <p className={styles.termBody}>
+                {extraCents === null ? (
+                  <>Each Revelle is commissioned on its own terms.</>
+                ) : (
+                  <>
+                    Each Revelle is commissioned on its own terms, at{" "}
+                    {formatPrice(extraCents)} — the members&rsquo; figure,
+                    because that is what a founding member is.
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -106,6 +145,25 @@ export default function PricingPage() {
                 ticks, no comparison table, and above all nothing added here to
                 make up for the option that was removed.
               */}
+              {/*
+                The allowance, before the argument for membership, because it
+                is the concrete half and she asked for it first: "$120 with
+                two included", then "25 per extra revelle".
+
+                NOTHING COUNTS THESE YET. No part of the machine tallies a
+                member's Revelles against their year — this is a printed term
+                with no meter behind it, and the note travels with the number
+                in src/lib/pricing.ts so the next reader of this page does not
+                assume the enforcement exists.
+              */}
+              <p className={styles.termBody}>
+                Dues cover {spellCount(includedRevelles)} Revelles a year
+                {extraCents === null
+                  ? "."
+                  : `, and each one after is ${formatPrice(extraCents)}.`}{" "}
+                There is no calendar on them: two in a month and two ten months
+                apart are the same two.
+              </p>
               <p className={styles.termBody}>
                 Apply once, then dues annually. Membership is continuity: the
                 société keeps your taste, your people, and what you would never
@@ -130,24 +188,46 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* ── the single Revelle: REMOVED, 2026-09-05 ───────────────────
-              Founder: "get rid of A single Revelle $30 / One occasion,
-              commissioned without joining. Designed the same way and issued
-              the same once — what it does not do is remember you afterwards."
+          {/* ── one Revelle, as a guest: RESTORED, 2026-09-06 ─────────────
+              Removed 2026-09-05 on her instruction — "get rid of A single
+              Revelle $30" — and asked back the next day at a new figure:
+              "$65 for one as guest." So the removal was about the price and
+              the framing, not about the door.
 
-              One occasion bought without joining was the second of two
-              products (docs/build-checklist.md still lists both, and is a
-              founder document, so it is reported rather than edited here).
-              Removing it makes membership the only way in, and her own copy
-              above already carries that argument: membership is CONTINUITY,
-              and the third occasion is sharper than the first. That reads
-              stronger with nothing cheaper beside it, so nothing was added to
-              compensate.
+              WHAT CHANGED BESIDES THE NUMBER. It is not a "commission" any
+              more; it is a guest. The old copy sold it by what it LACKED —
+              "what it does not do is remember you afterwards" — which is a
+              shabby way to describe somebody you want in the house. A guest
+              is welcome. The reason to join is made on the membership side,
+              as continuity, and that argument stands on its own without this
+              block being diminished to prop it up.
 
-              PRICE_SINGLE_COMMISSION is now read by nothing. The variable is
-              left set on Render — an unread variable is harmless and clearing
-              it is not this change's decision — but it is INERT, and this is
-              the note that stops it looking live. */}
+              PRICE_SINGLE_COMMISSION is read again. The env var keeps its
+              name; see src/lib/pricing.ts on why renaming it would cost a
+              live figure for nothing. */}
+          <div className={styles.term}>
+            <h2 className={styles.termName}>One, as a guest</h2>
+            <div>
+              {commissionCents === null ? (
+                <p className={styles.amountUnset}>On application</p>
+              ) : (
+                <p className={styles.amount}>
+                  {formatPrice(commissionCents)}
+                  <span className={styles.fine}> once</span>
+                </p>
+              )}
+              <p className={styles.termBody}>
+                One occasion, without joining. Designed the same way, by the
+                same house, and issued the same once — a guest is not sent a
+                lesser evening.
+              </p>
+              <p className={styles.termBody}>
+                What it does not come with is the second year. The société does
+                not keep your taste, your people, or what you would never do
+                twice, so the next one begins from nothing again.
+              </p>
+            </div>
+          </div>
         </section>
 
         <div className={styles.foot}>

@@ -42,15 +42,34 @@ export type Pricing = {
   /**
    * One Revelle, bought without joining, in cents. Null until decided.
    *
-   * READ BY NOTHING SINCE 2026-09-05. The founder removed the single Revelle
-   * from the pricing page, so membership is the only door and this figure has
-   * no surface. The field and `PRICE_SINGLE_COMMISSION` are both left in place
-   * — an unread variable costs nothing and clearing it is a separate decision
-   * — but rule 15 says an instrument that feeds nothing does not get to sit
-   * here looking wired, so it says here what it is. If the offer returns, the
-   * page is src/app/pricing/page.tsx and the block it lost is quoted in it.
+   * READ AGAIN SINCE 2026-09-06. The founder removed this offer on 2026-09-05
+   * and restored it the next day at a different figure — "$65 for one as
+   * guest" — so the page has two doors again. The word that came back with it
+   * is GUEST, not "commission": a guest is somebody the house is glad to see
+   * and does not yet know, which is the whole distinction membership sells.
+   *
+   * The field name stays `commissionCents` because `PRICE_SINGLE_COMMISSION`
+   * is already set on Render and renaming an env var to match a noun would
+   * cost a live figure for nothing. Rule 14 — the old reasoning is above, in
+   * the history, not deleted.
    */
   commissionCents: number | null;
+  /**
+   * Each Revelle past the ones dues cover, in cents. Null until decided.
+   *
+   * This is the figure that makes the allowance mean anything: without it,
+   * "two included" is a limit with nothing on the other side of it.
+   */
+  extraCents: number | null;
+  /**
+   * How many Revelles a year of dues covers.
+   *
+   * NOT ENFORCED ANYWHERE YET. Nothing counts a member's Revelles against
+   * their year — this number is a printed term and no part of the machine
+   * reads it back. Rule 15: it is stated here so that nobody reads the page
+   * and assumes a meter exists behind it.
+   */
+  includedRevelles: number;
   /**
    * How many founding memberships exist. The offer is a standing, not a
    * countdown: this number is printed as a fact and never as a remaining
@@ -65,6 +84,8 @@ export function pricing(): Pricing {
   return {
     duesCents: dollars("PRICE_ANNUAL_DUES"),
     commissionCents: dollars("PRICE_SINGLE_COMMISSION"),
+    extraCents: dollars("PRICE_EXTRA_REVELLE"),
+    includedRevelles: count("REVELLES_INCLUDED", 2),
     foundingMembers: count("FOUNDING_MEMBERS", 20),
     trialDays: count("TRIAL_DAYS", 7),
   };
