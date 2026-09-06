@@ -158,6 +158,77 @@ seam decision rather than a boundary one.
 **This is the finding to act on first.** It is cheaper than any of the others
 and it is the only one where doing nothing actively degrades the product.
 
+### Measured, 2026-09-06: what the ranker actually does today
+
+The section above was arithmetic over the matrix. This is the live instrument,
+driven the way `chooseDestinations` drives it.
+
+**First, a correction to a premise that was put to me.** `rankByStructure` is
+NOT uncalled. It is wired, at `src/lib/selection/destination.ts:455`, inside
+`orderByStructure`, and it has been. The open question was never whether to wire
+it.
+
+**And it already ranks on fed columns only — by construction, not by
+observation.** `statedStructure` iterates `FED_FACETS`, which is *derived* from
+`STRUCTURAL_SUPPLIERS` rather than hand-listed, so a member's row cannot hold a
+key for a column nothing supplies. The file says so itself: *"the number of
+columns the reveal ranks on cannot exceed the number a host has actually filled
+in."* A test asserts that list agrees with `fedBy` in the JSON. There is no
+change to make here.
+
+**What there is instead is a measurement.** Every answer a host can give today,
+against all nineteen rows:
+
+| her answer | nearest distance | rooms tied at it | distance bands |
+|---|---|---|---|
+| `clean_stop` / morning | 0.00 | 1 | 3 |
+| `clean_stop` / afternoon | 0.00 | 3 | 3 |
+| `clean_stop` / evening | 0.00 | 1 | 3 |
+| `clean_stop` / late | 0.25 | 1 | 4 |
+| `dissolves` / morning | 0.00 | 1 | 3 |
+| `dissolves` / afternoon | 0.00 | 3 | 3 |
+| `dissolves` / evening | 0.00 | 3 | 3 |
+| `dissolves` / late | 0.25 | 3 | 4 |
+| `until_morning` / morning | 1.00 | **9** | 2 |
+| `until_morning` / afternoon | 1.00 | **13** | 2 |
+| `until_morning` / evening | 0.00 | **7** | 3 |
+| `until_morning` / late | 0.00 | **7** | 3 |
+
+**A host who wants a night that runs until morning, starting in the afternoon,
+is handed thirteen of nineteen rooms at an identical distance.** The structural
+ranker contributes nothing to her reveal; the aesthetic score orders all
+thirteen. Two bands over the whole catalogue is not a ranking.
+
+Silence still costs nothing — every distance 0, one band, the aesthetic order
+unchanged, exactly as rule 3 requires.
+
+### The empty cell, measured on the live ranker
+
+The strongest single number this session produced, and it is an argument about
+one room rather than about the catalogue:
+
+| catalogue | `clean_stop` / `evening` → nearest | tied |
+|---|---|---|
+| the eighteen rows as they stand | **1.00** | **14 rooms** |
+| with `tokyo-1964` added | **0.00** | 1 room |
+
+**A host who says her evening starts at dinner and ends cleanly is currently
+handed fourteen of eighteen rooms at the same distance** — westhampton,
+new-york, new-orleans, dolomites, havana, las-vegas, tahiti, big-sur, nantucket,
+amalfi, palm-springs, st-moritz, aspen, acapulco. Not "poorly served": not
+served at all, by the only two columns the quiz feeds.
+
+That is the same hole § 0c of `docs/proposed-tokyo-1964.md` found by counting
+occupied cells, arriving from the other end and much harder. It is also the
+argument for `docs/proposals/rooms/hong-kong-1963.md`, which wants the same
+cell. **Either room closes it. Neither is closed by anything else in the
+catalogue.**
+
+The general form, and it is the reason wiring more facets is item 1 rather than
+item 3: **an unfed column cannot be under-served, because nobody can ask for it.
+A fed column with an empty cell is a member getting a shrug.** There are two fed
+columns and one of their nine cells was empty.
+
 ---
 
 ## 3. THE TONE VOCABULARY HAS A HARD CEILING AT 120, AND NOTHING NAMES IT
