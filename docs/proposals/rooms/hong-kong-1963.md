@@ -219,3 +219,75 @@ No row was written into `data/destination-matrix.json`. No entry in
 `src/lib/destinations.ts`, no tones, no palette, no content, no seed. Her
 instruction was to put this in draft with the revised row and label every
 distance UNCOMMITTED, and that is all this file is.
+
+
+---
+
+## THE DECISION SHE ASKED FOR — REPORTED, NOT RESOLVED
+
+> "Decide HK is a twin/register or a night with three ordinary differences that
+> do not need a drought."
+
+*Ordinary* is doing the work: three differences true of a real 1963 Hong Kong
+evening — new hotel, jackets, roof drinks then dinner, bought food, a table, the
+night ends — that hold without a researched footnote.
+
+### Her row against New York, cell by cell
+
+`ceremony, anchored, overlapping, dressed, bought, clean_stop, evening, one_table, nothing`
+`ceremony, posted, one_conversation, dressed, bought, dissolves, evening, one_table, nothing`
+
+Six cells agree. Three differ, and they are not equally ordinary.
+
+| cell | her sentence | needs the drought? |
+|---|---|---|
+| `schedule` — anchored vs posted | "Roof first, at its hour, while the Grill is dark. Then dinner." | **No.** A two-part evening with a fixed first act. Ordinary and true. |
+| `volume` — overlapping vs one_conversation | "After dinner the bar is other people's talk." | **No.** A hotel with a public bar against a private room with a seating plan. Ordinary, true, and the sharpest of the three. |
+| `ending` — clean_stop vs dissolves | "The glass is counted. When the hours for water are over, so is the night." | **YES. This sentence IS the drought.** |
+
+**Two ordinary differences. Not three.** The third is the one she has just
+called colour.
+
+### And the replacement is her own rule, which points the other way
+
+`room-structure.md` already settles what an ordinary Hong Kong ending licenses:
+
+> "A counted glass in a drought can license `clean_stop`. **A ferry home
+> licenses `dissolves`.**"
+
+Strip the drought and the ordinary facts available — guests going up to their
+own rooms in the hotel they are standing in, the last ferry across — license
+`dissolves`, which is **New York's value**. That takes the row to **distance 2**
+from New York: under the gate, undeclared, and needing a twin New York does not
+currently have.
+
+The six agreeing cells are where a third difference would have to come from, and
+none of them can move honestly. `arrival` is `ceremony` because a name is taken
+at a desk. `dress`, `food`, `starts` and `size` are New York's answers because
+they are true. `spectacle` she refused herself — "Lion dancers were March. Not
+tonight." **Moving any of them to find a third difference is rule 34 exactly,
+and is refused.**
+
+### So the finding
+
+**On the evidence, Hong Kong 1963 is New York in another city-year.** Two real
+differences in how the evening is timed and how loud the room after dinner is —
+which is a REGISTER, and her own framing says that is a legitimate product and
+not a defeat: *"her voice, her well."*
+
+**This is a report. She decides.** The two answers she named are the only two,
+and nothing here has been changed to make either easier: her row stands
+untouched, `ending` still reads `clean_stop`, and the drought is still in the
+copy where she put it.
+
+**UNCOMMITTED**, all of it. There is no `hong-kong-1963` row in
+`data/destination-matrix.json`, so `npm run check:matrix` cannot reproduce a
+single number above.
+
+### The Tokyo collision, recomputed and now stale in the other direction
+
+The earlier figure — Tokyo at 4, or 3 if its `size` moved — was computed from a
+`tokyo-1964` row. Tokyo is 1978 and its cells have not yet been re-earned
+against the new year, so **that number is withdrawn rather than carried
+forward.** It will be recomputed when the 1978 evening is written, and it stays
+UNCOMMITTED until both rooms have rows the audit can read.
