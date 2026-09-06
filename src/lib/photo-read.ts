@@ -15,6 +15,7 @@ import {
   isPhotoRole,
   mayPrune,
   silentExtract,
+  type Dropped,
   type PaletteSwatch,
   type PhotoExtract,
   type PhotoRole,
@@ -151,8 +152,8 @@ async function look(
 export type ReadOutcome = {
   photoId: string;
   extract: PhotoExtract;
-  /** How many entries the parser threw away. Rule 24. */
-  dropped: readonly string[];
+  /** What the parser threw away, structured. Rule 24. */
+  dropped: readonly Dropped[];
 };
 
 /**
@@ -248,7 +249,7 @@ export async function readPhoto(photoId: string): Promise<ReadOutcome | null> {
 async function write(
   applicationId: string,
   photoId: string,
-  dropped: readonly string[],
+  dropped: readonly Dropped[],
   extract: PhotoExtract
 ): Promise<ReadOutcome> {
   await transaction(async (client) => {

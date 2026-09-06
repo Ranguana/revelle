@@ -492,15 +492,17 @@ export function silentExtract(
  *   conflict   two accepted proposals disagree
  *   struck     every proposal for it was removed
  */
-export type SetFacet =
-  | { facet: MatrixFacet; state: "stated"; level: string }
-  | {
-      facet: MatrixFacet;
-      state: "untouched" | "pending" | "conflict" | "struck";
-      level: null;
-      /** The levels that were in play, for the conflict line on the desk. */
-      levels: readonly string[];
-    };
+export type StatedCell = { facet: MatrixFacet; state: "stated"; level: string };
+
+export type SilentCell = {
+  facet: MatrixFacet;
+  state: "untouched" | "pending" | "conflict" | "struck";
+  level: null;
+  /** The levels that were in play, for the conflict line on the desk. */
+  levels: readonly string[];
+};
+
+export type SetFacet = StatedCell | SilentCell;
 
 /**
  * EVERY PHOTOGRAPH ON ONE APPLICATION, MERGED.
@@ -736,8 +738,33 @@ export const EXTRACT_ASK = "Read this frame.";
 
 /* ══ 9 · READING THE REPLY ══════════════════════════════════════════ */
 
+/**
+ * ONE THING THE PARSER THREW AWAY, AS A FACT RATHER THAN AS A SENTENCE.
+ *
+ * `facet` is populated whenever the drop was about a column, and it is what
+ * lets the desk queue put "the model tried to propose `arrival`" in its own
+ * band without matching on a substring. CLAUDE.md rule 24: assume your
+ * matching is wrong until you have counted, and the cheapest way to never
+ * match wrongly is to never match.
+ */
+export type Dropped = {
+  /** Why it went. One of a small closed set so a screen can group them. */
+  kind:
+    | "fingerprint"
+    | "not_a_column"
+    | "not_a_level"
+    | "no_evidence"
+    | "duplicate"
+    | "malformed"
+    | "not_a_cue";
+  /** The column it was about, when it was about one. */
+  facet?: string;
+  /** The whole entry in words, for the desk and for the bench. */
+  said: string;
+};
+
 export type ExtractParse =
-  | { ok: true; extract: PhotoExtract; dropped: readonly string[] }
+  | { ok: true; extract: PhotoExtract; dropped: readonly Dropped[] }
   | { ok: false; silence: string };
 
 /**
@@ -773,38 +800,66 @@ export function extractFrom(input: {
     return { ok: false, silence: "the reply was not an object" };
   }
   const body = raw as Record<string, unknown>;
-  const dropped: string[] = [];
+  const dropped: Dropped[] = [];
 
   const facets: FacetProposal[] = [];
   const seen = new Set<string>();
   for (const item of arrayOf(body.facets)) {
     const row = objectOf(item);
     if (!row) {
-      dropped.push("a facet entry that was not an object");
+      dropped.push({
+        kind: "malformed",
+        said: "a facet entry that was not an object",
+      });
       continue;
     }
     const facet = String(row.facet ?? "");
     if (!mayPropose(facet)) {
+      // THE FINGERPRINT BAND'S ONE SOURCE OF TRUTH. `kind: "fingerprint"`
+      // means the model tried to propose a column a photograph may never
+      // reach, and the desk queue sorts on that fact rather than on a
+      // substring of `said` — rule 24, from the safe end: the cheapest way
+      // never to match wrongly is never to match.
       dropped.push(
         facet in NEVER_FROM_A_PHOTO
-          ? `${facet}, which a photograph may never propose`
-          : `${facet || "(unnamed)"}, which is not a column`
+          ? {
+              kind: "fingerprint",
+              facet,
+              said: `${facet}, which a photograph may never propose`,
+            }
+          : {
+              kind: "not_a_column",
+              facet: facet || undefined,
+              said: `${facet || "(unnamed)"}, which is not a column`,
+            }
       );
       continue;
     }
     const level = row.level;
     if (!isLevelOf(facet, level)) {
-      dropped.push(`${facet} = ${JSON.stringify(level)}, not a level of it`);
+      dropped.push({
+        kind: "not_a_level",
+        facet,
+        said: `${facet} = ${JSON.stringify(level)}, not a level of it`,
+      });
       continue;
     }
     const evidence = trimmed(row.evidence);
     if (evidence === "") {
-      dropped.push(`${facet} = ${String(level)}, with no evidence`);
+      dropped.push({
+        kind: "no_evidence",
+        facet,
+        said: `${facet} = ${String(level)}, with no evidence`,
+      });
       continue;
     }
-    const key = `${facet} ${String(level)}`;
+    const key = `${facet} ${String(level)}`;
     if (seen.has(key)) {
-      dropped.push(`${facet} = ${String(level)}, proposed twice`);
+      dropped.push({
+        kind: "duplicate",
+        facet,
+        said: `${facet} = ${String(level)}, proposed twice`,
+      });
       continue;
     }
     seen.add(key);
@@ -827,7 +882,10 @@ export function extractFrom(input: {
       evidence === "" ||
       venueSeen.has(affordance)
     ) {
-      dropped.push(`a venue cue: ${affordance || "(unnamed)"}`);
+      dropped.push({
+        kind: "not_a_cue",
+        said: `a venue cue: ${affordance || "(unnamed)"}`,
+      });
       continue;
     }
     venueSeen.add(affordance);
@@ -845,7 +903,10 @@ export function extractFrom(input: {
       evidence === "" ||
       toneSeen.has(cue)
     ) {
-      dropped.push(`a tone cue: ${cue || "(unnamed)"}`);
+      dropped.push({
+        kind: "not_a_cue",
+        said: `a tone cue: ${cue || "(unnamed)"}`,
+      });
       continue;
     }
     toneSeen.add(cue);
@@ -858,7 +919,10 @@ export function extractFrom(input: {
     const object = row ? trimmed(row.object) : "";
     const evidence = row ? trimmed(row.evidence) : "";
     if (object === "" || evidence === "") {
-      dropped.push("an object cue with no name or no evidence");
+      dropped.push({
+        kind: "no_evidence",
+        said: "an object cue with no name or no evidence",
+      });
       continue;
     }
     objects.push({ object: object.slice(0, 80), evidence });
