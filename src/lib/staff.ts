@@ -158,3 +158,59 @@ export async function recordAction(
     );
   }
 }
+
+/**
+ * THE LEDGER ROW FOR SOMETHING NO PERSON DID.
+ *
+ * db/036 made `staff_action.staff_id` nullable and added `actor` beside it,
+ * tied by a CHECK: `(staff_id is null) = (actor <> 'staff')`. So "nobody, this
+ * mechanism" is sayable without inventing a fake staff row, and
+ * `staff_recent_activity` stays the list of things PEOPLE did while
+ * `desk_activity` carries both.
+ *
+ * This exists so that a machine's act is written by the same function a
+ * person's act is, into the same table, with the same failure behaviour.
+ * CLAUDE.md rule 21: the ledger write has one owner. Before this, the only
+ * system rows in the database were written by hand-rolled INSERTs in seeder
+ * scripts, which is fine for a script and wrong for a server.
+ *
+ * ── AND WHY THE CALLER SUPPLIES THE ACTOR ────────────────────────────
+ *
+ * Because the desk has to be able to say WHICH mechanism. `auto:
+ * catalogue-sync` names a run, `auto: pool-stocking` names the rows a run
+ * offered, and `extract` names the model reading a member's photograph. A
+ * single 'system' would collapse three different questions into one answer and
+ * the screen would have to guess from the verb.
+ */
+export async function recordSystemAction(
+  actor: string,
+  record: ActionRecord
+): Promise<void> {
+  if (actor === "staff") {
+    // db/036's CHECK would refuse this row anyway. Refusing it here says why.
+    throw new Error(
+      "recordSystemAction cannot write as 'staff' — that actor means a person " +
+        "pressed something, and a person is recordAction's business."
+    );
+  }
+  try {
+    await query(
+      `insert into staff_action
+         (staff_id, actor, action, entity_table, entity_id, summary, detail)
+       values (null, $1, $2, $3, $4, $5, $6::jsonb)`,
+      [
+        actor,
+        record.action,
+        record.entityTable ?? null,
+        record.entityId ?? null,
+        record.summary ?? "",
+        JSON.stringify(record.detail ?? {}),
+      ]
+    );
+  } catch (err) {
+    console.error(
+      `[${actor}] could not record ${record.action}`,
+      err instanceof Error ? err.message : err
+    );
+  }
+}

@@ -602,7 +602,12 @@ type JsonSchema = Record<string, unknown>;
 export function extractTool(): {
   name: string;
   description: string;
-  input_schema: JsonSchema;
+  /**
+   * `type: "object"` is in the TYPE and not only in the value, so that this
+   * satisfies the SDK's `Tool` without a cast at the call site. A cast there
+   * would be the one place a schema change could stop being checked.
+   */
+  input_schema: { type: "object" } & JsonSchema;
 } {
   const evidence: JsonSchema = {
     type: "string",
