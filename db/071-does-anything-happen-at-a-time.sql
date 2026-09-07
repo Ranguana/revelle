@@ -103,7 +103,13 @@ insert into facet_dimension (code, label, description, position) values
    'fits rather than a taste: nothing in the catalogue is tagged here and the '
    'comparison is a level distance. DELIBERATELY NOT anti_preferences/schedule, '
    'which vetoes one level and chooses among none. See db/071.',
-   260);
+   -- POSITION IS DERIVED, NOT CHOSEN. db/070 first shipped `250` and wedged
+   -- the deploy on `facet_dimension_position_unique`: db/049 already held
+   -- 250, 260 and 270, and the reading that said 240 was the maximum came
+   -- from a matcher that only saw single-row inserts. db/049's is multi-row.
+   -- A literal here is a claim about every row that already exists, made by
+   -- someone who cannot see them; the subquery asks the table instead.
+   (select coalesce(max(position), 0) + 10 from facet_dimension));
 
 -- ── 3 · THE FOUR LEVELS ──────────────────────────────────────────────
 --
