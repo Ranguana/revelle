@@ -320,6 +320,7 @@ const PER_DESTINATION = {
   "Big Sur": 84,
   "New Orleans": 80,
   "Portofino": 80,
+  "Hong Kong": 19,
   "Amalfi Coast": 22,
   // 1 -> 4. THREE ADDED, AND THE ROOM STOPS THERE ON RULE 3 RATHER THAN ON A
   // NUMBER. `tamales` and `tortillas` are named in HER OWN RULING, quoted in
