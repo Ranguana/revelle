@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { test } from "node:test";
 
+import { deployChain } from "../../scripts/deploy-chain.mjs";
 import { CATALOGUE_CHAIN, POST_SEED_STEP } from "./desk/seed-chain.ts";
 
 /**
@@ -105,31 +106,22 @@ test("every seeder either runs on deploy or is listed as manual", () => {
  * because "no steps found" and "the file moved" must not be the same value: a
  * test that silently compares against nothing passes forever.
  */
-function deployChain(): string[] {
-  const render = readFileSync(new URL("../../render.yaml", import.meta.url), "utf8");
-  const lines = render.split("\n");
-  const start = lines.findIndex((line) =>
-    /^\s*preDeployCommand:\s*>-\s*$/.test(line)
-  );
-  if (start < 0) {
-    throw new Error(
-      "render.yaml has no `preDeployCommand: >-` block. If the deploy chain " +
-        "moved, this test has to be told where it went — it must never fall " +
-        "back to assuming there is one."
-    );
-  }
-
-  const indent = (line: string) => line.length - line.trimStart().length;
-  const base = indent(lines[start]);
-  const chain: string[] = [];
-  for (const line of lines.slice(start + 1)) {
-    if (line.trim() === "") break;
-    if (indent(line) <= base) break;
-    const m = /npm run ([A-Za-z0-9:_-]+)/.exec(line);
-    if (m) chain.push(m[1]);
-  }
-  return chain;
-}
+/*
+ * EXTRACTED 2026-09-08. The parser that used to live here is now
+ * `scripts/deploy-chain.mjs`, and this test is a consumer of it.
+ *
+ * It was written twice — here and in `scripts/smoke-seeders.mjs` — and a third
+ * copy was about to be written for `npm run preflight`. Rule 21's narrow test:
+ * MUST TWO SURFACES AGREE ABOUT THIS? They must. "Which seeders does the deploy
+ * run, in what order" has one answer, and three readers of one YAML block
+ * disagree on the day somebody adds a step and only two of them notice.
+ *
+ * THE GUARD STILL GOES THROUGH THE CONSUMER, which is the half of rule 21 that
+ * usually gets skipped: this test drives the shared parser the way the deploy
+ * drives it and asserts against the chain's real content, so a parser that
+ * started returning nothing would fail here rather than pass by comparing
+ * itself to itself.
+ */
 
 test("migrate runs on deploy, and runs before every seeder", () => {
   const chain = deployChain();
@@ -280,4 +272,59 @@ test("every migration is named NNN-description.sql, so its order is not a guess"
       `apply, in an order decided by the rest of the filename, which is not ` +
       `an order anybody chose.`
   );
+});
+
+test("THE DEPLOY CHAIN HAS ONE PARSER, and every surface reads it", () => {
+  /*
+   * Rule 21's guard has to go through the consumers, and the bypass it exists
+   * to catch is somebody writing a fourth copy next month — which by
+   * definition does not call the shared function. So this looks for the
+   * SHAPE of the parser rather than for calls to it: any file that finds
+   * `preDeployCommand` in render.yaml by itself is a second authority on what
+   * the deploy runs.
+   *
+   * It was three copies before this test existed — here, smoke-seeders, and
+   * one about to be written for preflight.
+   */
+  const root = new URL("../../", import.meta.url).pathname;
+  const OWNER = "scripts/deploy-chain.mjs";
+
+  const suspects = [
+    ...readdirSync(`${root}scripts`)
+      .filter((f) => f.endsWith(".mjs"))
+      .map((f) => `scripts/${f}`),
+    "src/lib/deploy.test.ts",
+  ];
+
+  const parsers = suspects.filter((file) => {
+    const source = readFileSync(`${root}${file}`, "utf8");
+    /*
+     * THE PARSER'S OWN SIGNATURE, not the word.
+     *
+     * The first version of this test matched `preDeployCommand:\s*>-`
+     * anywhere in the file, and flagged `scripts/migrate.mjs` twice: once
+     * correctly, for a real fourth copy, and once after that copy was removed
+     * — because migrate PRINTS the string "render.yaml's `preDeployCommand:
+     * >-`" in its failure summary. A detector that cannot tell a parser from
+     * a sentence about a parser is rule 24's matching problem exactly.
+     *
+     * So it looks for the anchored line-regex only a parser writes.
+     */
+    return source.includes("^\\s*preDeployCommand");
+  });
+
+  assert.deepEqual(
+    parsers,
+    [OWNER],
+    `these files parse render.yaml's preDeployCommand themselves. There may ` +
+      `be exactly one, and it is ${OWNER} — anything else is a second answer ` +
+      `to "what does the deploy run", and the two disagree the day a step is ` +
+      `added and only one of them is updated.`
+  );
+
+  // AND THE OWNER ACTUALLY WORKS, driven the way its consumers drive it, so
+  // this cannot pass by the parser having been deleted.
+  const chain = deployChain();
+  assert.ok(chain.length >= 5, `the shared parser returned ${chain.length} steps`);
+  assert.equal(chain[0], "migrate");
 });

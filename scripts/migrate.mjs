@@ -130,6 +130,8 @@ import { fileURLToPath } from "node:url";
 
 import pg from "pg";
 
+import { deployChain as sharedDeployChain } from "./deploy-chain.mjs";
+
 // Resolved from this file, not from process.cwd(), so it works no matter where
 // the deploy runner starts it.
 const MIGRATIONS_DIR = fileURLToPath(new URL("../db/", import.meta.url));
@@ -255,37 +257,27 @@ async function recordedHead(client) {
 }
 
 /**
- * Every `npm run …` in render.yaml's preDeployCommand, in order.
+ * Every `npm run …` in render.yaml's preDeployCommand, in order — or null.
  *
- * Read from the deploy rather than listed here, for the reason
- * scripts/smoke-seeders.mjs gives at length: a copy of the chain drifts from
- * the chain. The parser is duplicated from that script rather than shared,
- * following the same convention as `needsSsl` (which lives in three files) —
- * smoke-seeders.mjs runs top-level code on import and cannot be imported.
+ * ── THE PARSER IS SHARED NOW; THE ERROR POLICY IS NOT ────────────────
  *
- * Returns null rather than throwing, and the caller SAYS SO. A failure summary
- * that quietly omits "and here is what never ran" because it could not parse a
- * YAML block is this whole file's bug wearing a smaller hat.
+ * This file carried its own copy, and said why: "the parser is duplicated from
+ * that script rather than shared … smoke-seeders.mjs runs top-level code on
+ * import and cannot be imported." That reason EXPIRED on 2026-09-08, when the
+ * parser moved to `scripts/deploy-chain.mjs`, which has no top-level side
+ * effects and exists to be imported. It was one of four copies by then.
+ *
+ * WHAT IS KEPT IS THIS FILE'S OWN POLICY, and it is a real difference rather
+ * than a style: the shared parser THROWS when render.yaml has moved, which is
+ * right for a checker whose whole job is to read the chain. It is wrong here.
+ * This function is called while building a FAILURE SUMMARY, and a summary that
+ * dies because it could not parse a YAML block is this file's own bug wearing
+ * a smaller hat. So the throw is caught and becomes null, and the caller says
+ * "deploy steps: UNKNOWN" out loud rather than omitting the section.
  */
 function deployChain() {
   try {
-    const path = fileURLToPath(new URL("../render.yaml", import.meta.url));
-    const lines = readFileSync(path, "utf8").split("\n");
-    const start = lines.findIndex((line) =>
-      /^\s*preDeployCommand:\s*>-\s*$/.test(line)
-    );
-    if (start < 0) return null;
-
-    const indent = (line) => line.length - line.trimStart().length;
-    const base = indent(lines[start]);
-    const steps = [];
-    for (const line of lines.slice(start + 1)) {
-      if (line.trim() === "") break;
-      if (indent(line) <= base) break;
-      const m = /npm run ([A-Za-z0-9:_-]+)/.exec(line);
-      if (m) steps.push(m[1]);
-    }
-    return steps.length > 0 ? steps : null;
+    return sharedDeployChain();
   } catch {
     return null;
   }

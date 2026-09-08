@@ -35,6 +35,7 @@
     "gen:registry-dates": "node scripts/registry-dates.mjs",
     "check:registry-dates": "node scripts/registry-dates.mjs --check",
     "activate:catalogue": "node scripts/activate-catalogue.mjs",
+    "preflight": "node scripts/preflight.mjs",
     "smoke:seeders": "node scripts/smoke-seeders.mjs",
     "check:matrix": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/audit-matrix.mjs",
     "check:voices": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-voices.mjs",

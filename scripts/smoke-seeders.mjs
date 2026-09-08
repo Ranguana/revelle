@@ -59,6 +59,8 @@
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+
+import { deployChain } from "./deploy-chain.mjs";
 import { fileURLToPath } from "node:url";
 
 import pg from "pg";
@@ -94,40 +96,15 @@ function ident(name) {
 
 /* ── the chain, read from the deploy ─────────────────────────────────── */
 
-/**
- * Every `npm run …` in render.yaml's preDeployCommand, in order.
+/*
+ * `deployChain` MOVED TO scripts/deploy-chain.mjs on 2026-09-08.
  *
- * The block is YAML's `>-` folded scalar: indented lines until the indentation
- * drops back. Parsed by indentation rather than by a YAML library, because the
- * repo has no YAML dependency and adding one to read six lines would be the
- * expensive way to be less obvious.
+ * It lived here and in src/lib/deploy.test.ts, and `npm run preflight` was
+ * about to make three copies of one YAML parser. Rule 21: "which seeders does
+ * the deploy run, in what order" has exactly one answer, and three readers
+ * disagree the day somebody adds a step and only two notice. The behaviour is
+ * unchanged, including its refusal to fall back to a list of its own.
  */
-function deployChain() {
-  const lines = readFileSync(`${ROOT}render.yaml`, "utf8").split("\n");
-  const start = lines.findIndex((line) => /^\s*preDeployCommand:\s*>-\s*$/.test(line));
-  if (start < 0) {
-    throw new Error(
-      "render.yaml has no `preDeployCommand: >-` block. If the deploy chain " +
-        "moved, this script has to be told where it went — it must never fall " +
-        "back to a list of its own."
-    );
-  }
-
-  const indent = (line) => line.length - line.trimStart().length;
-  const base = indent(lines[start]);
-  const steps = [];
-  for (const line of lines.slice(start + 1)) {
-    if (line.trim() === "") break;
-    if (indent(line) <= base) break;
-    const m = /npm run ([A-Za-z0-9:_-]+)/.exec(line);
-    if (m) steps.push(m[1]);
-  }
-
-  if (steps.length === 0) {
-    throw new Error("render.yaml's preDeployCommand names no `npm run` steps.");
-  }
-  return steps;
-}
 
 /* ── the scratch database ────────────────────────────────────────────── */
 
