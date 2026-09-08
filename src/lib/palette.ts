@@ -168,3 +168,173 @@ export function paletteDarkAudit(
     belowFloor,
   };
 }
+
+/* ══ THE FRAME PROPOSES. THIS ARITHMETIC DISPOSES. ═══════════════════ */
+
+/**
+ * A COUNTED COLOUR, structurally. Deliberately not imported from
+ * `photo-extract.ts`.
+ *
+ * `PaletteSwatch` there is the vocabulary of a READING; this file is colour
+ * arithmetic and knows nothing about photographs. Declaring the shape
+ * structurally keeps the dependency from pointing the wrong way — a measurement
+ * module that imports a reading module is a measurement module that cannot be
+ * used on anything else, and the first thing anyone will want to measure this
+ * way is a palette somebody typed in by hand.
+ */
+export type CountedColour = { hex: string; share: number };
+
+/**
+ * PROPOSING A PALETTE FROM COUNTED COLOUR.
+ *
+ * ── THE DIVISION THIS FUNCTION EXISTS TO ENFORCE ─────────────────────
+ *
+ * Founder, on why the palette was never in the tool schema: *"VLMs invent
+ * #C4A574. Count pixels."* `palette()` in `src/lib/photo-store.ts` does the
+ * counting and has since the beginning. What was missing is the second half:
+ * a frame full of colour is not a palette, and turning one into the other is
+ * arithmetic that has to be written down somewhere it can be argued with.
+ *
+ *     THE FRAME SUPPLIES CANDIDATES. THE CONTRAST RULES DO THE CHOOSING.
+ *
+ * No model is asked for a hex at any point in this path, and no hex is
+ * invented, adjusted, blended or nudged here either. Every value that comes
+ * out of this function was counted off real pixels. **That is the whole
+ * design and it is the thing to protect** — the moment somebody "helpfully"
+ * darkens a candidate by 8% to get it over 7:1, the palette stops being
+ * evidence and becomes a plausible lie with six digits of precision, which is
+ * exactly what counting was chosen to avoid.
+ *
+ * ── AN UNSUPPLIED TOKEN IS ABSENT, NEVER DEFAULTED ───────────────────
+ *
+ * `minItems: 0` is the rule of the whole photograph feature and it reaches
+ * here intact. If no counted colour clears a token's floor, THE FRAME DOES NOT
+ * SUPPLY THAT TOKEN. It is reported in `unsupplied` with the best ratio the
+ * frame could manage, and no value is put in its place. A photograph that says
+ * nothing about an ink says nothing about an ink.
+ *
+ * That is why the return type is partial by construction rather than a
+ * `Palette` with holes patched from somewhere: a patched palette is
+ * indistinguishable from a read one once it is stored.
+ *
+ * ── WHY SHARE BREAKS THE TIE, AND NOT HEADROOM ───────────────────────
+ *
+ * Among the candidates that clear a floor, the one taken is the one MOST
+ * PRESENT IN THE FRAME, not the one with the best ratio. Optimising for
+ * headroom walks every palette toward black-on-white — it would produce
+ * technically excellent, mutually identical palettes, which is the exact
+ * defect the dark registry already has. Faithfulness to the photograph is the
+ * point; the floors are a floor, not a score.
+ */
+export type PaletteProposal = {
+  side: "palette" | "paletteDark";
+  /** Counted, never invented. Null when no candidate could serve as a ground. */
+  ground: string | null;
+  /** Only the tokens the frame actually supplied. */
+  tokens: Readonly<Record<string, string>>;
+  /** What the frame could not supply, and how close it came. */
+  unsupplied: { token: string; floor: number; best: number | null }[];
+};
+
+/**
+ * Is this candidate dark enough (or light enough) to be a ground for its side?
+ *
+ * The threshold is WCAG relative luminance 0.5, which is not a taste judgement
+ * — it is the point at which the contrast floors below become satisfiable in
+ * one direction rather than the other. A "dark" palette built on a light ground
+ * would pass nothing and propose nothing, which is a correct but useless
+ * answer arrived at expensively.
+ */
+function servesAsGround(hex: string, side: "palette" | "paletteDark"): boolean {
+  const l = luminance(hex);
+  return side === "paletteDark" ? l < 0.5 : l >= 0.5;
+}
+
+export function paletteFrom(
+  counted: readonly CountedColour[],
+  side: "palette" | "paletteDark" = "palette"
+): PaletteProposal {
+  // MOST PRESENT FIRST, and ties broken by hex so the same frame always
+  // produces the same proposal. Determinism is what makes this evidence
+  // rather than decoration — the same argument `palette()` makes about its
+  // own bucket ordering.
+  const ranked = [...counted].sort(
+    (a, b) => b.share - a.share || (a.hex < b.hex ? -1 : a.hex > b.hex ? 1 : 0)
+  );
+
+  const ground = ranked.find((c) => servesAsGround(c.hex, side))?.hex ?? null;
+  if (ground === null) {
+    return {
+      side,
+      ground: null,
+      tokens: {},
+      unsupplied: Object.entries(CONTRAST_FLOORS).map(([token, floor]) => ({
+        token,
+        floor,
+        best: null,
+      })),
+    };
+  }
+
+  const tokens: Record<string, string> = {};
+  const unsupplied: PaletteProposal["unsupplied"] = [];
+  const taken = new Set<string>([ground]);
+
+  for (const [token, floor] of Object.entries(CONTRAST_FLOORS)) {
+    // A TOKEN IS NEVER THE GROUND AND NEVER ANOTHER TOKEN. Six roles filled by
+    // four distinct colours is a palette with three invisible tokens, and the
+    // contrast test would not catch it — every one of them would clear its
+    // floor against the ground while being the same colour as its neighbour.
+    const candidates = ranked.filter(
+      (c) => !taken.has(c.hex) && contrast(c.hex, ground) >= floor
+    );
+    const best = ranked
+      .filter((c) => !taken.has(c.hex))
+      .reduce<number | null>(
+        (top, c) => Math.max(top ?? 0, contrast(c.hex, ground)),
+        null
+      );
+
+    if (candidates.length === 0) {
+      unsupplied.push({ token, floor, best });
+      continue;
+    }
+    tokens[token] = candidates[0].hex;
+    taken.add(candidates[0].hex);
+  }
+
+  return { side, ground, tokens, unsupplied };
+}
+
+/**
+ * WOULD THIS PROPOSED GROUND BE A NEAR-DUPLICATE OF A ROOM WE ALREADY HAVE?
+ *
+ * The separation half, and the reason it is a separate call: a proposal can be
+ * perfectly readable and still be the 147th pair below the floor. Contrast and
+ * separation fail independently and a path that checked only one of them would
+ * ship exactly the defect the dark registry already carries.
+ *
+ * Returns every room the proposal collides with, nearest first. EMPTY MEANS
+ * CLEAR. `slug` is excluded so a room may be re-proposed against itself.
+ */
+export function proposalCollisions(
+  hex: string,
+  rooms: Readonly<
+    Record<
+      string,
+      { look: { palette: Record<string, string>; paletteDark?: Record<string, string> } }
+    >
+  >,
+  side: "palette" | "paletteDark" = "palette",
+  slug?: string
+): SeparationReading[] {
+  const out: SeparationReading[] = [];
+  for (const [other, room] of Object.entries(rooms)) {
+    if (other === slug) continue;
+    const theirs = side === "palette" ? room.look.palette : room.look.paletteDark;
+    if (!theirs) continue;
+    const distance = apart(hex, theirs.ground);
+    if (distance < GROUND_FLOOR) out.push({ other, distance, ok: false });
+  }
+  return out.sort((a, b) => a.distance - b.distance);
+}

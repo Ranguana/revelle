@@ -12,6 +12,8 @@ import {
   apart,
   contrastReadings,
   paletteDarkAudit,
+  paletteFrom,
+  proposalCollisions,
   GROUND_FLOOR,
 } from "./palette.ts";
 
@@ -229,4 +231,143 @@ test("the palette measurement has ONE owner, and this file consumes it", () => {
   assert.equal(contrast("#123456", "#123456"), 1);
   assert.ok(Math.abs(luminance("#ffffff") - 1) < 1e-9);
   assert.equal(luminance("#000000"), 0);
+});
+
+/* ══ THE FRAME PROPOSES, THE ARITHMETIC DISPOSES — docs/photo-redirect.md ══ */
+
+/**
+ * These drive `paletteFrom` the way the photograph path will drive it, and
+ * every one of them is about a REFUSAL. The happy case is one test; the other
+ * four are the ways a proposal could quietly invent something, which is the
+ * only failure mode that matters here — an invented hex is indistinguishable
+ * from a counted one the moment it is stored.
+ */
+
+test("a proposal is built only from colours that were counted", () => {
+  // Havana's own dark palette, fed back as counted colour. Everything that
+  // comes out must be a value that went in — no blending, no nudging, no
+  // "close enough" adjustment to clear a floor.
+  const dark = DESTINATIONS.havana.look.paletteDark!;
+  const counted = Object.values(dark).map((hex, i) => ({ hex, share: 0.3 - i * 0.02 }));
+  const proposal = paletteFrom(counted, "paletteDark");
+
+  const wentIn = new Set(Object.values(dark).map((h) => h.toLowerCase()));
+  assert.ok(proposal.ground);
+  assert.ok(
+    wentIn.has(proposal.ground.toLowerCase()),
+    `the proposed ground ${proposal.ground} was not one of the counted colours. ` +
+      `A hex this function produced rather than selected is the exact thing ` +
+      `"count pixels" was chosen to prevent.`
+  );
+  for (const [token, hex] of Object.entries(proposal.tokens)) {
+    assert.ok(
+      wentIn.has(hex.toLowerCase()),
+      `${token} = ${hex} was not counted off the frame`
+    );
+  }
+});
+
+test("EVERY PROPOSED TOKEN CLEARS THE FLOOR IT IS PROPOSED FOR", () => {
+  // The gate, driven through the same `contrastReadings` the build uses, so a
+  // proposal cannot pass here and fail there.
+  const dark = DESTINATIONS.havana.look.paletteDark!;
+  const counted = Object.values(dark).map((hex, i) => ({ hex, share: 0.3 - i * 0.02 }));
+  const proposal = paletteFrom(counted, "paletteDark");
+
+  for (const reading of contrastReadings({ ...proposal.tokens, ground: proposal.ground! })) {
+    if (proposal.tokens[reading.token] === undefined) continue; // unsupplied is legal
+    assert.ok(
+      reading.ok,
+      `proposed ${reading.token} is ${reading.ratio.toFixed(1)}:1 against the ` +
+        `proposed ground, below ${reading.floor}:1`
+    );
+  }
+});
+
+test("A FRAME THAT SAYS NOTHING PROPOSES NOTHING", () => {
+  /*
+   * `minItems: 0` is the rule of the whole photograph feature and this is
+   * where it reaches the palette. Five near-identical beiges are a real
+   * photograph — an overexposed wall, a tablecloth in flat light — and they
+   * state a ground and nothing else. The failure this guards is a proposer
+   * that fills six tokens because six were asked for.
+   */
+  const flat = [
+    { hex: "#c9bda8", share: 0.5 },
+    { hex: "#c8bca7", share: 0.2 },
+    { hex: "#cabea9", share: 0.15 },
+    { hex: "#c7bba6", share: 0.1 },
+    { hex: "#cbbfaa", share: 0.05 },
+  ];
+
+  const day = paletteFrom(flat, "palette");
+  assert.equal(day.ground, "#c9bda8", "the commonest colour is a legitimate ground");
+  assert.deepEqual(day.tokens, {}, "and the frame supplies no ink, so none is invented");
+  assert.equal(day.unsupplied.length, 6, "all six are reported as unsupplied");
+  for (const u of day.unsupplied) {
+    assert.ok(u.best !== null && u.best < u.floor, `${u.token} reports how close it came`);
+  }
+
+  // AND ON THE DARK SIDE IT DOES NOT EVEN PROPOSE A GROUND. Nothing in the
+  // frame is dark enough to be one, and picking the darkest beige anyway
+  // would be the proposer deciding what the photograph meant.
+  const night = paletteFrom(flat, "paletteDark");
+  assert.equal(night.ground, null);
+  assert.deepEqual(night.tokens, {});
+});
+
+test("no two tokens of a proposal are the same colour", () => {
+  // Six roles filled from four distinct colours passes every contrast floor
+  // and renders three invisible tokens. The contrast test cannot catch it —
+  // each one clears its floor against the ground while being identical to its
+  // neighbour — so it is caught here, at the only place that knows.
+  const thin = [
+    { hex: "#101010", share: 0.6 },
+    { hex: "#fafafa", share: 0.3 },
+    { hex: "#f8f8f8", share: 0.1 },
+  ];
+  const proposal = paletteFrom(thin, "paletteDark");
+  const used = Object.values(proposal.tokens);
+  assert.equal(new Set(used).size, used.length, "a colour was used for two tokens");
+  assert.ok(!used.includes(proposal.ground!), "a token was given the ground's own colour");
+});
+
+test("a proposal is deterministic, so it is evidence and not decoration", () => {
+  const counted = [
+    { hex: "#0e1b18", share: 0.4 },
+    { hex: "#f2e2cb", share: 0.4 },
+    { hex: "#5fb6ae", share: 0.2 },
+  ];
+  assert.deepEqual(
+    paletteFrom(counted, "paletteDark"),
+    paletteFrom([...counted].reverse(), "paletteDark"),
+    "the same counted colours in a different order produced a different palette"
+  );
+});
+
+test("A PROPOSAL IS CHECKED FOR SEPARATION, NOT ONLY FOR CONTRAST", () => {
+  /*
+   * The two fail independently and a path that checked only contrast would
+   * ship the 147th near-duplicate with a green build. That is precisely how
+   * the dark registry got to 146 — every one of those rooms is readable.
+   */
+  const havanaDark = DESTINATIONS.havana.look.paletteDark!.ground;
+
+  const collides = proposalCollisions(havanaDark, DESTINATIONS, "paletteDark", "havana");
+  assert.ok(
+    collides.some((c) => c.other === "acapulco-1959" && c.distance === 0),
+    "re-proposing Havana's dark ground must collide with Acapulco, which shares it"
+  );
+  assert.ok(
+    !collides.some((c) => c.other === "havana"),
+    "a room does not collide with itself"
+  );
+
+  // AND A GENUINELY NEW GROUND IS CLEAR. Mid-grey sits far from every room's
+  // dark ground, all of which are near-black with a hue.
+  assert.deepEqual(
+    proposalCollisions("#7a7a7a", DESTINATIONS, "paletteDark"),
+    [],
+    "empty means clear, and a distinct ground must read as clear"
+  );
 });
