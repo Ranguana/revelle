@@ -6,7 +6,14 @@ import { DESTINATIONS } from "./destinations.ts";
 // room page could only have them by copying the arithmetic — rule 21's exact
 // defect, and the way "0.65 everywhere" happened. src/lib/palette.ts is the
 // one owner now and this test is a consumer of it.
-import { luminance, contrast, apart, paletteDarkAudit } from "./palette.ts";
+import {
+  luminance,
+  contrast,
+  apart,
+  contrastReadings,
+  paletteDarkAudit,
+  GROUND_FLOOR,
+} from "./palette.ts";
 
 /**
  * THE PALETTES ARE READABLE, AND THEY ARE EIGHTEEN PALETTES.
@@ -137,6 +144,76 @@ test("the dark registry does not get worse than it already is", () => {
     `${audit.measured} of ${Object.keys(DESTINATIONS).length} rooms carry a paletteDark; ` +
       "a room without one renders on the host's own ground after dark"
   );
+
+  /*
+   * AND THE NEAR-DUPLICATES ARE PINNED BY COUNT, which is the half that gives
+   * a PROPOSAL something to fail against.
+   *
+   * Byte-identical is the extreme case and it is rare. The ordinary way the
+   * dark registry gets worse is one more pair landing at 3.2 units — invisible
+   * to the identity check above, invisible to a reviewer, and indistinguishable
+   * from the 146 that are already there. A photograph proposing a ground is
+   * exactly the mechanism that would produce one, at volume, with good
+   * provenance.
+   *
+   * EXACT EQUALITY, NOT `<=`, and for the same reason the identical pin uses
+   * it: a number that may drift down silently is a number nobody records. Fix
+   * a palette, watch this go red, edit it down, and the diff carries how many
+   * pairs the fix actually bought. That is the only place that figure is ever
+   * written.
+   */
+  assert.equal(
+    audit.belowFloor.length,
+    146,
+    `${audit.belowFloor.length} dark pairs sit below the day floor of ` +
+      `${GROUND_FLOOR}, and 146 is the recorded state. UP means a new ` +
+      `near-duplicate landed — most likely a proposed palette that cleared ` +
+      `contrast and was never checked for separation. DOWN means somebody ` +
+      `fixed one: edit this number and say so in the commit.`
+  );
+});
+
+/**
+ * THE DARK SIDE IS READABLE, AND THAT FLOOR IS GATED RATHER THAN PINNED.
+ *
+ * ── WHY THIS ONE IS AN ASSERTION AND THE SEPARATION IS A PIN ─────────
+ *
+ * They are two different findings and they deserve two different mechanisms,
+ * which is the whole reason this test is separate from the one below it.
+ *
+ * Measured on 2026-09-08, across all nineteen rooms and all six floors:
+ * ZERO FAILURES. The dark palettes are perfectly readable. What they are not
+ * is DISTINCT — that is the separation finding, it is 146 pairs deep, and it
+ * is pinned below because it cannot be fixed by a build.
+ *
+ * So contrast costs nothing to gate today and must be gated today, because it
+ * is the floor a PROPOSED palette has to clear. A photograph is about to start
+ * supplying candidate grounds and inks (docs/photo-redirect.md); the frame
+ * proposes and this arithmetic disposes. Without this test the first proposed
+ * dark palette could ship unreadable text and the build would be green — and
+ * "the day side had a contrast test and the dark side did not" is exactly the
+ * asymmetry that let the dark registry collapse in the first place.
+ *
+ * IT READS `contrastReadings` RATHER THAN RE-DERIVING THE FLOORS. Rule 21: the
+ * floors live in src/lib/palette.ts, one copy, consumed by this test, by
+ * `npm run room:check`, and by the proposal path. A second list of numbers here
+ * is how "0.65 everywhere" happened.
+ */
+test("every room's writing is readable on its own DARK ground", () => {
+  for (const [slug, room] of Object.entries(DESTINATIONS)) {
+    const dark = room.look.paletteDark;
+    assert.ok(dark, `${slug} ships no paletteDark`);
+
+    for (const reading of contrastReadings(dark)) {
+      assert.ok(
+        reading.ok,
+        `${slug}: ${reading.token} on the DARK ground is ` +
+          `${reading.ratio.toFixed(1)}:1, below ${reading.floor}:1. This is a ` +
+          `member reading her own Revelle at night, which is when most of them ` +
+          `open it.`
+      );
+    }
+  }
 });
 
 test("the palette measurement has ONE owner, and this file consumes it", () => {
