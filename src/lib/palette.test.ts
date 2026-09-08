@@ -351,7 +351,8 @@ test("A PROPOSAL IS CHECKED FOR SEPARATION, NOT ONLY FOR CONTRAST", () => {
    * ship the 147th near-duplicate with a green build. That is precisely how
    * the dark registry got to 146 — every one of those rooms is readable.
    */
-  const havanaDark = DESTINATIONS.havana.look.paletteDark!.ground;
+  const havanaDark = DESTINATIONS.havana.look.paletteDark?.ground;
+  assert.ok(havanaDark, "havana ships a dark ground");
 
   const collides = proposalCollisions(havanaDark, DESTINATIONS, "paletteDark", "havana");
   assert.ok(

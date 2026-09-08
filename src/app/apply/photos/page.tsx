@@ -105,15 +105,29 @@ export default async function PhotosPage({
             encType="multipart/form-data"
           >
             <p className={styles.label}>What are you showing?</p>
+            {/*
+              NOTHING IS PRE-SELECTED, AND THAT IS THE RULE RATHER THAN A
+              STYLE CHOICE.
+
+              This carried `defaultChecked={index === 1}` until 2026-09-08,
+              which pre-selected `evening_she_wants` — and
+              src/lib/photo-extract.ts forbids exactly that, in these words:
+              "defaulting to a role is inventing the member's meaning, and the
+              role it would default to is the one that feeds the matrix."
+              The file argued the case and this form did the opposite of it.
+
+              A photograph whose role nobody has stated is a photograph whose
+              role nobody has stated. `setPictureRoleAction` resolves a missing
+              value to null, `mayPrune(null)` is false, and null is a legal and
+              meaningful state in db/064 — so leaving every radio unchecked
+              costs nothing and stops the house answering a question on her
+              behalf. It is deliberately NOT `required` either: forcing a
+              choice invents a meaning just as surely, only more loudly.
+            */}
             <div className={styles.options}>
-              {PHOTO_ROLES.map((role, index) => (
+              {PHOTO_ROLES.map((role) => (
                 <label key={role} className={styles.option}>
-                  <input
-                    type="radio"
-                    name="role"
-                    value={role}
-                    defaultChecked={index === 1}
-                  />
+                  <input type="radio" name="role" value={role} />
                   {ROLE_SAID[role]}
                 </label>
               ))}

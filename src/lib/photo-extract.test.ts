@@ -12,6 +12,7 @@ import {
   MAX_PHOTOS,
   NEVER_FROM_A_PHOTO,
   PHOTO_LONG_EDGE,
+  PHOTO_ROLES,
   PROPOSABLE_FACETS,
   PROPOSABLE_LEVELS,
   extractFrom,
@@ -1034,4 +1035,56 @@ test("a silent reading is reported with its reason, not as a zero", () => {
   assert.equal(s.read, 0);
   assert.equal(s.silences.length, 1);
   assert.match(s.silences[0], /evening-01: the reader declined/);
+});
+
+/* ══ 9 · THE HOUSE DOES NOT ANSWER FOR HER ══════════════════════════ */
+
+test("NO ROLE IS PRE-SELECTED ON THE MEMBER'S FORM", () => {
+  /*
+   * This file's own header forbids it, in these words: "defaulting to a role
+   * is inventing the member's meaning, and the role it would default to is the
+   * one that feeds the matrix."
+   *
+   * The form did it anyway, from the day it was written until 2026-09-08 —
+   * `defaultChecked={index === 1}`, which is `evening_she_wants`, which is
+   * precisely the role the sentence above names. The rule was written down, in
+   * the module the form imports from, and nothing was watching the form.
+   * Rule 20's shape: the file that describes the rule is not the rule.
+   *
+   * Kept as a test rather than a comment for exactly that reason. A member's
+   * photograph may carry no role at all; `mayPrune(null)` is false and db/064
+   * stores it, so the honest default is no answer.
+   */
+  // COMMENTS ARGUE ABOUT THIS AT LENGTH AND MUST KEEP DOING SO (rule 23:
+  // state the fact where the wrong reading would be made). It is the CODE
+  // that may not carry the default — so JSX comment blocks are stripped
+  // whole, not filtered line by line. A `{/* … */}` block's inner lines start
+  // with ordinary prose, so the line filter the surface test uses would have
+  // read this test's own explanation as a violation.
+  const form = readFileSync(`${ROOT}src/app/apply/photos/page.tsx`, "utf8");
+  const code = form
+    .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .split("\n")
+    .filter((line) => !line.trim().startsWith("//"))
+    .join("\n");
+
+  assert.doesNotMatch(
+    code,
+    /defaultChecked/,
+    "a role radio is pre-selected. The house has answered 'what are you " +
+      "showing?' on her behalf, and whichever role it picks becomes the one " +
+      "most photographs carry."
+  );
+  assert.doesNotMatch(
+    code,
+    /name="role"[^>]*\brequired\b/,
+    "the role radio is required. Forcing a choice invents a meaning too — " +
+      "just more loudly. Null is a legal, stored, meaningful state."
+  );
+  // AND THE THREE ROLES ARE STILL OFFERED, so this cannot pass by the form
+  // having lost the question altogether.
+  for (const role of PHOTO_ROLES) {
+    assert.match(code, new RegExp(`value=\\{role\\}|"${role}"`), `${role} is offered`);
+  }
 });
