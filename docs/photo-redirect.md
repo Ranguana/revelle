@@ -4,7 +4,22 @@
 > proving `clean_stop` from an empty glass count. That is the bigger issue CC
 > keeps stepping around."*
 
-A proposal, not a change. Nothing in `src/lib/photo-extract.ts` has moved.
+**APPROVED AND BUILT, 2026-09-08.** This began as a proposal and is kept
+because the argument is the part that gets lost. What has landed since:
+
+| | |
+|---|---|
+| dark contrast | **gated** — zero failures, so it cost nothing and gives a proposal something to clear |
+| dark separation | **pinned at 146 pairs** — a 147th goes red; the number can only be edited down |
+| `paletteFrom` | the frame supplies candidates, the contrast rules choose, and no hex is ever invented |
+| `proposalCollisions` | separation checked separately, because it and contrast fail independently |
+| `TABLE_CUES` | three closed axes — surface, service, what is growing on it — composed into her register |
+| the draft path | `bankDraftFrom` fed, not rebuilt |
+| the gold set | `palette` / `table` / `trap`, redesigned before she shot anything |
+| the role default | removed, and a test holds it |
+
+**Still open and still hers:** §8's questions, and the one build named in §7
+item 2 — which of Havana or Acapulco keeps the dark palette they share.
 
 ---
 
