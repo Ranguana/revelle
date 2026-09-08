@@ -33,7 +33,7 @@ import {
   type PhotoExtract,
 } from "./photo-extract.ts";
 import { bankDraftFrom } from "./desk/images.ts";
-import { GOLD_GROUPS, GOLD_SET, score } from "./photo-gold-set.ts";
+import { GOLD_GROUPS, GOLD_SET, PAYLOADS, score } from "./photo-gold-set.ts";
 import { bandOf, sortQueue, type QueueApplication } from "./desk/photo-queue.ts";
 
 /**
@@ -919,7 +919,7 @@ test("silence on a trap's invited column is the whole point", () => {
 });
 
 test("an unlabelled case contributes nothing to precision or recall", () => {
-  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
+  const evening = GOLD_SET.find((entry) => entry.id === "palette-01");
   assert.ok(evening);
   const s = score([
     {
@@ -944,7 +944,7 @@ test("an unlabelled case contributes nothing to precision or recall", () => {
 });
 
 test("a labelled case scores hits, misses and the columns left silent", () => {
-  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
+  const evening = GOLD_SET.find((entry) => entry.id === "palette-01");
   assert.ok(evening);
   const labelled = {
     ...evening,
@@ -987,8 +987,8 @@ test("a labelled case scores hits, misses and the columns left silent", () => {
 });
 
 test("the seam is checked on every bench case and a breach is not a score", () => {
-  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
-  const place = GOLD_SET.find((entry) => entry.id === "place-01");
+  const evening = GOLD_SET.find((entry) => entry.id === "palette-01");
+  const place = GOLD_SET.find((entry) => entry.id === "table-01");
   assert.ok(evening && place);
 
   const clean = score([
@@ -1032,14 +1032,14 @@ test("schema validity is counted apart from claim correctness", () => {
 });
 
 test("a silent reading is reported with its reason, not as a zero", () => {
-  const evening = GOLD_SET.find((entry) => entry.id === "evening-01");
+  const evening = GOLD_SET.find((entry) => entry.id === "palette-01");
   assert.ok(evening);
   const s = score([
     { photo: evening, extract: silentExtract("the reader declined this frame") },
   ]);
   assert.equal(s.read, 0);
   assert.equal(s.silences.length, 1);
-  assert.match(s.silences[0], /evening-01: the reader declined/);
+  assert.match(s.silences[0], /palette-01: the reader declined/);
 });
 
 /* ══ 9 · THE HOUSE DOES NOT ANSWER FOR HER ══════════════════════════ */
@@ -1271,4 +1271,112 @@ test("THE TABLE REACHES THE EXISTING DRAFT PATH, and the question holds it", () 
     source: "a member's photograph",
   });
   assert.equal(empty.ok, false);
+});
+
+/* ══ 11 · THE BENCH FOLLOWS THE AIM ═════════════════════════════════ */
+
+test("THE SEAM IS STILL BENCHED after the groups changed", () => {
+  /*
+   * THE REDIRECT NEARLY DELETED THIS BY ACCIDENT, which is the finding worth
+   * keeping. The old bench had a whole group of ten `place_she_has` frames;
+   * rewriting the groups to palette/table made every case `evening_she_wants`
+   * for a while, because a palette is a palette whoever's room it is — and
+   * `mayPrune` would have stopped being measured with nothing going red.
+   *
+   * It is the one property in this feature that is a SEAM rather than a score:
+   * a saved terrace must never become evidence about the room she actually
+   * has. So the bench must always contain frames of both kinds.
+   */
+  const hers = GOLD_SET.filter((entry) => entry.role === "place_she_has");
+  const saved = GOLD_SET.filter((entry) => entry.role !== "place_she_has");
+
+  assert.ok(
+    hers.length >= 5,
+    `${hers.length} bench cases are her own place. Below five the seam is ` +
+      `measured on a handful and mayPrune stops being a number.`
+  );
+  assert.ok(saved.length >= 5, `${saved.length} cases are not her place`);
+
+  for (const entry of hers) assert.equal(mayPrune(entry.role), true);
+  for (const entry of saved) assert.equal(mayPrune(entry.role), false);
+});
+
+test("the table briefs reach every term of the vocabulary", () => {
+  // A bench that never depicts `oilcloth` cannot tell a reader that is blind
+  // to oilcloth from one that is good at it. Rule 24 from the design end:
+  // count what the cases cover before trusting what they measure.
+  const briefs = GOLD_SET.filter((e) => e.group === "table")
+    .map((e) => e.brief.toLowerCase())
+    .join(" ");
+
+  const depicted: Record<string, RegExp> = {
+    bare_wood: /bare wood|bare boards/,
+    cloth: /\bcloth\b/,
+    oilcloth: /oilcloth/,
+    embroidered: /embroidered/,
+    matched_service: /matched service|matched everyday/,
+    mismatched_service: /do not match|mismatched/,
+    everyday_dishes: /everyday (plates|dishes)/,
+    good_dishes: /good dishes/,
+    flowers_arranged: /properly arranged/,
+    flowers_loose: /dropped straight into|not arranged/,
+    branches: /branch/,
+    fruit_on_the_table: /fruit/,
+  };
+
+  assert.deepEqual(
+    Object.keys(depicted).sort(),
+    [...TABLE_CUES].sort(),
+    "the coverage map and the vocabulary have drifted"
+  );
+  for (const [cue, pattern] of Object.entries(depicted)) {
+    assert.match(briefs, pattern, `no table brief depicts ${cue}`);
+  }
+});
+
+test("a trap names payloads that exist, and stays scoreable without her", () => {
+  const traps = GOLD_SET.filter((entry) => entry.group === "trap");
+  assert.equal(traps.length, 10);
+
+  for (const trap of traps) {
+    for (const payload of trap.mustBeSilentOn) {
+      assert.ok(
+        (PAYLOADS as readonly string[]).includes(payload),
+        `${trap.id} must be silent on "${payload}", which is not a payload`
+      );
+    }
+  }
+
+  // EVERY TRAP CARRIES AN EXPECTATION THAT NEEDS NO LABEL. That is what a trap
+  // is: a case whose failure is proposing anything at all on a named payload,
+  // so it measures on the day the photograph exists.
+  const scoreable = traps.filter(
+    (t) => t.mustBeSilentOn.length > 0 || t.mustNotPropose.length > 0
+  );
+  assert.equal(
+    scoreable.length,
+    traps.length,
+    "a trap with neither mustBeSilentOn nor mustNotPropose is a picture, not a " +
+      "measurement — it contributes nothing until somebody labels it"
+  );
+
+  // AND THE FOUNDER'S OWN THREE SURVIVED THE REDIRECT, which is evidence they
+  // were built on something more durable than the old aim.
+  for (const id of ["trap-01", "trap-02", "trap-03"]) {
+    const trap = GOLD_SET.find((e) => e.id === id);
+    assert.ok(trap, `${id} is gone`);
+    assert.match(trap.brief, /HERS\./, `${id} no longer records that it is hers`);
+  }
+});
+
+test("the palette group needs no labels, and says so by carrying none", () => {
+  // The redirect's dividend: a palette reading is deterministic, so these ten
+  // score on the day the photograph exists. Twenty of thirty cases used to
+  // need her judgement before they measured anything; ten do now.
+  const palettes = GOLD_SET.filter((entry) => entry.group === "palette");
+  assert.equal(palettes.length, 10);
+  for (const entry of palettes) {
+    assert.deepEqual(entry.expectedTable, [], `${entry.id} carries table labels`);
+    assert.equal(entry.labelled, false);
+  }
 });

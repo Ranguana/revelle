@@ -54,15 +54,44 @@ import {
   type MatrixFacet,
   type PhotoExtract,
   type PhotoRole,
+  type TableCueCode,
 } from "./photo-extract.ts";
 
 /* ══ 1 · WHAT ONE BENCH ENTRY IS ════════════════════════════════════ */
 
-export const GOLD_GROUPS = ["evening", "place", "trap"] as const;
+/**
+ * THE THREE GROUPS — redesigned 2026-09-08, before she shot anything.
+ *
+ * They were `evening` / `place` / `trap`, which was the right bench for the
+ * aim the photograph tool used to have: proposing matrix cells. Founder:
+ * *"Put the photo tool on tables and palettes, not on proving `clean_stop`
+ * from an empty glass count."* So the bench follows the aim.
+ *
+ * THE TIMING IS THE WHOLE REASON THIS IS CHEAP. She has not taken the thirty
+ * photographs. A brief rewritten today costs a paragraph; ten `evening-*`
+ * frames shot against the old briefs and then found to be the wrong evidence
+ * costs her a day and cannot be undone by any amount of code.
+ *
+ * `trap` survives by name and nearly by content — see TRAPS below.
+ */
+export const GOLD_GROUPS = ["palette", "table", "trap"] as const;
 export type GoldGroup = (typeof GOLD_GROUPS)[number];
 
 /** One expected cell. The founder writes these; nothing generates them. */
 export type GoldCell = { facet: MatrixFacet; level: string };
+
+/**
+ * WHICH PAYLOAD A CASE IS ABOUT — and, for a trap, which must come back empty.
+ *
+ * A trap's whole design is that a frame INVITES a reading it must not give,
+ * and under the old aim the only thing a frame could wrongly give was a matrix
+ * cell (`mustNotPropose`). Now there are five ways to over-read a picture, and
+ * the traps have to be able to name any of them: a black-and-white photograph
+ * invites a palette, a restaurant invites a table, a saved beach invites a
+ * venue cue.
+ */
+export const PAYLOADS = ["facets", "venue", "tone", "table", "palette"] as const;
+export type Payload = (typeof PAYLOADS)[number];
 
 export type GoldPhoto = {
   id: string;
@@ -83,6 +112,28 @@ export type GoldPhoto = {
    */
   mustNotPropose: readonly MatrixFacet[];
   /**
+   * PAYLOADS THAT MUST COME BACK EMPTY on this frame.
+   *
+   * Writable without the photograph, like `mustNotPropose`, because it is a
+   * property of the case rather than of the picture. This is what makes a trap
+   * scoreable before anybody has labelled anything.
+   */
+  mustBeSilentOn: readonly Payload[];
+  /**
+   * WHAT THE FRAME STATES ABOUT THE TABLE. The founder's, and empty until she
+   * says — the same rule as `expected`.
+   *
+   * NOTE THAT THE PALETTE GROUP HAS NO EQUIVALENT AND NEEDS NONE. A palette
+   * reading is DETERMINISTIC: `palette()` counts the same pixels the same way
+   * every run, and `paletteFrom` selects against fixed contrast floors. So a
+   * palette case is scored on properties that need no ground truth — did it
+   * propose only counted colours, does every proposed token clear its floor,
+   * does the ground collide with a room we already have. Twenty of thirty
+   * cases used to need her judgement before they measured anything; ten do
+   * now, and they are these.
+   */
+  expectedTable: readonly TableCueCode[];
+  /**
    * WHAT THE FRAME ACTUALLY STATES. The founder's, and empty until she says.
    * An entry with `labelled: false` is scored for schema validity and for its
    * `mustNotPropose` columns, and contributes nothing to precision or recall.
@@ -101,160 +152,208 @@ function slot(
   group: GoldGroup,
   role: PhotoRole,
   brief: string,
-  mustNotPropose: readonly MatrixFacet[] = []
+  over: {
+    mustNotPropose?: readonly MatrixFacet[];
+    mustBeSilentOn?: readonly Payload[];
+  } = {}
 ): GoldPhoto {
   return {
     id,
     group,
     role,
     brief,
-    mustNotPropose,
+    mustNotPropose: over.mustNotPropose ?? [],
+    mustBeSilentOn: over.mustBeSilentOn ?? [],
     expected: [],
+    expectedTable: [],
     labelled: false,
     file: `${id}.jpg`,
   };
 }
 
 /**
- * TEN EVENINGS. Frames of a party happening, presented as taste.
+ * TEN PALETTES. Frames chosen for the colour that can be counted out of them.
  *
- * The briefs span the six proposable columns deliberately — two that state
- * `size` unambiguously, two that state `food`, and so on — so that a reader
- * that is good at one column and blind in another is visible in the per-facet
- * breakdown rather than averaged away.
+ * ── WHAT THESE TEST, AND WHY THEY NEED NO LABELS ─────────────────────
+ *
+ * `palette()` counts pixels; `paletteFrom` selects a ground, an ink and three
+ * accents against fixed contrast floors. Both are deterministic, so a palette
+ * case is scoreable the day the photograph exists, with no judgement from
+ * anybody:
+ *
+ *   · every proposed value was one of the counted colours — nothing invented;
+ *   · every proposed token clears its floor against the proposed ground;
+ *   · the proposed ground does not collide with a room already in the registry;
+ *   · a frame that supplies no ink proposes no ink.
+ *
+ * THE BRIEFS SPAN THE WAYS A FRAME CAN BE HARD, not the ways it can be pretty.
+ * Two are deliberately near-monochrome and are EXPECTED to supply a ground and
+ * little else — a reader that returns six confident tokens off frame 05 is
+ * inventing, and that is the finding.
  */
-const EVENINGS: readonly GoldPhoto[] = [
-  slot("evening-01", "evening", "evening_she_wants", "One long table, laid, mid-meal, everybody seated and in one conversation."),
-  slot("evening-02", "evening", "evening_she_wants", "A room with forty people standing, drinks in hand, several conversations at once."),
-  slot("evening-03", "evening", "evening_she_wants", "Four people at a small table, late, plates pushed away."),
-  slot("evening-04", "evening", "evening_she_wants", "A kitchen mid-cook during the party — pans going, people in the room."),
-  slot("evening-05", "evening", "evening_she_wants", "A table of shop-bought things arranged on platters, nothing cooked."),
-  slot("evening-06", "evening", "evening_she_wants", "Black tie, obviously and uniformly, at a private party."),
-  slot("evening-07", "evening", "evening_she_wants", "The same kind of party in jeans and shirtsleeves — nobody has dressed."),
-  slot("evening-08", "evening", "evening_she_wants", "A band actually playing to a room that has turned to watch."),
-  slot("evening-09", "evening", "evening_she_wants", "A printed running order pinned up where guests can read it."),
-  slot("evening-10", "evening", "evening_she_wants", "A quiet room, three people, low light, nothing happening but talk."),
+const PALETTES: readonly GoldPhoto[] = [
+  slot("palette-01", "palette", "evening_she_wants", "A room after dark lit only by candles: a near-black ground with warm highlights on faces and glass."),
+  slot("palette-02", "palette", "evening_she_wants", "Late afternoon sun raking across a plain painted wall — one dominant warm ground, one hard shadow."),
+  slot("palette-03", "palette", "evening_she_wants", "A table under flat overcast daylight. Cool, low contrast, nothing saturated."),
+  slot("palette-04", "palette", "evening_she_wants", "A dark green painted room with brass and warm lamplight."),
+  slot("palette-05", "palette", "evening_she_wants", "A whitewashed room in bright sun, near-monochrome. It supplies a ground and very little else, and that is the correct reading."),
+  slot("palette-06", "palette", "evening_she_wants", "A red-walled room after dark, one lamp on."),
+  slot("palette-07", "palette", "evening_she_wants", "A pool at midday: saturated blue, white stone, hard light."),
+  slot("palette-08", "palette", "evening_she_wants", "A wood-panelled room, one lamp, everything else in shadow."),
+  slot("palette-09", "palette", "evening_she_wants", "A terrace at blue hour, the windows going blue and the lamps just on."),
+  slot("palette-10", "palette", "evening_she_wants", "A neutral kitchen where all the colour is in the objects, not the room. The ground is grey and the accents are real."),
 ];
 
 /**
- * TEN PLACES. Frames of a room somebody has, presented as her own.
+ * TEN TABLES. Frames of a table laid, spanning the three axes.
  *
- * These are the only ten in the bench that may produce a venue cue, and that
- * is half of what they test: `mayPrune` must be true for all ten and false for
- * the other twenty, whatever is in the frame.
+ * These are the ten that need her: `expectedTable` is the founder's list of
+ * which cues the frame actually states, and every cue she does not list is a
+ * cue the reading must be SILENT on. Listing fewer is the stricter test, the
+ * same way it was for cells.
+ *
+ * The briefs cover all twelve terms of `TABLE_CUES` at least once, so a reader
+ * blind to one axis — good at cloth, blind to what is in the vase — shows up
+ * in the per-case breakdown rather than being averaged away.
+ *
+ * ── FIVE ARE HER OWN TABLE AND FIVE ARE A TABLE SHE LIKES ────────────
+ *
+ * AND THAT IS WHAT KEEPS THE SEAM BENCHED. `mayPrune` is true for
+ * `place_she_has` and false for everything else, and it is the one property in
+ * this feature that is a seam rather than a score — a saved terrace must never
+ * become evidence about the room she actually has. The old bench tested it
+ * with a whole group of ten; the redirect nearly deleted it by accident,
+ * because a palette is a palette whoever's room it is.
+ *
+ * A table is where the distinction is real: HER table in HER room may say what
+ * that room can do, and a table off the internet may not, while both are
+ * perfectly good evidence about cloth and dishes. So the split lives here.
  */
-const PLACES: readonly GoldPhoto[] = [
-  slot("place-01", "place", "place_she_has", "Her own garden, open sky, grass, a table already out."),
-  slot("place-02", "place", "place_she_has", "A city apartment living room, no outdoor space visible."),
-  slot("place-03", "place", "place_she_has", "A domestic kitchen with a full oven and hob, hers."),
-  slot("place-04", "place", "place_she_has", "A terrace with a built grill or fire pit, clearly usable."),
-  slot("place-05", "place", "place_she_has", "A rented house's dining room, table for twelve."),
-  slot("place-06", "place", "place_she_has", "A poolside, daytime, her own."),
-  slot("place-07", "place", "place_she_has", "A narrow apartment kitchen — a hob and a sink, no room to put anything down."),
-  slot("place-08", "place", "place_she_has", "A hotel suite sitting room."),
-  slot("place-09", "place", "place_she_has", "A covered porch: outdoors, roofed, no sky directly above."),
-  slot("place-10", "place", "place_she_has", "A basement or windowless room with no natural light."),
+const TABLES: readonly GoldPhoto[] = [
+  slot("table-01", "table", "place_she_has", "Bare wood, the everyday plates, branches cut that morning lying along the middle."),
+  slot("table-02", "table", "place_she_has", "Printed oilcloth, dishes that do not match and never have, a bowl of fruit left out."),
+  slot("table-03", "table", "place_she_has", "A white cloth to the floor, matched service, flowers properly arranged."),
+  slot("table-04", "table", "place_she_has", "The good embroidered cloth, the good dishes out for this, nothing else on it."),
+  slot("table-05", "table", "place_she_has", "Stems dropped straight into a jug of water, not arranged, on bare wood."),
+  slot("table-06", "table", "evening_she_wants", "A table mid-meal: everyday dishes in use, cloth rucked, nothing growing on it."),
+  slot("table-07", "table", "evening_she_wants", "A long table outdoors on bare boards, matched everyday plates down both sides."),
+  slot("table-08", "table", "evening_she_wants", "A cloth, mismatched inherited china, a single cut branch."),
+  slot("table-09", "table", "evening_she_wants", "Bare wood with nothing on it but fruit — no cloth, no flowers, no service laid."),
+  slot("table-10", "table", "evening_she_wants", "A close crop of one corner: the cloth is legible and nothing else in the frame is."),
 ];
 
 /**
- * TEN TRAPS. Frames designed to produce a cell that is not there.
+ * TEN TRAPS. Frames designed to produce a reading that is not there.
  *
- * The first three are the founder's own. Every one of them has its invitation
- * written in `mustNotPropose`, which is what makes a trap scoreable before
- * anybody has labelled anything: the failure is proposing that column at all.
+ * ── THE FIRST THREE ARE THE FOUNDER'S AND THEY SURVIVED THE REDIRECT ──
+ *
+ * That is worth saying plainly, because it is evidence the traps were built on
+ * something more durable than the old aim. `trap-01`'s empty marble lobby and
+ * `trap-03`'s empty beach were written as arguments AGAINST STRUCTURAL
+ * INFERENCE — against reading an evening out of a frame that contains no
+ * evening — and every word of that argument holds against over-reading a
+ * palette or a table. Only what they must be silent ON has changed.
+ *
+ * The new ones are the ways the new aim can be over-read: a photograph whose
+ * colour is the filter's rather than the room's, a table that is not hers, a
+ * frame with several palettes in it.
  */
 const TRAPS: readonly GoldPhoto[] = [
   slot(
     "trap-01",
     "trap",
     "evening_she_wants",
-    "A marble hotel lobby, empty, no party in it. HERS: the grandeur reads as " +
-      "`dress = dressed`, and there is nobody in the frame to be dressed.",
-    ["dress"]
+    "A marble hotel lobby, empty, no party in it. HERS. It reads as grandeur, " +
+      "and there is nobody in the frame and nothing laid — so it states no " +
+      "table, whatever it states about colour.",
+    { mustNotPropose: ["dress"], mustBeSilentOn: ["table", "facets"] }
   ),
   slot(
     "trap-02",
     "trap",
     "evening_she_wants",
-    "One person standing with a raised glass at a table. HERS: a toast reads " +
-      "as `spectacle = performed`. It is not — the facet's own note says a " +
-      "room attending to one person it knows is CEREMONY, not spectacle.",
-    ["spectacle"]
+    "One person standing with a raised glass at a table. HERS. A toast reads " +
+      "as spectacle and is not — a room attending to one person it knows is " +
+      "ceremony. The table under it is real and may be read.",
+    { mustNotPropose: ["spectacle"], mustBeSilentOn: ["facets"] }
   ),
   slot(
     "trap-03",
     "trap",
     "evening_she_wants",
-    "An empty beach, beautiful, nobody in it. HERS: it reads as 'she has a " +
-      "beach'. It is a saved picture and states nothing about her place.",
-    []
+    "An empty beach, beautiful, nobody in it. HERS. It reads as 'she has a " +
+      "beach'. It is a saved picture: it states a palette and nothing else.",
+    { mustBeSilentOn: ["venue", "table", "facets"] }
   ),
   slot(
     "trap-04",
     "trap",
     "evening_she_wants",
-    "A restaurant dining room mid-service, waiters carrying plates. The staff " +
-      "make it read as `food = cooked` at a party that is not hers.",
-    ["food"]
+    "A restaurant dining room mid-service, waiters carrying plates. The tables " +
+      "are laid and none of them is hers — the frame invites a table reading " +
+      "for a room the member does not have.",
+    { mustNotPropose: ["food"], mustBeSilentOn: ["venue", "facets"] }
   ),
   slot(
     "trap-05",
     "trap",
     "evening_she_wants",
-    "A wedding, hundreds of guests. The scale reads as `size = crowd` for an " +
-      "evening the member never described.",
-    ["size"]
+    "A BLACK-AND-WHITE photograph of a laid table. There is no colour in it to " +
+      "count, so it states a table and NO PALETTE. A reader that returns a " +
+      "ground here has invented one, which is the exact failure counting was " +
+      "chosen to prevent.",
+    { mustBeSilentOn: ["palette", "facets"] }
   ),
   slot(
     "trap-06",
     "trap",
     "evening_she_wants",
-    "A dark bar at 2am with nobody in it. Reads as `starts = late` — a column " +
-      "no photograph may propose, so any proposal is a fingerprint attempt.",
-    []
+    "A heavily filtered image — a strong colour cast over the whole frame. The " +
+      "palette that can be counted is the FILTER'S, not the room's, and a " +
+      "ground taken off it would put a filter in the registry.",
+    { mustBeSilentOn: ["palette", "facets"] }
   ),
   slot(
     "trap-07",
     "trap",
     "evening_she_wants",
-    "A place setting with a name card at each seat. Reads as " +
-      "`arrival = assigned`, which is one room alone.",
-    []
+    "A screenshot of a grid of saved pictures — several rooms, several " +
+      "palettes, one frame. There is no single palette to count and no table " +
+      "to read.",
+    { mustBeSilentOn: ["palette", "table", "facets"] }
   ),
   slot(
     "trap-08",
     "trap",
     "evening_she_wants",
     "A styled magazine shot of a table nobody has eaten at. Everything about " +
-      "it is a proposition; nothing about it is an evening.",
-    []
+      "it is a proposition. The table is legible; the evening is not.",
+    { mustBeSilentOn: ["facets"] }
   ),
   slot(
     "trap-09",
     "trap",
     "evening_she_wants",
-    "A close crop of a single dish. There is no room in the frame, so `volume`, " +
-      "`size` and `dress` have nothing to stand on.",
-    ["volume", "size", "dress"]
+    "A close crop of a single dish. There is no room and no table surface in " +
+      "the frame, so the cloth, the service and the flowers have nothing to " +
+      "stand on.",
+    {
+      mustNotPropose: ["volume", "size", "dress"],
+      mustBeSilentOn: ["table", "facets"],
+    }
   ),
   slot(
     "trap-10",
     "trap",
     "object_to_find",
-    "A single object on a plain ground — a lamp, a glass. It proposes no cell " +
-      "at all; anything on any column is invented.",
-    [...PROPOSABLE_FACETS]
+    "A single object on a plain seamless ground — a lamp, a glass. It is an " +
+      "object and nothing else: no room, no table, and a 'palette' that is " +
+      "the photographer's backdrop.",
+    { mustNotPropose: [...PROPOSABLE_FACETS], mustBeSilentOn: ["palette", "table", "facets"] }
   ),
 ];
 
-/**
- * The bench.
- *
- * Thirty entries, ten of each group, exactly as specified. The count is
- * asserted in src/lib/photo-extract.test.ts rather than trusted, because a
- * bench that has quietly lost four cases still prints a percentage.
- */
-export const GOLD_SET: readonly GoldPhoto[] = [...EVENINGS, ...PLACES, ...TRAPS];
+export const GOLD_SET: readonly GoldPhoto[] = [...PALETTES, ...TABLES, ...TRAPS];
 
 /* ══ 3 · THE SCORE ══════════════════════════════════════════════════ */
 

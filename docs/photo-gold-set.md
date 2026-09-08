@@ -62,12 +62,29 @@ into exactly the behaviour the schema refuses.
 
 | group | n | role | what it tests |
 |---|---|---|---|
-| `evening` | 10 | `evening_she_wants` | can it read a party into the six proposable columns |
-| `place` | 10 | `place_she_has` | can it read a room's affordances, and does `mayPrune` hold |
+| `palette` | 10 | `evening_she_wants` | can colour be counted out of it, and does the proposal stay inside what was counted |
+| `table` | 10 | 5 × `place_she_has`, 5 × `evening_she_wants` | can it read cloth, service and flowers — and does `mayPrune` hold |
 | `trap` | 10 | mixed | does it refuse the obvious wrong answer |
 
+**REDESIGNED 2026-09-08, before she shot anything.** The groups were
+`evening` / `place` / `trap`, which was the right bench for the aim the tool
+used to have. Founder: *"Put the photo tool on tables and palettes, not on
+proving `clean_stop` from an empty glass count."* A brief rewritten today costs
+a paragraph; ten frames shot against the old briefs and then found to be the
+wrong evidence costs her a day and cannot be undone by code. See
+`docs/photo-redirect.md`.
+
+**The `table` group carries the seam.** `mayPrune` is true for `place_she_has`
+and false for everything else, and it is the one property here that is a seam
+rather than a score — a saved terrace must never become evidence about the room
+she actually has. The redirect nearly deleted it by accident: a palette is a
+palette whoever's room it is, so for a while every case was
+`evening_she_wants`. A table is where the distinction is real, so the split
+lives there and a test holds it.
+
 The briefs are in `src/lib/photo-gold-set.ts` and each names one file:
-`evening-01.jpg` … `trap-10.jpg`.
+`palette-01.jpg` … `trap-10.jpg`. `npm run bench:photos -- --dry-run` prints
+the whole shot list with its briefs.
 
 ### The traps, and why they can be written without the picture
 
@@ -78,11 +95,20 @@ and a trap scores today even unlabelled.
 
 The founder named the first three:
 
-| id | the frame | what it invites | must not propose |
+| id | the frame | what it invites | must be silent on |
 |---|---|---|---|
-| `trap-01` | a marble hotel lobby, empty | `dress = dressed` — the grandeur reads as formality, and there is nobody in the frame to be dressed | `dress` |
-| `trap-02` | one person with a raised glass | `spectacle = performed` — but the facet's own note says a room attending to one person it knows is CEREMONY, not spectacle | `spectacle` |
-| `trap-03` | an empty beach, nobody in it | "she has a beach" — it is a saved picture and states nothing about her place | (nothing; the failure is a venue cue or `mayPrune`) |
+| `trap-01` | a marble hotel lobby, empty | grandeur reads as formality, and nothing is laid | `table`, `facets` |
+| `trap-02` | one person with a raised glass | reads as spectacle; a room attending to one person it knows is CEREMONY | `facets` |
+| `trap-03` | an empty beach, nobody in it | "she has a beach" — it is a saved picture, and states a palette and nothing else | `venue`, `table`, `facets` |
+| `trap-05` | a BLACK-AND-WHITE photograph of a laid table | there is no colour to count; a ground returned here was invented | `palette`, `facets` |
+| `trap-06` | a heavily filtered image | the palette that can be counted is the FILTER'S, not the room's | `palette`, `facets` |
+| `trap-07` | a screenshot of a grid of saved pictures | several rooms, several palettes, one frame | `palette`, `table`, `facets` |
+
+**The founder's own three survived the redirect**, and that is evidence they
+were built on something more durable than the old aim. `trap-01` and `trap-03`
+were written as arguments against STRUCTURAL INFERENCE — against reading an
+evening out of a frame containing no evening — and every word holds against
+over-reading a palette or a table. Only what they must be silent ON changed.
 
 Seven more are built on the same principle: a restaurant mid-service reading as
 `food = cooked`, a wedding reading as `size = crowd`, a 2am bar reading as
@@ -98,16 +124,27 @@ it, and a single object on a plain ground that should propose nothing whatever.
 `<id>.jpg`. They do not go in the repository — they are other people's pictures
 or her own, and the bench reads them off disk.
 
-**2 · Labels for the twenty non-traps.** For each `evening-*` and `place-*`
-case, the cells the frame actually states, written into `expected` in
-`src/lib/photo-gold-set.ts`, and `labelled: true` beside them.
+**2 · Labels for the TEN table cases — and only those.**
 
-Nobody but the founder can write these. That judgement — this frame is
-`size = one_table` — *is* the ground truth the bench measures against, and a
-machine writing it would be marking its own paper with its own answers. An
-unlabelled case still scores schema validity, the seam and its traps; it
-contributes nothing to precision or recall, and the bench says so in its header
-rather than quietly averaging over what it has.
+This is the redirect's dividend and it is worth stating as a number: **it was
+twenty of thirty, and it is ten.**
+
+A palette reading is DETERMINISTIC. `palette()` counts the same pixels the same
+way every run and `paletteFrom` selects against fixed contrast floors, so a
+palette case is scoreable the day the photograph exists, with no judgement from
+anybody:
+
+- every proposed value was one of the counted colours — nothing invented;
+- every proposed token clears its floor against the proposed ground;
+- the proposed ground does not collide with a room already in the registry;
+- a frame that supplies no ink proposes no ink.
+
+What still needs her is TASTE — *is this the right ground for this room* — and
+that is a curator's yes at the desk, not a bench number.
+
+The ten `table-*` cases need her list of which `TABLE_CUES` terms the frame
+actually states, written into `expectedTable`. Every cue she does not list is a
+cue the reading must be **silent** on. Listing fewer is the stricter test.
 
 **3 · The seven unnamed traps' own briefs**, if the ones drafted are not the
 seven she wants. They are guesses at the shape of her three, and the shape is

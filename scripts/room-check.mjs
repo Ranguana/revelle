@@ -180,7 +180,12 @@ if (!room?.look) {
     line(`      ground separation: nearest ${worst.distance.toFixed(1)} (${worst.other}), floor ${GROUND_FLOOR} ${worst.ok ? "ok" : "FAIL"}`);
   });
   compose("palette dark", () => {
-    line("   DARK — never gated by any test; measured here for the first time");
+    // WAS "never gated by any test", which stopped being true on 2026-09-08.
+    // The CONTRAST floors are gated now — they measured zero failures, so
+    // gating cost nothing and gives a proposed palette something to clear.
+    // The SEPARATION is still only pinned: 146 of 171 pairs sit below the day
+    // floor, and asserting it would be a red build with no owner.
+    line("   DARK — contrast gated; separation pinned, not gated (146 pairs below the floor)");
     if (!room.look.paletteDark) { line("      no paletteDark on this room"); return; }
     for (const c of contrastReadings(room.look.paletteDark))
       line(`      ${c.token.padEnd(9)} ${c.ratio.toFixed(2)}:1  floor ${String(c.floor).padEnd(4)} ${c.ok ? "ok" : "FAIL"}`);

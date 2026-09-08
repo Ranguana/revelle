@@ -28,10 +28,27 @@
  *
  * ── THE DARK PALETTES WERE NEVER MEASURED ────────────────────────────
  *
- * `palette.test.ts` checks `look.palette` and has never once looked at
+ * `palette.test.ts` checked `look.palette` and had never once looked at
  * `look.paletteDark`. Every room ships both. The day-side registry was
  * deduplicated in 2026-09-04 after it was found to be very nearly one palette;
  * the dark side got none of that pass, and it shows — see `paletteDarkAudit`.
+ *
+ * ── WHERE THAT STANDS SINCE 2026-09-08 ───────────────────────────────
+ *
+ * Two findings, two mechanisms, and the difference is the point.
+ *
+ * CONTRAST on the dark side is GATED. It measured zero failures across every
+ * room and every floor, so gating cost nothing on the day and gives a proposed
+ * palette something to clear — a photograph is supplying candidate grounds and
+ * inks now (`paletteFrom` below), and without a gate the first proposal could
+ * ship unreadable text with a green build.
+ *
+ * SEPARATION is PINNED, not gated: 146 of 171 pairs sit below the day floor
+ * and one pair is byte-identical. Asserting the day floor here would fail 146
+ * pairs on the first run, which is a red build with no owner and no next
+ * action — CLAUDE.md's `copyAgrees` precedent, a tripwire amber since the day
+ * it was installed. The pin counts pairs, so a 147th goes red the day it
+ * lands and the number can only be edited downward.
  */
 
 /** WCAG relative luminance of a `#rrggbb` hex. */
