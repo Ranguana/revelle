@@ -194,6 +194,10 @@ export function bandOf(application: QueueApplication): Ranked {
         facets: [],
         venue: extract.venue,
         tone: extract.tone,
+        // The queue reads the facet side only — `mergeSet` merges cells and
+        // nothing else — so the payloads it does not consult are passed empty
+        // rather than plumbed through a type that has never carried them.
+        table: [],
         objects: extract.objects,
         palette: extract.palette,
       })),

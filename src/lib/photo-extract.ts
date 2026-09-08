@@ -471,6 +471,119 @@ export type ToneCue = {
 };
 
 /**
+ * WHAT IS ON THE TABLE AND HOW IT IS LAID — the second half of the redirect.
+ *
+ * Founder, 2026-09-06: *"Put the photo tool on tables and palettes."* A
+ * photograph is honest evidence of a table in a way it is not honest evidence
+ * of an evening's shape: the cloth, the dishes and the flowers are IN THE
+ * FRAME, and reading them is looking rather than inferring.
+ *
+ * ── IT PROPOSES THE SAME KIND OF THING SHE WRITES BY HAND ────────────
+ *
+ * From `docs/deliverables-sheets.md`, in her own register:
+ *
+ *     "The table: oilcloth or the good embroidered one, marigolds if they're
+ *      in season, clay dishes that have done this before."
+ *
+ * That is the target. Three axes — the SURFACE, the SERVICE, the FLOWERS —
+ * and nothing else, because those are the three things her own sheets name and
+ * the three a frame actually shows.
+ *
+ * ── THREE THINGS DELIBERATELY NOT IN THIS VOCABULARY ─────────────────
+ *
+ * THE LIGHT IS NOT HERE. `TONE_CUES` already carries `candlelight`,
+ * `daylight`, `late_sun` and `electric_night`, and a second way to say how a
+ * frame is lit is rule 21's duplicated authority — two vocabularies that must
+ * agree about one fact and eventually will not. A candle as an OBJECT is an
+ * `ObjectCue`; the light it casts is a tone cue.
+ *
+ * NAMED THINGS ARE NOT HERE either. "A low brass lamp" is an `ObjectCue` and
+ * always was. This vocabulary is closed and structural; that one is open and
+ * particular, and collapsing them would make the closed one a free-text field
+ * with extra steps.
+ *
+ * AND THERE IS NO WAY TO SAY SOMETHING IS ABSENT. No `no_flowers`, no
+ * `nothing_set`, no `bare` meaning "not laid" — only `bare_wood`, which is a
+ * surface you can see. This is `VenueCue`'s rule and CLAUDE.md rule 3, and it
+ * is the one a later author will try to soften: a frame with no flowers in it
+ * is a frame with no flowers in it, not a table that refuses them. The
+ * absence of a cue IS the absence, and `minItems: 0` is how it is said.
+ */
+export const TABLE_CUES = [
+  // the surface
+  "bare_wood",
+  "cloth",
+  "oilcloth",
+  "embroidered",
+  // the service
+  "matched_service",
+  "mismatched_service",
+  "everyday_dishes",
+  "good_dishes",
+  // what is growing on it
+  "flowers_arranged",
+  "flowers_loose",
+  "branches",
+  "fruit_on_the_table",
+] as const;
+export type TableCueCode = (typeof TABLE_CUES)[number];
+
+/**
+ * The house's own words for each, in her register.
+ *
+ * Lower case and phrased as a clause, because they are composed into a
+ * sentence by `tableClauseFrom` rather than rendered as a list of labels.
+ */
+export const TABLE_SAID: Readonly<Record<TableCueCode, string>> = {
+  bare_wood: "bare wood",
+  cloth: "a cloth",
+  oilcloth: "oilcloth",
+  embroidered: "the good embroidered one",
+  matched_service: "dishes that match",
+  mismatched_service: "dishes that do not match and never have",
+  everyday_dishes: "the everyday dishes",
+  good_dishes: "the good dishes, out for this",
+  flowers_arranged: "flowers, arranged",
+  flowers_loose: "flowers dropped in water, not arranged",
+  branches: "branches, cut that morning",
+  fruit_on_the_table: "fruit left on the table",
+};
+
+export type TableCue = {
+  cue: TableCueCode;
+  evidence: string;
+};
+
+/**
+ * THE CUES, COMPOSED INTO ONE CLAUSE IN THE HOUSE'S REGISTER.
+ *
+ * What `bankDraftFrom` in src/lib/desk/images.ts takes as its `bankClause`.
+ * That function already owns the whole draft gesture — the name, the
+ * `FOUNDER-PENDING` marker that is the ONLY thing holding a row in draft, and
+ * the refusal to write a row when no question was asked — and none of it is
+ * rebuilt here. This composes the sentence and hands it over.
+ *
+ * ORDER IS THE SENTENCE'S, NOT THE MODEL'S. Surface, then service, then what
+ * is growing on it, because that is the order her own sheets read in and
+ * because a stable order makes two readings of one table comparable. A cue the
+ * frame did not state is simply missing from the sentence.
+ *
+ * Returns "" when the frame stated nothing, and the caller must treat that as
+ * a refusal rather than write an empty row — which `bankDraftFrom` already
+ * does, by name.
+ */
+export function tableClauseFrom(cues: readonly TableCue[]): string {
+  const order = new Map(TABLE_CUES.map((cue, i) => [cue, i] as const));
+  const said = [...cues]
+    .sort((a, b) => (order.get(a.cue) ?? 0) - (order.get(b.cue) ?? 0))
+    .map((c) => TABLE_SAID[c.cue]);
+
+  if (said.length === 0) return "";
+  if (said.length === 1) return `The table: ${said[0]}`;
+  return `The table: ${said.slice(0, -1).join(", ")}, ${said[said.length - 1]}`;
+}
+
+/**
  * A THING IN THE FRAME, NAMED PLAINLY.
  *
  * For `object_to_find`. Plain words in the house's register — "a low brass
@@ -515,6 +628,8 @@ export type PhotoExtract = {
   facets: readonly FacetProposal[];
   venue: readonly VenueCue[];
   tone: readonly ToneCue[];
+  /** db/… the table, as three closed axes. See TABLE_CUES. */
+  table: readonly TableCue[];
   objects: readonly ObjectCue[];
   palette: readonly PaletteSwatch[];
 };
@@ -535,6 +650,7 @@ export function silentExtract(
     facets: [],
     venue: [],
     tone: [],
+    table: [],
     objects: [],
     palette: over.palette ?? [],
   };
@@ -689,7 +805,7 @@ export function extractTool(): {
     input_schema: {
       type: "object",
       additionalProperties: false,
-      required: ["facets", "venue", "tone", "objects"],
+      required: ["facets", "venue", "tone", "table", "objects"],
       properties: {
         facets: {
           type: "array",
@@ -738,6 +854,26 @@ export function extractTool(): {
             required: ["cue", "evidence"],
             properties: {
               cue: { enum: [...TONE_CUES] },
+              evidence,
+            },
+          },
+        },
+        table: {
+          type: "array",
+          minItems: 0,
+          maxItems: TABLE_CUES.length,
+          description:
+            "What is on the table and how it is laid: the surface, the " +
+            "service, and what is growing on it. ONLY WHAT IS VISIBLE, and " +
+            "only as a positive — there is no way to say a table has no " +
+            "flowers, on purpose. An empty array is the right answer for a " +
+            "frame with no table in it.",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["cue", "evidence"],
+            properties: {
+              cue: { enum: [...TABLE_CUES] },
               evidence,
             },
           },
@@ -974,6 +1110,29 @@ export function extractFrom(input: {
     tone.push({ cue: cue as ToneCueCode, evidence });
   }
 
+  // THE TABLE. Same discipline as the tone cues: a closed vocabulary, evidence
+  // required, and a cue said twice is dropped rather than counted twice.
+  const table: TableCue[] = [];
+  const tableSeen = new Set<string>();
+  for (const item of arrayOf(body.table)) {
+    const row = objectOf(item);
+    const cue = row ? String(row.cue ?? "") : "";
+    const evidence = row ? trimmed(row.evidence) : "";
+    if (
+      !(TABLE_CUES as readonly string[]).includes(cue) ||
+      evidence === "" ||
+      tableSeen.has(cue)
+    ) {
+      dropped.push({
+        kind: "not_a_cue",
+        said: `a table cue: ${cue || "(unnamed)"}`,
+      });
+      continue;
+    }
+    tableSeen.add(cue);
+    table.push({ cue: cue as TableCueCode, evidence });
+  }
+
   const objects: ObjectCue[] = [];
   for (const item of arrayOf(body.objects)) {
     const row = objectOf(item);
@@ -1003,6 +1162,7 @@ export function extractFrom(input: {
       facets,
       venue: mayPrune(role) ? venue : [],
       tone,
+      table,
       objects,
       palette,
     },

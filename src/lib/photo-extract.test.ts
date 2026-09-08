@@ -24,10 +24,15 @@ import {
   mergeSet,
   saidAs,
   silentExtract,
+  tableClauseFrom,
+  TABLE_CUES,
+  TABLE_SAID,
+  TONE_CUES,
   type DecidedClaim,
   type MatrixFacet,
   type PhotoExtract,
 } from "./photo-extract.ts";
+import { bankDraftFrom } from "./desk/images.ts";
 import { GOLD_GROUPS, GOLD_SET, score } from "./photo-gold-set.ts";
 import { bandOf, sortQueue, type QueueApplication } from "./desk/photo-queue.ts";
 
@@ -1087,4 +1092,183 @@ test("NO ROLE IS PRE-SELECTED ON THE MEMBER'S FORM", () => {
   for (const role of PHOTO_ROLES) {
     assert.match(code, new RegExp(`value=\\{role\\}|"${role}"`), `${role} is offered`);
   }
+});
+
+/* ══ 10 · THE TABLE — the second half of the redirect ═══════════════ */
+
+test("every table cue has a word, and none of them says a thing is absent", () => {
+  /*
+   * VenueCue's rule, reaching the table: "THERE IS NO WAY IN THIS TYPE TO SAY
+   * THAT SOMETHING IS ABSENT." A frame with no flowers in it is a frame with
+   * no flowers in it, not a table that refuses them (CLAUDE.md rule 3). The
+   * absence of a cue IS the absence, and `minItems: 0` is how it is said.
+   *
+   * This is the assertion a later author trips over when they add `no_flowers`
+   * because a reviewer asked for it.
+   */
+  for (const cue of TABLE_CUES) {
+    assert.ok(TABLE_SAID[cue], `${cue} has no member-facing word`);
+    assert.doesNotMatch(
+      cue,
+      /^(no_|not_|without_|un)|_absent$|^nothing/,
+      `${cue} names an absence. Only what is visible in the frame.`
+    );
+    assert.doesNotMatch(
+      TABLE_SAID[cue],
+      /\b(no|none|without|nothing|not set|un-?laid)\b/i,
+      `"${TABLE_SAID[cue]}" describes what is missing`
+    );
+  }
+  assert.equal(
+    Object.keys(TABLE_SAID).length,
+    TABLE_CUES.length,
+    "TABLE_SAID and TABLE_CUES have drifted"
+  );
+});
+
+test("THE TABLE VOCABULARY DOES NOT RE-SAY THE LIGHT", () => {
+  // Rule 21: `TONE_CUES` already owns how a frame is lit — candlelight,
+  // daylight, late_sun, electric_night. A second way to say it is two
+  // authorities over one fact, and they disagree the day one of them gains a
+  // value. A candle as an OBJECT is an ObjectCue; the light it casts is a tone.
+  const light = /candle|lamp|light|dark|sun|lit|bright|dim/i;
+  for (const cue of TABLE_CUES) {
+    assert.doesNotMatch(cue, light, `${cue} describes light, which TONE_CUES owns`);
+  }
+  const overlap = TABLE_CUES.filter((c) => (TONE_CUES as readonly string[]).includes(c));
+  assert.deepEqual(overlap, [], "a cue is in both vocabularies");
+});
+
+test("the clause reads in the house's register, in the sentence's order", () => {
+  /*
+   * The target is her own line from docs/deliverables-sheets.md:
+   *
+   *   "The table: oilcloth or the good embroidered one, marigolds if they're
+   *    in season, clay dishes that have done this before."
+   *
+   * Surface, service, then what is growing on it — and the order is the
+   * VOCABULARY'S, not the order the model happened to emit, so two readings of
+   * one table are comparable.
+   */
+  const cues = [
+    { cue: "flowers_loose" as const, evidence: "stems in a jug, not arranged" },
+    { cue: "oilcloth" as const, evidence: "wipeable cloth, printed" },
+    { cue: "everyday_dishes" as const, evidence: "the plates are chipped" },
+  ];
+  const clause = tableClauseFrom(cues);
+
+  assert.equal(
+    clause,
+    "The table: oilcloth, the everyday dishes, flowers dropped in water, not arranged"
+  );
+  assert.equal(
+    tableClauseFrom([...cues].reverse()),
+    clause,
+    "the model's emission order changed the sentence"
+  );
+  assert.equal(tableClauseFrom([]), "", "a frame with no table composes nothing");
+  assert.equal(
+    tableClauseFrom([{ cue: "bare_wood", evidence: "unfinished plank top" }]),
+    "The table: bare wood"
+  );
+});
+
+test("A FRAME WITH NO TABLE IN IT PROPOSES NO TABLE", () => {
+  // `minItems: 0`, at the third place it has to hold. The tool must permit an
+  // empty array and the parser must not invent one.
+  const schema = extractTool().input_schema.properties as Record<
+    string,
+    { minItems?: number; maxItems?: number }
+  >;
+  assert.equal(schema.table.minItems, 0, "the tool requires at least one table cue");
+  assert.equal(schema.table.maxItems, TABLE_CUES.length);
+  assert.ok(
+    (extractTool().input_schema.required as string[]).includes("table"),
+    "the key must be required even though the array may be empty — a missing " +
+      "key and an empty array are different answers and only one of them is a " +
+      "reading"
+  );
+
+  const parsed = extractFrom({
+    raw: { facets: [], venue: [], tone: [], table: [], objects: [] },
+    role: "evening_she_wants",
+    model: "test",
+    palette: [],
+  });
+  assert.ok(parsed.ok);
+  assert.deepEqual(parsed.extract.table, []);
+});
+
+test("a table cue without evidence, or said twice, is dropped", () => {
+  const parsed = extractFrom({
+    raw: {
+      facets: [],
+      venue: [],
+      tone: [],
+      table: [
+        { cue: "cloth", evidence: "white cloth to the floor" },
+        { cue: "cloth", evidence: "the same cloth again" },
+        { cue: "good_dishes", evidence: "" },
+        { cue: "a_nice_table", evidence: "it looks nice" },
+      ],
+      objects: [],
+    },
+    role: "evening_she_wants",
+    model: "test",
+    palette: [],
+  });
+
+  assert.ok(parsed.ok);
+  assert.deepEqual(
+    parsed.extract.table.map((c) => c.cue),
+    ["cloth"],
+    "only the first well-formed cue survives"
+  );
+  assert.equal(parsed.dropped.length, 3);
+  for (const d of parsed.dropped) assert.equal(d.kind, "not_a_cue");
+});
+
+test("THE TABLE REACHES THE EXISTING DRAFT PATH, and the question holds it", () => {
+  /*
+   * `bankDraftFrom` already owns the whole gesture — the name, the
+   * FOUNDER-PENDING marker that is the ONLY thing holding a row in draft, and
+   * the refusal to write a row when no question was asked. She specified that
+   * flow; it is not rebuilt here, it is fed.
+   */
+  const clause = tableClauseFrom([
+    { cue: "embroidered", evidence: "drawn-thread work at the hem" },
+    { cue: "good_dishes", evidence: "gilt rims, not the everyday set" },
+  ]);
+
+  const drafted = bankDraftFrom({
+    bankClause: clause,
+    question: "Is this the table for this room, or is it somebody else's?",
+    placement: "table_set",
+    source: "a member's photograph",
+  });
+
+  assert.ok(drafted.ok, "a composed clause with a question must draft");
+  assert.equal(drafted.draft.kind, "good");
+  assert.match(drafted.draft.description, /FOUNDER-PENDING/);
+  assert.match(drafted.draft.description, /the good embroidered one/);
+
+  // AND A READING THAT ASKED NOTHING WRITES NOTHING. The marker is the
+  // hold-back, so a row with no question is a row nothing holds in draft —
+  // which is rule 13's silent failure, a machine-proposed object going live.
+  const unheld = bankDraftFrom({
+    bankClause: clause,
+    question: "",
+    placement: "table_set",
+    source: "a member's photograph",
+  });
+  assert.equal(unheld.ok, false);
+
+  // And an empty frame cannot draft at all.
+  const empty = bankDraftFrom({
+    bankClause: tableClauseFrom([]),
+    question: "Is this the table for this room?",
+    placement: "table_set",
+    source: "a member's photograph",
+  });
+  assert.equal(empty.ok, false);
 });
