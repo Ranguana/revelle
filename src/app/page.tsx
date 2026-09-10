@@ -199,7 +199,7 @@ export default function Home() {
                 the address, and says nothing to either of them about which.
               */}
               <Link className={styles.mastheadLink} href="/login">
-                Login
+                Sign in
               </Link>
             </nav>
           </div>
